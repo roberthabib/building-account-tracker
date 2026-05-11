@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Building account tracker">
+  <rect width="128" height="128" rx="24" fill="#163832"/>
+  <path fill="#f6f7f5" d="M30 104h68V34L64 18 30 34v70Z"/>
+  <path fill="#1f6b5a" d="M42 46h12v12H42V46Zm20 0h12v12H62V46Zm20 0h12v12H82V46ZM42 68h12v12H42V68Zm20 0h12v12H62V68Zm20 0h12v12H82V68ZM58 92h12v12H58V92Z"/>
+  <path fill="#a7661b" d="M74 92h12v12H74V92Z"/>
+</svg>

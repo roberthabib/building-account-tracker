@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#163832" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Building Account" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="assets/icon-192.png" />
+    <title>Naccache 1727 Building Account Tracker</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <img src="assets/icon.svg" alt="" />
+          <div>
+            <p class="eyebrow">Naccache 1727</p>
+            <h1>BUILDING ACCOUNT TRACKER v56</h1>
+          </div>
+        </div>
+        <button class="icon-button" id="openAddButton" type="button" aria-label="Add transaction">+</button>
+      </header>
+
+      <main>
+        <section class="view active" id="dashboardView" aria-labelledby="dashboardTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Overview</p>
+              <h2 id="dashboardTitle">Account Position</h2>
+            </div>
+            <div class="month-nav">
+              <button class="month-nav-btn" id="monthPrev" type="button" aria-label="Previous month">&#8249;</button>
+              <select id="monthSelect" aria-label="Month"></select>
+              <button class="month-nav-btn" id="monthNext" type="button" aria-label="Next month">&#8250;</button>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="kpiGrid"></div>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h3>Monthly Collection</h3>
+              <span id="collectionRate"></span>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+              <div id="collectionProgress" class="progress-bar"></div>
+            </div>
+            <div class="tenant-status-grid" id="tenantStatusGrid"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h3>Monthly Activity</h3>
+              <span id="categorySummaryPeriod"></span>
+            </div>
+            <div class="summary-list" id="categorySummary"></div>
+          </section>
+
+          <section class="panel hidden" id="expenseByCategoryPanel">
+            <div class="panel-header">
+              <h3>Expenses by Category</h3>
+              <span id="expenseByCategoryPeriod"></span>
+            </div>
+            <div class="summary-list" id="expenseByCategoryList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="paymentsView" aria-labelledby="paymentsTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Collections</p>
+              <h2 id="paymentsTitle">Monthly Payments</h2>
+            </div>
+          </div>
+          <div class="payment-actions-bar">
+            <button class="secondary-button" id="lastReceiptButton" type="button">Last Receipt</button>
+            <button class="secondary-button" id="dueOnlyToggle" type="button">Due Only</button>
+            <button class="secondary-button whatsapp-all-btn" id="whatsappAllDueButton" type="button">Message Due</button>
+            <button class="secondary-button" id="addMonthButton" type="button">Add Month</button>
+          </div>
+          <div class="payment-toolbar">
+            <label for="paymentMonthSelect">Month</label>
+            <div class="month-nav">
+              <button class="month-nav-btn" id="paymentMonthPrev" type="button" aria-label="Previous month">&#8249;</button>
+              <select id="paymentMonthSelect" aria-label="Payment month"></select>
+              <button class="month-nav-btn" id="paymentMonthNext" type="button" aria-label="Next month">&#8250;</button>
+            </div>
+          </div>
+          <div class="payment-summary-grid" id="paymentSummary"></div>
+          <div class="payment-content">
+            <section class="payment-section">
+              <div class="panel-header">
+                <h3>Tenant Status</h3>
+                <span id="paymentMonthRate"></span>
+              </div>
+              <div class="tenant-payment-list" id="tenantPaymentList"></div>
+            </section>
+            <section class="payment-section">
+              <div class="panel-header">
+                <h3>Month History</h3>
+              </div>
+              <div class="month-overview-list" id="monthOverviewList"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="tenantsView" aria-labelledby="tenantsTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Residents</p>
+              <h2 id="tenantsTitle">Tenant Accounts</h2>
+            </div>
+            <input id="tenantSearch" class="compact-input" type="search" placeholder="Search" />
+          </div>
+          <div class="tenant-list" id="tenantList"></div>
+        </section>
+
+        <section class="view" id="ledgerView" aria-labelledby="ledgerTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Transactions</p>
+              <h2 id="ledgerTitle">Ledger</h2>
+            </div>
+            <div class="section-actions">
+              <button class="secondary-button" id="exportExcelButton" type="button">Export Excel</button>
+              <button class="secondary-button" id="exportButton" type="button">Export PDF</button>
+            </div>
+          </div>
+          <div class="filters">
+            <select id="categoryFilter" aria-label="Category filter"></select>
+            <select id="expenseCategoryFilter" class="hidden" aria-label="Expense category filter"></select>
+            <input id="ledgerSearch" type="search" placeholder="Search ledger" />
+            <div class="date-range-filter">
+              <input id="ledgerDateFrom" type="date" aria-label="From date" title="From date" />
+              <span class="date-range-sep">–</span>
+              <input id="ledgerDateTo" type="date" aria-label="To date" title="To date" />
+            </div>
+          </div>
+          <div class="ledger-filter-status hidden" id="ledgerFilterStatus">
+            <span id="ledgerCount"></span>
+            <button class="mini-button" id="clearLedgerFilters" type="button">Clear filters</button>
+          </div>
+          <div class="ledger-list" id="ledgerList"></div>
+        </section>
+
+        <section class="view" id="settingsView" aria-labelledby="settingsTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Setup</p>
+              <h2 id="settingsTitle">Settings</h2>
+            </div>
+          </div>
+          <section class="panel">
+            <label>
+              Building name
+              <input id="buildingNameInput" type="text" />
+            </label>
+            <label>
+              Default monthly amount USD
+              <input id="defaultDueInput" type="number" min="0" step="1" />
+            </label>
+            <label>
+              LBP per USD conversion rate
+              <input id="conversionRateInput" type="number" min="1" step="1" />
+            </label>
+            <label>
+              Google Apps Script URL (Sheet sync)
+              <input id="invoiceUploadUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+            </label>
+            <label>
+              Google Sheet ID
+              <input id="cloudSpreadsheetIdInput" type="text" />
+            </label>
+            <label>
+              Google Drive invoice folder ID
+              <input id="invoiceUploadFolderIdInput" type="text" />
+            </label>
+            <div class="button-row">
+              <button class="primary-button" id="saveSettingsButton" type="button">Save</button>
+              <button class="danger-button" id="resetButton" type="button">Reset Data</button>
+            </div>
+            <button class="danger-button full-width" id="zeroAccountsButton" type="button">Zero Accounts</button>
+            <div class="button-row cloud-actions">
+              <button class="secondary-button" id="loadCloudButton" type="button">Restore from Sheet</button>
+            </div>
+            <p class="settings-note" id="cloudSyncStatus">Cloud sync is automatic after the script URL and Google Sheet ID are saved.</p>
+          </section>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Primary">
+        <button class="nav-button active" type="button" data-view="dashboardView">Dashboard</button>
+        <button class="nav-button" type="button" data-view="paymentsView">Payments</button>
+        <button class="nav-button" type="button" data-view="tenantsView">Tenants</button>
+        <button class="nav-button" type="button" data-view="ledgerView">Ledger</button>
+        <button class="nav-button" type="button" data-view="settingsView">Settings</button>
+      </nav>
+    </div>
+
+    <section id="printStatement" aria-hidden="true"></section>
+
+    <dialog id="transactionDialog">
+      <form id="transactionForm" method="dialog">
+        <div class="dialog-header">
+          <h2 id="transactionDialogTitle">Add Transaction</h2>
+          <button class="icon-button small" id="closeDialogButton" type="button" aria-label="Close">x</button>
+        </div>
+
+        <label>
+          Type
+          <select id="transactionCategory" required>
+            <option>Payments</option>
+            <option>Expenses</option>
+            <option>Opening Balance</option>
+          </select>
+        </label>
+
+        <label class="direction-field hidden">
+          Direction
+          <select id="transactionDirection">
+            <option value="credit">Received</option>
+            <option value="debit">Applied or paid out</option>
+          </select>
+        </label>
+
+        <label class="tenant-field">
+          Tenant
+          <select id="transactionTenant"></select>
+        </label>
+
+        <label class="description-field">
+          Description
+          <input id="transactionDescription" type="text" />
+        </label>
+
+        <div class="two-col">
+          <label>
+            Date
+            <input id="transactionDate" type="date" required />
+          </label>
+          <label class="month-field">
+            For month
+            <input id="transactionMonth" type="month" />
+          </label>
+        </div>
+
+        <div class="two-col amount-row">
+          <label class="lbp-amount-field">
+            LBP
+            <input id="transactionLbp" type="number" min="0" step="1" />
+          </label>
+          <label class="usd-amount-field">
+            USD
+            <input id="transactionUsd" type="number" min="0" step="1" />
+          </label>
+        </div>
+        <div class="conversion-preview hidden" id="expenseConversionPreview"></div>
+
+        <div class="two-col extra-fields">
+          <label class="supplier-field">
+            Supplier
+            <div class="supplier-combobox">
+              <input
+                id="transactionSupplier"
+                type="text"
+                placeholder="Type supplier"
+                autocomplete="off"
+                aria-controls="supplierDropdown"
+                aria-expanded="false"
+              />
+              <button id="supplierDropdownButton" type="button" aria-label="Show saved suppliers">▼</button>
+              <div class="supplier-dropdown hidden" id="supplierDropdown" role="listbox"></div>
+            </div>
+          </label>
+          <label>
+            Invoice Number
+            <input id="transactionInvoice" type="text" />
+          </label>
+        </div>
+
+        <label class="expense-category-field hidden">
+          Expense Category
+          <div class="expense-category-combobox">
+            <input
+              id="transactionExpenseCategory"
+              type="text"
+              placeholder="Type category"
+              autocomplete="off"
+              aria-controls="expenseCategoryDropdown"
+              aria-expanded="false"
+            />
+            <button id="expenseCategoryDropdownButton" type="button" aria-label="Show saved categories">▼</button>
+            <div class="supplier-dropdown hidden" id="expenseCategoryDropdown" role="listbox"></div>
+          </div>
+        </label>
+
+        <label>
+          Project
+          <div class="project-combobox">
+            <input
+              id="transactionProject"
+              type="text"
+              placeholder="Type project"
+              autocomplete="off"
+              aria-controls="projectDropdown"
+              aria-expanded="false"
+            />
+            <button id="projectDropdownButton" type="button" aria-label="Show saved projects">▼</button>
+            <div class="supplier-dropdown hidden" id="projectDropdown" role="listbox"></div>
+          </div>
+        </label>
+
+        <div class="invoice-file-field hidden">
+          <span class="field-label">Invoice picture</span>
+          <div class="invoice-source-row">
+            <button class="secondary-button" id="takeInvoicePhotoButton" type="button">Use Camera</button>
+            <button class="secondary-button" id="uploadInvoicePhotoButton" type="button">Upload Photo</button>
+          </div>
+          <input id="transactionInvoiceCameraFile" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
+          <input id="transactionInvoiceFile" class="file-input-hidden" type="file" accept="image/*" />
+          <span class="file-selection-status" id="invoiceFileSelectionStatus">No photo selected</span>
+        </div>
+        <div class="attachment-status hidden" id="invoiceAttachmentStatus"></div>
+
+        <datalist id="supplierList"></datalist>
+        <datalist id="projectList"></datalist>
+
+        <div class="button-row">
+          <button class="primary-button" id="transactionSubmitButton" type="submit">Add</button>
+          <button class="secondary-button" id="cancelDialogButton" type="button">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="whatsappDialog">
+      <div class="dialog-header">
+        <h2>Send Payment Reminders</h2>
+        <button class="icon-button small" id="closeWhatsappDialog" type="button" aria-label="Close">x</button>
+      </div>
+      <p class="settings-note" id="whatsappDialogNote"></p>
+      <div id="whatsappReminderList"></div>
+    </dialog>
+
+    <dialog id="monthDialog">
+      <form id="monthForm" method="dialog">
+        <div class="dialog-header">
+          <h2>Add Month</h2>
+          <button class="icon-button small" id="closeMonthButton" type="button" aria-label="Close">x</button>
+        </div>
+        <label>
+          Month
+          <input id="newMonthInput" type="month" required />
+        </label>
+        <label>
+          Expected USD
+          <input id="newMonthAmountInput" type="number" min="0" step="1" required />
+        </label>
+        <div class="button-row">
+          <button class="primary-button" type="submit">Add</button>
+          <button class="secondary-button" id="cancelMonthButton" type="button">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
