@@ -576,6 +576,13 @@ label select {
   white-space: nowrap;
 }
 
+.tenant-card-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .tenant-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

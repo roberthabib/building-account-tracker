@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v56";
+const APP_VERSION = "v57";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -18,6 +18,16 @@ const els = {
   monthOverviewList: document.querySelector("#monthOverviewList"),
   tenantList: document.querySelector("#tenantList"),
   tenantSearch: document.querySelector("#tenantSearch"),
+  addTenantButton: document.querySelector("#addTenantButton"),
+  tenantDialog: document.querySelector("#tenantDialog"),
+  tenantDialogTitle: document.querySelector("#tenantDialogTitle"),
+  tenantForm: document.querySelector("#tenantForm"),
+  tenantNameInput: document.querySelector("#tenantNameInput"),
+  tenantUnitInput: document.querySelector("#tenantUnitInput"),
+  tenantPhoneDialogInput: document.querySelector("#tenantPhoneDialogInput"),
+  tenantSubmitButton: document.querySelector("#tenantSubmitButton"),
+  closeTenantDialog: document.querySelector("#closeTenantDialog"),
+  cancelTenantButton: document.querySelector("#cancelTenantButton"),
   ledgerList: document.querySelector("#ledgerList"),
   ledgerSearch: document.querySelector("#ledgerSearch"),
   categoryFilter: document.querySelector("#categoryFilter"),
@@ -103,6 +113,7 @@ let seedState;
 let state;
 let selectedMonth;
 let dueOnlyFilter = false;
+let editingTenantId = null;
 let editingExpenseId = null;
 let printCleanupTimer = null;
 let cloudSaveTimer = null;
@@ -748,31 +759,27 @@ function renderTenants() {
             <strong></strong>
             <span></span>
           </div>
-          <button class="mini-button print-statement-button" type="button">Print Statement</button>
+          <div class="tenant-card-actions">
+            <button class="mini-button edit-tenant-button" type="button">Edit</button>
+            <button class="mini-button print-statement-button" type="button">Statement</button>
+            <button class="mini-button delete-tenant-button danger-mini" type="button">Delete</button>
+          </div>
         </div>
         <div class="tenant-metrics">
           <div class="metric"><span>Paid USD</span><b></b></div>
           <div class="metric"><span>Advance</span><b></b></div>
           <div class="metric"><span>Due USD</span><b></b></div>
         </div>
-        <label class="tenant-phone-label">
-          WhatsApp number
-          <input class="tenant-phone-input" type="tel" placeholder="+961 71 000 000" />
-        </label>
       `;
       card.querySelector("strong").textContent = tenant.name;
-      card.querySelector("span").textContent = `Unit ${tenant.unit}`;
+      card.querySelector("span").textContent = `Unit ${tenant.unit}${tenant.phone ? "" : " – no phone"}`;
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
       metrics[2].textContent = formatMonthly(totals.dueUsd);
-      card.querySelector("button").dataset.tenantId = tenant.id;
-      const phoneInput = card.querySelector(".tenant-phone-input");
-      phoneInput.value = tenant.phone || "";
-      phoneInput.addEventListener("change", () => {
-        const t = state.tenants.find((entry) => entry.id === tenant.id);
-        if (t) { t.phone = phoneInput.value.trim(); saveState(); }
-      });
+      card.querySelector(".edit-tenant-button").dataset.tenantId = tenant.id;
+      card.querySelector(".print-statement-button").dataset.tenantId = tenant.id;
+      card.querySelector(".delete-tenant-button").dataset.tenantId = tenant.id;
       return card;
     }),
   );
@@ -3081,6 +3088,74 @@ function handleLedgerPdfExport() {
   showToast("Ledger PDF ready");
 }
 
+function generateTenantId(name) {
+  const base = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "tenant";
+  let id = base;
+  let n = 1;
+  while (state.tenants.some((t) => t.id === id)) id = `${base}-${++n}`;
+  return id;
+}
+
+function openAddTenantDialog() {
+  editingTenantId = null;
+  els.tenantDialogTitle.textContent = "Add Tenant";
+  els.tenantNameInput.value = "";
+  els.tenantUnitInput.value = "";
+  els.tenantPhoneDialogInput.value = "";
+  els.tenantSubmitButton.textContent = "Add";
+  openDialog(els.tenantDialog);
+  els.tenantNameInput.focus();
+}
+
+function openEditTenantDialog(tenantId) {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant) return;
+  editingTenantId = tenantId;
+  els.tenantDialogTitle.textContent = "Edit Tenant";
+  els.tenantNameInput.value = tenant.name;
+  els.tenantUnitInput.value = tenant.unit;
+  els.tenantPhoneDialogInput.value = tenant.phone || "";
+  els.tenantSubmitButton.textContent = "Save";
+  openDialog(els.tenantDialog);
+  els.tenantNameInput.focus();
+}
+
+function handleTenantFormSubmit(event) {
+  event.preventDefault();
+  const name = els.tenantNameInput.value.trim();
+  const unit = els.tenantUnitInput.value.trim();
+  const phone = els.tenantPhoneDialogInput.value.trim();
+  if (!name || !unit) return;
+
+  if (editingTenantId) {
+    const tenant = state.tenants.find((t) => t.id === editingTenantId);
+    if (tenant) { tenant.name = name; tenant.unit = unit; tenant.phone = phone; }
+    showToast("Tenant updated");
+  } else {
+    state.tenants.push({ id: generateTenantId(name), name, unit, active: true, phone });
+    showToast(`${name} added`);
+  }
+
+  saveState();
+  closeDialog(els.tenantDialog);
+  editingTenantId = null;
+  renderAll();
+}
+
+function deleteTenant(tenantId) {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant) return;
+  const txCount = state.transactions.filter((t) => t.tenantId === tenantId).length;
+  const msg = txCount > 0
+    ? `Delete ${tenant.name}? Their ${txCount} transaction(s) will be kept but unlinked from this tenant.`
+    : `Delete ${tenant.name}?`;
+  if (!window.confirm(msg)) return;
+  state.tenants = state.tenants.filter((t) => t.id !== tenantId);
+  saveState();
+  renderAll();
+  showToast(`${tenant.name} removed`);
+}
+
 function buildWhatsAppUrl(tenant, dueAmount, month) {
   const phone = (tenant.phone || "").replace(/\D/g, "");
   if (!phone) return null;
@@ -3184,10 +3259,17 @@ function attachEvents() {
   });
   els.lastReceiptButton.addEventListener("click", printLastReceipt);
   els.tenantSearch.addEventListener("input", renderTenants);
+  els.addTenantButton.addEventListener("click", openAddTenantDialog);
+  els.tenantForm.addEventListener("submit", handleTenantFormSubmit);
+  els.closeTenantDialog.addEventListener("click", () => closeDialog(els.tenantDialog));
+  els.cancelTenantButton.addEventListener("click", () => closeDialog(els.tenantDialog));
   els.tenantList.addEventListener("click", (event) => {
-    const button = event.target.closest(".print-statement-button[data-tenant-id]");
-    if (!button) return;
-    void shareTenantStatementPdf(button.dataset.tenantId);
+    const statBtn = event.target.closest(".print-statement-button[data-tenant-id]");
+    if (statBtn) { void shareTenantStatementPdf(statBtn.dataset.tenantId); return; }
+    const editBtn = event.target.closest(".edit-tenant-button[data-tenant-id]");
+    if (editBtn) { openEditTenantDialog(editBtn.dataset.tenantId); return; }
+    const delBtn = event.target.closest(".delete-tenant-button[data-tenant-id]");
+    if (delBtn) deleteTenant(delBtn.dataset.tenantId);
   });
   window.addEventListener("afterprint", () => schedulePrintCleanup());
   els.ledgerSearch.addEventListener("input", renderLedger);

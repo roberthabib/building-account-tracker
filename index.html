@@ -20,7 +20,7 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v56</h1>
+            <h1>BUILDING ACCOUNT TRACKER v57</h1>
           </div>
         </div>
         <button class="icon-button" id="openAddButton" type="button" aria-label="Add transaction">+</button>
@@ -115,7 +115,10 @@
               <p class="eyebrow">Residents</p>
               <h2 id="tenantsTitle">Tenant Accounts</h2>
             </div>
-            <input id="tenantSearch" class="compact-input" type="search" placeholder="Search" />
+            <div class="section-actions">
+              <input id="tenantSearch" class="compact-input" type="search" placeholder="Search" />
+              <button class="secondary-button" id="addTenantButton" type="button">+ Add</button>
+            </div>
           </div>
           <div class="tenant-list" id="tenantList"></div>
         </section>
@@ -333,6 +336,31 @@
         <div class="button-row">
           <button class="primary-button" id="transactionSubmitButton" type="submit">Add</button>
           <button class="secondary-button" id="cancelDialogButton" type="button">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="tenantDialog">
+      <form id="tenantForm" method="dialog">
+        <div class="dialog-header">
+          <h2 id="tenantDialogTitle">Add Tenant</h2>
+          <button class="icon-button small" id="closeTenantDialog" type="button" aria-label="Close">x</button>
+        </div>
+        <label>
+          Name
+          <input id="tenantNameInput" type="text" required placeholder="e.g. John Smith" />
+        </label>
+        <label>
+          Unit number
+          <input id="tenantUnitInput" type="text" required placeholder="e.g. 01" />
+        </label>
+        <label>
+          WhatsApp number
+          <input id="tenantPhoneDialogInput" type="tel" placeholder="+961 71 000 000" />
+        </label>
+        <div class="button-row">
+          <button class="primary-button" id="tenantSubmitButton" type="submit">Add</button>
+          <button class="secondary-button" id="cancelTenantButton" type="button">Cancel</button>
         </div>
       </form>
     </dialog>
