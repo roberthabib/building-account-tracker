@@ -387,7 +387,6 @@ label select {
 
 .tenant-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -1332,6 +1331,7 @@ label {
 
   .tenant-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 700px;
   }
 
   .payment-summary-grid {
