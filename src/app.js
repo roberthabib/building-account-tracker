@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v57";
+const APP_VERSION = "v59";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -11,7 +11,7 @@ const els = {
   tenantStatusGrid: document.querySelector("#tenantStatusGrid"),
   categorySummaryPeriod: document.querySelector("#categorySummaryPeriod"),
   categorySummary: document.querySelector("#categorySummary"),
-  paymentMonthSelect: document.querySelector("#paymentMonthSelect"),
+  paymentMonthStrip: document.querySelector("#paymentMonthStrip"),
   paymentSummary: document.querySelector("#paymentSummary"),
   paymentMonthRate: document.querySelector("#paymentMonthRate"),
   tenantPaymentList: document.querySelector("#tenantPaymentList"),
@@ -39,8 +39,6 @@ const els = {
   clearLedgerFilters: document.querySelector("#clearLedgerFilters"),
   monthPrev: document.querySelector("#monthPrev"),
   monthNext: document.querySelector("#monthNext"),
-  paymentMonthPrev: document.querySelector("#paymentMonthPrev"),
-  paymentMonthNext: document.querySelector("#paymentMonthNext"),
   dueOnlyToggle: document.querySelector("#dueOnlyToggle"),
   whatsappAllDueButton: document.querySelector("#whatsappAllDueButton"),
   whatsappDialog: document.querySelector("#whatsappDialog"),
@@ -169,6 +167,12 @@ function amountInputValue(value) {
 function getConversionRate() {
   const rate = Number(state?.settings?.lbpPerUsd || DEFAULT_LBP_PER_USD);
   return rate > 0 ? rate : DEFAULT_LBP_PER_USD;
+}
+
+function formatDateLabel(dateStr) {
+  if (!dateStr) return "";
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
 
 function formatMonth(value) {
@@ -448,7 +452,7 @@ function getMonthlyActivityRows(month) {
   const rowByCategory = new Map(rows.map((row) => [row.sourceCategory || row.category, row]));
 
   state.transactions.forEach((transaction) => {
-    if (!month || monthKey(transactionDateValue(transaction)) !== month) return;
+    if (!month || monthKey(transactionDateValue(transaction)) !== monthKey(month)) return;
     const row = rowByCategory.get(isProjectPayment(transaction) ? "Project Payments" : transaction.category);
     if (!row) return;
     row.usd += transactionNetUsd(transaction);
@@ -628,22 +632,25 @@ function renderPaymentMonthSelect() {
   const months = getMonths();
   if (!selectedMonth || !months.includes(selectedMonth)) selectedMonth = months.at(-1);
 
-  els.paymentMonthSelect.replaceChildren(
+  els.paymentMonthStrip.replaceChildren(
     ...months
       .slice()
       .reverse()
       .map((month) => {
-        const option = document.createElement("option");
-        option.value = month;
-        option.textContent = formatMonth(month);
-        option.selected = month === selectedMonth;
-        return option;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "month-strip-btn";
+        btn.dataset.month = month;
+        btn.textContent = formatMonth(month);
+        btn.classList.toggle("active", month === selectedMonth);
+        return btn;
       }),
   );
 
-  const idx = months.indexOf(selectedMonth);
-  els.paymentMonthPrev.disabled = idx <= 0;
-  els.paymentMonthNext.disabled = idx >= months.length - 1;
+  requestAnimationFrame(() => {
+    const active = els.paymentMonthStrip.querySelector(".month-strip-btn.active");
+    if (active) active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  });
 }
 
 function renderPayments() {
@@ -675,52 +682,49 @@ function renderPayments() {
 
   els.tenantPaymentList.replaceChildren(
     ...visibleStatuses.map(({ tenant, status }) => {
-      const progress = status.expected ? Math.min(100, Math.round((status.paid / status.expected) * 100)) : 0;
       const due = Math.max(0, status.expected - status.paid);
-      const card = document.createElement("article");
-      card.className = "tenant-payment-card";
-      card.innerHTML = `
-        <div class="tenant-payment-main">
-          <div>
+      const row = document.createElement("div");
+      row.className = "tenant-payment-row";
+      row.innerHTML = `
+        <div class="tpr-main">
+          <div class="tpr-info">
             <strong></strong>
             <span></span>
           </div>
-          <div class="tenant-payment-amount"></div>
+          <div class="tpr-amount"></div>
         </div>
-        <div class="tenant-payment-progress"><div></div></div>
-        <div class="tenant-payment-actions">
-          <div class="tenant-payment-detail"></div>
-          <button class="mini-button" type="button">Add</button>
+        <div class="tpr-status-row">
+          <div class="tpr-status-left">
+            <span class="status-pill"></span>
+            <span class="tpr-detail"></span>
+          </div>
+          <button class="mini-button tpr-add-btn" type="button">Add</button>
         </div>
       `;
-      card.querySelector("strong").textContent = tenant.name;
-      card.querySelector("span").textContent = `Unit ${tenant.unit}`;
-      card.querySelector(".tenant-payment-amount").textContent =
-        `${formatMonthly(status.paid)} / ${formatMonthly(status.expected)}`;
-      card.querySelector(".tenant-payment-progress div").style.width = `${progress}%`;
-      const detail = card.querySelector(".tenant-payment-detail");
-      detail.textContent = due > 0 ? `${formatMonthly(due)} due` : "Fully paid";
-      const button = card.querySelector("button");
-      button.dataset.tenantId = tenant.id;
-      button.dataset.month = selectedMonth;
-      button.dataset.due = String(due || status.expected || state.settings.defaultDueUsd || 0);
-      const pill = document.createElement("span");
+      row.querySelector("strong").textContent = tenant.name;
+      row.querySelector(".tpr-info span").textContent = `Unit ${tenant.unit}`;
+      row.querySelector(".tpr-amount").textContent = `${formatMonthly(status.paid)} / ${formatMonthly(status.expected)}`;
+      const pill = row.querySelector(".status-pill");
       pill.className = `status-pill status-${status.className === "none" ? "due" : status.className}`;
       pill.textContent = status.label;
-      detail.prepend(pill, " ");
+      row.querySelector(".tpr-detail").textContent = due > 0 ? `${formatMonthly(due)} due` : "Fully paid";
+      const addBtn = row.querySelector(".tpr-add-btn");
+      addBtn.dataset.tenantId = tenant.id;
+      addBtn.dataset.month = selectedMonth;
+      addBtn.dataset.due = String(due || status.expected || state.settings.defaultDueUsd || 0);
       if (due > 0 && tenant.phone) {
         const waUrl = buildWhatsAppUrl(tenant, due, selectedMonth);
         if (waUrl) {
-          const waLink = document.createElement("a");
-          waLink.className = "mini-button whatsapp-btn";
-          waLink.href = waUrl;
-          waLink.target = "_blank";
-          waLink.rel = "noopener";
-          waLink.textContent = "WhatsApp";
-          card.append(waLink);
+          const waBtn = document.createElement("a");
+          waBtn.className = "whatsapp-full-btn";
+          waBtn.href = waUrl;
+          waBtn.target = "_blank";
+          waBtn.rel = "noopener";
+          waBtn.textContent = "Send WhatsApp Reminder";
+          row.append(waBtn);
         }
       }
-      return card;
+      return row;
     }),
   );
 
@@ -747,36 +751,41 @@ function renderPayments() {
 
 function renderTenants() {
   const query = els.tenantSearch.value.trim().toLowerCase();
-  const tenants = state.tenants.filter((tenant) => tenant.name.toLowerCase().includes(query));
+  const tenants = state.tenants.filter(
+    (tenant) => tenant.name.toLowerCase().includes(query) || tenant.unit.toLowerCase().includes(query),
+  );
   els.tenantList.replaceChildren(
     ...tenants.map((tenant) => {
       const totals = getTenantTotals(tenant.id);
       const card = document.createElement("article");
       card.className = "tenant-card";
       card.innerHTML = `
-        <div class="tenant-card-header">
+        <div class="tenant-card-top">
           <div>
             <strong></strong>
-            <span></span>
+            <span class="tenant-unit-line"></span>
           </div>
-          <div class="tenant-card-actions">
-            <button class="mini-button edit-tenant-button" type="button">Edit</button>
-            <button class="mini-button print-statement-button" type="button">Statement</button>
-            <button class="mini-button delete-tenant-button danger-mini" type="button">Delete</button>
-          </div>
+          <button class="tenant-trash-btn delete-tenant-button" type="button" aria-label="Delete tenant">&#128465;</button>
         </div>
         <div class="tenant-metrics">
-          <div class="metric"><span>Paid USD</span><b></b></div>
+          <div class="metric metric-paid"><span>&#10003; Paid</span><b></b></div>
           <div class="metric"><span>Advance</span><b></b></div>
-          <div class="metric"><span>Due USD</span><b></b></div>
+          <div class="metric metric-due"><span>Due</span><b></b></div>
+        </div>
+        <div class="tenant-card-footer">
+          <button class="text-link-btn edit-tenant-button" type="button">Edit</button>
+          <button class="text-link-btn print-statement-button" type="button">Statement</button>
         </div>
       `;
       card.querySelector("strong").textContent = tenant.name;
-      card.querySelector("span").textContent = `Unit ${tenant.unit}${tenant.phone ? "" : " – no phone"}`;
+      const unitSpan = card.querySelector(".tenant-unit-line");
+      unitSpan.textContent = `Unit ${tenant.unit}${tenant.phone ? "" : " · no phone"}`;
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
       metrics[2].textContent = formatMonthly(totals.dueUsd);
+      if (totals.paidUsd > 0) card.querySelector(".metric-paid").classList.add("is-filled");
+      if (totals.dueUsd > 0) card.querySelector(".metric-due").classList.add("has-due");
       card.querySelector(".edit-tenant-button").dataset.tenantId = tenant.id;
       card.querySelector(".print-statement-button").dataset.tenantId = tenant.id;
       card.querySelector(".delete-tenant-button").dataset.tenantId = tenant.id;
@@ -1767,90 +1776,94 @@ function renderLedger() {
     return;
   }
 
-  els.ledgerList.replaceChildren(
-    ...rows.slice(0, 160).map((transaction) => {
-      const amountValue = transactionNetUsd(transaction);
-      const amountLabel = formatUsd(amountValue);
-      const item = document.createElement("article");
-      item.className = "ledger-item";
-      const receiptReference = isReceiptablePayment(transaction) ? transaction.receiptRef : "";
-      item.innerHTML = `
+  function buildLedgerItem(transaction) {
+    const amountValue = transactionNetUsd(transaction);
+    const item = document.createElement("article");
+    item.className = `ledger-item ${transaction.category === "Expenses" ? "ledger-expense" : "ledger-payment"}`;
+    const dateStr = transaction.date || (transaction.forMonth ? transaction.forMonth.slice(0, 10) : "");
+    const receiptReference = isReceiptablePayment(transaction) ? transaction.receiptRef : "";
+    item.innerHTML = `
+      <div class="ledger-card-top">
+        <span class="ledger-date-label"></span>
+        <div class="ledger-action-group"></div>
+      </div>
+      <div class="ledger-card-body">
         <div class="ledger-text">
           <strong></strong>
           <span class="ledger-subtitle"></span>
           <div class="ledger-expand"></div>
         </div>
-        <div class="ledger-side">
-          <div class="ledger-amount"></div>
-        </div>
-      `;
-      const title = transaction.tenantId ? tenantName(transaction.tenantId) : transaction.description;
-      item.querySelector("strong").textContent = title || transaction.category;
-      item.querySelector(".ledger-subtitle").textContent = [
-        transaction.category,
-        transaction.expenseCategory || "",
-        transaction.date || (transaction.forMonth ? formatMonth(transaction.forMonth) : ""),
-      ]
-        .filter(Boolean)
-        .join(" | ");
+        <div class="ledger-amount"></div>
+      </div>
+    `;
+    item.querySelector(".ledger-date-label").textContent = dateStr ? formatDateLabel(dateStr) : "";
+    const title = transaction.tenantId ? tenantName(transaction.tenantId) : transaction.description;
+    item.querySelector("strong").textContent = title || transaction.category;
+    item.querySelector(".ledger-subtitle").textContent = [
+      transaction.category,
+      transaction.expenseCategory || "",
+      transaction.forMonth ? `Month: ${formatMonth(transaction.forMonth)}` : "",
+    ].filter(Boolean).join(" · ");
 
-      const detailItems = [
-        transaction.supplier ? `Supplier: ${transaction.supplier}` : "",
-        transaction.project ? `Project: ${transaction.project}` : "",
-        transaction.forMonth ? `Month: ${formatMonth(transaction.forMonth)}` : "",
-        transaction.invoice ? `Invoice: ${transaction.invoice}` : "",
-        receiptReference ? `Receipt: ${receiptReference}` : "",
-        transaction.invoiceAttachment?.fileName ? `Attachment: ${transaction.invoiceAttachment.fileName}` : "",
-      ].filter(Boolean);
-      const expand = item.querySelector(".ledger-expand");
-      if (detailItems.length) {
-        detailItems.forEach((text) => {
-          const p = document.createElement("p");
-          p.textContent = text;
-          expand.append(p);
-        });
-      } else {
-        expand.remove();
-      }
+    const detailItems = [
+      transaction.supplier ? `Supplier: ${transaction.supplier}` : "",
+      transaction.project ? `Project: ${transaction.project}` : "",
+      transaction.invoice ? `Invoice: ${transaction.invoice}` : "",
+      receiptReference ? `Receipt: ${receiptReference}` : "",
+      transaction.invoiceAttachment?.fileName ? `Attachment: ${transaction.invoiceAttachment.fileName}` : "",
+    ].filter(Boolean);
+    const expand = item.querySelector(".ledger-expand");
+    if (detailItems.length) {
+      detailItems.forEach((text) => {
+        const p = document.createElement("p");
+        p.textContent = text;
+        expand.append(p);
+      });
+    } else {
+      expand.remove();
+    }
 
-      const amount = item.querySelector(".ledger-amount");
-      amount.textContent = amountLabel;
-      amount.classList.toggle("positive", amountValue >= 0);
-      amount.classList.toggle("negative", amountValue < 0);
-      if (isReceiptablePayment(transaction)) {
-        const button = document.createElement("button");
-        button.className = "mini-button receipt-button";
-        button.type = "button";
-        button.dataset.transactionId = transaction.id;
-        button.textContent = "Receipt";
-        item.querySelector(".ledger-side").append(button);
-      }
-      if (transaction.category === "Expenses") {
-        const button = document.createElement("button");
-        button.className = "mini-button edit-expense-button";
-        button.type = "button";
-        button.dataset.transactionId = transaction.id;
-        button.textContent = "Edit";
-        item.querySelector(".ledger-side").append(button);
-      }
-      if (transaction.invoiceAttachment?.driveUrl) {
-        const link = document.createElement("a");
-        link.className = "mini-button attachment-button";
-        link.href = transaction.invoiceAttachment.driveUrl;
-        link.target = "_blank";
-        link.rel = "noopener";
-        link.textContent = "Invoice Photo";
-        item.querySelector(".ledger-side").append(link);
-      }
-      const deleteButton = document.createElement("button");
-      deleteButton.className = "mini-button delete-transaction-button danger-mini";
-      deleteButton.type = "button";
-      deleteButton.dataset.transactionId = transaction.id;
-      deleteButton.textContent = "Delete";
-      item.querySelector(".ledger-side").append(deleteButton);
-      return item;
-    }),
-  );
+    const amount = item.querySelector(".ledger-amount");
+    amount.textContent = formatUsd(amountValue);
+    amount.classList.toggle("positive", amountValue >= 0);
+    amount.classList.toggle("negative", amountValue < 0);
+
+    const actionGroup = item.querySelector(".ledger-action-group");
+    if (isReceiptablePayment(transaction)) {
+      const btn = document.createElement("button");
+      btn.className = "ledger-action-btn receipt-button";
+      btn.type = "button";
+      btn.dataset.transactionId = transaction.id;
+      btn.textContent = "Receipt";
+      actionGroup.append(btn);
+    }
+    if (transaction.category === "Expenses") {
+      const btn = document.createElement("button");
+      btn.className = "ledger-action-btn edit-expense-button";
+      btn.type = "button";
+      btn.dataset.transactionId = transaction.id;
+      btn.textContent = "Edit";
+      actionGroup.append(btn);
+    }
+    if (transaction.invoiceAttachment?.driveUrl) {
+      const link = document.createElement("a");
+      link.className = "ledger-action-btn attachment-button";
+      link.href = transaction.invoiceAttachment.driveUrl;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Invoice";
+      actionGroup.append(link);
+    }
+    const delBtn = document.createElement("button");
+    delBtn.className = "ledger-action-btn delete-transaction-button danger-action";
+    delBtn.type = "button";
+    delBtn.dataset.transactionId = transaction.id;
+    delBtn.textContent = "Delete";
+    actionGroup.append(delBtn);
+    return item;
+  }
+
+  els.ledgerList.replaceChildren(...rows.slice(0, 160).map(buildLedgerItem));
 }
 
 function renderDatalists() {
@@ -3229,8 +3242,6 @@ function attachEvents() {
   els.navButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
   els.monthPrev.addEventListener("click", () => navigateMonth(-1));
   els.monthNext.addEventListener("click", () => navigateMonth(1));
-  els.paymentMonthPrev.addEventListener("click", () => navigateMonth(-1));
-  els.paymentMonthNext.addEventListener("click", () => navigateMonth(1));
   els.dueOnlyToggle.addEventListener("click", () => { dueOnlyFilter = !dueOnlyFilter; renderPayments(); });
   els.whatsappAllDueButton.addEventListener("click", openWhatsAppReminderDialog);
   els.closeWhatsappDialog.addEventListener("click", () => closeDialog(els.whatsappDialog));
@@ -3240,8 +3251,10 @@ function attachEvents() {
     renderDashboard();
     renderPayments();
   });
-  els.paymentMonthSelect.addEventListener("change", () => {
-    selectedMonth = els.paymentMonthSelect.value;
+  els.paymentMonthStrip.addEventListener("click", (e) => {
+    const btn = e.target.closest(".month-strip-btn");
+    if (!btn) return;
+    selectedMonth = btn.dataset.month;
     renderDashboard();
     renderPayments();
   });

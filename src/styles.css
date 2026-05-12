@@ -262,6 +262,7 @@ label select {
   font-size: clamp(1.08rem, 4.8vw, 1.65rem);
   line-height: 1.1;
   overflow-wrap: anywhere;
+  color: var(--primary);
 }
 
 .kpi small {
@@ -371,11 +372,22 @@ label select {
 }
 
 .summary-list,
-.tenant-list,
-.ledger-list,
-.tenant-payment-list,
 .month-overview-list {
   display: grid;
+  gap: 8px;
+}
+
+.ledger-list {
+  display: block;
+}
+
+.tenant-payment-list {
+  display: block;
+}
+
+.tenant-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -451,63 +463,80 @@ label select {
   box-shadow: var(--shadow);
 }
 
-.tenant-payment-card {
+.tenant-payment-row {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
   display: grid;
-  gap: 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  padding: 12px;
+  gap: 8px;
 }
 
-.tenant-payment-main {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: start;
+.tenant-payment-row:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
 }
 
-.tenant-payment-main strong {
+.tpr-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tpr-info strong {
   display: block;
+  font-size: 0.95rem;
   line-height: 1.2;
 }
 
-.tenant-payment-main span,
-.tenant-payment-detail {
+.tpr-info span {
+  display: block;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
+  margin-top: 2px;
 }
 
-.tenant-payment-detail .status-pill {
-  margin-top: 0;
-  margin-right: 6px;
-  vertical-align: middle;
-}
-
-.tenant-payment-amount {
-  text-align: right;
+.tpr-amount {
   font-weight: 800;
+  font-size: 0.9rem;
+  text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.tenant-payment-progress {
-  height: 8px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #e0e5e1;
-}
-
-.tenant-payment-progress div {
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--primary);
-}
-
-.tenant-payment-actions {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
+.tpr-status-row {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tpr-status-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  flex: 1;
+  min-width: 0;
+}
+
+.tpr-status-left .status-pill {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.whatsapp-full-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 11px 12px;
+  background: #1a8f35;
+  color: #fff;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-top: 4px;
 }
 
 .mini-button {
@@ -565,57 +594,201 @@ label select {
   gap: 10px;
 }
 
-.tenant-card-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: start;
-}
-
-.print-statement-button {
-  white-space: nowrap;
-}
-
-.tenant-card-actions {
+.tenant-card-top {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tenant-card-top strong {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.tenant-unit-line {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.tenant-trash-btn {
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font-size: 1.05rem;
+  color: var(--red);
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .tenant-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
 }
 
 .metric {
   border-radius: 8px;
   background: var(--surface-2);
-  padding: 8px;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+}
+
+.metric span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 2px;
 }
 
 .metric b {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 800;
   overflow-wrap: anywhere;
 }
 
-.ledger-item {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
+.metric-paid.is-filled {
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
-.ledger-side {
-  display: grid;
-  justify-items: end;
-  gap: 8px;
+.metric-paid.is-filled span,
+.metric-paid.is-filled b {
+  color: #ffffff;
+}
+
+.metric-due.has-due {
+  background: #f3d8d8;
+  border-color: #e7bcbc;
+}
+
+.metric-due.has-due span,
+.metric-due.has-due b {
+  color: #772c2c;
+}
+
+.tenant-card-footer {
+  display: flex;
+  gap: 14px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.text-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.text-link-btn:hover {
+  text-decoration: underline;
+}
+
+#addTenantButton {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  z-index: 50;
+  border-radius: 999px;
+  padding: 12px 20px;
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: var(--primary-dark);
+  font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(22, 56, 50, 0.35);
+  display: none;
+}
+
+#tenantsView.active #addTenantButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ledger-item {
+  display: block;
+  margin-bottom: 8px;
+  border-radius: 10px;
+}
+
+.ledger-payment {
+  background: #edf7f2;
+  border-color: #c3e6d0;
+}
+
+.ledger-expense {
+  background: #fdf2f2;
+  border-color: #f0c9c9;
+}
+
+.ledger-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ledger-item .ledger-date-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.ledger-action-group {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.ledger-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 9px;
+  min-height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  line-height: 1.3;
+}
+
+.danger-action {
+  border-color: #e7bcbc;
+  color: #772c2c;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.ledger-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .ledger-amount {
   text-align: right;
   font-weight: 800;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .positive {
@@ -696,27 +869,90 @@ label select {
 
 .payment-actions-bar {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
   margin-bottom: 14px;
 }
 
-.payment-toolbar {
+.payment-actions-bar .secondary-button {
+  font-size: 0.7rem;
+  padding: 0 4px;
+  min-height: 40px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.month-strip-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 14px;
+  scrollbar-width: none;
+}
+
+.month-strip-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.month-strip {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 6px;
+  padding: 2px 0;
+  white-space: nowrap;
 }
 
-.payment-toolbar label {
+.month-strip-btn {
   flex-shrink: 0;
-  font-size: 0.84rem;
-  font-weight: 700;
-  color: var(--muted);
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms, color 120ms, border-color 120ms;
 }
 
-.payment-toolbar .month-nav {
-  flex: 1;
+.month-strip-btn.active {
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: var(--primary-dark);
+}
+
+.month-strip-btn:not(.active):hover {
+  background: var(--surface-2);
+}
+
+.ledger-date-header {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  padding: 14px 2px 4px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.ledger-date-header:first-child {
+  padding-top: 2px;
+}
+
+.settings-section-header {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin: 20px 0 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.settings-section-header:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
 }
 
 .secondary-button.is-active {
@@ -1000,6 +1236,27 @@ label {
 
 .cloud-actions button {
   flex: 1;
+}
+
+#saveSettingsButton {
+  width: 100%;
+  border-radius: 999px;
+  padding: 14px;
+  font-size: 1rem;
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #fff;
+}
+
+.settings-data-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.settings-data-row button {
+  font-size: 0.78rem;
+  padding: 0 6px;
 }
 
 #toast {

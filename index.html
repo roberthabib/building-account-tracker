@@ -20,7 +20,7 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v57</h1>
+            <h1>BUILDING ACCOUNT TRACKER v59</h1>
           </div>
         </div>
         <button class="icon-button" id="openAddButton" type="button" aria-label="Add transaction">+</button>
@@ -83,13 +83,8 @@
             <button class="secondary-button whatsapp-all-btn" id="whatsappAllDueButton" type="button">Message Due</button>
             <button class="secondary-button" id="addMonthButton" type="button">Add Month</button>
           </div>
-          <div class="payment-toolbar">
-            <label for="paymentMonthSelect">Month</label>
-            <div class="month-nav">
-              <button class="month-nav-btn" id="paymentMonthPrev" type="button" aria-label="Previous month">&#8249;</button>
-              <select id="paymentMonthSelect" aria-label="Payment month"></select>
-              <button class="month-nav-btn" id="paymentMonthNext" type="button" aria-label="Next month">&#8250;</button>
-            </div>
+          <div class="month-strip-wrap">
+            <div class="month-strip" id="paymentMonthStrip" aria-label="Select month"></div>
           </div>
           <div class="payment-summary-grid" id="paymentSummary"></div>
           <div class="payment-content">
@@ -116,7 +111,7 @@
               <h2 id="tenantsTitle">Tenant Accounts</h2>
             </div>
             <div class="section-actions">
-              <input id="tenantSearch" class="compact-input" type="search" placeholder="Search" />
+              <input id="tenantSearch" class="compact-input" type="search" placeholder="Search tenants or units" />
               <button class="secondary-button" id="addTenantButton" type="button">+ Add</button>
             </div>
           </div>
@@ -159,6 +154,7 @@
             </div>
           </div>
           <section class="panel">
+            <p class="settings-section-header">Building Details</p>
             <label>
               Building name
               <input id="buildingNameInput" type="text" />
@@ -167,10 +163,14 @@
               Default monthly amount USD
               <input id="defaultDueInput" type="number" min="0" step="1" />
             </label>
+
+            <p class="settings-section-header">Currency &amp; Conversion</p>
             <label>
               LBP per USD conversion rate
               <input id="conversionRateInput" type="number" min="1" step="1" />
             </label>
+
+            <p class="settings-section-header">Google Integration</p>
             <label>
               Google Apps Script URL (Sheet sync)
               <input id="invoiceUploadUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
@@ -185,11 +185,13 @@
             </label>
             <div class="button-row">
               <button class="primary-button" id="saveSettingsButton" type="button">Save</button>
-              <button class="danger-button" id="resetButton" type="button">Reset Data</button>
             </div>
-            <button class="danger-button full-width" id="zeroAccountsButton" type="button">Zero Accounts</button>
-            <div class="button-row cloud-actions">
+
+            <p class="settings-section-header">Data Management</p>
+            <div class="settings-data-row">
               <button class="secondary-button" id="loadCloudButton" type="button">Restore from Sheet</button>
+              <button class="danger-button" id="zeroAccountsButton" type="button">Zero Accounts</button>
+              <button class="danger-button" id="resetButton" type="button">Reset Data</button>
             </div>
             <p class="settings-note" id="cloudSyncStatus">Cloud sync is automatic after the script URL and Google Sheet ID are saved.</p>
           </section>
