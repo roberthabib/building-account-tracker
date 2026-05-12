@@ -14,16 +14,45 @@
     <link rel="stylesheet" href="src/styles.css" />
   </head>
   <body>
+    <div id="loginScreen" class="login-screen">
+      <div class="login-card">
+        <div class="login-brand">
+          <img src="assets/icon.svg" alt="" />
+          <div>
+            <p class="eyebrow">Naccache 1727</p>
+            <p class="login-app-name">Building Account</p>
+          </div>
+        </div>
+        <div class="login-tabs">
+          <button class="login-tab active" id="loginOwnerTab" type="button">Owner</button>
+          <button class="login-tab" id="loginTenantTab" type="button">Tenant</button>
+        </div>
+        <div id="loginOwnerForm">
+          <input class="login-input" id="loginPasswordInput" type="password" placeholder="Password" autocomplete="current-password" />
+        </div>
+        <div id="loginTenantForm" class="hidden">
+          <select class="login-input" id="loginTenantSelect"></select>
+          <input class="login-input" id="loginPinInput" type="password" placeholder="PIN" autocomplete="current-password" />
+        </div>
+        <p class="login-error hidden" id="loginError">Incorrect password or PIN</p>
+        <button class="login-submit-btn" id="loginSubmitBtn" type="button">Enter</button>
+        <p class="login-hint hidden" id="loginHint"></p>
+      </div>
+    </div>
+
     <div class="app-shell">
       <header class="topbar">
         <div class="brand-lockup">
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v60</h1>
+            <h1>BUILDING ACCOUNT TRACKER v61</h1>
           </div>
         </div>
-        <button class="icon-button" id="openAddButton" type="button" aria-label="Add transaction">+</button>
+        <div class="topbar-actions">
+          <button class="icon-button logout-btn hidden" id="logoutButton" type="button" aria-label="Logout" title="Logout">&#128274;</button>
+          <button class="icon-button owner-only" id="openAddButton" type="button" aria-label="Add transaction">+</button>
+        </div>
       </header>
 
       <main>
@@ -78,10 +107,10 @@
             </div>
           </div>
           <div class="payment-actions-bar">
-            <button class="secondary-button" id="lastReceiptButton" type="button">Last Receipt</button>
-            <button class="secondary-button" id="dueOnlyToggle" type="button">Due Only</button>
-            <button class="secondary-button whatsapp-all-btn" id="whatsappAllDueButton" type="button">Message Due</button>
-            <button class="secondary-button" id="addMonthButton" type="button">Add Month</button>
+            <button class="secondary-button owner-only" id="lastReceiptButton" type="button">Last Receipt</button>
+            <button class="secondary-button owner-only" id="dueOnlyToggle" type="button">Due Only</button>
+            <button class="secondary-button whatsapp-all-btn owner-only" id="whatsappAllDueButton" type="button">Message Due</button>
+            <button class="secondary-button owner-only" id="addMonthButton" type="button">Add Month</button>
           </div>
           <div class="month-strip-wrap">
             <div class="month-strip" id="paymentMonthStrip" aria-label="Select month"></div>
@@ -125,8 +154,8 @@
               <h2 id="ledgerTitle">Ledger</h2>
             </div>
             <div class="section-actions">
-              <button class="secondary-button" id="exportExcelButton" type="button">Export Excel</button>
-              <button class="secondary-button" id="exportButton" type="button">Export PDF</button>
+              <button class="secondary-button owner-only" id="exportExcelButton" type="button">Export Excel</button>
+              <button class="secondary-button owner-only" id="exportButton" type="button">Export PDF</button>
             </div>
           </div>
           <div class="filters">
@@ -154,6 +183,13 @@
             </div>
           </div>
           <section class="panel">
+            <p class="settings-section-header">Access Control</p>
+            <label>
+              Owner password
+              <input id="ownerPasswordInput" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
+            </label>
+            <p class="settings-note" style="margin:0 0 4px">Tenants use a PIN set per-tenant (in the Tenants tab). Leave owner password blank to allow entry without a password.</p>
+
             <p class="settings-section-header">Building Details</p>
             <label>
               Building name
@@ -203,7 +239,7 @@
         <button class="nav-button" type="button" data-view="paymentsView">Payments</button>
         <button class="nav-button" type="button" data-view="tenantsView">Tenants</button>
         <button class="nav-button" type="button" data-view="ledgerView">Ledger</button>
-        <button class="nav-button" type="button" data-view="settingsView">Settings</button>
+        <button class="nav-button owner-only" type="button" data-view="settingsView">Settings</button>
       </nav>
     </div>
 
@@ -359,6 +395,10 @@
         <label>
           WhatsApp number
           <input id="tenantPhoneDialogInput" type="tel" placeholder="+961 71 000 000" />
+        </label>
+        <label>
+          Tenant PIN (for app access)
+          <input id="tenantPinDialogInput" type="password" placeholder="Leave blank to disable tenant login" maxlength="20" autocomplete="new-password" />
         </label>
         <div class="button-row">
           <button class="primary-button" id="tenantSubmitButton" type="submit">Add</button>

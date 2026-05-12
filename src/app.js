@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v60";
+const APP_VERSION = "v61";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -105,6 +105,20 @@ const els = {
   zeroAccountsButton: document.querySelector("#zeroAccountsButton"),
   printStatement: document.querySelector("#printStatement"),
   toast: document.querySelector("#toast"),
+  loginScreen: document.querySelector("#loginScreen"),
+  loginOwnerTab: document.querySelector("#loginOwnerTab"),
+  loginTenantTab: document.querySelector("#loginTenantTab"),
+  loginOwnerForm: document.querySelector("#loginOwnerForm"),
+  loginTenantForm: document.querySelector("#loginTenantForm"),
+  loginTenantSelect: document.querySelector("#loginTenantSelect"),
+  loginPasswordInput: document.querySelector("#loginPasswordInput"),
+  loginPinInput: document.querySelector("#loginPinInput"),
+  loginSubmitBtn: document.querySelector("#loginSubmitBtn"),
+  loginError: document.querySelector("#loginError"),
+  loginHint: document.querySelector("#loginHint"),
+  logoutButton: document.querySelector("#logoutButton"),
+  tenantPinDialogInput: document.querySelector("#tenantPinDialogInput"),
+  ownerPasswordInput: document.querySelector("#ownerPasswordInput"),
 };
 
 let seedState;
@@ -116,6 +130,8 @@ let editingExpenseId = null;
 let printCleanupTimer = null;
 let cloudSaveTimer = null;
 let cloudSaveInFlight = false;
+let sessionMode = null; // "owner" | "tenant"
+let sessionTenantId = null;
 
 const numberFormat = new Intl.NumberFormat("en-US");
 const usdFormat = new Intl.NumberFormat("en-US", {
@@ -256,8 +272,9 @@ function hydrateState(rawState) {
   hydrated.settings.cloudSpreadsheetId ||= DEFAULT_GOOGLE_SHEET_ID;
   hydrated.settings.invoiceUploadFolderId ||= DEFAULT_INVOICE_FOLDER_ID;
   hydrated.transactions ||= [];
+  hydrated.settings.ownerPassword ||= "";
   hydrated.tenants ||= [];
-  hydrated.tenants.forEach((tenant) => { tenant.phone ||= ""; });
+  hydrated.tenants.forEach((tenant) => { tenant.phone ||= ""; tenant.pin ||= ""; });
   hydrated.projects ||= [];
   hydrated.suppliers ||= [];
   hydrated.expenseCategories ||= [];
@@ -506,18 +523,97 @@ function hasPaymentInMonth(month) {
   return state.transactions.some((transaction) => transaction.category === "Payments" && transaction.forMonth === month);
 }
 
+function showLoginScreen() {
+  const tenantsWithPin = state.tenants.filter((t) => t.pin);
+  els.loginTenantSelect.replaceChildren(
+    ...tenantsWithPin.map((t) => {
+      const opt = document.createElement("option");
+      opt.value = t.id;
+      opt.textContent = `${t.name} — Unit ${t.unit}`;
+      return opt;
+    }),
+  );
+  const hasPassword = Boolean(state.settings.ownerPassword);
+  const hasTenants = tenantsWithPin.length > 0;
+  els.loginHint.textContent = hasPassword ? "" : "No password set — press Enter to access as owner";
+  els.loginHint.classList.toggle("hidden", hasPassword);
+  els.loginTenantTab.classList.toggle("hidden", !hasTenants);
+  els.loginScreen.classList.remove("hidden");
+  document.querySelector(".app-shell").classList.add("hidden");
+  els.loginPasswordInput.focus();
+}
+
+function hideLoginScreen() {
+  els.loginScreen.classList.add("hidden");
+  document.querySelector(".app-shell").classList.remove("hidden");
+}
+
+function applySessionMode() {
+  if (sessionMode === "tenant") {
+    document.body.classList.add("tenant-mode");
+    els.logoutButton.classList.remove("hidden");
+  } else {
+    document.body.classList.remove("tenant-mode");
+    els.logoutButton.classList.add("hidden");
+  }
+}
+
+function attemptLogin() {
+  const isOwnerTab = !els.loginOwnerForm.classList.contains("hidden");
+  els.loginError.classList.add("hidden");
+
+  if (isOwnerTab) {
+    const entered = els.loginPasswordInput.value;
+    const stored = state.settings.ownerPassword;
+    if (!stored || entered === stored) {
+      sessionMode = "owner";
+      sessionTenantId = null;
+      applySessionMode();
+      hideLoginScreen();
+      els.loginPasswordInput.value = "";
+    } else {
+      els.loginError.textContent = "Incorrect password";
+      els.loginError.classList.remove("hidden");
+    }
+  } else {
+    const tenantId = els.loginTenantSelect.value;
+    const entered = els.loginPinInput.value;
+    const tenant = state.tenants.find((t) => t.id === tenantId);
+    if (tenant && tenant.pin && entered === tenant.pin) {
+      sessionMode = "tenant";
+      sessionTenantId = tenantId;
+      applySessionMode();
+      hideLoginScreen();
+      setView("dashboardView");
+      renderAll();
+      els.loginPinInput.value = "";
+    } else {
+      els.loginError.textContent = "Incorrect PIN";
+      els.loginError.classList.remove("hidden");
+    }
+  }
+}
+
+function logout() {
+  sessionMode = null;
+  sessionTenantId = null;
+  document.body.classList.remove("tenant-mode");
+  els.logoutButton.classList.add("hidden");
+  els.loginPasswordInput.value = "";
+  els.loginPinInput.value = "";
+  els.loginError.classList.add("hidden");
+  els.loginOwnerTab.classList.add("active");
+  els.loginTenantTab.classList.remove("active");
+  els.loginOwnerForm.classList.remove("hidden");
+  els.loginTenantForm.classList.add("hidden");
+  showLoginScreen();
+}
+
 function renderDashboard() {
   renderMonthSelect();
-  const totals = getPositionTotals();
-  const kpis = [
-    ["Cash Balance", formatUsd(totals.cashUsd), "Ledger cash now"],
-    ["Tenant Receivables", formatUsd(totals.receivableUsd), "Unpaid monthly dues"],
-    ["Advance Liability", formatUsd(totals.advanceLiabilityUsd), "Tenant credit to honor"],
-    ["Net Position", formatUsd(totals.netPositionUsd), "Cash + receivables - advances"],
-  ];
 
-  els.kpiGrid.replaceChildren(
-    ...kpis.map(([label, value, note]) => {
+  function buildKpiCards(kpis) {
+    return kpis.map(([label, value, note]) => {
       const card = document.createElement("article");
       card.className = "kpi";
       card.innerHTML = `<span></span><strong></strong><small></small>`;
@@ -525,18 +621,48 @@ function renderDashboard() {
       card.querySelector("strong").textContent = value;
       card.querySelector("small").textContent = note;
       return card;
-    }),
-  );
+    });
+  }
+
+  if (sessionMode === "tenant") {
+    const tt = getTenantTotals(sessionTenantId);
+    const ms = paymentStatus(sessionTenantId, selectedMonth);
+    els.kpiGrid.replaceChildren(...buildKpiCards([
+      ["Total Paid", formatUsd(tt.paidUsd), "All time payments made"],
+      ["This Month", `${formatMonthly(ms.paid)} / ${formatMonthly(ms.expected)}`, ms.label],
+      ["Advance Credit", formatUsd(Math.max(0, tt.advanceUsd)), "Balance in your favor"],
+      ["Amount Due", formatUsd(tt.dueUsd), "Unpaid monthly balance"],
+    ]));
+  } else {
+    const totals = getPositionTotals();
+    els.kpiGrid.replaceChildren(...buildKpiCards([
+      ["Cash Balance", formatUsd(totals.cashUsd), "Ledger cash now"],
+      ["Tenant Receivables", formatUsd(totals.receivableUsd), "Unpaid monthly dues"],
+      ["Advance Liability", formatUsd(totals.advanceLiabilityUsd), "Tenant credit to honor"],
+      ["Net Position", formatUsd(totals.netPositionUsd), "Cash + receivables - advances"],
+    ]));
+  }
 
   renderTenantStatus();
-  renderCategorySummary();
-  renderExpenseCategoryBreakdown();
+
+  const activityPanel = els.categorySummary.closest(".panel");
+  if (sessionMode === "tenant") {
+    activityPanel.classList.add("hidden");
+    els.expenseByCategoryPanel.classList.add("hidden");
+  } else {
+    activityPanel.classList.remove("hidden");
+    renderCategorySummary();
+    renderExpenseCategoryBreakdown();
+  }
 }
 
 function renderTenantStatus() {
   const expected = getExpectedMonthlyUsd(selectedMonth);
-  const statuses = state.tenants.map((tenant) => ({ tenant, status: paymentStatus(tenant.id, selectedMonth) }));
-  const expectedTotal = expected * state.tenants.length;
+  const allStatuses = state.tenants.map((tenant) => ({ tenant, status: paymentStatus(tenant.id, selectedMonth) }));
+  const statuses = sessionMode === "tenant"
+    ? allStatuses.filter(({ tenant }) => tenant.id === sessionTenantId)
+    : allStatuses;
+  const expectedTotal = expected * statuses.length;
   const paidTotal = statuses.reduce((sum, entry) => sum + entry.status.paid, 0);
   const rate = expectedTotal ? Math.min(100, Math.round((paidTotal / expectedTotal) * 100)) : 0;
 
@@ -656,14 +782,28 @@ function renderPaymentMonthSelect() {
 function renderPayments() {
   renderPaymentMonthSelect();
   const collection = getMonthCollection(selectedMonth);
-  const summary = [
-    ["Expected", formatMonthly(collection.expectedTotal)],
-    ["Collected", formatMonthly(collection.paidTotal)],
-    ["Due", formatMonthly(collection.dueTotal)],
-    ["Paid Tenants", `${collection.paidCount}/${state.tenants.length}`],
-  ];
 
-  els.paymentMonthRate.textContent = `${collection.rate}% collected`;
+  let summary;
+  if (sessionMode === "tenant") {
+    const ms = paymentStatus(sessionTenantId, selectedMonth);
+    const due = Math.max(0, ms.expected - ms.paid);
+    summary = [
+      ["Expected", formatMonthly(ms.expected)],
+      ["Paid", formatMonthly(ms.paid)],
+      ["Due", formatMonthly(due)],
+      ["Status", ms.label],
+    ];
+    els.paymentMonthRate.textContent = ms.label;
+  } else {
+    summary = [
+      ["Expected", formatMonthly(collection.expectedTotal)],
+      ["Collected", formatMonthly(collection.paidTotal)],
+      ["Due", formatMonthly(collection.dueTotal)],
+      ["Paid Tenants", `${collection.paidCount}/${state.tenants.length}`],
+    ];
+    els.paymentMonthRate.textContent = `${collection.rate}% collected`;
+  }
+
   els.paymentSummary.replaceChildren(
     ...summary.map(([label, value]) => {
       const card = document.createElement("article");
@@ -676,9 +816,12 @@ function renderPayments() {
   );
 
   els.dueOnlyToggle.classList.toggle("is-active", dueOnlyFilter);
-  const visibleStatuses = dueOnlyFilter
+  let visibleStatuses = dueOnlyFilter
     ? collection.tenantStatuses.filter(({ status }) => status.paid < status.expected)
     : collection.tenantStatuses;
+  if (sessionMode === "tenant") {
+    visibleStatuses = visibleStatuses.filter(({ tenant }) => tenant.id === sessionTenantId);
+  }
 
   els.tenantPaymentList.replaceChildren(
     ...visibleStatuses.map(({ tenant, status }) => {
@@ -751,9 +894,12 @@ function renderPayments() {
 
 function renderTenants() {
   const query = els.tenantSearch.value.trim().toLowerCase();
-  const tenants = state.tenants.filter(
+  let tenants = state.tenants.filter(
     (tenant) => tenant.name.toLowerCase().includes(query) || tenant.unit.toLowerCase().includes(query),
   );
+  if (sessionMode === "tenant") {
+    tenants = tenants.filter((t) => t.id === sessionTenantId);
+  }
   els.tenantList.replaceChildren(
     ...tenants.map((tenant) => {
       const totals = getTenantTotals(tenant.id);
@@ -1759,8 +1905,13 @@ function clearAllLedgerFilters() {
 
 function renderLedger() {
   renderLedgerFilters();
-  const rows = getFilteredLedgerRows();
-  const total = state.transactions.length;
+  let rows = getFilteredLedgerRows();
+  if (sessionMode === "tenant") {
+    rows = rows.filter((tx) => tx.tenantId === sessionTenantId);
+  }
+  const total = sessionMode === "tenant"
+    ? state.transactions.filter((tx) => tx.tenantId === sessionTenantId).length
+    : state.transactions.length;
 
   const anyActive = isAnyLedgerFilterActive();
   els.ledgerFilterStatus.classList.toggle("hidden", !anyActive);
@@ -2034,6 +2185,7 @@ function renderSettings() {
   els.invoiceUploadUrlInput.value = state.settings.invoiceUploadUrl || "";
   els.cloudSpreadsheetIdInput.value = state.settings.cloudSpreadsheetId || "";
   els.invoiceUploadFolderIdInput.value = state.settings.invoiceUploadFolderId || "";
+  els.ownerPasswordInput.value = state.settings.ownerPassword || "";
   renderCloudStatus();
 }
 
@@ -2047,6 +2199,7 @@ function renderAll() {
 }
 
 function setView(viewId) {
+  if (sessionMode === "tenant" && viewId === "settingsView") viewId = "dashboardView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
   els.navButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === viewId));
 }
@@ -3115,6 +3268,7 @@ function openAddTenantDialog() {
   els.tenantNameInput.value = "";
   els.tenantUnitInput.value = "";
   els.tenantPhoneDialogInput.value = "";
+  els.tenantPinDialogInput.value = "";
   els.tenantSubmitButton.textContent = "Add";
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
@@ -3128,6 +3282,7 @@ function openEditTenantDialog(tenantId) {
   els.tenantNameInput.value = tenant.name;
   els.tenantUnitInput.value = tenant.unit;
   els.tenantPhoneDialogInput.value = tenant.phone || "";
+  els.tenantPinDialogInput.value = tenant.pin || "";
   els.tenantSubmitButton.textContent = "Save";
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
@@ -3138,14 +3293,15 @@ function handleTenantFormSubmit(event) {
   const name = els.tenantNameInput.value.trim();
   const unit = els.tenantUnitInput.value.trim();
   const phone = els.tenantPhoneDialogInput.value.trim();
+  const pin = els.tenantPinDialogInput.value.trim();
   if (!name || !unit) return;
 
   if (editingTenantId) {
     const tenant = state.tenants.find((t) => t.id === editingTenantId);
-    if (tenant) { tenant.name = name; tenant.unit = unit; tenant.phone = phone; }
+    if (tenant) { tenant.name = name; tenant.unit = unit; tenant.phone = phone; tenant.pin = pin; }
     showToast("Tenant updated");
   } else {
-    state.tenants.push({ id: generateTenantId(name), name, unit, active: true, phone });
+    state.tenants.push({ id: generateTenantId(name), name, unit, active: true, phone, pin });
     showToast(`${name} added`);
   }
 
@@ -3457,6 +3613,7 @@ function attachEvents() {
     state.settings.invoiceUploadUrl = els.invoiceUploadUrlInput.value.trim();
     state.settings.cloudSpreadsheetId = els.cloudSpreadsheetIdInput.value.trim();
     state.settings.invoiceUploadFolderId = els.invoiceUploadFolderIdInput.value.trim();
+    state.settings.ownerPassword = els.ownerPasswordInput.value.trim();
     saveState();
     renderAll();
     updateExpenseConversionPreview();
@@ -3474,6 +3631,27 @@ function attachEvents() {
     renderAll();
     showToast("Data reset");
   });
+
+  els.loginOwnerTab.addEventListener("click", () => {
+    els.loginOwnerTab.classList.add("active");
+    els.loginTenantTab.classList.remove("active");
+    els.loginOwnerForm.classList.remove("hidden");
+    els.loginTenantForm.classList.add("hidden");
+    els.loginError.classList.add("hidden");
+    els.loginPasswordInput.focus();
+  });
+  els.loginTenantTab.addEventListener("click", () => {
+    els.loginTenantTab.classList.add("active");
+    els.loginOwnerTab.classList.remove("active");
+    els.loginTenantForm.classList.remove("hidden");
+    els.loginOwnerForm.classList.add("hidden");
+    els.loginError.classList.add("hidden");
+    els.loginPinInput.focus();
+  });
+  els.loginSubmitBtn.addEventListener("click", attemptLogin);
+  els.loginPasswordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
+  els.loginPinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
+  els.logoutButton.addEventListener("click", logout);
 }
 
 async function boot() {
@@ -3490,6 +3668,8 @@ async function boot() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }
+
+  showLoginScreen();
 }
 
 boot().catch((error) => {

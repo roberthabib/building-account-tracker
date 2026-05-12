@@ -1293,6 +1293,166 @@ label {
   display: none !important;
 }
 
+.tenant-mode .owner-only {
+  display: none !important;
+}
+
+.tenant-mode .bottom-nav {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.tenant-mode .tenant-trash-btn,
+.tenant-mode .edit-tenant-button,
+.tenant-mode .delete-transaction-button,
+.tenant-mode .edit-expense-button,
+.tenant-mode .tpr-add-btn {
+  display: none !important;
+}
+
+.tenant-mode .payment-actions-bar {
+  grid-template-columns: 1fr;
+}
+
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 14px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.login-brand img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.login-brand .eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.login-app-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.login-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.login-tab {
+  padding: 8px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.login-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(20, 33, 31, 0.1);
+}
+
+.login-input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0 14px;
+  font: inherit;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.login-input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.login-submit-btn {
+  width: 100%;
+  min-height: 50px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary-dark);
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.login-error {
+  color: var(--red);
+  font-size: 0.84rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+.login-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 0;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-btn {
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 1.1rem;
+}
+
 #printStatement {
   position: fixed;
   top: 0;
