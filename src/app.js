@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v59";
+const APP_VERSION = "v60";
 
 const els = {
   views: document.querySelectorAll(".view"),
