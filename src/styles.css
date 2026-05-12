@@ -1310,7 +1310,7 @@ label {
 }
 
 .tenant-mode .payment-actions-bar {
-  grid-template-columns: 1fr;
+  display: none;
 }
 
 .login-screen {

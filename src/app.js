@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v61";
+const APP_VERSION = "v62";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -624,44 +624,23 @@ function renderDashboard() {
     });
   }
 
-  if (sessionMode === "tenant") {
-    const tt = getTenantTotals(sessionTenantId);
-    const ms = paymentStatus(sessionTenantId, selectedMonth);
-    els.kpiGrid.replaceChildren(...buildKpiCards([
-      ["Total Paid", formatUsd(tt.paidUsd), "All time payments made"],
-      ["This Month", `${formatMonthly(ms.paid)} / ${formatMonthly(ms.expected)}`, ms.label],
-      ["Advance Credit", formatUsd(Math.max(0, tt.advanceUsd)), "Balance in your favor"],
-      ["Amount Due", formatUsd(tt.dueUsd), "Unpaid monthly balance"],
-    ]));
-  } else {
-    const totals = getPositionTotals();
-    els.kpiGrid.replaceChildren(...buildKpiCards([
-      ["Cash Balance", formatUsd(totals.cashUsd), "Ledger cash now"],
-      ["Tenant Receivables", formatUsd(totals.receivableUsd), "Unpaid monthly dues"],
-      ["Advance Liability", formatUsd(totals.advanceLiabilityUsd), "Tenant credit to honor"],
-      ["Net Position", formatUsd(totals.netPositionUsd), "Cash + receivables - advances"],
-    ]));
-  }
+  const totals = getPositionTotals();
+  els.kpiGrid.replaceChildren(...buildKpiCards([
+    ["Cash Balance", formatUsd(totals.cashUsd), "Ledger cash now"],
+    ["Tenant Receivables", formatUsd(totals.receivableUsd), "Unpaid monthly dues"],
+    ["Advance Liability", formatUsd(totals.advanceLiabilityUsd), "Tenant credit to honor"],
+    ["Net Position", formatUsd(totals.netPositionUsd), "Cash + receivables - advances"],
+  ]));
 
   renderTenantStatus();
-
-  const activityPanel = els.categorySummary.closest(".panel");
-  if (sessionMode === "tenant") {
-    activityPanel.classList.add("hidden");
-    els.expenseByCategoryPanel.classList.add("hidden");
-  } else {
-    activityPanel.classList.remove("hidden");
-    renderCategorySummary();
-    renderExpenseCategoryBreakdown();
-  }
+  els.categorySummary.closest(".panel").classList.remove("hidden");
+  renderCategorySummary();
+  renderExpenseCategoryBreakdown();
 }
 
 function renderTenantStatus() {
   const expected = getExpectedMonthlyUsd(selectedMonth);
-  const allStatuses = state.tenants.map((tenant) => ({ tenant, status: paymentStatus(tenant.id, selectedMonth) }));
-  const statuses = sessionMode === "tenant"
-    ? allStatuses.filter(({ tenant }) => tenant.id === sessionTenantId)
-    : allStatuses;
+  const statuses = state.tenants.map((tenant) => ({ tenant, status: paymentStatus(tenant.id, selectedMonth) }));
   const expectedTotal = expected * statuses.length;
   const paidTotal = statuses.reduce((sum, entry) => sum + entry.status.paid, 0);
   const rate = expectedTotal ? Math.min(100, Math.round((paidTotal / expectedTotal) * 100)) : 0;
@@ -783,26 +762,13 @@ function renderPayments() {
   renderPaymentMonthSelect();
   const collection = getMonthCollection(selectedMonth);
 
-  let summary;
-  if (sessionMode === "tenant") {
-    const ms = paymentStatus(sessionTenantId, selectedMonth);
-    const due = Math.max(0, ms.expected - ms.paid);
-    summary = [
-      ["Expected", formatMonthly(ms.expected)],
-      ["Paid", formatMonthly(ms.paid)],
-      ["Due", formatMonthly(due)],
-      ["Status", ms.label],
-    ];
-    els.paymentMonthRate.textContent = ms.label;
-  } else {
-    summary = [
-      ["Expected", formatMonthly(collection.expectedTotal)],
-      ["Collected", formatMonthly(collection.paidTotal)],
-      ["Due", formatMonthly(collection.dueTotal)],
-      ["Paid Tenants", `${collection.paidCount}/${state.tenants.length}`],
-    ];
-    els.paymentMonthRate.textContent = `${collection.rate}% collected`;
-  }
+  const summary = [
+    ["Expected", formatMonthly(collection.expectedTotal)],
+    ["Collected", formatMonthly(collection.paidTotal)],
+    ["Due", formatMonthly(collection.dueTotal)],
+    ["Paid Tenants", `${collection.paidCount}/${state.tenants.length}`],
+  ];
+  els.paymentMonthRate.textContent = `${collection.rate}% collected`;
 
   els.paymentSummary.replaceChildren(
     ...summary.map(([label, value]) => {
@@ -816,12 +782,9 @@ function renderPayments() {
   );
 
   els.dueOnlyToggle.classList.toggle("is-active", dueOnlyFilter);
-  let visibleStatuses = dueOnlyFilter
+  const visibleStatuses = dueOnlyFilter
     ? collection.tenantStatuses.filter(({ status }) => status.paid < status.expected)
     : collection.tenantStatuses;
-  if (sessionMode === "tenant") {
-    visibleStatuses = visibleStatuses.filter(({ tenant }) => tenant.id === sessionTenantId);
-  }
 
   els.tenantPaymentList.replaceChildren(
     ...visibleStatuses.map(({ tenant, status }) => {
@@ -894,12 +857,9 @@ function renderPayments() {
 
 function renderTenants() {
   const query = els.tenantSearch.value.trim().toLowerCase();
-  let tenants = state.tenants.filter(
+  const tenants = state.tenants.filter(
     (tenant) => tenant.name.toLowerCase().includes(query) || tenant.unit.toLowerCase().includes(query),
   );
-  if (sessionMode === "tenant") {
-    tenants = tenants.filter((t) => t.id === sessionTenantId);
-  }
   els.tenantList.replaceChildren(
     ...tenants.map((tenant) => {
       const totals = getTenantTotals(tenant.id);
@@ -935,6 +895,9 @@ function renderTenants() {
       card.querySelector(".edit-tenant-button").dataset.tenantId = tenant.id;
       card.querySelector(".print-statement-button").dataset.tenantId = tenant.id;
       card.querySelector(".delete-tenant-button").dataset.tenantId = tenant.id;
+      if (sessionMode === "tenant" && tenant.id !== sessionTenantId) {
+        card.querySelector(".tenant-card-footer").classList.add("hidden");
+      }
       return card;
     }),
   );
@@ -1905,13 +1868,8 @@ function clearAllLedgerFilters() {
 
 function renderLedger() {
   renderLedgerFilters();
-  let rows = getFilteredLedgerRows();
-  if (sessionMode === "tenant") {
-    rows = rows.filter((tx) => tx.tenantId === sessionTenantId);
-  }
-  const total = sessionMode === "tenant"
-    ? state.transactions.filter((tx) => tx.tenantId === sessionTenantId).length
-    : state.transactions.length;
+  const rows = getFilteredLedgerRows();
+  const total = state.transactions.length;
 
   const anyActive = isAnyLedgerFilterActive();
   els.ledgerFilterStatus.classList.toggle("hidden", !anyActive);
