@@ -1,3 +1,7 @@
 .vercel
 node_modules
 *.log
+
+# Source workbook and cloud backups contain real resident financial data — never commit
+Naccache 1727 rev3.xlsx
+cloud-state-backup-*.json

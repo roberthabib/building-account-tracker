@@ -46,7 +46,7 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v62</h1>
+            <h1>BUILDING ACCOUNT TRACKER v113</h1>
           </div>
         </div>
         <div class="topbar-actions">
@@ -54,6 +54,14 @@
           <button class="icon-button owner-only" id="openAddButton" type="button" aria-label="Add transaction">+</button>
         </div>
       </header>
+
+      <div id="dueBanner" class="due-banner hidden" role="alert">
+        <div class="due-banner-body">
+          <span class="due-banner-icon">&#9888;</span>
+          <span id="dueBannerText"></span>
+        </div>
+        <button id="dueBannerClose" class="due-banner-close" type="button" aria-label="Dismiss">&#x2715;</button>
+      </div>
 
       <main>
         <section class="view active" id="dashboardView" aria-labelledby="dashboardTitle">
@@ -69,17 +77,59 @@
             </div>
           </div>
 
-          <div class="kpi-grid" id="kpiGrid"></div>
+          <section class="panel hidden" id="tenantDuesPanel">
+            <div class="panel-header">
+              <h3>My Outstanding Dues</h3>
+            </div>
+            <div id="tenantDuesList"></div>
+          </section>
 
           <section class="panel">
             <div class="panel-header">
-              <h3>Monthly Collection</h3>
+              <h3>Building Financial Position</h3>
+            </div>
+            <div class="kpi-grid" id="kpiGrid"></div>
+          </section>
+
+          <div id="newMonthBanner" class="new-month-banner hidden" role="alert">
+            <div class="new-month-banner-body">
+              <span class="new-month-banner-icon">&#128197;</span>
+              <span id="newMonthBannerText"></span>
+            </div>
+            <div class="new-month-banner-actions">
+              <button id="newMonthBannerAdd" class="primary-button" type="button">Add Month</button>
+              <button id="newMonthBannerDismiss" class="icon-button" type="button" aria-label="Dismiss">&#x2715;</button>
+            </div>
+          </div>
+
+          <section class="panel owner-only hidden" id="declarationsPanel">
+            <div class="panel-header">
+              <h3>Payment Notifications</h3>
+              <span id="declarationsBadge" class="declarations-badge"></span>
+            </div>
+            <div id="declarationsList"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h3>Tenant Balances</h3>
               <span id="collectionRate"></span>
             </div>
             <div class="progress-track" aria-hidden="true">
               <div id="collectionProgress" class="progress-bar"></div>
             </div>
             <div class="tenant-status-grid" id="tenantStatusGrid"></div>
+          </section>
+
+          <section class="panel hidden" id="sharedExpensesPanel">
+            <div class="panel-header">
+              <h3>Monthly Services Expenses</h3>
+              <span id="sharedExpensesRate"></span>
+            </div>
+            <div class="progress-track hidden" id="sharedExpensesProgress" aria-hidden="true">
+              <div id="sharedExpensesBar" class="progress-bar"></div>
+            </div>
+            <div id="sharedExpensesList"></div>
           </section>
 
           <section class="panel">
@@ -115,15 +165,29 @@
           <div class="month-strip-wrap">
             <div class="month-strip" id="paymentMonthStrip" aria-label="Select month"></div>
           </div>
+          <p class="payment-summary-label">Monthly Payments <span id="paymentPaidCount" class="summary-paid-badge"></span></p>
           <div class="payment-summary-grid" id="paymentSummary"></div>
+          <p class="payment-summary-label hidden" id="paymentSharedSummaryLabel">Monthly Services Expenses <span id="paymentSharedPaidCount" class="summary-paid-badge"></span></p>
+          <div class="payment-summary-grid hidden" id="paymentSharedSummary"></div>
           <div class="payment-content">
             <section class="payment-section">
               <div class="panel-header">
-                <h3>Tenant Status</h3>
+                <h3>Monthly Payment Status</h3>
                 <span id="paymentMonthRate"></span>
               </div>
               <div class="tenant-payment-list" id="tenantPaymentList"></div>
             </section>
+            <section class="payment-section hidden" id="paymentSharedExpensesSection">
+              <div class="panel-header">
+                <h3>Monthly Services Expenses Status</h3>
+                <span id="paymentSharedExpensesRate"></span>
+              </div>
+              <div class="progress-track hidden" id="paymentSharedExpensesProgress" aria-hidden="true">
+                <div id="paymentSharedExpensesBar" class="progress-bar"></div>
+              </div>
+              <div id="paymentSharedExpensesList"></div>
+            </section>
+
             <section class="payment-section">
               <div class="panel-header">
                 <h3>Month History</h3>
@@ -141,7 +205,7 @@
             </div>
             <div class="section-actions">
               <input id="tenantSearch" class="compact-input" type="search" placeholder="Search tenants or units" />
-              <button class="secondary-button" id="addTenantButton" type="button">+ Add</button>
+              <button class="secondary-button owner-only" id="addTenantButton" type="button">+ Add</button>
             </div>
           </div>
           <div class="tenant-list" id="tenantList"></div>
@@ -175,6 +239,28 @@
           <div class="ledger-list" id="ledgerList"></div>
         </section>
 
+        <section class="view" id="projectsView" aria-labelledby="projectsTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Building</p>
+              <h2 id="projectsTitle">Projects</h2>
+            </div>
+            <button class="primary-button owner-only" id="createProjectButton" type="button">+ New</button>
+          </div>
+          <div id="buildingProjectList"></div>
+        </section>
+
+        <section class="view" id="pollsView" aria-labelledby="pollsTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Building</p>
+              <h2 id="pollsTitle">Polls</h2>
+            </div>
+            <button class="primary-button" id="createPollButton" type="button">+ New Poll</button>
+          </div>
+          <div id="pollList"></div>
+        </section>
+
         <section class="view" id="settingsView" aria-labelledby="settingsTitle">
           <div class="section-title">
             <div>
@@ -188,7 +274,8 @@
               Owner password
               <input id="ownerPasswordInput" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
             </label>
-            <p class="settings-note" style="margin:0 0 4px">Tenants use a PIN set per-tenant (in the Tenants tab). Leave owner password blank to allow entry without a password.</p>
+            <button class="mini-button hidden" id="removeOwnerPasswordButton" type="button">Remove current password</button>
+            <p class="settings-note" style="margin:0 0 4px">Tenants use a PIN set per-tenant (in the Tenants tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.</p>
 
             <p class="settings-section-header">Building Details</p>
             <label>
@@ -196,9 +283,18 @@
               <input id="buildingNameInput" type="text" />
             </label>
             <label>
-              Default monthly amount USD
+              Collection mode
+              <select id="collectionModeInput">
+                <option value="actual">Split actual monthly expenses</option>
+                <option value="fixed">Fixed monthly amount + reserve fund</option>
+              </select>
+            </label>
+            <p class="settings-note" id="collectionModeNote"></p>
+            <label id="monthlyBudgetField">
+              Total monthly building budget USD
               <input id="defaultDueInput" type="number" min="0" step="1" />
             </label>
+            <p class="settings-note" id="coefficientStatus"></p>
 
             <p class="settings-section-header">Currency &amp; Conversion</p>
             <label>
@@ -225,9 +321,11 @@
 
             <p class="settings-section-header">Data Management</p>
             <div class="settings-data-row">
+              <button class="secondary-button" id="runWizardButton" type="button">Setup Wizard</button>
               <button class="secondary-button" id="loadCloudButton" type="button">Restore from Sheet</button>
               <button class="danger-button" id="zeroAccountsButton" type="button">Zero Accounts</button>
               <button class="danger-button" id="resetButton" type="button">Reset Data</button>
+              <button class="danger-button" id="startFreshButton" type="button">Start Fresh</button>
             </div>
             <p class="settings-note" id="cloudSyncStatus">Cloud sync is automatic after the script URL and Google Sheet ID are saved.</p>
           </section>
@@ -238,7 +336,9 @@
         <button class="nav-button active" type="button" data-view="dashboardView">Dashboard</button>
         <button class="nav-button" type="button" data-view="paymentsView">Payments</button>
         <button class="nav-button" type="button" data-view="tenantsView">Tenants</button>
+        <button class="nav-button" type="button" data-view="projectsView">Projects</button>
         <button class="nav-button" type="button" data-view="ledgerView">Ledger</button>
+        <button class="nav-button" type="button" data-view="pollsView">Polls</button>
         <button class="nav-button owner-only" type="button" data-view="settingsView">Settings</button>
       </nav>
     </div>
@@ -340,6 +440,15 @@
           </div>
         </label>
 
+        <label class="shared-expense-dist-field hidden">
+          Split Distribution
+          <select id="transactionDistribution">
+            <option value="equal">Equal Split</option>
+            <option value="coefficient">By Coefficient (proportional)</option>
+          </select>
+        </label>
+        <div class="shared-expense-preview hidden" id="sharedExpenseInlinePreview"></div>
+
         <label>
           Project
           <div class="project-combobox">
@@ -397,9 +506,14 @@
           <input id="tenantPhoneDialogInput" type="tel" placeholder="+961 71 000 000" />
         </label>
         <label>
+          Coefficient (X / 1000)
+          <input id="tenantCoefficientInput" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" />
+        </label>
+        <label>
           Tenant PIN (for app access)
           <input id="tenantPinDialogInput" type="password" placeholder="Leave blank to disable tenant login" maxlength="20" autocomplete="new-password" />
         </label>
+        <button class="mini-button hidden" id="removeTenantPinButton" type="button">Remove current PIN</button>
         <div class="button-row">
           <button class="primary-button" id="tenantSubmitButton" type="submit">Add</button>
           <button class="secondary-button" id="cancelTenantButton" type="button">Cancel</button>
@@ -409,7 +523,7 @@
 
     <dialog id="whatsappDialog">
       <div class="dialog-header">
-        <h2>Send Payment Reminders</h2>
+        <h2 id="whatsappDialogTitle">Send Payment Reminders</h2>
         <button class="icon-button small" id="closeWhatsappDialog" type="button" aria-label="Close">x</button>
       </div>
       <p class="settings-note" id="whatsappDialogNote"></p>
@@ -427,12 +541,163 @@
           <input id="newMonthInput" type="month" required />
         </label>
         <label>
-          Expected USD
+          Total Monthly Expected Building Budget USD
           <input id="newMonthAmountInput" type="number" min="0" step="1" required />
         </label>
         <div class="button-row">
           <button class="primary-button" type="submit">Add</button>
           <button class="secondary-button" id="cancelMonthButton" type="button">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="pollDialog">
+      <form id="pollForm" method="dialog">
+        <div class="dialog-header">
+          <h2 class="dialog-title">New Poll</h2>
+          <button type="button" id="closePollDialog" class="icon-button" aria-label="Close">&#x2715;</button>
+        </div>
+        <label class="field-label">
+          Question <span class="required">*</span>
+          <input id="pollTitleInput" type="text" placeholder="Should we...?" required />
+        </label>
+        <label class="field-label">
+          Description (optional)
+          <textarea id="pollDescInput" rows="3" placeholder="Add more details about this project..."></textarea>
+        </label>
+        <div class="dialog-footer">
+          <button type="button" id="cancelPollButton" class="secondary-button">Cancel</button>
+          <button type="submit" id="pollSubmitButton" class="primary-button">Create Poll</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="setupWizardDialog" class="setup-wizard-dialog">
+      <div class="wizard-progress">
+        <span class="wizard-dot active" id="wizardDot1"></span>
+        <span class="wizard-dot" id="wizardDot2"></span>
+        <span class="wizard-dot" id="wizardDot3"></span>
+      </div>
+
+      <div class="wizard-step" id="wizardStep1">
+        <div class="wizard-hero">&#127970;</div>
+        <h2 class="wizard-title">Welcome to Building Account Tracker</h2>
+        <p class="wizard-subtitle">Let's quickly set up your building. You can update these details any time in Settings.</p>
+        <label class="wizard-field">
+          Building Name
+          <input id="wizardBuildingName" class="wizard-input" type="text" placeholder="e.g. Naccache 1727" />
+        </label>
+        <label class="wizard-field">
+          Owner Password <span class="wizard-opt">(optional)</span>
+          <input id="wizardOwnerPassword" class="wizard-input" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
+        </label>
+        <div class="wizard-footer wizard-footer-right">
+          <button id="wizardStep1Next" class="primary-button" type="button">Next &#8594;</button>
+        </div>
+      </div>
+
+      <div class="wizard-step hidden" id="wizardStep2">
+        <div class="wizard-hero">&#128176;</div>
+        <h2 class="wizard-title">Financial Settings</h2>
+        <p class="wizard-subtitle">Choose how the building collects money and set the LBP/USD exchange rate.</p>
+        <label class="wizard-field">
+          Collection Mode
+          <select id="wizardCollectionMode" class="wizard-input">
+            <option value="actual">Split actual monthly expenses among tenants</option>
+            <option value="fixed">Fixed monthly amount + reserve fund</option>
+          </select>
+        </label>
+        <p class="wizard-coeff-status" id="wizardCollectionModeNote"></p>
+        <label class="wizard-field" id="wizardBudgetField">
+          Total Monthly Expected Building Budget (USD)
+          <input id="wizardMonthlyBudget" class="wizard-input" type="number" min="0" step="1" placeholder="e.g. 1500" />
+        </label>
+        <label class="wizard-field">
+          LBP per USD Rate
+          <input id="wizardLbpRate" class="wizard-input" type="number" min="1" step="1" placeholder="e.g. 89500" />
+        </label>
+        <div class="wizard-footer">
+          <button id="wizardStep2Prev" class="secondary-button" type="button">&#8592; Back</button>
+          <button id="wizardStep2Next" class="primary-button" type="button">Next &#8594;</button>
+        </div>
+      </div>
+
+      <div class="wizard-step hidden" id="wizardStep3">
+        <div class="wizard-hero">&#128101;</div>
+        <h2 class="wizard-title">Add Tenants</h2>
+        <p class="wizard-subtitle">Add your building's tenants. You can add or edit more at any time in the Tenants tab.</p>
+        <div id="wizardTenantList" class="wizard-tenant-list"></div>
+        <div class="wizard-tenant-form">
+          <div class="wizard-two-col">
+            <label class="wizard-field">
+              Name
+              <input id="wizardTenantName" class="wizard-input" type="text" placeholder="Full name" />
+            </label>
+            <label class="wizard-field">
+              Unit
+              <input id="wizardTenantUnit" class="wizard-input" type="text" placeholder="e.g. 3B" />
+            </label>
+          </div>
+          <div class="wizard-two-col">
+            <label class="wizard-field">
+              WhatsApp Number
+              <input id="wizardTenantPhone" class="wizard-input" type="tel" placeholder="+961 71 000 000" />
+            </label>
+            <label class="wizard-field">
+              PIN (app access)
+              <input id="wizardTenantPin" class="wizard-input" type="password" placeholder="4 digits" maxlength="20" autocomplete="new-password" />
+            </label>
+          </div>
+          <label class="wizard-field">
+            Coefficient (X / 1000)
+            <input id="wizardTenantCoeff" class="wizard-input" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" />
+          </label>
+          <div class="wizard-add-row">
+            <button id="wizardAddTenantBtn" class="secondary-button" type="button">+ Add Tenant</button>
+            <button id="wizardCancelEditBtn" class="text-link-btn hidden" type="button">Cancel Edit</button>
+          </div>
+          <p id="wizardCoeffStatus" class="wizard-coeff-status"></p>
+        </div>
+        <div class="wizard-footer">
+          <button id="wizardStep3Prev" class="secondary-button" type="button">&#8592; Back</button>
+          <button id="wizardFinishBtn" class="primary-button" type="button">&#10003; Finish Setup</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="projectDialog">
+      <form id="projectForm" method="dialog">
+        <div class="dialog-header">
+          <h2>New Project</h2>
+          <button class="icon-button small" id="closeProjectDialog" type="button" aria-label="Close">x</button>
+        </div>
+        <label>
+          Project Name
+          <input id="projectNameInput" type="text" required placeholder="e.g. Generator Replacement" />
+        </label>
+        <label>
+          Description <span style="font-weight:400;font-size:0.8rem">(optional)</span>
+          <input id="projectDescInput" type="text" placeholder="Brief description" />
+        </label>
+        <label>
+          Total Budget (USD)
+          <input id="projectBudgetInput" type="number" min="0" step="1" required placeholder="0" />
+        </label>
+        <label>
+          Payment Due Date
+          <input id="projectDueDateInput" type="date" required />
+        </label>
+        <label>
+          Split Distribution
+          <select id="projectDistributionInput">
+            <option value="equal">Equal Split</option>
+            <option value="coefficient">By Coefficient (proportional)</option>
+          </select>
+        </label>
+        <div class="shared-expense-preview hidden" id="projectSharePreview"></div>
+        <div class="button-row">
+          <button class="primary-button" id="projectSubmitButton" type="submit">Create Project</button>
+          <button class="secondary-button" id="cancelProjectButton" type="button">Cancel</button>
         </div>
       </form>
     </dialog>

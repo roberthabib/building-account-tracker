@@ -1,11 +1,13 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v62";
+const APP_VERSION = "v113";
 
 const els = {
   views: document.querySelectorAll(".view"),
   navButtons: document.querySelectorAll(".nav-button"),
   monthSelect: document.querySelector("#monthSelect"),
   kpiGrid: document.querySelector("#kpiGrid"),
+  tenantDuesPanel: document.querySelector("#tenantDuesPanel"),
+  tenantDuesList: document.querySelector("#tenantDuesList"),
   collectionRate: document.querySelector("#collectionRate"),
   collectionProgress: document.querySelector("#collectionProgress"),
   tenantStatusGrid: document.querySelector("#tenantStatusGrid"),
@@ -42,6 +44,7 @@ const els = {
   dueOnlyToggle: document.querySelector("#dueOnlyToggle"),
   whatsappAllDueButton: document.querySelector("#whatsappAllDueButton"),
   whatsappDialog: document.querySelector("#whatsappDialog"),
+  whatsappDialogTitle: document.querySelector("#whatsappDialogTitle"),
   whatsappDialogNote: document.querySelector("#whatsappDialogNote"),
   whatsappReminderList: document.querySelector("#whatsappReminderList"),
   closeWhatsappDialog: document.querySelector("#closeWhatsappDialog"),
@@ -102,6 +105,7 @@ const els = {
   loadCloudButton: document.querySelector("#loadCloudButton"),
   cloudSyncStatus: document.querySelector("#cloudSyncStatus"),
   resetButton: document.querySelector("#resetButton"),
+  startFreshButton: document.querySelector("#startFreshButton"),
   zeroAccountsButton: document.querySelector("#zeroAccountsButton"),
   printStatement: document.querySelector("#printStatement"),
   toast: document.querySelector("#toast"),
@@ -117,8 +121,92 @@ const els = {
   loginError: document.querySelector("#loginError"),
   loginHint: document.querySelector("#loginHint"),
   logoutButton: document.querySelector("#logoutButton"),
+  tenantCoefficientInput: document.querySelector("#tenantCoefficientInput"),
   tenantPinDialogInput: document.querySelector("#tenantPinDialogInput"),
+  coefficientStatus: document.querySelector("#coefficientStatus"),
   ownerPasswordInput: document.querySelector("#ownerPasswordInput"),
+  dueBanner: document.querySelector("#dueBanner"),
+  dueBannerText: document.querySelector("#dueBannerText"),
+  dueBannerClose: document.querySelector("#dueBannerClose"),
+  newMonthBanner: document.querySelector("#newMonthBanner"),
+  newMonthBannerText: document.querySelector("#newMonthBannerText"),
+  newMonthBannerAdd: document.querySelector("#newMonthBannerAdd"),
+  newMonthBannerDismiss: document.querySelector("#newMonthBannerDismiss"),
+  declarationsPanel: document.querySelector("#declarationsPanel"),
+  declarationsBadge: document.querySelector("#declarationsBadge"),
+  declarationsList: document.querySelector("#declarationsList"),
+  pollList: document.querySelector("#pollList"),
+  createPollButton: document.querySelector("#createPollButton"),
+  pollDialog: document.querySelector("#pollDialog"),
+  pollForm: document.querySelector("#pollForm"),
+  pollTitleInput: document.querySelector("#pollTitleInput"),
+  pollDescInput: document.querySelector("#pollDescInput"),
+  closePollDialog: document.querySelector("#closePollDialog"),
+  cancelPollButton: document.querySelector("#cancelPollButton"),
+  buildingProjectList: document.querySelector("#buildingProjectList"),
+  createProjectButton: document.querySelector("#createProjectButton"),
+  projectDialog: document.querySelector("#projectDialog"),
+  closeProjectDialog: document.querySelector("#closeProjectDialog"),
+  cancelProjectButton: document.querySelector("#cancelProjectButton"),
+  projectForm: document.querySelector("#projectForm"),
+  projectNameInput: document.querySelector("#projectNameInput"),
+  projectDescInput: document.querySelector("#projectDescInput"),
+  projectBudgetInput: document.querySelector("#projectBudgetInput"),
+  projectDueDateInput: document.querySelector("#projectDueDateInput"),
+  projectDistributionInput: document.querySelector("#projectDistributionInput"),
+  projectSharePreview: document.querySelector("#projectSharePreview"),
+  projectSubmitButton: document.querySelector("#projectSubmitButton"),
+  runWizardButton: document.querySelector("#runWizardButton"),
+  setupWizardDialog: document.querySelector("#setupWizardDialog"),
+  wizardStep1: document.querySelector("#wizardStep1"),
+  wizardStep2: document.querySelector("#wizardStep2"),
+  wizardStep3: document.querySelector("#wizardStep3"),
+  wizardDot1: document.querySelector("#wizardDot1"),
+  wizardDot2: document.querySelector("#wizardDot2"),
+  wizardDot3: document.querySelector("#wizardDot3"),
+  wizardBuildingName: document.querySelector("#wizardBuildingName"),
+  wizardOwnerPassword: document.querySelector("#wizardOwnerPassword"),
+  wizardMonthlyBudget: document.querySelector("#wizardMonthlyBudget"),
+  wizardLbpRate: document.querySelector("#wizardLbpRate"),
+  wizardTenantList: document.querySelector("#wizardTenantList"),
+  wizardTenantName: document.querySelector("#wizardTenantName"),
+  wizardTenantUnit: document.querySelector("#wizardTenantUnit"),
+  wizardTenantPhone: document.querySelector("#wizardTenantPhone"),
+  wizardTenantPin: document.querySelector("#wizardTenantPin"),
+  wizardTenantCoeff: document.querySelector("#wizardTenantCoeff"),
+  wizardCoeffStatus: document.querySelector("#wizardCoeffStatus"),
+  wizardStep1Next: document.querySelector("#wizardStep1Next"),
+  wizardStep2Prev: document.querySelector("#wizardStep2Prev"),
+  wizardStep2Next: document.querySelector("#wizardStep2Next"),
+  wizardStep3Prev: document.querySelector("#wizardStep3Prev"),
+  wizardAddTenantBtn: document.querySelector("#wizardAddTenantBtn"),
+  wizardCancelEditBtn: document.querySelector("#wizardCancelEditBtn"),
+  wizardFinishBtn: document.querySelector("#wizardFinishBtn"),
+  sharedExpensesPanel: document.querySelector("#sharedExpensesPanel"),
+  sharedExpensesRate: document.querySelector("#sharedExpensesRate"),
+  sharedExpensesProgress: document.querySelector("#sharedExpensesProgress"),
+  sharedExpensesBar: document.querySelector("#sharedExpensesBar"),
+  sharedExpensesList: document.querySelector("#sharedExpensesList"),
+  paymentSharedExpensesSection: document.querySelector("#paymentSharedExpensesSection"),
+  paymentSharedExpensesRate: document.querySelector("#paymentSharedExpensesRate"),
+  paymentSharedExpensesProgress: document.querySelector("#paymentSharedExpensesProgress"),
+  paymentSharedExpensesBar: document.querySelector("#paymentSharedExpensesBar"),
+  paymentSharedExpensesList: document.querySelector("#paymentSharedExpensesList"),
+  paymentSharedSummary: document.querySelector("#paymentSharedSummary"),
+  paymentSharedSummaryLabel: document.querySelector("#paymentSharedSummaryLabel"),
+  paymentPaidCount: document.querySelector("#paymentPaidCount"),
+  paymentSharedPaidCount: document.querySelector("#paymentSharedPaidCount"),
+  sharedExpensesEnabledToggle: document.querySelector("#sharedExpensesEnabledToggle"),
+  transactionDistribution: document.querySelector("#transactionDistribution"),
+  sharedExpenseInlinePreview: document.querySelector("#sharedExpenseInlinePreview"),
+  collectionModeInput: document.querySelector("#collectionModeInput"),
+  collectionModeNote: document.querySelector("#collectionModeNote"),
+  monthlyBudgetField: document.querySelector("#monthlyBudgetField"),
+  removeOwnerPasswordButton: document.querySelector("#removeOwnerPasswordButton"),
+  removeTenantPinButton: document.querySelector("#removeTenantPinButton"),
+  wizardCollectionMode: document.querySelector("#wizardCollectionMode"),
+  wizardCollectionModeNote: document.querySelector("#wizardCollectionModeNote"),
+  wizardBudgetField: document.querySelector("#wizardBudgetField"),
 };
 
 let seedState;
@@ -131,6 +219,9 @@ let printCleanupTimer = null;
 let cloudSaveTimer = null;
 let cloudSaveInFlight = false;
 let sessionMode = null; // "owner" | "tenant"
+let newMonthBannerDismissed = false;
+let wizardTenants = [];
+let wizardEditingIdx = null;
 let sessionTenantId = null;
 
 const numberFormat = new Intl.NumberFormat("en-US");
@@ -141,10 +232,7 @@ const usdFormat = new Intl.NumberFormat("en-US", {
 });
 
 const DEFAULT_LBP_PER_USD = 89500;
-const DEFAULT_GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzXlrSIWH5FUM5bU5iGpyB0KGXuXeThGloAaiYvAdxwSe88H96kZMtB2kCm4HvpYwAA/exec";
-const DEFAULT_GOOGLE_SHEET_ID = "1LYnpt1p5JkuGNbzLM0uOZBtmXmBiQtqc3SG9qMqhehU";
-const DEFAULT_INVOICE_FOLDER_ID = "1QOdJLYZV4dlnW8xP2ZnjEpYY8vjmQxnn";
+const SYNC_META_KEY = "building-account-tracker:sync";
 const DEFAULT_CATEGORIES = ["Opening Balance", "Payments", "Expenses"];
 const SERVER_INVOICE_UPLOAD_PATH = "/api/upload-invoice";
 const EXPENSE_INVOICE_PREFIX = "INV";
@@ -161,6 +249,73 @@ function localDateInput(date = new Date()) {
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+// Synchronous SHA-256 (no crypto.subtle, so it also works on plain-http LAN testing).
+const SHA256_K = [
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+];
+
+function sha256Hex(message) {
+  const bytes = new TextEncoder().encode(String(message));
+  const bitLen = bytes.length * 8;
+  const padded = new Uint8Array((((bytes.length + 8) >> 6) << 6) + 64);
+  padded.set(bytes);
+  padded[bytes.length] = 0x80;
+  const dv = new DataView(padded.buffer);
+  dv.setUint32(padded.length - 4, bitLen >>> 0);
+  dv.setUint32(padded.length - 8, Math.floor(bitLen / 0x100000000));
+  const H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  const w = new Array(64);
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  for (let i = 0; i < padded.length; i += 64) {
+    for (let t = 0; t < 16; t += 1) w[t] = dv.getUint32(i + t * 4);
+    for (let t = 16; t < 64; t += 1) {
+      const s0 = rotr(w[t - 15], 7) ^ rotr(w[t - 15], 18) ^ (w[t - 15] >>> 3);
+      const s1 = rotr(w[t - 2], 17) ^ rotr(w[t - 2], 19) ^ (w[t - 2] >>> 10);
+      w[t] = (w[t - 16] + s0 + w[t - 7] + s1) >>> 0;
+    }
+    let [a, b, c, d, e, f, g, h] = H;
+    for (let t = 0; t < 64; t += 1) {
+      const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (h + S1 + ch + SHA256_K[t] + w[t]) >>> 0;
+      const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (S0 + maj) >>> 0;
+      h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+    }
+    H[0] = (H[0] + a) >>> 0; H[1] = (H[1] + b) >>> 0; H[2] = (H[2] + c) >>> 0; H[3] = (H[3] + d) >>> 0;
+    H[4] = (H[4] + e) >>> 0; H[5] = (H[5] + f) >>> 0; H[6] = (H[6] + g) >>> 0; H[7] = (H[7] + h) >>> 0;
+  }
+  return H.map((x) => x.toString(16).padStart(8, "0")).join("");
+}
+
+function hashSecret(value, salt) {
+  return sha256Hex(`${salt}:${value}`);
+}
+
+function randomToken() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function loadSyncMeta() {
+  try {
+    return JSON.parse(localStorage.getItem(SYNC_META_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSyncMeta(meta) {
+  localStorage.setItem(SYNC_META_KEY, JSON.stringify(meta));
 }
 
 function formatLbp(value) {
@@ -259,6 +414,9 @@ function showToast(message) {
 
 function saveState(options = {}) {
   state.monthlyExpected = normalizedMonthlyExpected(state.monthlyExpected);
+  state.meta = state.meta || {};
+  state.meta.rev = Number(state.meta.rev || 0) + 1;
+  state.meta.updatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   if (options.sync !== false) queueCloudSave();
 }
@@ -268,16 +426,63 @@ function hydrateState(rawState) {
   hydrated.settings ||= {};
   if (hydrated.settings.defaultDueUsd === undefined) hydrated.settings.defaultDueUsd = getSeedDefaultDue(hydrated);
   if (hydrated.settings.lbpPerUsd === undefined) hydrated.settings.lbpPerUsd = DEFAULT_LBP_PER_USD;
-  hydrated.settings.invoiceUploadUrl ||= DEFAULT_GOOGLE_SCRIPT_URL;
-  hydrated.settings.cloudSpreadsheetId ||= DEFAULT_GOOGLE_SHEET_ID;
-  hydrated.settings.invoiceUploadFolderId ||= DEFAULT_INVOICE_FOLDER_ID;
+  hydrated.settings.invoiceUploadUrl ||= "";
+  hydrated.settings.cloudSpreadsheetId ||= "";
+  hydrated.settings.invoiceUploadFolderId ||= "";
+  hydrated.settings.collectionMode = hydrated.settings.collectionMode === "fixed" ? "fixed" : "actual";
+  hydrated.meta ||= {};
+  hydrated.meta.rev = Number(hydrated.meta.rev || 0);
+  hydrated.meta.epoch = Number(hydrated.meta.epoch || 0);
+  hydrated.meta.token ||= "";
+  hydrated.meta.updatedAt ||= "";
+  hydrated.deleted ||= {};
+  hydrated.deleted.transactions ||= [];
+  hydrated.deleted.tenants ||= [];
+  hydrated.deleted.polls ||= [];
+  hydrated.deleted.projects ||= [];
+  hydrated.security ||= {};
+  hydrated.security.salt ||= randomToken();
   hydrated.transactions ||= [];
-  hydrated.settings.ownerPassword ||= "";
+  // Migrate plaintext owner password / tenant PINs to salted hashes (v112).
+  if (hydrated.settings.ownerPassword) {
+    hydrated.settings.ownerPasswordHash = hashSecret(hydrated.settings.ownerPassword, hydrated.security.salt);
+  }
+  delete hydrated.settings.ownerPassword;
+  hydrated.settings.ownerPasswordHash ||= "";
   hydrated.tenants ||= [];
-  hydrated.tenants.forEach((tenant) => { tenant.phone ||= ""; tenant.pin ||= ""; });
+  hydrated.tenants.forEach((tenant) => {
+    tenant.phone ||= "";
+    tenant.coefficient ||= 0;
+    if (tenant.pin) tenant.pinHash = hashSecret(tenant.pin, hydrated.security.salt);
+    delete tenant.pin;
+    tenant.pinHash ||= "";
+  });
   hydrated.projects ||= [];
   hydrated.suppliers ||= [];
   hydrated.expenseCategories ||= [];
+  hydrated.building ||= {};
+  hydrated.polls ||= [];
+  hydrated.paymentDeclarations ||= [];
+  hydrated.sharedExpenses ||= [];
+  hydrated.buildingProjects ||= [];
+  hydrated.settings.sharedExpensesEnabled = false; // v108: merged into unified Expenses model
+  if (hydrated.setupComplete === undefined) {
+    hydrated.setupComplete = Boolean(
+      hydrated.building && hydrated.building.name &&
+      hydrated.tenants && hydrated.tenants.length > 0
+    );
+  }
+  hydrated.transactions = hydrated.transactions.map((t) =>
+    t.category === "Services Expenses" ? { ...t, category: "Expenses" } : t
+  );
+  const deletedTx = new Set(hydrated.deleted.transactions);
+  const deletedTenants = new Set(hydrated.deleted.tenants);
+  const deletedPolls = new Set(hydrated.deleted.polls);
+  const deletedProjects = new Set(hydrated.deleted.projects);
+  hydrated.transactions = hydrated.transactions.filter((t) => !deletedTx.has(t.id));
+  hydrated.tenants = hydrated.tenants.filter((t) => !deletedTenants.has(t.id));
+  hydrated.polls = hydrated.polls.filter((p) => !deletedPolls.has(p.id));
+  hydrated.buildingProjects = hydrated.buildingProjects.filter((p) => !deletedProjects.has(p.id));
   hydrated.transactions.forEach((transaction) => {
     if (transaction.category === "Payments" && transaction.project) transaction.forMonth = null;
   });
@@ -318,14 +523,180 @@ function tenantIdByName(name) {
 function getMonths() {
   const months = new Set();
   state.monthlyExpected.forEach((entry) => entry.month && months.add(entry.month));
-  state.transactions.forEach((transaction) => transaction.forMonth && months.add(transaction.forMonth));
-  return [...months].sort();
+  state.transactions.forEach((transaction) => {
+    if (transaction.forMonth) months.add(transaction.forMonth);
+    if (transaction.date) months.add(monthIso(monthKey(transaction.date)));
+  });
+  return [...months].filter(Boolean).sort();
 }
+
+// ── Live-expenses model ──────────────────────────────────────────────────────
+function getTotalActiveCoefficient() {
+  return state.tenants.filter((t) => t.active !== false).reduce((s, t) => s + (t.coefficient || 0), 0);
+}
+
+function getTenantExpenseShareForTransaction(tenantId, transaction) {
+  // Prefer the share split snapshotted when the expense was recorded, so later
+  // tenant/coefficient changes do not retroactively shift historical balances.
+  if (transaction.shares) return roundUsd(Number(transaction.shares[tenantId] || 0));
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  if (!activeTenants.length) return 0;
+  const totalUsd = toUsd(Number(transaction.debitUsd || 0), Number(transaction.debitLbp || 0));
+  if (!totalUsd) return 0;
+  const coeffSum = activeTenants.reduce((s, t) => s + (t.coefficient || 0), 0);
+  const tenant = activeTenants.find((t) => t.id === tenantId);
+  if (!tenant) return 0;
+  if (coeffSum > 0) return roundUsd(totalUsd * ((tenant.coefficient || 0) / coeffSum));
+  return roundUsd(totalUsd / activeTenants.length);
+}
+
+function getTenantExpenseShare(tenantId, month = null) {
+  return roundUsd(
+    state.transactions
+      .filter((t) => {
+        if (t.category !== "Expenses") return false;
+        if (month && monthKey(t.date || t.forMonth || "") !== monthKey(month)) return false;
+        return true;
+      })
+      .reduce((sum, t) => sum + getTenantExpenseShareForTransaction(tenantId, t), 0),
+  );
+}
+
+function getTenantPaymentsTotal(tenantId, month = null) {
+  return roundUsd(
+    state.transactions
+      .filter((t) => {
+        if (t.category !== "Payments") return false;
+        if (t.tenantId !== tenantId) return false;
+        if (t.project) return false;
+        if (month && monthKey(t.date || t.forMonth || "") !== monthKey(month)) return false;
+        return true;
+      })
+      .reduce((sum, t) => sum + transactionNetUsd(t), 0),
+  );
+}
+
+// ── Collection mode ──────────────────────────────────────────────────────────
+// "actual": tenants owe their share of recorded expenses (live-expenses model).
+// "fixed": tenants owe the configured monthly amount; surplus builds the reserve fund.
+function isFixedMode() {
+  return state?.settings?.collectionMode === "fixed";
+}
+
+function getMonthlyDueForTenant(tenantId, month) {
+  if (isFixedMode()) return roundUsd(getExpectedForTenant(tenantId, month));
+  return getTenantExpenseShare(tenantId, month);
+}
+
+function getTenantFixedDueTotal(tenantId) {
+  return roundUsd(
+    state.monthlyExpected
+      .filter((entry) => isCurrentOrPastMonth(entry.month))
+      .reduce((sum, entry) => sum + getExpectedForTenant(tenantId, entry.month), 0),
+  );
+}
+
+function getTenantDueBasisTotal(tenantId) {
+  return isFixedMode() ? getTenantFixedDueTotal(tenantId) : getTenantExpenseShare(tenantId);
+}
+
+function getTenantOpeningNet(tenantId) {
+  // Net of tenant-tied Opening Balance entries: debit = tenant owes (carry-in
+  // arrears), credit = prepaid credit. These adjust the tenant balance only —
+  // they are receivables/liabilities, not building cash.
+  return roundUsd(
+    state.transactions
+      .filter((t) => t.category === "Opening Balance" && t.tenantId === tenantId)
+      .reduce((sum, t) => sum + transactionNetUsd(t), 0),
+  );
+}
+
+function getTenantBalance(tenantId) {
+  // Positive = tenant owes money; negative = credit
+  return roundUsd(
+    getTenantDueBasisTotal(tenantId) - getTenantPaymentsTotal(tenantId) - getTenantOpeningNet(tenantId),
+  );
+}
+
+function getTenantExpensesByCategory(tenantId, month = null) {
+  const map = new Map();
+  state.transactions
+    .filter((t) => {
+      if (t.category !== "Expenses") return false;
+      if (month && monthKey(t.date || t.forMonth || "") !== monthKey(month)) return false;
+      return true;
+    })
+    .forEach((t) => {
+      const cat = t.expenseCategory || "General";
+      const share = getTenantExpenseShareForTransaction(tenantId, t);
+      if (share > 0) map.set(cat, (map.get(cat) || 0) + share);
+    });
+  return map;
+}
+function getMonthEndDate(monthIso) {
+  const [year, month] = monthIso.split("-").map(Number);
+  const lastDay = new Date(year, month, 0).getDate();
+  return `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+}
+
+function getLastCompletedMonth() {
+  const today = new Date();
+  const m = today.getMonth(); // 0-indexed
+  if (m === 0) return `${today.getFullYear() - 1}-12-01`;
+  return `${today.getFullYear()}-${String(m).padStart(2, "0")}-01`;
+}
+
+function getTenantMonthEndBalance(tenantId, monthIso) {
+  const endDate = getMonthEndDate(monthIso);
+  const dues = isFixedMode()
+    ? state.monthlyExpected
+        .filter((entry) => monthKey(entry.month) <= monthKey(monthIso))
+        .reduce((sum, entry) => sum + getExpectedForTenant(tenantId, entry.month), 0)
+    : state.transactions
+        .filter((t) => t.category === "Expenses" && t.date && t.date <= endDate)
+        .reduce((sum, t) => sum + getTenantExpenseShareForTransaction(tenantId, t), 0);
+  const payments = state.transactions
+    .filter((t) => t.category === "Payments" && t.tenantId === tenantId && !t.project && t.date && t.date <= endDate)
+    .reduce((sum, t) => sum + transactionNetUsd(t), 0);
+  const openingNet = state.transactions
+    .filter((t) => t.category === "Opening Balance" && t.tenantId === tenantId && (!t.date || t.date <= endDate))
+    .reduce((sum, t) => sum + transactionNetUsd(t), 0);
+  return roundUsd(dues - payments - openingNet);
+}
+
+function getTenantStatementNotification(tenantId) {
+  const hasBasis = isFixedMode()
+    ? state.monthlyExpected.length > 0
+    : state.transactions.some((t) => t.category === "Expenses");
+  if (!hasBasis) return null;
+  const lastMonth = getLastCompletedMonth();
+  const statementBalance = getTenantMonthEndBalance(tenantId, lastMonth);
+  if (statementBalance <= 0.005) return null;
+  const endDate = getMonthEndDate(lastMonth);
+  const paidSince = roundUsd(
+    state.transactions
+      .filter((t) => t.category === "Payments" && t.tenantId === tenantId && !t.project && t.date && t.date > endDate)
+      .reduce((sum, t) => sum + transactionNetUsd(t), 0),
+  );
+  const remaining = roundUsd(statementBalance - paidSince);
+  if (remaining <= 0.005) return null;
+  return { month: lastMonth, statementBalance, paidSince, remaining };
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 
 function getExpectedMonthlyUsd(month) {
   const configured = state.monthlyExpected.find((entry) => entry.month === month);
   if (configured && Number(configured.expectedUsd || 0) > 0) return Number(configured.expectedUsd || 0);
   return Number(state.settings.defaultDueUsd || 0);
+}
+
+function getExpectedForTenant(tenantId, month) {
+  const total = getExpectedMonthlyUsd(month);
+  if (!total) return 0;
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (tenant && tenant.coefficient > 0) return roundUsd(total * (tenant.coefficient / 1000));
+  return total;
 }
 
 function hasConfiguredMonthlyExpected(month) {
@@ -345,44 +716,526 @@ function getRawPaidForMonth(tenantId, month) {
   return { usd };
 }
 
-function getPaidForMonth(tenantId, month) {
-  const rawPaid = getRawPaidForMonth(tenantId, month).usd;
-  const expected = getExpectedMonthlyUsd(month);
-  return { usd: expected > 0 ? Math.min(rawPaid, expected) : rawPaid };
+function getTenantTotals(tenantId) {
+  const balance = getTenantBalance(tenantId);
+  const projectOutstanding = getTenantProjectOutstanding(tenantId);
+  return {
+    paidUsd: getTenantPaymentsTotal(tenantId),
+    advanceUsd: Math.max(0, -balance),
+    dueUsd: roundUsd(Math.max(0, balance) + projectOutstanding),
+  };
 }
 
-function getTenantTotals(tenantId) {
-  const totals = {
-    paidUsd: 0,
-    advanceUsd: 0,
-    dueUsd: 0,
+function getTenantSharedOutstanding(tenantId) {
+  if (!state.settings?.sharedExpensesEnabled) return 0;
+  const byMonth = new Map();
+  (state.sharedExpenses || []).forEach((se) => {
+    if (se.forMonth) {
+      byMonth.set(se.forMonth, (byMonth.get(se.forMonth) || 0) + Number(se.shares?.[tenantId] || 0));
+    } else {
+      // Legacy: no forMonth, fall back to manual collections
+      const owed = Number(se.shares?.[tenantId] || 0);
+      const collected = Number(se.collections?.[tenantId] || 0);
+      byMonth.set(`legacy-${se.id}`, Math.max(0, owed - collected));
+    }
+  });
+  let total = 0;
+  byMonth.forEach((totalShare, key) => {
+    if (key.startsWith("legacy-")) { total += totalShare; return; }
+    const month = key;
+    const rent = getExpectedForTenant(tenantId, month);
+    const rawPaid = getRawPaidForMonth(tenantId, month).usd;
+    const excessOverRent = Math.max(0, rawPaid - rent);
+    total += Math.max(0, totalShare - excessOverRent);
+  });
+  return roundUsd(total);
+}
+
+function getExplicitAdvanceBalance(tenantId) {
+  return roundUsd(
+    state.transactions
+      .filter((t) => t.tenantId === tenantId && t.category === "Advance Payments")
+      .reduce((sum, t) => sum + transactionNetUsd(t), 0),
+  );
+}
+
+function getRawPaidForProject(tenantId, projectName) {
+  return roundUsd(
+    state.transactions
+      .filter((t) => t.category === "Payments" && t.tenantId === tenantId && t.project === projectName)
+      .reduce((sum, t) => sum + transactionNetUsd(t), 0),
+  );
+}
+
+function getProjectTenantStatus(project, tenantId) {
+  const share = roundUsd(Number(project.shares?.[tenantId] || 0));
+  const paid = getRawPaidForProject(tenantId, project.name);
+  if (!share) return { share: 0, paid: 0, label: "No share", className: "none" };
+  if (paid >= share - 0.005) return { share, paid, label: "Paid", className: "paid" };
+  if (paid > 0) return { share, paid, label: "Partial", className: "partial" };
+  return { share, paid, label: "Due", className: "due" };
+}
+
+function getTenantProjectOutstanding(tenantId) {
+  return roundUsd(
+    (state.buildingProjects || [])
+      .filter((p) => p.status !== "completed")
+      .reduce((sum, project) => {
+        const share = roundUsd(Number(project.shares?.[tenantId] || 0));
+        const paid = getRawPaidForProject(tenantId, project.name);
+        return sum + Math.max(0, share - paid);
+      }, 0),
+  );
+}
+
+function updateProjectSharePreview() {
+  const budget = Number(els.projectBudgetInput.value || 0);
+  const distribution = els.projectDistributionInput.value;
+  if (budget <= 0) {
+    els.projectSharePreview.classList.add("hidden");
+    els.projectSharePreview.replaceChildren();
+    return;
+  }
+  const shares = computeSharedExpenseShares(budget, distribution);
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const rows = activeTenants.map((t) => {
+    const share = shares[t.id] || 0;
+    const pct = budget > 0 ? Math.round((share / budget) * 100) : 0;
+    const row = document.createElement("div");
+    row.className = "se-preview-row";
+    const name = document.createElement("span");
+    name.textContent = t.name;
+    const amount = document.createElement("span");
+    amount.className = "se-preview-amount";
+    amount.textContent = `${formatUsd(share)} (${pct}%)`;
+    row.append(name, amount);
+    return row;
+  });
+  els.projectSharePreview.replaceChildren(...rows);
+  els.projectSharePreview.classList.remove("hidden");
+}
+
+function openCreateProjectDialog() {
+  els.projectForm.reset();
+  els.projectDueDateInput.value = localDateInput();
+  els.projectSharePreview.classList.add("hidden");
+  els.projectSharePreview.replaceChildren();
+  openDialog(els.projectDialog);
+  setTimeout(() => els.projectNameInput.focus(), 50);
+}
+
+function submitProject(event) {
+  event.preventDefault();
+  const name = els.projectNameInput.value.trim();
+  const description = els.projectDescInput.value.trim();
+  const totalBudget = Number(els.projectBudgetInput.value || 0);
+  const dueDate = els.projectDueDateInput.value;
+  const distribution = els.projectDistributionInput.value;
+  if (!name) { showToast("Enter a project name"); return; }
+  if (!totalBudget) { showToast("Enter the total budget"); return; }
+  if (!dueDate) { showToast("Select a payment due date"); return; }
+  const shares = computeSharedExpenseShares(totalBudget, distribution);
+  const project = {
+    id: `bp-${Date.now()}`,
+    name,
+    description,
+    totalBudget,
+    dueDate,
+    distribution,
+    shares,
+    status: "active",
+    createdAt: new Date().toISOString(),
+  };
+  (state.buildingProjects ||= []).push(project);
+  addKnownValue(state.projects, name);
+  saveState();
+  closeDialog(els.projectDialog);
+  renderAll();
+  showToast("Project created");
+}
+
+function deleteProject(projectId) {
+  const project = (state.buildingProjects || []).find((p) => p.id === projectId);
+  if (!project) return;
+  if (!window.confirm(`Delete project "${project.name}"? Payment transactions linked to this project will remain in the ledger.`)) return;
+  state.buildingProjects = state.buildingProjects.filter((p) => p.id !== projectId);
+  recordDeletedId("projects", projectId);
+  saveState();
+  renderAll();
+  showToast("Project deleted");
+}
+
+function openCollectForProject(project) {
+  resetTransactionForm();
+  els.transactionProject.value = project.name;
+  syncTransactionFormMode();
+  openDialog(els.transactionDialog);
+  setTimeout(() => els.transactionTenant.focus(), 50);
+}
+
+function renderProjects() {
+  const projects = state.buildingProjects || [];
+  if (!projects.length) {
+    const empty = document.createElement("p");
+    empty.className = "settings-note";
+    empty.textContent = sessionMode === "owner"
+      ? "No projects yet. Create one with the + New button."
+      : "No active projects.";
+    els.buildingProjectList.replaceChildren(empty);
+    return;
+  }
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  els.buildingProjectList.replaceChildren(
+    ...projects.map((project) => {
+      const tenantStatuses = activeTenants
+        .map((tenant) => ({ tenant, ...getProjectTenantStatus(project, tenant.id) }))
+        .filter((s) => s.share > 0);
+      const totalCollected = tenantStatuses.reduce((s, ts) => s + ts.paid, 0);
+      const totalBudget = Number(project.totalBudget || 0);
+      const rate = totalBudget > 0 ? Math.min(100, Math.round((totalCollected / totalBudget) * 100)) : 0;
+
+      const card = document.createElement("div");
+      card.className = "project-card";
+
+      // Header row
+      const header = document.createElement("div");
+      header.className = "project-card-header";
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.className = "project-card-title";
+      title.textContent = project.name;
+      const meta = document.createElement("div");
+      meta.className = "project-card-meta";
+      const metaParts = [`${formatUsd(totalBudget)} budget`, `Due ${formatDateLabel(project.dueDate)}`];
+      if (project.description) metaParts.unshift(project.description);
+      meta.textContent = metaParts.join(" · ");
+      info.append(title, meta);
+      const actions = document.createElement("div");
+      actions.className = "project-card-actions";
+      const rateSpan = document.createElement("span");
+      rateSpan.className = "project-rate";
+      rateSpan.textContent = `${rate}%`;
+      actions.append(rateSpan);
+      if (sessionMode === "owner") {
+        const hasDue = tenantStatuses.some(({ share, paid }) => paid < share - 0.005);
+        if (hasDue) {
+          const remindBtn = document.createElement("button");
+          remindBtn.type = "button";
+          remindBtn.className = "mini-button whatsapp-btn remind-project-btn";
+          remindBtn.dataset.projectId = project.id;
+          remindBtn.textContent = "Remind";
+          actions.append(remindBtn);
+        }
+        const collectBtn = document.createElement("button");
+        collectBtn.type = "button";
+        collectBtn.className = "mini-button collect-project-btn";
+        collectBtn.dataset.projectId = project.id;
+        collectBtn.textContent = "Collect";
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "icon-button small delete-project-btn";
+        deleteBtn.dataset.projectId = project.id;
+        deleteBtn.title = "Delete project";
+        deleteBtn.textContent = "×";
+        actions.append(collectBtn, deleteBtn);
+      }
+      header.append(info, actions);
+
+      // Progress bar
+      const track = document.createElement("div");
+      track.className = "progress-track";
+      const bar = document.createElement("div");
+      bar.className = "progress-bar";
+      bar.style.width = `${rate}%`;
+      track.append(bar);
+
+      // Collected / budget summary
+      const summary = document.createElement("div");
+      summary.className = "project-collected-summary";
+      summary.textContent = `${formatUsd(totalCollected)} collected of ${formatUsd(totalBudget)}`;
+
+      // Tenant status grid
+      const grid = document.createElement("div");
+      grid.className = "tenant-status-grid";
+      tenantStatuses.forEach(({ tenant, share, paid, label, className }) => {
+        const statusCard = document.createElement("article");
+        statusCard.className = "status-card";
+        statusCard.innerHTML = `<strong></strong><span></span><div class="status-pill"></div>`;
+        statusCard.querySelector("strong").textContent = tenant.name;
+        statusCard.querySelector("span").textContent = `${formatUsd(paid)} / ${formatUsd(share)}`;
+        const pill = statusCard.querySelector(".status-pill");
+        pill.classList.add(`status-${className === "none" ? "due" : className}`);
+        pill.textContent = label;
+        grid.append(statusCard);
+      });
+
+      card.append(header, track, summary, grid);
+      return card;
+    }),
+  );
+}
+
+function computeSharedExpenseShares(totalUsd, distribution) {
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  if (!activeTenants.length) return {};
+  const shares = {};
+  if (distribution === "coefficient") {
+    const coeffSum = activeTenants.reduce((s, t) => s + (t.coefficient || 0), 0);
+    if (coeffSum > 0) {
+      let allocated = 0;
+      activeTenants.forEach((t, i) => {
+        if (i === activeTenants.length - 1) {
+          shares[t.id] = roundUsd(totalUsd - allocated);
+        } else {
+          const share = roundUsd(totalUsd * ((t.coefficient || 0) / coeffSum));
+          shares[t.id] = share;
+          allocated += share;
+        }
+      });
+      return shares;
+    }
+  }
+  let allocated = 0;
+  activeTenants.forEach((t, i) => {
+    if (i === activeTenants.length - 1) {
+      shares[t.id] = roundUsd(totalUsd - allocated);
+    } else {
+      const share = roundUsd(totalUsd / activeTenants.length);
+      shares[t.id] = share;
+      allocated += share;
+    }
+  });
+  return shares;
+}
+
+function buildSharedExpensesForMonth(month) {
+  const monthExpenses = (state.sharedExpenses || []).filter(
+    (se) => se.forMonth && monthKey(se.forMonth) === monthKey(month),
+  );
+  if (!monthExpenses.length) return null;
+
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const tenantStatuses = activeTenants.map((tenant) => {
+    const totalShare = monthExpenses.reduce((s, se) => s + Number(se.shares?.[tenant.id] || 0), 0);
+    const rent = getExpectedForTenant(tenant.id, month);
+    const rawPaid = getRawPaidForMonth(tenant.id, month).usd;
+    const excessOverRent = Math.max(0, rawPaid - rent);
+    const covered = Math.min(excessOverRent, totalShare);
+    let label, className;
+    if (!totalShare) { label = "No share"; className = "none"; }
+    else if (covered >= totalShare - 0.005) { label = "Paid"; className = "paid"; }
+    else if (covered > 0) { label = "Partial"; className = "partial"; }
+    else { label = "Due"; className = "due"; }
+    return { tenant, totalShare, covered, label, className };
+  }).filter((s) => s.totalShare > 0);
+
+  const expectedTotal = tenantStatuses.reduce((s, ts) => s + ts.totalShare, 0);
+  const coveredTotal = tenantStatuses.reduce((s, ts) => s + ts.covered, 0);
+  const rate = expectedTotal ? Math.min(100, Math.round((coveredTotal / expectedTotal) * 100)) : 0;
+
+  const categoryMap = new Map();
+  monthExpenses.forEach((se) => {
+    const cat = se.category || se.description || "Uncategorized";
+    categoryMap.set(cat, (categoryMap.get(cat) || 0) + Number(se.totalUsd || 0));
+  });
+  const totalShared = [...categoryMap.values()].reduce((s, v) => s + v, 0);
+
+  return { rate, tenantStatuses, categoryMap, totalShared };
+}
+
+function buildSharedExpensesSummaryList({ categoryMap, totalShared }) {
+  const summaryList = document.createElement("div");
+  summaryList.className = "summary-list";
+  [...categoryMap.entries()].forEach(([cat, amount]) => {
+    const row = document.createElement("article");
+    row.className = "summary-row";
+    row.innerHTML = `<div><strong></strong></div><b></b>`;
+    row.querySelector("strong").textContent = cat;
+    row.querySelector("b").textContent = formatUsd(amount);
+    summaryList.append(row);
+  });
+  if (categoryMap.size > 1) {
+    const totalRow = document.createElement("article");
+    totalRow.className = "summary-row emphasis";
+    totalRow.innerHTML = `<div><strong></strong></div><b></b>`;
+    totalRow.querySelector("strong").textContent = "Total";
+    totalRow.querySelector("b").textContent = formatUsd(totalShared);
+    summaryList.append(totalRow);
+  }
+  return summaryList;
+}
+
+function renderSharedExpenses() {
+  if (!state.settings?.sharedExpensesEnabled || !sessionMode) {
+    els.sharedExpensesPanel.classList.add("hidden");
+    return;
+  }
+  els.sharedExpensesPanel.classList.remove("hidden");
+
+  const data = buildSharedExpensesForMonth(selectedMonth);
+  if (!data) {
+    els.sharedExpensesRate.textContent = "";
+    els.sharedExpensesProgress.classList.add("hidden");
+    const empty = document.createElement("p");
+    empty.className = "settings-note";
+    empty.textContent = selectedMonth ? `No shared expenses for ${formatMonth(selectedMonth)}.` : "No shared expenses.";
+    els.sharedExpensesList.replaceChildren(empty);
+    return;
+  }
+
+  els.sharedExpensesRate.textContent = `${data.rate}%`;
+  els.sharedExpensesProgress.classList.remove("hidden");
+  els.sharedExpensesBar.style.width = `${data.rate}%`;
+
+  const grid = document.createElement("div");
+  grid.className = "tenant-status-grid";
+  data.tenantStatuses.forEach(({ tenant, totalShare, covered, label, className }) => {
+    const card = document.createElement("article");
+    card.className = "status-card";
+    card.innerHTML = `<strong></strong><span></span><div class="status-pill"></div>`;
+    card.querySelector("strong").textContent = tenant.name;
+    card.querySelector("span").textContent = `${formatUsd(covered)} / ${formatUsd(totalShare)}`;
+    const pill = card.querySelector(".status-pill");
+    pill.classList.add(`status-${className === "none" ? "due" : className}`);
+    pill.textContent = label;
+    grid.append(card);
+  });
+
+  els.sharedExpensesList.replaceChildren(buildSharedExpensesSummaryList(data), grid);
+}
+
+function renderPaymentsSharedExpenses() {
+  const hide = () => {
+    els.paymentSharedExpensesSection.classList.add("hidden");
+    els.paymentSharedSummary.classList.add("hidden");
+    els.paymentSharedSummaryLabel.classList.add("hidden");
   };
 
-  state.transactions.forEach((transaction) => {
-    if (transaction.tenantId !== tenantId) return;
-    const netUsd = transactionNetUsd(transaction);
-    if (isMonthlyPayment(transaction)) {
-      totals.paidUsd += netUsd;
+  if (!state.settings?.sharedExpensesEnabled || !sessionMode) { hide(); return; }
+
+  const data = buildSharedExpensesForMonth(selectedMonth);
+  if (!data) { hide(); return; }
+
+  // Summary KPI cards — same 4-card layout as Monthly Payments
+  const expectedTotal = data.tenantStatuses.reduce((s, ts) => s + ts.totalShare, 0);
+  const coveredTotal = data.tenantStatuses.reduce((s, ts) => s + ts.covered, 0);
+  const dueTotal = roundUsd(expectedTotal - coveredTotal);
+  const paidCount = data.tenantStatuses.filter(({ totalShare, covered }) => covered >= totalShare - 0.005).length;
+  els.paymentSharedPaidCount.textContent = `${paidCount}/${data.tenantStatuses.length} paid`;
+
+  els.paymentSharedSummary.replaceChildren(
+    ...["Expected", "Collected", "Due"].map((label, i) => {
+      const value = [formatUsd(expectedTotal), formatUsd(coveredTotal), formatUsd(dueTotal)][i];
+      const card = document.createElement("article");
+      card.className = "payment-summary-card";
+      card.innerHTML = `<span></span><strong></strong>`;
+      card.querySelector("span").textContent = label;
+      card.querySelector("strong").textContent = value;
+      return card;
+    }),
+  );
+  els.paymentSharedSummary.classList.remove("hidden");
+  els.paymentSharedSummaryLabel.classList.remove("hidden");
+
+
+  // Detail section
+  els.paymentSharedExpensesSection.classList.remove("hidden");
+  els.paymentSharedExpensesRate.textContent = `${data.rate}%`;
+  els.paymentSharedExpensesProgress.classList.remove("hidden");
+  els.paymentSharedExpensesBar.style.width = `${data.rate}%`;
+
+  const list = document.createElement("div");
+  list.className = "tenant-payment-list";
+  data.tenantStatuses.forEach(({ tenant, totalShare, covered, label, className }) => {
+    const due = roundUsd(totalShare - covered);
+    const row = document.createElement("div");
+    row.className = "tenant-payment-row";
+    row.innerHTML = `
+      <div class="tpr-main">
+        <div class="tpr-info">
+          <strong></strong>
+          <span></span>
+        </div>
+        <div class="tpr-amount"></div>
+      </div>
+      <div class="tpr-status-row">
+        <div class="tpr-status-left">
+          <span class="status-pill"></span>
+          <span class="tpr-detail"></span>
+        </div>
+      </div>
+    `;
+    row.querySelector("strong").textContent = tenant.name;
+    row.querySelector(".tpr-info span").textContent = `Unit ${tenant.unit}`;
+    row.querySelector(".tpr-amount").textContent = `${formatUsd(covered)} / ${formatUsd(totalShare)}`;
+    const pill = row.querySelector(".status-pill");
+    pill.className = `status-pill status-${className === "none" ? "due" : className}`;
+    pill.textContent = label;
+    row.querySelector(".tpr-detail").textContent = due > 0 ? `${formatUsd(due)} due` : "Fully paid";
+    // Per-tenant WhatsApp reminder (owner only, same as Monthly Payment Status)
+    if (due > 0 && sessionMode === "owner") {
+      const waUrl = buildSharedExpensesWhatsAppUrl(tenant, due, selectedMonth);
+      if (waUrl) {
+        const waBtn = document.createElement("a");
+        waBtn.className = "whatsapp-full-btn";
+        waBtn.href = waUrl;
+        waBtn.target = "_blank";
+        waBtn.rel = "noopener";
+        waBtn.textContent = "Send WhatsApp Reminder";
+        row.append(waBtn);
+      } else {
+        const waBtn = document.createElement("button");
+        waBtn.className = "whatsapp-full-btn whatsapp-no-phone";
+        waBtn.type = "button";
+        waBtn.textContent = "Set phone to send reminder";
+        waBtn.dataset.editTenantId = tenant.id;
+        row.append(waBtn);
+      }
     }
-    if (transaction.category === "Advance Payments") {
-      totals.advanceUsd += netUsd;
-    }
+    list.append(row);
   });
 
-  getMonths().forEach((month) => {
-    const expected = getExpectedMonthlyUsd(month);
-    if (!expected) return;
-    const rawPaid = getRawPaidForMonth(tenantId, month).usd;
-    if (isFutureMonth(month)) {
-      totals.advanceUsd += Math.max(0, rawPaid);
-      return;
-    }
-    totals.advanceUsd += Math.max(0, rawPaid - expected);
-    if (isCurrentOrPastMonth(month)) totals.dueUsd += Math.max(0, expected - Math.min(rawPaid, expected));
-  });
-
-  return totals;
+  els.paymentSharedExpensesList.replaceChildren(list);
 }
+
+
+function updateSharedExpenseInlinePreview() {
+  if (els.transactionCategory.value !== "Services Expenses") return;
+  const lbp = Number(els.transactionLbp.value || 0);
+  const usd = Number(els.transactionUsd.value || 0);
+  const totalUsd = toUsd(usd, lbp);
+  const distribution = els.transactionDistribution.value;
+  if (totalUsd <= 0) {
+    els.sharedExpenseInlinePreview.classList.add("hidden");
+    els.sharedExpenseInlinePreview.replaceChildren();
+    return;
+  }
+  const shares = computeSharedExpenseShares(totalUsd, distribution);
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const rows = activeTenants.map((t) => {
+    const share = shares[t.id] || 0;
+    const pct = totalUsd > 0 ? Math.round((share / totalUsd) * 100) : 0;
+    const row = document.createElement("div");
+    row.className = "se-preview-row";
+    const name = document.createElement("span");
+    name.textContent = t.name;
+    const amount = document.createElement("span");
+    amount.className = "se-preview-amount";
+    amount.textContent = `${formatUsd(share)} (${pct}%)`;
+    row.append(name, amount);
+    return row;
+  });
+  const totalRow = document.createElement("div");
+  totalRow.className = "se-preview-total";
+  const tLabel = document.createElement("strong");
+  tLabel.textContent = "Total:";
+  const tVal = document.createElement("strong");
+  tVal.textContent = formatUsd(totalUsd);
+  totalRow.append(tLabel, tVal);
+  els.sharedExpenseInlinePreview.replaceChildren(...rows, totalRow);
+  els.sharedExpenseInlinePreview.classList.remove("hidden");
+}
+
 
 function getCategoryTotals() {
   return state.categories.map((category) => {
@@ -396,6 +1249,8 @@ function getCategoryTotals() {
 function getAccountTotals() {
   return state.transactions.reduce(
     (acc, transaction) => {
+      // Tenant-tied opening balances are receivables/credits, not cash.
+      if (transaction.category === "Opening Balance" && transaction.tenantId) return acc;
       const netUsd = transactionNetUsd(transaction);
       acc.usd += netUsd;
       if (transaction.category === "Payments") {
@@ -420,15 +1275,17 @@ function getAccountTotals() {
 
 function getPositionTotals() {
   const account = getAccountTotals();
-  const tenantTotals = state.tenants.map((tenant) => getTenantTotals(tenant.id));
-  const receivableUsd = tenantTotals.reduce((sum, totals) => sum + totals.dueUsd, 0);
-  const advanceLiabilityUsd = tenantTotals.reduce((sum, totals) => sum + Math.max(0, totals.advanceUsd), 0);
-
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const tenantBalances = activeTenants.map((t) => getTenantBalance(t.id));
+  const receivableUsd = roundUsd(tenantBalances.reduce((sum, b) => sum + Math.max(0, b), 0));
+  const advanceLiabilityUsd = roundUsd(tenantBalances.reduce((sum, b) => sum + Math.max(0, -b), 0));
+  const projectReceivable = roundUsd(activeTenants.reduce((sum, t) => sum + getTenantProjectOutstanding(t.id), 0));
+  const totalReceivable = roundUsd(receivableUsd + projectReceivable);
   return {
     cashUsd: account.usd,
-    receivableUsd,
+    receivableUsd: totalReceivable,
     advanceLiabilityUsd,
-    netPositionUsd: account.usd + receivableUsd - advanceLiabilityUsd,
+    netPositionUsd: roundUsd(account.usd + totalReceivable - advanceLiabilityUsd),
   };
 }
 
@@ -470,6 +1327,7 @@ function getMonthlyActivityRows(month) {
 
   state.transactions.forEach((transaction) => {
     if (!month || monthKey(transactionDateValue(transaction)) !== monthKey(month)) return;
+    if (transaction.category === "Opening Balance" && transaction.tenantId) return; // not cash movement
     const row = rowByCategory.get(isProjectPayment(transaction) ? "Project Payments" : transaction.category);
     if (!row) return;
     row.usd += transactionNetUsd(transaction);
@@ -487,8 +1345,9 @@ function getMonthlyActivityRows(month) {
 }
 
 function paymentStatus(tenantId, month) {
-  const expected = getExpectedMonthlyUsd(month);
-  const paid = getPaidForMonth(tenantId, month).usd;
+  const expected = getMonthlyDueForTenant(tenantId, month);
+  const rawPaid = isFixedMode() ? getRawPaidForMonth(tenantId, month).usd : getTenantPaymentsTotal(tenantId, month);
+  const paid = expected > 0 ? Math.min(rawPaid, expected) : rawPaid;
   if (!expected && !paid) return { label: "No due", className: "none", paid, expected };
   if (paid >= expected) return { label: "Paid", className: "paid", paid, expected };
   if (paid > 0) return { label: "Partial", className: "partial", paid, expected };
@@ -524,7 +1383,7 @@ function hasPaymentInMonth(month) {
 }
 
 function showLoginScreen() {
-  const tenantsWithPin = state.tenants.filter((t) => t.pin);
+  const tenantsWithPin = state.tenants.filter((t) => t.pinHash);
   els.loginTenantSelect.replaceChildren(
     ...tenantsWithPin.map((t) => {
       const opt = document.createElement("option");
@@ -533,7 +1392,7 @@ function showLoginScreen() {
       return opt;
     }),
   );
-  const hasPassword = Boolean(state.settings.ownerPassword);
+  const hasPassword = Boolean(state.settings.ownerPasswordHash);
   const hasTenants = tenantsWithPin.length > 0;
   els.loginHint.textContent = hasPassword ? "" : "No password set — press Enter to access as owner";
   els.loginHint.classList.toggle("hidden", hasPassword);
@@ -564,13 +1423,15 @@ function attemptLogin() {
 
   if (isOwnerTab) {
     const entered = els.loginPasswordInput.value;
-    const stored = state.settings.ownerPassword;
-    if (!stored || entered === stored) {
+    const stored = state.settings.ownerPasswordHash;
+    if (!stored || hashSecret(entered, state.security.salt) === stored) {
       sessionMode = "owner";
       sessionTenantId = null;
       applySessionMode();
       hideLoginScreen();
       els.loginPasswordInput.value = "";
+      renderAll();
+      checkSetupWizard();
     } else {
       els.loginError.textContent = "Incorrect password";
       els.loginError.classList.remove("hidden");
@@ -579,13 +1440,14 @@ function attemptLogin() {
     const tenantId = els.loginTenantSelect.value;
     const entered = els.loginPinInput.value;
     const tenant = state.tenants.find((t) => t.id === tenantId);
-    if (tenant && tenant.pin && entered === tenant.pin) {
+    if (tenant && tenant.pinHash && hashSecret(entered, state.security.salt) === tenant.pinHash) {
       sessionMode = "tenant";
       sessionTenantId = tenantId;
       applySessionMode();
       hideLoginScreen();
       setView("dashboardView");
       renderAll();
+      checkDueBanner();
       els.loginPinInput.value = "";
     } else {
       els.loginError.textContent = "Incorrect PIN";
@@ -606,7 +1468,104 @@ function logout() {
   els.loginTenantTab.classList.remove("active");
   els.loginOwnerForm.classList.remove("hidden");
   els.loginTenantForm.classList.add("hidden");
+  els.dueBanner.classList.add("hidden");
   showLoginScreen();
+}
+
+function checkDueBanner() {
+  if (sessionMode !== "tenant" || !sessionTenantId) {
+    els.dueBanner.classList.add("hidden");
+    return;
+  }
+  const balance = getTenantBalance(sessionTenantId);
+  const projectsDue = getTenantProjectOutstanding(sessionTenantId);
+  const totalDue = roundUsd(Math.max(0, balance) + projectsDue);
+  if (totalDue > 0) {
+    els.dueBannerText.textContent = `You have ${formatUsd(totalDue)} outstanding. Please contact the building owner to settle your balance.`;
+    els.dueBanner.classList.remove("hidden");
+  } else {
+    els.dueBanner.classList.add("hidden");
+  }
+}
+
+function renderTenantDuesSummary() {
+  if (sessionMode !== "tenant" || !sessionTenantId) {
+    els.tenantDuesPanel.classList.add("hidden");
+    return;
+  }
+
+  const tenantId = sessionTenantId;
+  const dueBasis = getTenantDueBasisTotal(tenantId);
+  const paymentsTotal = getTenantPaymentsTotal(tenantId);
+  const openingNet = getTenantOpeningNet(tenantId);
+  const balance = getTenantBalance(tenantId);
+  const projectsDue = getTenantProjectOutstanding(tenantId);
+  const totalDue = roundUsd(Math.max(0, balance) + projectsDue);
+
+  const list = document.createElement("div");
+  list.className = "summary-list";
+
+  const dueHeaderRow = document.createElement("article");
+  dueHeaderRow.className = "summary-row";
+  dueHeaderRow.innerHTML = `<div><strong></strong></div><b></b>`;
+  dueHeaderRow.querySelector("strong").textContent = isFixedMode() ? "Your Monthly Dues" : "Your Expense Share";
+  dueHeaderRow.querySelector("b").textContent = formatUsd(dueBasis);
+  list.append(dueHeaderRow);
+
+  if (!isFixedMode()) {
+    const categoryMap = getTenantExpensesByCategory(tenantId);
+    [...categoryMap.entries()].sort((a, b) => b[1] - a[1]).forEach(([cat, amount]) => {
+      const row = document.createElement("article");
+      row.className = "summary-row summary-row-indent";
+      row.innerHTML = `<div><strong></strong></div><b></b>`;
+      row.querySelector("strong").textContent = cat;
+      row.querySelector("b").textContent = formatUsd(amount);
+      list.append(row);
+    });
+  }
+
+  // Opening balance carry-in (only when present)
+  if (Math.abs(openingNet) > 0.005) {
+    const openingRow = document.createElement("article");
+    openingRow.className = "summary-row";
+    openingRow.innerHTML = `<div><strong>Opening Balance</strong></div><b></b>`;
+    const openingValue = openingRow.querySelector("b");
+    if (openingNet < 0) {
+      openingValue.textContent = formatUsd(-openingNet);
+      openingValue.className = "due-amount";
+    } else {
+      openingValue.textContent = `−${formatUsd(openingNet)}`;
+      openingValue.className = "advance-credit";
+    }
+    list.append(openingRow);
+  }
+
+  // Payments made
+  const paymentsRow = document.createElement("article");
+  paymentsRow.className = "summary-row";
+  paymentsRow.innerHTML = `<div><strong>Payments Made</strong></div><b class="advance-credit"></b>`;
+  paymentsRow.querySelector("b").textContent = `−${formatUsd(paymentsTotal)}`;
+  list.append(paymentsRow);
+
+  // Projects if any
+  if (projectsDue > 0) {
+    const projRow = document.createElement("article");
+    projRow.className = "summary-row";
+    projRow.innerHTML = `<div><strong>Projects</strong></div><b class="due-amount"></b>`;
+    projRow.querySelector("b").textContent = formatUsd(projectsDue);
+    list.append(projRow);
+  }
+
+  // Total balance
+  const totalRow = document.createElement("article");
+  totalRow.className = "summary-row emphasis";
+  const balanceClass = totalDue > 0 ? "due-amount" : balance < -0.005 ? "advance-credit" : "";
+  totalRow.innerHTML = `<div><strong>Current Balance</strong></div><b class="${balanceClass}"></b>`;
+  totalRow.querySelector("b").textContent = totalDue > 0 ? formatUsd(totalDue) : balance < -0.005 ? `Credit ${formatUsd(-balance)}` : "Settled";
+  list.append(totalRow);
+
+  els.tenantDuesList.replaceChildren(list);
+  els.tenantDuesPanel.classList.remove("hidden");
 }
 
 function renderDashboard() {
@@ -625,38 +1584,351 @@ function renderDashboard() {
   }
 
   const totals = getPositionTotals();
-  els.kpiGrid.replaceChildren(...buildKpiCards([
-    ["Cash Balance", formatUsd(totals.cashUsd), "Ledger cash now"],
-    ["Tenant Receivables", formatUsd(totals.receivableUsd), "Unpaid monthly dues"],
-    ["Advance Liability", formatUsd(totals.advanceLiabilityUsd), "Tenant credit to honor"],
-    ["Net Position", formatUsd(totals.netPositionUsd), "Cash + receivables - advances"],
-  ]));
+  const totalExpenses = roundUsd(state.transactions.filter((t) => t.category === "Expenses").reduce((s, t) => s + toUsd(t.debitUsd, t.debitLbp), 0));
+  els.kpiGrid.replaceChildren(...buildKpiCards(
+    isFixedMode()
+      ? [
+          ["Reserve Fund", formatUsd(totals.cashUsd), "Collected funds minus expenses"],
+          ["Total Expenses", formatUsd(totalExpenses), "All recorded building costs"],
+          ["Outstanding", formatUsd(totals.receivableUsd), "Tenant dues owed"],
+          ["Net Position", formatUsd(totals.netPositionUsd), "Reserve + outstanding - credits"],
+        ]
+      : [
+          ["Cash Balance", formatUsd(totals.cashUsd), "Ledger net cash"],
+          ["Total Expenses", formatUsd(totalExpenses), "All shared building costs"],
+          ["Outstanding", formatUsd(totals.receivableUsd), "Tenant balances owed"],
+          ["Net Position", formatUsd(totals.netPositionUsd), "Cash + outstanding - credits"],
+        ],
+  ));
 
+  renderTenantDuesSummary();
+  renderPaymentDeclarations();
+  renderSharedExpenses();
+  checkNewMonthBanner();
   renderTenantStatus();
   els.categorySummary.closest(".panel").classList.remove("hidden");
   renderCategorySummary();
   renderExpenseCategoryBreakdown();
 }
 
+function checkNewMonthBanner() {
+  if (sessionMode !== "owner" || newMonthBannerDismissed || !isFixedMode()) {
+    els.newMonthBanner.classList.add("hidden");
+    return;
+  }
+  const now = new Date();
+  const currentMonthIso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  const alreadyAdded = state.monthlyExpected.some((e) => e.month === currentMonthIso);
+  if (alreadyAdded) {
+    els.newMonthBanner.classList.add("hidden");
+  } else {
+    const label = now.toLocaleString("default", { month: "long", year: "numeric" });
+    els.newMonthBannerText.textContent = `${label} has not been set up yet. Add it to start tracking this month's payments.`;
+    els.newMonthBanner.classList.remove("hidden");
+  }
+}
+
+function checkSetupWizard() {
+  if (sessionMode === "owner" && !state.setupComplete) openSetupWizard();
+}
+
+function applyWizardCollectionModeVisibility() {
+  const fixed = els.wizardCollectionMode.value === "fixed";
+  els.wizardBudgetField.classList.toggle("hidden", !fixed);
+  els.wizardCollectionModeNote.textContent = fixed
+    ? "Tenants pay a fixed monthly amount; surplus builds the reserve fund."
+    : "Each month's actual expenses are split among tenants.";
+}
+
+function openSetupWizard() {
+  wizardTenants = state.tenants.map((t) => ({
+    id: t.id,
+    name: t.name || "",
+    unit: t.unit || "",
+    phone: t.phone || "",
+    pinHash: t.pinHash || "",
+    newPin: "",
+    coefficient: t.coefficient || 0,
+    active: t.active !== false,
+  }));
+  els.wizardBuildingName.value = (state.building && state.building.name) || "";
+  els.wizardOwnerPassword.value = "";
+  els.wizardOwnerPassword.placeholder = state.settings.ownerPasswordHash
+    ? "Password set — type to change"
+    : "Leave blank for no password";
+  els.wizardCollectionMode.value = state.settings.collectionMode || "actual";
+  applyWizardCollectionModeVisibility();
+  els.wizardMonthlyBudget.value = state.settings.defaultDueUsd || "";
+  els.wizardLbpRate.value = state.settings.lbpPerUsd || "";
+  wizardEditingIdx = null;
+  els.wizardTenantName.value = "";
+  els.wizardTenantUnit.value = "";
+  els.wizardTenantPhone.value = "";
+  els.wizardTenantPin.value = "";
+  els.wizardTenantCoeff.value = "";
+  els.wizardAddTenantBtn.textContent = "+ Add Tenant";
+  els.wizardCancelEditBtn.classList.add("hidden");
+  showWizardStep(1);
+  renderWizardTenants();
+  openDialog(els.setupWizardDialog);
+  setTimeout(() => els.wizardBuildingName.focus(), 50);
+}
+
+function showWizardStep(n) {
+  [els.wizardStep1, els.wizardStep2, els.wizardStep3].forEach((step, i) => {
+    step.classList.toggle("hidden", i + 1 !== n);
+  });
+  [els.wizardDot1, els.wizardDot2, els.wizardDot3].forEach((dot, i) => {
+    dot.classList.toggle("active", i + 1 <= n);
+  });
+}
+
+function wizardNextStep(from) {
+  if (from === 1) {
+    if (!els.wizardBuildingName.value.trim()) {
+      showToast("Please enter the building name.");
+      els.wizardBuildingName.focus();
+      return;
+    }
+    showWizardStep(2);
+    setTimeout(() => els.wizardMonthlyBudget.focus(), 50);
+  } else if (from === 2) {
+    showWizardStep(3);
+    setTimeout(() => els.wizardTenantName.focus(), 50);
+  }
+}
+
+function wizardPrevStep(from) {
+  showWizardStep(from - 1);
+}
+
+function wizardClearTenantForm() {
+  els.wizardTenantName.value = "";
+  els.wizardTenantUnit.value = "";
+  els.wizardTenantPhone.value = "";
+  els.wizardTenantPin.value = "";
+  els.wizardTenantPin.placeholder = "4 digits";
+  els.wizardTenantCoeff.value = "";
+  els.wizardAddTenantBtn.textContent = "+ Add Tenant";
+  els.wizardCancelEditBtn.classList.add("hidden");
+  wizardEditingIdx = null;
+}
+
+function wizardEditTenant(idx) {
+  const t = wizardTenants[idx];
+  if (!t) return;
+  wizardEditingIdx = idx;
+  els.wizardTenantName.value = t.name;
+  els.wizardTenantUnit.value = t.unit;
+  els.wizardTenantPhone.value = t.phone || "";
+  els.wizardTenantPin.value = t.newPin || "";
+  els.wizardTenantPin.placeholder = t.pinHash ? "PIN set — type to change" : "4 digits";
+  els.wizardTenantCoeff.value = t.coefficient > 0 ? String(t.coefficient) : "";
+  els.wizardAddTenantBtn.textContent = "Save Changes";
+  els.wizardCancelEditBtn.classList.remove("hidden");
+  els.wizardTenantName.focus();
+}
+
+function wizardAddTenant() {
+  const name = els.wizardTenantName.value.trim();
+  const unit = els.wizardTenantUnit.value.trim();
+  if (!name) { showToast("Please enter the tenant name."); els.wizardTenantName.focus(); return; }
+  if (!unit) { showToast("Please enter the unit number."); els.wizardTenantUnit.focus(); return; }
+  const data = {
+    name,
+    unit,
+    phone: els.wizardTenantPhone.value.trim(),
+    pinHash: "",
+    newPin: els.wizardTenantPin.value.trim(),
+    coefficient: parseInt(els.wizardTenantCoeff.value, 10) || 0,
+  };
+  if (wizardEditingIdx !== null) {
+    data.id = wizardTenants[wizardEditingIdx].id;
+    data.active = wizardTenants[wizardEditingIdx].active;
+    data.pinHash = wizardTenants[wizardEditingIdx].pinHash || "";
+    wizardTenants[wizardEditingIdx] = data;
+  } else {
+    wizardTenants.push(data);
+  }
+  wizardClearTenantForm();
+  renderWizardTenants();
+  els.wizardTenantName.focus();
+}
+
+function renderWizardTenants() {
+  const coeffSum = wizardTenants.reduce((s, t) => s + (t.coefficient || 0), 0);
+  const hasCoeff = wizardTenants.some((t) => t.coefficient > 0);
+  const items = wizardTenants.map((t, i) => {
+    const item = document.createElement("div");
+    item.className = "wizard-tenant-item";
+    const info = document.createElement("div");
+    info.className = "wizard-tenant-item-info";
+    const nameLine = document.createElement("span");
+    nameLine.className = "wizard-tenant-item-name";
+    nameLine.textContent = `${t.name} — Unit ${t.unit}`;
+    const metaLine = document.createElement("span");
+    metaLine.className = "wizard-tenant-item-meta";
+    const parts = [];
+    if (t.phone) parts.push(t.phone);
+    if (t.pinHash || t.newPin) parts.push("PIN set");
+    if (t.coefficient) parts.push(`${t.coefficient}/1000`);
+    metaLine.textContent = parts.join(" · ") || "—";
+    info.append(nameLine, metaLine);
+    const actions = document.createElement("div");
+    actions.className = "wizard-tenant-actions";
+    const editBtn = document.createElement("button");
+    editBtn.className = "wizard-tenant-edit";
+    editBtn.textContent = "Edit";
+    editBtn.type = "button";
+    editBtn.dataset.editIdx = String(i);
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "wizard-tenant-remove";
+    removeBtn.textContent = "×";
+    removeBtn.type = "button";
+    removeBtn.dataset.idx = String(i);
+    actions.append(editBtn, removeBtn);
+    item.append(info, actions);
+    return item;
+  });
+  els.wizardTenantList.replaceChildren(...items);
+  const s = els.wizardCoeffStatus;
+  if (!hasCoeff) {
+    s.textContent = "";
+    s.className = "wizard-coeff-status";
+  } else if (coeffSum === 1000) {
+    s.textContent = `Coefficients: ${coeffSum}/1000 ✓`;
+    s.className = "wizard-coeff-status coeff-ok";
+  } else {
+    s.textContent = `Coefficients: ${coeffSum}/1000 — total must be 1000`;
+    s.className = "wizard-coeff-status coeff-warn";
+  }
+}
+
+function finishSetupWizard() {
+  const buildingName = els.wizardBuildingName.value.trim();
+  if (!buildingName) {
+    showWizardStep(1);
+    showToast("Please enter the building name.");
+    els.wizardBuildingName.focus();
+    return;
+  }
+  state.building = state.building || {};
+  state.building.name = buildingName;
+  const pw = els.wizardOwnerPassword.value;
+  if (pw) state.settings.ownerPasswordHash = hashSecret(pw, state.security.salt);
+  state.settings.collectionMode = els.wizardCollectionMode.value === "fixed" ? "fixed" : "actual";
+  const budget = parseFloat(els.wizardMonthlyBudget.value);
+  if (budget > 0) state.settings.defaultDueUsd = budget;
+  const rate = parseFloat(els.wizardLbpRate.value);
+  if (rate > 0) state.settings.lbpPerUsd = rate;
+  state.tenants = wizardTenants.map((t) => ({
+    id: t.id || ("tenant-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6)),
+    name: t.name,
+    unit: t.unit,
+    phone: t.phone || "",
+    pinHash: t.newPin ? hashSecret(t.newPin, state.security.salt) : (t.pinHash || ""),
+    coefficient: t.coefficient || 0,
+    active: t.active !== false,
+  }));
+  state.setupComplete = true;
+  saveState();
+  closeDialog(els.setupWizardDialog);
+  populateTenantSelect();
+  renderAll();
+  showToast("Setup complete! Welcome to Building Account Tracker.");
+}
+
+function renderPaymentDeclarations() {
+  const pending = (state.paymentDeclarations || []).filter((d) => d.status === "pending");
+  els.declarationsPanel.classList.toggle("hidden", pending.length === 0);
+  if (!pending.length) return;
+  els.declarationsBadge.textContent = `${pending.length} pending`;
+  els.declarationsList.replaceChildren(
+    ...pending.map((decl) => {
+      const name = tenantName(decl.tenantId);
+      const item = document.createElement("div");
+      item.className = "declaration-item";
+      const info = document.createElement("div");
+      info.className = "declaration-info";
+      const strong = document.createElement("strong");
+      strong.textContent = `${name} says they paid ${formatMonthly(decl.amount)} for ${formatMonth(decl.month)}`;
+      const sub = document.createElement("span");
+      sub.textContent = decl.declaredAt ? `Notified ${formatDateLabel(decl.declaredAt.slice(0, 10))}` : "";
+      info.append(strong, sub);
+      const actions = document.createElement("div");
+      actions.className = "declaration-actions";
+      const recordBtn = document.createElement("button");
+      recordBtn.type = "button";
+      recordBtn.className = "primary-button declaration-record-btn";
+      recordBtn.dataset.declId = decl.id;
+      recordBtn.dataset.tenantId = decl.tenantId;
+      recordBtn.dataset.month = decl.month;
+      recordBtn.dataset.amount = String(decl.amount);
+      recordBtn.textContent = "Record Payment";
+      const dismissBtn = document.createElement("button");
+      dismissBtn.type = "button";
+      dismissBtn.className = "secondary-button declaration-dismiss-btn";
+      dismissBtn.dataset.declId = decl.id;
+      dismissBtn.textContent = "Dismiss";
+      actions.append(recordBtn, dismissBtn);
+      item.append(info, actions);
+      return item;
+    }),
+  );
+}
+
+function declarePayment(tenantId, month, amount) {
+  if (!window.confirm(`Notify the owner that you've paid ${formatMonthly(amount)} for ${formatMonth(month)}?`)) return;
+  const decl = {
+    id: `decl-${Date.now()}`,
+    tenantId,
+    month,
+    amount: Number(amount),
+    declaredAt: new Date().toISOString(),
+    status: "pending",
+  };
+  (state.paymentDeclarations ||= []).push(decl);
+  saveState();
+  renderPayments();
+  showToast("Owner notified of your payment");
+}
+
+function acknowledgeDeclaration(id, { record = false } = {}) {
+  const decl = (state.paymentDeclarations || []).find((d) => d.id === id);
+  if (!decl) return;
+  decl.status = "acknowledged";
+  saveState();
+  renderDashboard();
+  if (record) openPaymentDialogFor(decl.tenantId, decl.month, decl.amount);
+}
+
 function renderTenantStatus() {
-  const expected = getExpectedMonthlyUsd(selectedMonth);
-  const statuses = state.tenants.map((tenant) => ({ tenant, status: paymentStatus(tenant.id, selectedMonth) }));
-  const expectedTotal = expected * statuses.length;
-  const paidTotal = statuses.reduce((sum, entry) => sum + entry.status.paid, 0);
-  const rate = expectedTotal ? Math.min(100, Math.round((paidTotal / expectedTotal) * 100)) : 0;
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const balanceData = activeTenants.map((t) => ({
+    tenant: t,
+    balance: getTenantBalance(t.id),
+    payments: getTenantPaymentsTotal(t.id),
+    owed: roundUsd(getTenantDueBasisTotal(t.id) - getTenantOpeningNet(t.id)),
+  }));
+  const totalOwed = roundUsd(balanceData.reduce((s, d) => s + d.owed, 0));
+  const totalPaid = roundUsd(balanceData.reduce((s, d) => s + d.payments, 0));
+  const rate = totalOwed > 0 ? Math.min(100, Math.round((totalPaid / totalOwed) * 100)) : 0;
 
   els.collectionRate.textContent = `${rate}%`;
   els.collectionProgress.style.width = `${rate}%`;
   els.tenantStatusGrid.replaceChildren(
-    ...statuses.map(({ tenant, status }) => {
+    ...balanceData.map(({ tenant, balance }) => {
       const card = document.createElement("article");
       card.className = "status-card";
       card.innerHTML = `<strong></strong><span></span><div class="status-pill"></div>`;
       card.querySelector("strong").textContent = tenant.name;
-      card.querySelector("span").textContent = `${formatMonthly(status.paid)} / ${formatMonthly(status.expected)}`;
       const pill = card.querySelector(".status-pill");
-      pill.classList.add(`status-${status.className === "none" ? "due" : status.className}`);
-      pill.textContent = status.label;
+      const statusClass = balance > 0.005 ? "due" : "paid";
+      pill.classList.add(`status-${statusClass}`);
+      pill.textContent = balance > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
+      card.querySelector("span").textContent = balance > 0.005
+        ? `Owes ${formatUsd(balance)}`
+        : balance < -0.005 ? `Credit ${formatUsd(-balance)}` : "Settled";
       return card;
     }),
   );
@@ -721,16 +1993,17 @@ function renderCategorySummary() {
 }
 
 function getMonthCollection(month) {
-  const expected = getExpectedMonthlyUsd(month);
-  const tenantStatuses = state.tenants.map((tenant) => ({ tenant, status: paymentStatus(tenant.id, month) }));
-  const expectedTotal = expected * state.tenants.length;
+  const tenantStatuses = state.tenants
+    .filter((t) => t.active !== false)
+    .map((tenant) => ({ tenant, status: paymentStatus(tenant.id, month) }));
+  const expectedTotal = tenantStatuses.reduce((sum, entry) => sum + entry.status.expected, 0);
   const paidTotal = tenantStatuses.reduce((sum, entry) => sum + entry.status.paid, 0);
   const dueTotal = Math.max(0, expectedTotal - paidTotal);
   const paidCount = tenantStatuses.filter((entry) => entry.status.className === "paid").length;
   const partialCount = tenantStatuses.filter((entry) => entry.status.className === "partial").length;
   const dueCount = tenantStatuses.filter((entry) => entry.status.className === "due").length;
   const rate = expectedTotal ? Math.min(100, Math.round((paidTotal / expectedTotal) * 100)) : 0;
-  return { expected, expectedTotal, paidTotal, dueTotal, paidCount, partialCount, dueCount, rate, tenantStatuses };
+  return { expectedTotal, paidTotal, dueTotal, paidCount, partialCount, dueCount, rate, tenantStatuses };
 }
 
 function renderPaymentMonthSelect() {
@@ -760,18 +2033,121 @@ function renderPaymentMonthSelect() {
 
 function renderPayments() {
   renderPaymentMonthSelect();
-  const collection = getMonthCollection(selectedMonth);
+  els.addMonthButton.classList.toggle("hidden", !isFixedMode());
+  if (isFixedMode()) renderPaymentsFixed();
+  else renderPaymentsActual();
 
-  const summary = [
-    ["Expected", formatMonthly(collection.expectedTotal)],
-    ["Collected", formatMonthly(collection.paidTotal)],
-    ["Due", formatMonthly(collection.dueTotal)],
-    ["Paid Tenants", `${collection.paidCount}/${state.tenants.length}`],
-  ];
-  els.paymentMonthRate.textContent = `${collection.rate}% collected`;
+  // Hide shared expenses section (merged into regular expenses now)
+  els.paymentSharedExpensesSection.classList.add("hidden");
+  els.paymentSharedSummary.classList.add("hidden");
+  els.paymentSharedSummaryLabel.classList.add("hidden");
+
+  const months = getMonths().slice().reverse();
+  els.monthOverviewList.replaceChildren(
+    ...months.map((month) => {
+      const monthExpensesTotal = roundUsd(
+        state.transactions
+          .filter((t) => t.category === "Expenses" && monthKey(t.date || "") === monthKey(month))
+          .reduce((s, t) => s + toUsd(t.debitUsd, t.debitLbp), 0),
+      );
+      const monthPaymentsTotal = roundUsd(
+        state.transactions
+          .filter((t) => t.category === "Payments" && !t.project && monthKey(t.date || t.forMonth || "") === monthKey(month))
+          .reduce((s, t) => s + transactionNetUsd(t), 0),
+      );
+      const row = document.createElement("button");
+      row.className = "payment-month-row";
+      row.type = "button";
+      row.dataset.month = month;
+      row.innerHTML = `
+        <div><strong></strong><span></span></div>
+        <div class="month-progress"><b></b><small></small></div>
+      `;
+      row.querySelector("strong").textContent = formatMonth(month);
+      row.querySelector("span").textContent = `${formatUsd(monthPaymentsTotal)} collected`;
+      row.querySelector("b").textContent = formatUsd(monthExpensesTotal);
+      row.querySelector("small").textContent = "expenses";
+      return row;
+    }),
+  );
+}
+
+function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsappUrl = null, declarationDue = 0 } = {}) {
+  if (reminderDue > 0 && sessionMode === "owner") {
+    if (whatsappUrl) {
+      const waBtn = document.createElement("a");
+      waBtn.className = "whatsapp-full-btn owner-only";
+      waBtn.href = whatsappUrl;
+      waBtn.target = "_blank";
+      waBtn.rel = "noopener";
+      waBtn.textContent = "Send WhatsApp Reminder";
+      row.append(waBtn);
+    } else {
+      const waBtn = document.createElement("button");
+      waBtn.className = "whatsapp-full-btn whatsapp-no-phone owner-only";
+      waBtn.type = "button";
+      waBtn.textContent = "Set phone to send reminder";
+      waBtn.dataset.editTenantId = tenant.id;
+      row.append(waBtn);
+    }
+  }
+  if (sessionMode === "tenant" && tenant.id === sessionTenantId && declarationDue > 0) {
+    const hasPending = (state.paymentDeclarations || []).some(
+      (d) => d.tenantId === tenant.id && d.status === "pending",
+    );
+    const paidBtn = document.createElement("button");
+    paidBtn.type = "button";
+    paidBtn.className = "paid-declaration-btn";
+    if (hasPending) {
+      paidBtn.textContent = "Owner notified ✓";
+      paidBtn.disabled = true;
+    } else {
+      paidBtn.textContent = "I've Paid";
+      paidBtn.dataset.tenantId = tenant.id;
+      paidBtn.dataset.month = month;
+      paidBtn.dataset.amount = String(declarationDue);
+    }
+    row.append(paidBtn);
+  }
+}
+
+function buildTenantPaymentRowBase(tenant, amountText, statusLabel, statusClass, detailText) {
+  const row = document.createElement("div");
+  row.className = "tenant-payment-row";
+  row.innerHTML = `
+    <div class="tpr-main">
+      <div class="tpr-info">
+        <strong></strong>
+        <span></span>
+      </div>
+      <div class="tpr-amount"></div>
+    </div>
+    <div class="tpr-status-row">
+      <div class="tpr-status-left">
+        <span class="status-pill"></span>
+        <span class="tpr-detail"></span>
+      </div>
+      <button class="mini-button tpr-add-btn owner-only" type="button">Add Payment</button>
+    </div>
+  `;
+  row.querySelector("strong").textContent = tenant.name;
+  row.querySelector(".tpr-info span").textContent = `Unit ${tenant.unit}`;
+  row.querySelector(".tpr-amount").textContent = amountText;
+  const pill = row.querySelector(".status-pill");
+  pill.className = `status-pill status-${statusClass}`;
+  pill.textContent = statusLabel;
+  row.querySelector(".tpr-detail").textContent = detailText;
+  return row;
+}
+
+function renderPaymentsFixed() {
+  const collection = getMonthCollection(selectedMonth);
+  els.paymentMonthRate.textContent = `${collection.rate}%`;
+  els.paymentPaidCount.textContent = `${collection.paidCount}/${collection.tenantStatuses.length} paid`;
 
   els.paymentSummary.replaceChildren(
-    ...summary.map(([label, value]) => {
+    ...["Expected", "Collected", "Due"].map((label, i) => {
+      const value = [formatUsd(collection.expectedTotal), formatUsd(collection.paidTotal), formatUsd(collection.dueTotal)][i];
       const card = document.createElement("article");
       card.className = "payment-summary-card";
       card.innerHTML = `<span></span><strong></strong>`;
@@ -782,74 +2158,94 @@ function renderPayments() {
   );
 
   els.dueOnlyToggle.classList.toggle("is-active", dueOnlyFilter);
-  const visibleStatuses = dueOnlyFilter
-    ? collection.tenantStatuses.filter(({ status }) => status.paid < status.expected)
+  const visible = dueOnlyFilter
+    ? collection.tenantStatuses.filter(({ status }) => status.className === "due" || status.className === "partial")
     : collection.tenantStatuses;
 
   els.tenantPaymentList.replaceChildren(
-    ...visibleStatuses.map(({ tenant, status }) => {
-      const due = Math.max(0, status.expected - status.paid);
-      const row = document.createElement("div");
-      row.className = "tenant-payment-row";
-      row.innerHTML = `
-        <div class="tpr-main">
-          <div class="tpr-info">
-            <strong></strong>
-            <span></span>
-          </div>
-          <div class="tpr-amount"></div>
-        </div>
-        <div class="tpr-status-row">
-          <div class="tpr-status-left">
-            <span class="status-pill"></span>
-            <span class="tpr-detail"></span>
-          </div>
-          <button class="mini-button tpr-add-btn" type="button">Add</button>
-        </div>
-      `;
-      row.querySelector("strong").textContent = tenant.name;
-      row.querySelector(".tpr-info span").textContent = `Unit ${tenant.unit}`;
-      row.querySelector(".tpr-amount").textContent = `${formatMonthly(status.paid)} / ${formatMonthly(status.expected)}`;
-      const pill = row.querySelector(".status-pill");
-      pill.className = `status-pill status-${status.className === "none" ? "due" : status.className}`;
-      pill.textContent = status.label;
-      row.querySelector(".tpr-detail").textContent = due > 0 ? `${formatMonthly(due)} due` : "Fully paid";
+    ...visible.map(({ tenant, status }) => {
+      const due = roundUsd(Math.max(0, status.expected - status.paid));
+      const detail = due > 0 ? `${formatUsd(due)} due` : status.expected > 0 ? "Fully paid" : "No due";
+      const row = buildTenantPaymentRowBase(
+        tenant,
+        `${formatUsd(status.paid)} / ${formatUsd(status.expected)}`,
+        status.label,
+        status.className,
+        detail,
+      );
       const addBtn = row.querySelector(".tpr-add-btn");
       addBtn.dataset.tenantId = tenant.id;
       addBtn.dataset.month = selectedMonth;
-      addBtn.dataset.due = String(due || status.expected || state.settings.defaultDueUsd || 0);
-      if (due > 0 && tenant.phone) {
-        const waUrl = buildWhatsAppUrl(tenant, due, selectedMonth);
-        if (waUrl) {
-          const waBtn = document.createElement("a");
-          waBtn.className = "whatsapp-full-btn";
-          waBtn.href = waUrl;
-          waBtn.target = "_blank";
-          waBtn.rel = "noopener";
-          waBtn.textContent = "Send WhatsApp Reminder";
-          row.append(waBtn);
-        }
-      }
+      addBtn.dataset.due = String(due || 0);
+      const waUrl = tenant.phone ? buildMonthlyDueWhatsAppUrl(tenant, due, selectedMonth) : null;
+      appendTenantPaymentExtras(row, tenant, {
+        month: selectedMonth,
+        reminderDue: due,
+        whatsappUrl: waUrl,
+        declarationDue: due,
+      });
       return row;
     }),
   );
+}
 
-  const months = getMonths().slice().reverse();
-  els.monthOverviewList.replaceChildren(
-    ...months.map((month) => {
-      const monthCollection = getMonthCollection(month);
-      const row = document.createElement("button");
-      row.className = "payment-month-row";
-      row.type = "button";
-      row.dataset.month = month;
-      row.innerHTML = `
-        <div><strong></strong><span></span></div>
-        <div class="month-progress"><b></b><small></small></div>
-      `;
-      row.querySelector("strong").textContent = formatMonth(month);
-      row.querySelector("span").textContent = `${formatMonthly(monthCollection.paidTotal)} collected`;
-      row.querySelector("b").textContent = `${monthCollection.rate}%`;
-      row.querySelector("small").textContent = `${monthCollection.paidCount}/${state.tenants.length} paid`;
+function renderPaymentsActual() {
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const balanceData = activeTenants.map((tenant) => ({
+    tenant,
+    balance: getTenantBalance(tenant.id),
+    expenseShare: getTenantExpenseShare(tenant.id),
+    payments: getTenantPaymentsTotal(tenant.id),
+  }));
+
+  const totalOutstanding = roundUsd(balanceData.reduce((s, d) => s + Math.max(0, d.balance), 0));
+  const totalCollected = roundUsd(balanceData.reduce((s, d) => s + d.payments, 0));
+  const totalExpenses = roundUsd(balanceData.reduce((s, d) => s + d.expenseShare, 0));
+  const settledCount = balanceData.filter((d) => d.balance <= 0.005).length;
+
+  els.paymentMonthRate.textContent = `${settledCount}/${activeTenants.length} settled`;
+  els.paymentPaidCount.textContent = `${settledCount}/${activeTenants.length} settled`;
+
+  els.paymentSummary.replaceChildren(
+    ...["Total Expenses", "Collected", "Outstanding"].map((label, i) => {
+      const value = [formatUsd(totalExpenses), formatUsd(totalCollected), formatUsd(totalOutstanding)][i];
+      const card = document.createElement("article");
+      card.className = "payment-summary-card";
+      card.innerHTML = `<span></span><strong></strong>`;
+      card.querySelector("span").textContent = label;
+      card.querySelector("strong").textContent = value;
+      return card;
+    }),
+  );
+
+  els.dueOnlyToggle.classList.toggle("is-active", dueOnlyFilter);
+  const visibleData = dueOnlyFilter ? balanceData.filter((d) => d.balance > 0.005) : balanceData;
+
+  els.tenantPaymentList.replaceChildren(
+    ...visibleData.map(({ tenant, balance, expenseShare, payments }) => {
+      const due = Math.max(0, balance);
+      const statusClass = balance > 0.005 ? "due" : "paid";
+      const statusLabel = balance > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
+      const detail = due > 0 ? `${formatUsd(due)} due` : balance < -0.005 ? `${formatUsd(-balance)} credit` : "Settled";
+      const row = buildTenantPaymentRowBase(
+        tenant,
+        `${formatUsd(payments)} paid of ${formatUsd(expenseShare)}`,
+        statusLabel,
+        statusClass,
+        detail,
+      );
+      const addBtn = row.querySelector(".tpr-add-btn");
+      addBtn.dataset.tenantId = tenant.id;
+      addBtn.dataset.month = selectedMonth;
+      addBtn.dataset.due = String(due || 0);
+      const stmtNotif = getTenantStatementNotification(tenant.id);
+      const waUrl = stmtNotif && tenant.phone ? buildWhatsAppUrl(tenant, stmtNotif.remaining, stmtNotif.month) : null;
+      appendTenantPaymentExtras(row, tenant, {
+        month: selectedMonth,
+        reminderDue: stmtNotif ? stmtNotif.remaining : 0,
+        whatsappUrl: waUrl,
+        declarationDue: due,
+      });
       return row;
     }),
   );
@@ -885,7 +2281,8 @@ function renderTenants() {
       `;
       card.querySelector("strong").textContent = tenant.name;
       const unitSpan = card.querySelector(".tenant-unit-line");
-      unitSpan.textContent = `Unit ${tenant.unit}${tenant.phone ? "" : " · no phone"}`;
+      const coeffLabel = tenant.coefficient > 0 ? ` · ${tenant.coefficient}/1000` : "";
+      unitSpan.textContent = `Unit ${tenant.unit}${coeffLabel}${tenant.phone ? "" : " · no phone"}`;
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
@@ -917,6 +2314,49 @@ function appendHeaderCell(row, text, className = "") {
   row.append(cell);
 }
 
+function tenantStatementRows(tenantId) {
+  let changed = false;
+  const rows = getMonths().map((month) => {
+    const status = paymentStatus(tenantId, month);
+    const due = roundUsd(status.expected);
+    const paid = roundUsd(status.paid);
+    const outstanding = roundUsd(Math.max(0, due - paid));
+    const receipts = state.transactions
+      .filter((tx) => isMonthlyPayment(tx) && tx.tenantId === tenantId && tx.forMonth === month)
+      .sort((a, b) => transactionDateValue(a).localeCompare(transactionDateValue(b)) || String(a.id).localeCompare(String(b.id)))
+      .map((tx) => {
+        const before = tx.receiptRef;
+        const reference = ensureReceiptReference(tx);
+        if (tx.receiptRef !== before) changed = true;
+        return reference;
+      })
+      .filter(Boolean);
+    return { month, due, paid, outstanding, status: status.label, receipts };
+  });
+  const totals = rows.reduce(
+    (acc, row) => {
+      acc.due += row.due;
+      acc.paid += row.paid;
+      acc.outstanding += row.outstanding;
+      return acc;
+    },
+    { due: 0, paid: 0, outstanding: 0 },
+  );
+  return { rows, totals, receiptChanged: changed };
+}
+
+function tenantStatementSummaryItems(tenant, projectTotal, tenantTotals) {
+  const openingNet = getTenantOpeningNet(tenant.id);
+  return [
+    [isFixedMode() ? "Total Monthly Dues" : "Expense Share", formatUsd(getTenantDueBasisTotal(tenant.id))],
+    ["Opening Balance", formatUsd(roundUsd(-openingNet))],
+    ["Payments Made", formatUsd(getTenantPaymentsTotal(tenant.id))],
+    ["Current Balance", formatUsd(getTenantBalance(tenant.id))],
+    ["Project Payments", formatUsd(projectTotal)],
+    ["Advance Balance", formatUsd(tenantTotals.advanceUsd)],
+  ];
+}
+
 function printTenantStatement(tenantId) {
   const tenant = state.tenants.find((entry) => entry.id === tenantId);
   if (!tenant) {
@@ -924,41 +2364,7 @@ function printTenantStatement(tenantId) {
     return;
   }
 
-  const months = getMonths();
-  let receiptChanged = false;
-  const rows = months.map((month) => {
-    const status = paymentStatus(tenant.id, month);
-    const receipts = state.transactions
-      .filter(
-        (transaction) =>
-          isMonthlyPayment(transaction) && transaction.tenantId === tenant.id && transaction.forMonth === month,
-      )
-      .sort((a, b) => transactionDateValue(a).localeCompare(transactionDateValue(b)) || String(a.id).localeCompare(String(b.id)))
-      .map((transaction) => {
-        const before = transaction.receiptRef;
-        const reference = ensureReceiptReference(transaction);
-        if (transaction.receiptRef !== before) receiptChanged = true;
-        return reference;
-      })
-      .filter(Boolean);
-    return {
-      month,
-      expected: status.expected,
-      paid: status.paid,
-      due: Math.max(0, status.expected - status.paid),
-      status: status.label,
-      receipts,
-    };
-  });
-  const totals = rows.reduce(
-    (acc, row) => {
-      acc.expected += row.expected;
-      acc.paid += row.paid;
-      acc.due += row.due;
-      return acc;
-    },
-    { expected: 0, paid: 0, due: 0 },
-  );
+  const { rows, totals, receiptChanged } = tenantStatementRows(tenant.id);
   const tenantTotals = getTenantTotals(tenant.id);
   const projectRows = state.transactions
     .filter((transaction) => isProjectPayment(transaction) && transaction.tenantId === tenant.id)
@@ -998,13 +2404,7 @@ function printTenantStatement(tenantId) {
 
   const summary = document.createElement("section");
   summary.className = "print-summary";
-  [
-    ["Monthly Expected", formatMonthly(totals.expected)],
-    ["Monthly Paid", formatMonthly(totals.paid)],
-    ["Remaining Monthly Due", formatMonthly(totals.due)],
-    ["Project Payments", formatUsd(projectTotal)],
-    ["Advance Balance", formatUsd(tenantTotals.advanceUsd)],
-  ].forEach(([label, value]) => {
+  tenantStatementSummaryItems(tenant, projectTotal, tenantTotals).forEach(([label, value]) => {
     const item = document.createElement("div");
     const itemLabel = document.createElement("span");
     itemLabel.textContent = label;
@@ -1016,14 +2416,14 @@ function printTenantStatement(tenantId) {
 
   const monthlyTitle = document.createElement("h2");
   monthlyTitle.className = "print-section-title";
-  monthlyTitle.textContent = "Monthly Fees";
+  monthlyTitle.textContent = "Monthly Dues";
 
   const table = document.createElement("table");
   table.className = "print-table";
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
-    ["Month", "Expected USD", "Paid USD", "Due USD", "Status", "Receipts"].forEach((heading, index) =>
-      appendHeaderCell(headerRow, heading, index > 0 && index < 4 ? "numeric" : ""),
+  ["Month", "Due USD", "Paid USD", "Outstanding USD", "Status", "Receipts"].forEach((heading, index) =>
+    appendHeaderCell(headerRow, heading, index > 0 && index < 4 ? "numeric" : ""),
   );
   thead.append(headerRow);
 
@@ -1031,9 +2431,9 @@ function printTenantStatement(tenantId) {
   rows.forEach((entry) => {
     const row = document.createElement("tr");
     appendCell(row, formatMonth(entry.month));
-    appendCell(row, formatMonthly(entry.expected), "numeric");
-    appendCell(row, formatMonthly(entry.paid), "numeric");
     appendCell(row, formatMonthly(entry.due), "numeric");
+    appendCell(row, formatMonthly(entry.paid), "numeric");
+    appendCell(row, formatMonthly(entry.outstanding), "numeric");
     appendCell(row, entry.status);
     appendCell(row, entry.receipts.join(", "));
     tbody.append(row);
@@ -1042,9 +2442,9 @@ function printTenantStatement(tenantId) {
   const tfoot = document.createElement("tfoot");
   const totalRow = document.createElement("tr");
   appendCell(totalRow, "Total");
-  appendCell(totalRow, formatMonthly(totals.expected), "numeric");
-  appendCell(totalRow, formatMonthly(totals.paid), "numeric");
   appendCell(totalRow, formatMonthly(totals.due), "numeric");
+  appendCell(totalRow, formatMonthly(totals.paid), "numeric");
+  appendCell(totalRow, formatMonthly(totals.outstanding), "numeric");
   appendCell(totalRow, "");
   appendCell(totalRow, "");
   tfoot.append(totalRow);
@@ -1091,7 +2491,6 @@ function isMonthlyPayment(transaction) {
   return (
     transaction.category === "Payments" &&
     Boolean(transaction.tenantId) &&
-    Boolean(transaction.forMonth) &&
     !transaction.project
   );
 }
@@ -1211,7 +2610,12 @@ function getPaymentReceiptData(transactionId) {
   const amount = receiptEntries.reduce((sum, entry) => sum + transactionNetUsd(entry), 0);
   const advanceAmount = isProject
     ? 0
-    : receiptEntries.filter((entry) => isFutureMonth(entry.forMonth)).reduce((sum, entry) => sum + transactionNetUsd(entry), 0);
+    : state.transactions
+        .filter((entry) =>
+          entry.category === "Advance Payments" &&
+          entry.tenantId === transaction.tenantId &&
+          samePaymentGroup(entry, transaction))
+        .reduce((sum, entry) => sum + transactionNetUsd(entry), 0);
   saveState();
   return { transaction, tenant, isProject, receiptNo, receiptEntries, amount, advanceAmount };
 }
@@ -1228,7 +2632,7 @@ function receiptSummaryRows(data) {
         ["Received From", data.tenant.name],
         ["Months Covered", formatCoveredMonths(data.receiptEntries)],
         ["Amount Received", formatUsd(data.amount)],
-        ["Advance Liability", formatUsd(data.advanceAmount)],
+        ...(data.advanceAmount > 0 ? [["Advance Credit", formatUsd(data.advanceAmount)]] : []),
       ];
 }
 
@@ -1244,14 +2648,9 @@ function receiptTableRows(data) {
   }
 
   return data.receiptEntries.map((entry) => {
+    const applied = transactionNetUsd(entry);
     const status = paymentStatus(data.tenant.id, entry.forMonth);
-    return [
-      formatMonth(entry.forMonth),
-      formatUsd(transactionNetUsd(entry)),
-      formatUsd(status.expected),
-      formatUsd(status.paid),
-      status.label,
-    ];
+    return [formatMonth(entry.forMonth), formatUsd(applied), status.label];
   });
 }
 
@@ -1311,19 +2710,16 @@ function printPaymentReceipt(transactionId) {
   } else {
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
-    ["Month", "Applied USD", "Expected USD", "Paid For Month", "Status"].forEach((heading, index) =>
-      appendHeaderCell(headerRow, heading, index > 0 && index < 4 ? "numeric" : ""),
+    ["Month", "Applied USD", "Status"].forEach((heading, index) =>
+      appendHeaderCell(headerRow, heading, index === 1 ? "numeric" : ""),
     );
     thead.append(headerRow);
     const tbody = document.createElement("tbody");
-    data.receiptEntries.forEach((entry) => {
-      const status = paymentStatus(data.tenant.id, entry.forMonth);
+    receiptTableRows(data).forEach((cells) => {
       const row = document.createElement("tr");
-      appendCell(row, formatMonth(entry.forMonth));
-      appendCell(row, formatUsd(transactionNetUsd(entry)), "numeric");
-      appendCell(row, formatUsd(status.expected), "numeric");
-      appendCell(row, formatUsd(status.paid), "numeric");
-      appendCell(row, status.label);
+      appendCell(row, cells[0]);
+      appendCell(row, cells[1], "numeric");
+      appendCell(row, cells[2]);
       tbody.append(row);
     });
     table.append(thead, tbody);
@@ -1333,7 +2729,7 @@ function printPaymentReceipt(transactionId) {
   note.className = "print-note";
   note.textContent = data.isProject
     ? "Project payments are separate from monthly building fees."
-    : "Any amount allocated to future months is treated as advance liability until that month is reached.";
+    : "Payments are applied to the tenant's building dues for the month.";
 
   page.append(header, summary, table, note);
   printPreparedPage(page);
@@ -1381,9 +2777,9 @@ function paymentReceiptPdfLines(data) {
   } else {
     lines.push(
       { text: "Monthly Allocation", size: 13, bold: true },
-      { text: "Month | Applied USD | Expected USD | Paid For Month | Status", size: 9, bold: true },
+      { text: "Month | Applied USD | Status", size: 9, bold: true },
       ...receiptTableRows(data).map((row) => ({ text: row.join(" | "), size: 9 })),
-      { text: "Any amount allocated to future months is treated as advance liability until that month is reached.", size: 10 },
+      { text: "Payments are applied to the tenant's building dues for the month.", size: 10 },
     );
   }
 
@@ -1483,8 +2879,8 @@ function buildReceiptLayoutPdf(data) {
       y -= 22;
     });
   } else {
-    const headers = ["Month", "Applied USD", "Expected USD", "Paid For Month", "Status"];
-    const widths = [92, 92, 92, 104, 115];
+    const headers = ["Month", "Applied USD", "Status"];
+    const widths = [165, 165, 165];
     const rows = receiptTableRows(data);
     let x = left;
     headers.forEach((heading, index) => {
@@ -1509,7 +2905,7 @@ function buildReceiptLayoutPdf(data) {
     pdfTextCommand(
       data.isProject
         ? "Project payments are separate from monthly building fees."
-        : "Any amount allocated to future months is treated as advance liability until that month is reached.",
+        : "Payments are applied to the tenant's building dues for the month.",
       left,
       Math.max(52, y),
       9,
@@ -1532,27 +2928,7 @@ function buildTenantStatementPdf(tenantId) {
   const tenant = state.tenants.find((entry) => entry.id === tenantId);
   if (!tenant) return null;
 
-  const months = getMonths();
-  const rows = months.map((month) => {
-    const status = paymentStatus(tenant.id, month);
-    const receipts = state.transactions
-      .filter((tx) => isMonthlyPayment(tx) && tx.tenantId === tenant.id && tx.forMonth === month)
-      .sort((a, b) => transactionDateValue(a).localeCompare(transactionDateValue(b)) || String(a.id).localeCompare(String(b.id)))
-      .map((tx) => tx.receiptRef)
-      .filter(Boolean);
-    return {
-      month,
-      expected: status.expected,
-      paid: status.paid,
-      due: Math.max(0, status.expected - status.paid),
-      status: status.label,
-      receipts,
-    };
-  });
-  const totals = rows.reduce(
-    (acc, row) => { acc.expected += row.expected; acc.paid += row.paid; acc.due += row.due; return acc; },
-    { expected: 0, paid: 0, due: 0 },
-  );
+  const { rows, totals } = tenantStatementRows(tenant.id);
   const tenantTotals = getTenantTotals(tenant.id);
   const projectRows = state.transactions
     .filter((tx) => isProjectPayment(tx) && tx.tenantId === tenant.id)
@@ -1576,13 +2952,7 @@ function buildTenantStatementPdf(tenantId) {
   y -= 120;
 
   // Summary boxes (2 columns)
-  const summaryItems = [
-    ["Monthly Expected", formatMonthly(totals.expected)],
-    ["Monthly Paid", formatMonthly(totals.paid)],
-    ["Remaining Due", formatMonthly(totals.due)],
-    ["Project Payments", formatUsd(projectTotal)],
-    ["Advance Balance", formatUsd(tenantTotals.advanceUsd)],
-  ];
+  const summaryItems = tenantStatementSummaryItems(tenant, projectTotal, tenantTotals);
   const boxWidth = 238;
   const boxHeight = 44;
   summaryItems.forEach(([label, value], index) => {
@@ -1597,16 +2967,16 @@ function buildTenantStatementPdf(tenantId) {
 
   y -= Math.ceil(summaryItems.length / 2) * (boxHeight + 8) + 18;
 
-  // Monthly Fees table
-  commands.push(pdfTextCommand("Monthly Fees", left, y, 13, true));
+  // Monthly Dues table
+  commands.push(pdfTextCommand("Monthly Dues", left, y, 13, true));
   y -= 20;
 
   const monthCols = [
     { heading: "Month", width: 80 },
-    { heading: "Expected USD", width: 80 },
+    { heading: "Due USD", width: 80 },
     { heading: "Paid USD", width: 80 },
-    { heading: "Due USD", width: 75 },
-    { heading: "Status", width: 65 },
+    { heading: "Outstanding", width: 80 },
+    { heading: "Status", width: 60 },
     { heading: "Receipts", width: 115 },
   ];
 
@@ -1622,9 +2992,9 @@ function buildTenantStatementPdf(tenantId) {
     x = left;
     const cells = [
       formatMonth(entry.month),
-      formatMonthly(entry.expected),
-      formatMonthly(entry.paid),
       formatMonthly(entry.due),
+      formatMonthly(entry.paid),
+      formatMonthly(entry.outstanding),
       entry.status,
       entry.receipts.join(", "),
     ];
@@ -1638,7 +3008,7 @@ function buildTenantStatementPdf(tenantId) {
 
   // Totals row
   x = left;
-  const totalCells = ["Total", formatMonthly(totals.expected), formatMonthly(totals.paid), formatMonthly(totals.due), "", ""];
+  const totalCells = ["Total", formatMonthly(totals.due), formatMonthly(totals.paid), formatMonthly(totals.outstanding), "", ""];
   monthCols.forEach((col, index) => {
     commands.push(pdfRectCommand(x, y - 16, col.width, 22));
     commands.push(pdfTextCommand(pdfClip(totalCells[index], Math.floor(col.width / 5.5)), x + 5, y - 4, 8, index === 0));
@@ -1810,6 +3180,10 @@ function getFilteredLedgerRows() {
   const dateFrom = els.ledgerDateFrom.value; // "YYYY-MM-DD" or ""
   const dateTo = els.ledgerDateTo.value;     // "YYYY-MM-DD" or ""
   return state.transactions
+    .filter((transaction) => {
+      if (sessionMode === "tenant" && transaction.tenantId && transaction.tenantId !== sessionTenantId) return false;
+      return true;
+    })
     .filter((transaction) => category === "All" || transaction.category === category)
     .filter((transaction) => {
       if (expenseCat === "All") return true;
@@ -1946,7 +3320,7 @@ function renderLedger() {
       btn.textContent = "Receipt";
       actionGroup.append(btn);
     }
-    if (transaction.category === "Expenses") {
+    if (transaction.category === "Expenses" && sessionMode === "owner") {
       const btn = document.createElement("button");
       btn.className = "ledger-action-btn edit-expense-button";
       btn.type = "button";
@@ -1963,12 +3337,14 @@ function renderLedger() {
       link.textContent = "Invoice";
       actionGroup.append(link);
     }
-    const delBtn = document.createElement("button");
-    delBtn.className = "ledger-action-btn delete-transaction-button danger-action";
-    delBtn.type = "button";
-    delBtn.dataset.transactionId = transaction.id;
-    delBtn.textContent = "Delete";
-    actionGroup.append(delBtn);
+    if (sessionMode === "owner") {
+      const delBtn = document.createElement("button");
+      delBtn.className = "ledger-action-btn delete-transaction-button danger-action";
+      delBtn.type = "button";
+      delBtn.dataset.transactionId = transaction.id;
+      delBtn.textContent = "Delete";
+      actionGroup.append(delBtn);
+    }
     return item;
   }
 
@@ -2136,14 +3512,232 @@ function selectExpenseCategory(name) {
   els.transactionExpenseCategory.focus();
 }
 
+function renderPolls() {
+  const polls = (state.polls || []).slice().reverse();
+  if (!polls.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "No polls yet. Tap \"+ New Poll\" to start one.";
+    els.pollList.replaceChildren(empty);
+    return;
+  }
+  els.pollList.replaceChildren(...polls.map(buildPollCard));
+}
+
+function buildPollCard(poll) {
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const allVoterIds = ["owner", ...activeTenants.map((t) => t.id)];
+  const votes = poll.votes || {};
+  const yesCount = Object.values(votes).filter((v) => v === "yes").length;
+  const noCount = Object.values(votes).filter((v) => v === "no").length;
+  const abstainCount = Object.values(votes).filter((v) => v === "abstain").length;
+  const totalVoters = allVoterIds.length;
+  const pending = allVoterIds.filter((id) => !votes[id]);
+
+  const myId = sessionMode === "owner" ? "owner" : sessionTenantId;
+  const myVote = votes[myId];
+  const isOpen = poll.status === "open";
+  const isOwner = sessionMode === "owner";
+  const creatorName = poll.createdBy === "owner" ? "Owner" : tenantName(poll.createdBy);
+
+  const card = document.createElement("article");
+  card.className = "poll-card";
+
+  const header = document.createElement("div");
+  header.className = "poll-card-header";
+  const titleEl = document.createElement("h3");
+  titleEl.className = "poll-card-title";
+  titleEl.textContent = poll.title;
+  const badge = document.createElement("span");
+  badge.className = `poll-status-badge ${poll.status}`;
+  badge.textContent = poll.status === "open" ? "Open" : "Closed";
+  header.append(titleEl, badge);
+  card.append(header);
+
+  const meta = document.createElement("p");
+  meta.className = "poll-meta";
+  meta.textContent = `By ${creatorName} · ${poll.createdAt ? formatDateLabel(poll.createdAt.slice(0, 10)) : ""}`;
+  card.append(meta);
+
+  if (poll.description) {
+    const desc = document.createElement("p");
+    desc.className = "poll-desc";
+    desc.textContent = poll.description;
+    card.append(desc);
+  }
+
+  const tally = document.createElement("div");
+  tally.className = "poll-tally";
+  const yesPct = totalVoters > 0 ? Math.round((yesCount / totalVoters) * 100) : 0;
+  const abstainPct = totalVoters > 0 ? Math.round((abstainCount / totalVoters) * 100) : 0;
+  const noPct = totalVoters > 0 ? Math.round((noCount / totalVoters) * 100) : 0;
+  const track = document.createElement("div");
+  track.className = "poll-tally-track";
+  const yesBar = document.createElement("div");
+  yesBar.className = "poll-tally-yes";
+  yesBar.style.width = `${yesPct}%`;
+  const abstainBar = document.createElement("div");
+  abstainBar.className = "poll-tally-abstain";
+  abstainBar.style.width = `${abstainPct}%`;
+  const noBar = document.createElement("div");
+  noBar.className = "poll-tally-no";
+  noBar.style.width = `${noPct}%`;
+  track.append(yesBar, abstainBar, noBar);
+  const labels = document.createElement("div");
+  labels.className = "poll-tally-labels";
+  const yesLbl = document.createElement("span");
+  yesLbl.className = "ptl-yes";
+  yesLbl.textContent = `YES ${yesCount}`;
+  const abstainLbl = document.createElement("span");
+  abstainLbl.className = "ptl-abstain";
+  abstainLbl.textContent = `ABSTAIN ${abstainCount}`;
+  const noLbl = document.createElement("span");
+  noLbl.className = "ptl-no";
+  noLbl.textContent = `NO ${noCount}`;
+  const pendingLbl = document.createElement("span");
+  pendingLbl.className = "ptl-pending";
+  pendingLbl.textContent = `${pending.length} pending`;
+  labels.append(yesLbl, abstainLbl, noLbl, pendingLbl);
+  tally.append(labels, track);
+  card.append(tally);
+
+  const resultList = document.createElement("ul");
+  resultList.className = "poll-result-list";
+  allVoterIds.forEach((voterId) => {
+    const voterVote = votes[voterId];
+    const voterName = voterId === "owner" ? "Owner" : tenantName(voterId);
+    const li = document.createElement("li");
+    li.className = "poll-result-row";
+    const nameEl = document.createElement("span");
+    nameEl.className = "prr-name";
+    nameEl.textContent = voterName;
+    const voteEl = document.createElement("span");
+    voteEl.className = `prr-vote ${voterVote || "pending"}`;
+    voteEl.textContent = voterVote ? voterVote.toUpperCase() : "—";
+    li.append(nameEl, voteEl);
+    resultList.append(li);
+  });
+  card.append(resultList);
+
+  if (isOpen) {
+    const voteRow = document.createElement("div");
+    voteRow.className = "poll-vote-row";
+    const yesBtn = document.createElement("button");
+    yesBtn.type = "button";
+    yesBtn.className = `vote-btn vote-yes${myVote === "yes" ? " selected" : ""}`;
+    yesBtn.dataset.pollId = poll.id;
+    yesBtn.dataset.vote = "yes";
+    yesBtn.textContent = myVote === "yes" ? "✓ YES" : "Vote YES";
+    const abstainBtn = document.createElement("button");
+    abstainBtn.type = "button";
+    abstainBtn.className = `vote-btn vote-abstain${myVote === "abstain" ? " selected" : ""}`;
+    abstainBtn.dataset.pollId = poll.id;
+    abstainBtn.dataset.vote = "abstain";
+    abstainBtn.textContent = myVote === "abstain" ? "✓ Abstain" : "Abstain";
+    const noBtn = document.createElement("button");
+    noBtn.type = "button";
+    noBtn.className = `vote-btn vote-no${myVote === "no" ? " selected" : ""}`;
+    noBtn.dataset.pollId = poll.id;
+    noBtn.dataset.vote = "no";
+    noBtn.textContent = myVote === "no" ? "✓ NO" : "Vote NO";
+    voteRow.append(yesBtn, abstainBtn, noBtn);
+    card.append(voteRow);
+  }
+
+  if (isOwner) {
+    const actRow = document.createElement("div");
+    actRow.className = "poll-actions-row";
+    if (isOpen) {
+      const closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.className = "secondary-button poll-close-btn";
+      closeBtn.dataset.pollId = poll.id;
+      closeBtn.textContent = "Close Poll";
+      actRow.append(closeBtn);
+    }
+    const delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.className = "danger-button poll-delete-btn";
+    delBtn.dataset.pollId = poll.id;
+    delBtn.textContent = "Delete";
+    actRow.append(delBtn);
+    card.append(actRow);
+  }
+
+  return card;
+}
+
+function openCreatePollDialog() {
+  els.pollTitleInput.value = "";
+  els.pollDescInput.value = "";
+  openDialog(els.pollDialog);
+  setTimeout(() => els.pollTitleInput.focus(), 50);
+}
+
+function castVote(pollId, vote) {
+  const poll = (state.polls || []).find((p) => p.id === pollId);
+  if (!poll || poll.status !== "open") return;
+  const myId = sessionMode === "owner" ? "owner" : sessionTenantId;
+  if (!myId) return;
+  poll.votes[myId] = vote;
+  saveState();
+  renderPolls();
+  showToast(`Voted ${vote.toUpperCase()}`);
+}
+
+function closePoll(pollId) {
+  const poll = (state.polls || []).find((p) => p.id === pollId);
+  if (!poll) return;
+  poll.status = "closed";
+  saveState();
+  renderPolls();
+  showToast("Poll closed");
+}
+
+function deletePoll(pollId) {
+  if (!window.confirm("Delete this poll? This cannot be undone.")) return;
+  state.polls = (state.polls || []).filter((p) => p.id !== pollId);
+  recordDeletedId("polls", pollId);
+  saveState();
+  renderPolls();
+  showToast("Poll deleted");
+}
+
+
+function applyCollectionModeVisibility(mode) {
+  const fixed = mode === "fixed";
+  els.monthlyBudgetField.classList.toggle("hidden", !fixed);
+  els.collectionModeNote.textContent = fixed
+    ? "Tenants pay a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund."
+    : "Each month's recorded expenses are split among tenants (by coefficient when set). No fixed monthly amount.";
+}
+
 function renderSettings() {
-  els.buildingNameInput.value = state.building.name;
+  els.buildingNameInput.value = (state.building && state.building.name) || "";
   els.defaultDueInput.value = amountInputValue(state.settings.defaultDueUsd);
   els.conversionRateInput.value = Number(state.settings.lbpPerUsd || DEFAULT_LBP_PER_USD);
   els.invoiceUploadUrlInput.value = state.settings.invoiceUploadUrl || "";
   els.cloudSpreadsheetIdInput.value = state.settings.cloudSpreadsheetId || "";
   els.invoiceUploadFolderIdInput.value = state.settings.invoiceUploadFolderId || "";
-  els.ownerPasswordInput.value = state.settings.ownerPassword || "";
+  els.collectionModeInput.value = state.settings.collectionMode || "actual";
+  applyCollectionModeVisibility(els.collectionModeInput.value);
+  els.ownerPasswordInput.value = "";
+  els.ownerPasswordInput.placeholder = state.settings.ownerPasswordHash
+    ? "Password set — type to change"
+    : "Leave blank for no password";
+  els.removeOwnerPasswordButton.classList.toggle("hidden", !state.settings.ownerPasswordHash);
+  const coeffSum = state.tenants.reduce((sum, t) => sum + (t.coefficient || 0), 0);
+  const tenantsWithCoeff = state.tenants.filter((t) => t.coefficient > 0).length;
+  if (tenantsWithCoeff > 0) {
+    const ok = coeffSum === 1000;
+    els.coefficientStatus.textContent = ok
+      ? `Coefficients: ${coeffSum}/1000 — all tenants accounted for.`
+      : `Coefficients: ${coeffSum}/1000 — must total 1000. ${1000 - coeffSum > 0 ? `${1000 - coeffSum} remaining.` : `${coeffSum - 1000} over.`}`;
+    els.coefficientStatus.className = ok ? "settings-note coeff-ok" : "settings-note coeff-warn";
+  } else {
+    els.coefficientStatus.textContent = "No coefficients set — all tenants use the same flat monthly amount.";
+    els.coefficientStatus.className = "settings-note";
+  }
   renderCloudStatus();
 }
 
@@ -2151,7 +3745,9 @@ function renderAll() {
   renderDashboard();
   renderPayments();
   renderTenants();
+  renderProjects();
   renderLedger();
+  renderPolls();
   renderDatalists();
   renderSettings();
 }
@@ -2172,15 +3768,41 @@ function closeDialog(dialog) {
   else dialog.removeAttribute("open");
 }
 
-function populateTenantSelect() {
-  els.transactionTenant.replaceChildren(
-    ...state.tenants.map((tenant) => {
-      const option = document.createElement("option");
-      option.value = tenant.id;
-      option.textContent = tenant.name;
-      return option;
-    }),
-  );
+function populateTenantSelect(includeBuildingOption = false) {
+  const previous = els.transactionTenant.value;
+  const options = [];
+  if (includeBuildingOption) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Building cash (no tenant)";
+    options.push(option);
+  }
+  state.tenants.forEach((tenant) => {
+    const option = document.createElement("option");
+    option.value = tenant.id;
+    option.textContent = tenant.name;
+    options.push(option);
+  });
+  els.transactionTenant.replaceChildren(...options);
+  if (previous && state.tenants.some((t) => t.id === previous)) els.transactionTenant.value = previous;
+  else if (includeBuildingOption) els.transactionTenant.value = "";
+}
+
+function updateTransactionDirectionLabels() {
+  const category = els.transactionCategory.value;
+  const [creditOption, debitOption] = els.transactionDirection.options;
+  if (category === "Opening Balance") {
+    if (els.transactionTenant.value) {
+      creditOption.textContent = "Tenant has credit (prepaid)";
+      debitOption.textContent = "Tenant owes (opening due)";
+    } else {
+      creditOption.textContent = "Cash on hand (add)";
+      debitOption.textContent = "Cash shortfall (subtract)";
+    }
+  } else {
+    creditOption.textContent = "Received";
+    debitOption.textContent = "Applied or paid out";
+  }
 }
 
 function expenseInvoiceSequenceNumber(value) {
@@ -2190,13 +3812,14 @@ function expenseInvoiceSequenceNumber(value) {
 
 function nextExpenseInvoiceNumber(excludeTransactionId = null) {
   const highest = state.transactions
-    .filter((transaction) => transaction.category === "Expenses" && transaction.id !== excludeTransactionId)
-    .reduce((max, transaction) => Math.max(max, expenseInvoiceSequenceNumber(transaction.invoice)), 0);
+    .filter((t) => t.category === "Expenses" && t.id !== excludeTransactionId)
+    .reduce((max, t) => Math.max(max, expenseInvoiceSequenceNumber(t.invoice)), 0);
   return `${EXPENSE_INVOICE_PREFIX}${String(highest + 1).padStart(4, "0")}`;
 }
 
 function maybeSetNextExpenseInvoiceNumber() {
-  if (editingExpenseId || els.transactionCategory.value !== "Expenses" || els.transactionInvoice.value.trim()) return;
+  const cat = els.transactionCategory.value;
+  if (editingExpenseId || cat !== "Expenses" || els.transactionInvoice.value.trim()) return;
   els.transactionInvoice.value = nextExpenseInvoiceNumber();
 }
 
@@ -2204,10 +3827,12 @@ function syncTransactionFormMode() {
   const category = els.transactionCategory.value;
   const project = els.transactionProject.value.trim();
   const tenantMode = category === "Payments" || category === "Advance Payments";
+  const openingMode = category === "Opening Balance";
   const monthlyPaymentMode = category === "Payments" && !project;
   const expenseMode = category === "Expenses";
-  document.querySelector(".tenant-field").classList.toggle("hidden", !tenantMode);
-  document.querySelector(".direction-field").classList.toggle("hidden", category !== "Advance Payments");
+  populateTenantSelect(openingMode);
+  document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
+  document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
   document.querySelector(".month-field").classList.toggle("hidden", !monthlyPaymentMode);
   document.querySelector(".lbp-amount-field").classList.toggle("hidden", !expenseMode);
@@ -2215,16 +3840,20 @@ function syncTransactionFormMode() {
   document.querySelector(".extra-fields").classList.toggle("hidden", !expenseMode);
   document.querySelector(".expense-category-field").classList.toggle("hidden", !expenseMode);
   document.querySelector(".invoice-file-field").classList.toggle("hidden", !expenseMode);
+  document.querySelector(".shared-expense-dist-field").classList.add("hidden");
+  els.sharedExpenseInlinePreview.classList.add("hidden");
   els.expenseConversionPreview.classList.toggle("hidden", !expenseMode);
   els.invoiceAttachmentStatus.classList.toggle("hidden", !expenseMode || !editingExpenseId);
-  els.transactionDescription.required = !tenantMode;
-  els.transactionMonth.required = monthlyPaymentMode;
+  els.transactionDescription.required = !tenantMode && !openingMode;
+  els.transactionMonth.required = false;
+  updateTransactionDirectionLabels();
   maybeSetNextExpenseInvoiceNumber();
   updateExpenseConversionPreview();
 }
 
 function updateExpenseConversionPreview() {
-  if (els.transactionCategory.value !== "Expenses") return;
+  const cat = els.transactionCategory.value;
+  if (cat !== "Expenses") return;
   const lbp = Number(els.transactionLbp.value || 0);
   const usd = Number(els.transactionUsd.value || 0);
   const rate = getConversionRate();
@@ -2236,12 +3865,16 @@ function updateExpenseConversionPreview() {
 function applyTransactionCategoryDefaults() {
   const category = els.transactionCategory.value;
   els.transactionLbp.value = "";
-  els.transactionUsd.value = category === "Payments" ? amountInputValue(state.settings.defaultDueUsd) : "";
+  els.transactionUsd.value = "";
   if (category !== "Expenses") {
     els.transactionSupplier.value = "";
     els.transactionInvoice.value = "";
   }
   syncTransactionFormMode();
+  if (category === "Opening Balance") {
+    els.transactionTenant.value = "";
+    updateTransactionDirectionLabels();
+  }
 }
 
 function selectedInvoiceFile() {
@@ -2271,52 +3904,29 @@ function addKnownValue(collection, name) {
   collection.push({ id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""), name });
 }
 
-function allocateMonthlyPayment(amountUsd, startMonth) {
-  const allocations = [];
-  let remaining = roundUsd(amountUsd);
-  let month = startMonth;
-  let guard = 0;
-  const fallbackExpected = roundUsd(getExpectedMonthlyUsd(startMonth));
-
-  if (fallbackExpected <= 0) {
-    throw new Error("Set the expected monthly amount USD for the selected month");
-  }
-
-  while (remaining > 0 && guard < 360) {
-    const configuredExpected = roundUsd(getExpectedMonthlyUsd(month));
-    const expected = configuredExpected > 0 ? configuredExpected : fallbackExpected;
-    const amount = roundUsd(Math.min(remaining, expected));
-    allocations.push({ month, amountUsd: amount, expectedUsd: expected });
-    remaining = roundUsd(remaining - amount);
-    month = addMonths(month, 1);
-    guard += 1;
-  }
-
-  if (remaining > 0) throw new Error("Payment covers too many months");
-  allocations.forEach((allocation) => {
-    if (!hasConfiguredMonthlyExpected(allocation.month) && Number(state.settings.defaultDueUsd || 0) <= 0) {
-      state.monthlyExpected.push({ month: allocation.month, expectedUsd: allocation.expectedUsd });
-    }
-  });
-  state.monthlyExpected = normalizedMonthlyExpected(state.monthlyExpected);
-  return allocations;
-}
-
 function createTransactionsFromForm() {
   const category = els.transactionCategory.value;
-  const amountLbp = category === "Expenses" ? Number(els.transactionLbp.value || 0) : 0;
+  const isExpenseLike = category === "Expenses";
+  const amountLbp = isExpenseLike ? Number(els.transactionLbp.value || 0) : 0;
   const amountUsd = Number(els.transactionUsd.value || 0);
   if (!amountLbp && !amountUsd) throw new Error("Enter an amount");
 
   const tenantId = els.transactionTenant.value;
-  const isDebit = category === "Expenses" || (category === "Advance Payments" && els.transactionDirection.value === "debit");
+  const isOpening = category === "Opening Balance";
+  const openingTenantId = isOpening ? (tenantId || null) : null;
+  const isDebit =
+    isExpenseLike ||
+    ((category === "Advance Payments" || isOpening) && els.transactionDirection.value === "debit");
   const tenantMode = category === "Payments" || category === "Advance Payments";
-  const description = tenantMode ? tenantName(tenantId) : els.transactionDescription.value.trim();
+  let description = tenantMode ? tenantName(tenantId) : els.transactionDescription.value.trim();
+  if (isOpening && !description) {
+    description = openingTenantId ? `Opening balance - ${tenantName(openingTenantId)}` : "Opening balance";
+  }
   if (!description) throw new Error("Enter a description");
 
   const project = els.transactionProject.value.trim();
   const supplier = els.transactionSupplier.value.trim();
-  const expenseCategory = category === "Expenses" ? els.transactionExpenseCategory.value.trim() : "";
+  const expenseCategory = isExpenseLike ? els.transactionExpenseCategory.value.trim() : "";
   addKnownValue(state.projects, project);
   addKnownValue(state.suppliers, supplier);
   if (expenseCategory) addKnownValue(state.expenseCategories, expenseCategory);
@@ -2325,7 +3935,7 @@ function createTransactionsFromForm() {
     id: `tx-${Date.now()}`,
     category,
     description,
-    tenantId: tenantMode ? tenantId : null,
+    tenantId: tenantMode ? tenantId : openingTenantId,
     forMonth: category === "Payments" && !project ? monthIso(els.transactionMonth.value) : null,
     project,
     date: els.transactionDate.value,
@@ -2342,20 +3952,23 @@ function createTransactionsFromForm() {
     sourceRow: null,
   };
 
+  if (isExpenseLike) {
+    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), "coefficient");
+    // Snapshot the split when there is a roster to split across; null keeps the
+    // share dynamic so the expense is picked up once tenants are added.
+    baseTransaction.shares = Object.keys(shares).length ? shares : null;
+  }
+
+  // Payments: simple credit — no month allocation, receipt assigned
   if (category === "Payments" && !project) {
-    const startMonth = monthIso(els.transactionMonth.value);
-    if (!startMonth) throw new Error("Select the starting month");
-    const receiptRef = nextReceiptReference(els.transactionDate.value || startMonth || localDateInput());
+    const receiptRef = nextReceiptReference(els.transactionDate.value || localDateInput());
     const paymentGroupId = `pay-${Date.now()}`;
-    return allocateMonthlyPayment(amountUsd, startMonth).map((allocation, index) => ({
+    return [{
       ...baseTransaction,
-      id: `${paymentGroupId}-${String(index + 1).padStart(2, "0")}`,
-      forMonth: allocation.month,
-      creditUsd: allocation.amountUsd,
-      balanceUsd: allocation.amountUsd,
+      id: `${paymentGroupId}-01`,
       receiptRef,
       paymentGroupId,
-    }));
+    }];
   }
 
   return [baseTransaction];
@@ -2512,8 +4125,7 @@ function cloudConfig() {
 }
 
 function hasCloudConfig() {
-  const config = cloudConfig();
-  return Boolean(config.scriptUrl && config.spreadsheetId);
+  return Boolean(cloudConfig().scriptUrl);
 }
 
 function renderCloudStatus(message = "") {
@@ -2521,28 +4133,126 @@ function renderCloudStatus(message = "") {
   els.cloudSyncStatus.textContent =
     message ||
     (hasCloudConfig()
-      ? "Cloud sync is on. Changes save locally and sync automatically to the Google Sheet."
-      : "Cloud sync is off until the script URL and Google Sheet ID are saved.");
+      ? "Cloud sync is on. Data is saved locally and synced to the Google Sheet."
+      : "Cloud sync is off. Enter the Google Apps Script URL in Settings to enable.");
 }
 
 async function postCloudAction(action, payload = {}) {
   const config = cloudConfig();
-  if (!config.scriptUrl || !config.spreadsheetId) {
-    throw new Error("Set the Google Apps Script URL and Google Sheet ID in Settings");
-  }
+  if (!config.scriptUrl) throw new Error("Google Apps Script URL not set. Add it in Settings.");
+  const body = { action, ...payload };
+  if (config.spreadsheetId) body.spreadsheetId = config.spreadsheetId;
   const response = await fetch(config.scriptUrl, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({
-      action,
-      spreadsheetId: config.spreadsheetId,
-      ...payload,
-    }),
+    body: JSON.stringify(body),
   });
   if (!response.ok) throw new Error("Google Sheet sync failed");
   const result = await response.json();
   if (!result.success) throw new Error(result.error || "Google Sheet sync failed");
   return result;
+}
+
+// ── Sync conflict protection ─────────────────────────────────────────────────
+// The Sheet stores whole-state snapshots, so two devices writing close together
+// used to silently overwrite each other. Each pushed snapshot now carries a
+// random token; if the cloud token is not the one this device last synced,
+// another device wrote in between and the two states are merged item-by-item
+// before pushing. Deletions survive merging through the state.deleted tombstones.
+function recordDeletedId(kind, id) {
+  state.deleted ||= {};
+  state.deleted[kind] ||= [];
+  state.deleted[kind].push(id);
+  state.deleted[kind] = state.deleted[kind].slice(-1000);
+}
+
+function mergeById(olderArr, newerArr, deletedIds = []) {
+  const map = new Map();
+  (olderArr || []).forEach((item) => item?.id && map.set(item.id, item));
+  (newerArr || []).forEach((item) => item?.id && map.set(item.id, item));
+  deletedIds.forEach((id) => map.delete(id));
+  return [...map.values()];
+}
+
+function mergeByMonth(olderArr, newerArr) {
+  const map = new Map();
+  (olderArr || []).forEach((entry) => entry?.month && map.set(entry.month, entry));
+  (newerArr || []).forEach((entry) => entry?.month && map.set(entry.month, entry));
+  return [...map.values()];
+}
+
+function mergePolls(olderArr, newerArr, deletedIds = []) {
+  const map = new Map();
+  (olderArr || []).forEach((p) => p?.id && map.set(p.id, p));
+  (newerArr || []).forEach((p) => {
+    if (!p?.id) return;
+    const prev = map.get(p.id);
+    if (!prev) {
+      map.set(p.id, p);
+      return;
+    }
+    map.set(p.id, {
+      ...prev,
+      ...p,
+      votes: { ...(prev.votes || {}), ...(p.votes || {}) },
+      status: prev.status === "closed" || p.status === "closed" ? "closed" : p.status,
+    });
+  });
+  deletedIds.forEach((id) => map.delete(id));
+  return [...map.values()];
+}
+
+function mergeDeclarations(olderArr, newerArr) {
+  const map = new Map();
+  [...(olderArr || []), ...(newerArr || [])].forEach((d) => {
+    if (!d?.id) return;
+    const prev = map.get(d.id);
+    if (!prev || (prev.status !== "acknowledged" && d.status === "acknowledged")) map.set(d.id, d);
+  });
+  return [...map.values()];
+}
+
+function mergeDeletedLists(local, remote) {
+  const kinds = ["transactions", "tenants", "polls", "projects"];
+  const merged = {};
+  kinds.forEach((kind) => {
+    merged[kind] = [...new Set([...(local?.[kind] || []), ...(remote?.[kind] || [])])].slice(-1000);
+  });
+  return merged;
+}
+
+function mergeStates(local, remote) {
+  const localEpoch = Number(local.meta?.epoch || 0);
+  const remoteEpoch = Number(remote.meta?.epoch || 0);
+  // An epoch bump means "Zero Accounts" / "Reset" happened: the higher epoch
+  // wins wholesale so wiped data is not resurrected by a stale device.
+  if (localEpoch !== remoteEpoch) return clone(localEpoch > remoteEpoch ? local : remote);
+
+  const localNewer = String(local.meta?.updatedAt || "") >= String(remote.meta?.updatedAt || "");
+  const newer = localNewer ? local : remote;
+  const older = localNewer ? remote : local;
+  const merged = clone(newer);
+  merged.deleted = mergeDeletedLists(local.deleted, remote.deleted);
+  merged.transactions = mergeById(older.transactions, newer.transactions, merged.deleted.transactions);
+  merged.tenants = mergeById(older.tenants, newer.tenants, merged.deleted.tenants);
+  merged.buildingProjects = mergeById(older.buildingProjects, newer.buildingProjects, merged.deleted.projects);
+  merged.polls = mergePolls(older.polls, newer.polls, merged.deleted.polls);
+  merged.paymentDeclarations = mergeDeclarations(older.paymentDeclarations, newer.paymentDeclarations);
+  merged.suppliers = mergeById(older.suppliers, newer.suppliers);
+  merged.projects = mergeById(older.projects, newer.projects);
+  merged.expenseCategories = mergeById(older.expenseCategories, newer.expenseCategories);
+  merged.monthlyExpected = mergeByMonth(older.monthlyExpected, newer.monthlyExpected);
+  merged.meta = {
+    rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
+    epoch: localEpoch,
+    token: "",
+    updatedAt: new Date().toISOString(),
+  };
+  return merged;
+}
+
+function localHasUnsyncedChanges() {
+  return Number(state.meta?.rev || 0) > Number(loadSyncMeta().lastPushedRev || 0);
 }
 
 function queueCloudSave() {
@@ -2557,7 +4267,28 @@ async function saveCloudState({ silent = false } = {}) {
   cloudSaveInFlight = true;
   try {
     if (!silent) renderCloudStatus("Saving to Google Sheet...");
+    // Check whether another device wrote since this device last synced.
+    const sync = loadSyncMeta();
+    let remote = null;
+    try {
+      const result = await postCloudAction("loadState");
+      remote = result?.state || null;
+    } catch {
+      // Cloud unreachable for the pre-check; push anyway (best effort).
+    }
+    let mergedForeignChanges = false;
+    if (remote && remote.meta?.token && remote.meta.token !== sync.lastSyncedToken) {
+      state = hydrateState(mergeStates(state, remote));
+      mergedForeignChanges = true;
+    }
+    state.meta.token = randomToken();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     await postCloudAction("saveState", { state });
+    saveSyncMeta({ lastSyncedToken: state.meta.token, lastPushedRev: Number(state.meta.rev || 0) });
+    if (mergedForeignChanges) {
+      populateTenantSelect();
+      renderAll();
+    }
     renderCloudStatus(`Google Sheet saved at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
     if (!silent) showToast("Saved to Google Sheet");
   } catch (error) {
@@ -2574,8 +4305,10 @@ async function loadCloudState() {
     const result = await postCloudAction("loadState");
     if (!result.state) throw new Error("No app data found in Google Sheet");
     state = hydrateState(result.state);
-    saveState({ sync: false });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    saveSyncMeta({ lastSyncedToken: state.meta?.token || "", lastPushedRev: Number(state.meta?.rev || 0) });
     selectedMonth = null;
+    populateTenantSelect();
     renderAll();
     renderCloudStatus("Loaded from Google Sheet");
     showToast("Loaded from Google Sheet");
@@ -2593,8 +4326,11 @@ async function zeroAccounts() {
   state.monthlyExpected = [];
   state.projects = [];
   state.suppliers = [];
+  state.sharedExpenses = [];
   state.categories = DEFAULT_CATEGORIES.slice();
   state.settings.defaultDueUsd = 0;
+  state.deleted = { transactions: [], tenants: [], polls: [], projects: [] };
+  state.meta.epoch = Number(state.meta?.epoch || 0) + 1;
   selectedMonth = null;
   saveState({ sync: false });
   renderAll();
@@ -2646,6 +4382,7 @@ function expenseDebitLbp(transaction) {
 }
 
 function openExpenseEditDialog(transactionId) {
+  if (sessionMode !== "owner") return;
   const transaction = state.transactions.find((entry) => entry.id === transactionId);
   if (!transaction || transaction.category !== "Expenses") {
     showToast("Only expense entries can be edited here");
@@ -2686,6 +4423,7 @@ function openPaymentDialogFor(tenantId, month, amount) {
 }
 
 function deleteLedgerTransaction(transactionId) {
+  if (sessionMode !== "owner") return;
   const transaction = state.transactions.find((entry) => entry.id === transactionId);
   if (!transaction) {
     showToast("Transaction not found");
@@ -2700,6 +4438,8 @@ function deleteLedgerTransaction(transactionId) {
   }
 
   state.transactions = state.transactions.filter((entry) => entry.id !== transactionId);
+  state.sharedExpenses = (state.sharedExpenses || []).filter((se) => se.expenseTransactionId !== transactionId);
+  recordDeletedId("transactions", transactionId);
   saveState();
   renderAll();
   showToast("Ledger entry deleted");
@@ -3226,7 +4966,10 @@ function openAddTenantDialog() {
   els.tenantNameInput.value = "";
   els.tenantUnitInput.value = "";
   els.tenantPhoneDialogInput.value = "";
+  els.tenantCoefficientInput.value = "";
   els.tenantPinDialogInput.value = "";
+  els.tenantPinDialogInput.placeholder = "Leave blank to disable tenant login";
+  els.removeTenantPinButton.classList.add("hidden");
   els.tenantSubmitButton.textContent = "Add";
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
@@ -3240,7 +4983,10 @@ function openEditTenantDialog(tenantId) {
   els.tenantNameInput.value = tenant.name;
   els.tenantUnitInput.value = tenant.unit;
   els.tenantPhoneDialogInput.value = tenant.phone || "";
-  els.tenantPinDialogInput.value = tenant.pin || "";
+  els.tenantCoefficientInput.value = tenant.coefficient > 0 ? String(tenant.coefficient) : "";
+  els.tenantPinDialogInput.value = "";
+  els.tenantPinDialogInput.placeholder = tenant.pinHash ? "PIN set — type to change" : "Leave blank to disable tenant login";
+  els.removeTenantPinButton.classList.toggle("hidden", !tenant.pinHash);
   els.tenantSubmitButton.textContent = "Save";
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
@@ -3251,15 +4997,30 @@ function handleTenantFormSubmit(event) {
   const name = els.tenantNameInput.value.trim();
   const unit = els.tenantUnitInput.value.trim();
   const phone = els.tenantPhoneDialogInput.value.trim();
-  const pin = els.tenantPinDialogInput.value.trim();
+  const coefficient = Math.max(0, Math.min(1000, Number(els.tenantCoefficientInput.value || 0)));
+  const pinEntered = els.tenantPinDialogInput.value.trim();
   if (!name || !unit) return;
 
   if (editingTenantId) {
     const tenant = state.tenants.find((t) => t.id === editingTenantId);
-    if (tenant) { tenant.name = name; tenant.unit = unit; tenant.phone = phone; tenant.pin = pin; }
+    if (tenant) {
+      tenant.name = name;
+      tenant.unit = unit;
+      tenant.phone = phone;
+      tenant.coefficient = coefficient;
+      if (pinEntered) tenant.pinHash = hashSecret(pinEntered, state.security.salt);
+    }
     showToast("Tenant updated");
   } else {
-    state.tenants.push({ id: generateTenantId(name), name, unit, active: true, phone, pin });
+    state.tenants.push({
+      id: generateTenantId(name),
+      name,
+      unit,
+      active: true,
+      phone,
+      coefficient,
+      pinHash: pinEntered ? hashSecret(pinEntered, state.security.salt) : "",
+    });
     showToast(`${name} added`);
   }
 
@@ -3270,6 +5031,7 @@ function handleTenantFormSubmit(event) {
 }
 
 function deleteTenant(tenantId) {
+  if (sessionMode !== "owner") return;
   const tenant = state.tenants.find((t) => t.id === tenantId);
   if (!tenant) return;
   const txCount = state.transactions.filter((t) => t.tenantId === tenantId).length;
@@ -3278,34 +5040,116 @@ function deleteTenant(tenantId) {
     : `Delete ${tenant.name}?`;
   if (!window.confirm(msg)) return;
   state.tenants = state.tenants.filter((t) => t.id !== tenantId);
+  recordDeletedId("tenants", tenantId);
   saveState();
   renderAll();
   showToast(`${tenant.name} removed`);
 }
 
-function buildWhatsAppUrl(tenant, dueAmount, month) {
+function buildWhatsAppUrl(tenant, dueAmount, statementMonth = null) {
   const phone = (tenant.phone || "").replace(/\D/g, "");
   if (!phone) return null;
+  const monthLine = statementMonth ? ` as of the ${formatMonth(statementMonth)} statement` : "";
   const message = [
     `${state.building.name} – Payment Reminder`,
-    `Hi ${tenant.name}, your rent for ${formatMonth(month)} is due: ${formatMonthly(dueAmount)}.`,
+    `Hi ${tenant.name}, your outstanding balance${monthLine} is ${formatUsd(dueAmount)}.`,
     `Please settle at your earliest convenience. Thank you.`,
   ].join("\n");
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 
-function openWhatsAppReminderDialog() {
-  const collection = getMonthCollection(selectedMonth);
-  const dueStatuses = collection.tenantStatuses.filter(({ status }) => status.paid < status.expected);
+function buildMonthlyDueWhatsAppUrl(tenant, owed, month) {
+  const phone = (tenant.phone || "").replace(/\D/g, "");
+  if (!phone) return null;
+  const message = [
+    `${state.building.name} – Payment Reminder`,
+    `Hi ${tenant.name}, your building payment for ${formatMonth(month)} is outstanding: ${formatUsd(owed)}.`,
+    `Please settle at your earliest convenience. Thank you.`,
+  ].join("\n");
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
+function buildSharedExpensesWhatsAppUrl(tenant, owed, month) {
+  const phone = (tenant.phone || "").replace(/\D/g, "");
+  if (!phone) return null;
+  const message = [
+    `${state.building.name} – Shared Expenses Reminder`,
+    `Hi ${tenant.name}, your share of the building shared expenses for ${formatMonth(month)} is outstanding: ${formatMonthly(owed)}.`,
+    `Please settle at your earliest convenience. Thank you.`,
+  ].join("\n");
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
+function openSharedExpensesWhatsAppReminderDialog() {
+  const data = buildSharedExpensesForMonth(selectedMonth);
+  if (!data) { showToast("No shared expenses for this month"); return; }
+
+  const dueStatuses = data.tenantStatuses.filter(({ totalShare, covered }) => covered < totalShare - 0.005);
+  if (!dueStatuses.length) { showToast("All tenants have paid their shared expenses"); return; }
+
+  const withPhone = dueStatuses.filter(({ tenant }) => tenant.phone);
+  const withoutPhone = dueStatuses.filter(({ tenant }) => !tenant.phone);
+
+  els.whatsappDialogTitle.textContent = `Shared Expenses Reminders – ${formatMonth(selectedMonth)}`;
+  els.whatsappDialogNote.textContent = withoutPhone.length
+    ? `${withoutPhone.map(({ tenant }) => tenant.name).join(", ")} skipped – no phone number saved in the Tenants tab.`
+    : "";
+  els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
+
+  if (!withPhone.length) { showToast("No due tenants have a phone number saved"); return; }
+
+  els.whatsappReminderList.replaceChildren(
+    ...withPhone.map(({ tenant, totalShare, covered }) => {
+      const owed = roundUsd(totalShare - covered);
+      const url = buildSharedExpensesWhatsAppUrl(tenant, owed, selectedMonth);
+      const row = document.createElement("div");
+      row.className = "whatsapp-reminder-row";
+      const info = document.createElement("div");
+      const name = document.createElement("strong");
+      name.textContent = tenant.name;
+      const detail = document.createElement("span");
+      detail.textContent = `Unit ${tenant.unit} – ${formatMonthly(owed)} due – ${formatMonth(selectedMonth)}`;
+      info.append(name, detail);
+      const link = document.createElement("a");
+      link.className = "mini-button whatsapp-btn";
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Send";
+      row.append(info, link);
+      return row;
+    }),
+  );
+
+  openDialog(els.whatsappDialog);
+}
+
+function buildProjectWhatsAppUrl(tenant, project, owedAmount) {
+  const phone = (tenant.phone || "").replace(/\D/g, "");
+  if (!phone) return null;
+  const message = [
+    `${state.building.name} – Project Payment Reminder`,
+    `Hi ${tenant.name}, your share for the "${project.name}" project is ${formatMonthly(owedAmount)}, due by ${formatDateLabel(project.dueDate)}.`,
+    `Please settle at your earliest convenience. Thank you.`,
+  ].join("\n");
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
+function openProjectWhatsAppReminderDialog(project) {
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const dueStatuses = activeTenants
+    .map((tenant) => ({ tenant, ...getProjectTenantStatus(project, tenant.id) }))
+    .filter(({ share, paid }) => share > 0 && paid < share - 0.005);
 
   if (!dueStatuses.length) {
-    showToast("No due payments for this month");
+    showToast("All tenants have paid their share");
     return;
   }
 
   const withPhone = dueStatuses.filter(({ tenant }) => tenant.phone);
   const withoutPhone = dueStatuses.filter(({ tenant }) => !tenant.phone);
 
+  els.whatsappDialogTitle.textContent = `Reminders – ${project.name}`;
   els.whatsappDialogNote.textContent = withoutPhone.length
     ? `${withoutPhone.map(({ tenant }) => tenant.name).join(", ")} skipped – no phone number saved in the Tenants tab.`
     : "";
@@ -3317,16 +5161,65 @@ function openWhatsAppReminderDialog() {
   }
 
   els.whatsappReminderList.replaceChildren(
-    ...withPhone.map(({ tenant, status }) => {
-      const due = Math.max(0, status.expected - status.paid);
-      const url = buildWhatsAppUrl(tenant, due, selectedMonth);
+    ...withPhone.map(({ tenant, share, paid }) => {
+      const owed = roundUsd(share - paid);
+      const url = buildProjectWhatsAppUrl(tenant, project, owed);
       const row = document.createElement("div");
       row.className = "whatsapp-reminder-row";
       const info = document.createElement("div");
       const name = document.createElement("strong");
       name.textContent = tenant.name;
       const detail = document.createElement("span");
-      detail.textContent = `Unit ${tenant.unit} – ${formatMonthly(due)} due – ${formatMonth(selectedMonth)}`;
+      detail.textContent = `${formatMonthly(owed)} outstanding – due ${formatDateLabel(project.dueDate)}`;
+      info.append(name, detail);
+      const link = document.createElement("a");
+      link.className = "mini-button whatsapp-btn";
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Send";
+      row.append(info, link);
+      return row;
+    }),
+  );
+
+  openDialog(els.whatsappDialog);
+}
+
+function openWhatsAppReminderDialog() {
+  const lastMonth = getLastCompletedMonth();
+  els.whatsappDialogTitle.textContent = `Payment Reminders – ${formatMonth(lastMonth)} Statement`;
+
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const dueEntries = activeTenants
+    .map((tenant) => ({ tenant, notification: getTenantStatementNotification(tenant.id) }))
+    .filter(({ notification }) => notification !== null);
+
+  if (!dueEntries.length) { showToast("No outstanding statement balances"); return; }
+
+  const withPhone = dueEntries.filter(({ tenant }) => tenant.phone);
+  const withoutPhone = dueEntries.filter(({ tenant }) => !tenant.phone);
+
+  els.whatsappDialogNote.textContent = withoutPhone.length
+    ? `${withoutPhone.map(({ tenant }) => tenant.name).join(", ")} skipped – no phone number saved.`
+    : "";
+  els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
+
+  if (!withPhone.length) { showToast("No due tenants have a phone number saved"); return; }
+
+  els.whatsappReminderList.replaceChildren(
+    ...withPhone.map(({ tenant, notification }) => {
+      const { month, statementBalance, paidSince, remaining } = notification;
+      const url = buildWhatsAppUrl(tenant, remaining, month);
+      const row = document.createElement("div");
+      row.className = "whatsapp-reminder-row";
+      const info = document.createElement("div");
+      const name = document.createElement("strong");
+      name.textContent = tenant.name;
+      const detail = document.createElement("span");
+      detail.textContent = paidSince > 0
+        ? `Unit ${tenant.unit} – ${formatUsd(remaining)} remaining (stmt ${formatUsd(statementBalance)}, paid ${formatUsd(paidSince)})`
+        : `Unit ${tenant.unit} – ${formatUsd(remaining)} due (${formatMonth(month)} statement)`;
       info.append(name, detail);
       const link = document.createElement("a");
       link.className = "mini-button whatsapp-btn";
@@ -3373,9 +5266,19 @@ function attachEvents() {
     renderPayments();
   });
   els.tenantPaymentList.addEventListener("click", (event) => {
+    const paidBtn = event.target.closest(".paid-declaration-btn[data-tenant-id]");
+    if (paidBtn) { declarePayment(paidBtn.dataset.tenantId, paidBtn.dataset.month, paidBtn.dataset.amount); return; }
+    const noPhoneBtn = event.target.closest(".whatsapp-no-phone[data-edit-tenant-id]");
+    if (noPhoneBtn) { openEditTenantDialog(noPhoneBtn.dataset.editTenantId); return; }
     const button = event.target.closest("button[data-tenant-id]");
     if (!button) return;
     openPaymentDialogFor(button.dataset.tenantId, button.dataset.month, button.dataset.due);
+  });
+  els.declarationsList.addEventListener("click", (event) => {
+    const recordBtn = event.target.closest(".declaration-record-btn[data-decl-id]");
+    if (recordBtn) { acknowledgeDeclaration(recordBtn.dataset.declId, { record: true }); return; }
+    const dismissBtn = event.target.closest(".declaration-dismiss-btn[data-decl-id]");
+    if (dismissBtn) { acknowledgeDeclaration(dismissBtn.dataset.declId); return; }
   });
   els.monthOverviewList.addEventListener("click", (event) => {
     const row = event.target.closest("button[data-month]");
@@ -3390,6 +5293,15 @@ function attachEvents() {
   els.tenantForm.addEventListener("submit", handleTenantFormSubmit);
   els.closeTenantDialog.addEventListener("click", () => closeDialog(els.tenantDialog));
   els.cancelTenantButton.addEventListener("click", () => closeDialog(els.tenantDialog));
+  els.removeTenantPinButton.addEventListener("click", () => {
+    const tenant = state.tenants.find((t) => t.id === editingTenantId);
+    if (!tenant || !window.confirm(`Remove ${tenant.name}'s PIN? They will no longer be able to log in.`)) return;
+    tenant.pinHash = "";
+    saveState();
+    els.removeTenantPinButton.classList.add("hidden");
+    els.tenantPinDialogInput.placeholder = "Leave blank to disable tenant login";
+    showToast("Tenant PIN removed");
+  });
   els.tenantList.addEventListener("click", (event) => {
     const statBtn = event.target.closest(".print-statement-button[data-tenant-id]");
     if (statBtn) { void shareTenantStatementPdf(statBtn.dataset.tenantId); return; }
@@ -3430,6 +5342,11 @@ function attachEvents() {
   els.closeDialogButton.addEventListener("click", () => closeDialog(els.transactionDialog));
   els.cancelDialogButton.addEventListener("click", () => closeDialog(els.transactionDialog));
   els.transactionCategory.addEventListener("change", applyTransactionCategoryDefaults);
+  els.transactionTenant.addEventListener("change", () => {
+    if (els.transactionCategory.value === "Payments") applyTransactionCategoryDefaults();
+    else if (els.transactionCategory.value === "Opening Balance") updateTransactionDirectionLabels();
+  });
+  els.transactionMonth.addEventListener("change", () => { if (els.transactionCategory.value === "Payments") applyTransactionCategoryDefaults(); });
   els.transactionProject.addEventListener("input", () => {
     setProjectDropdownOpen(true);
     syncTransactionFormMode();
@@ -3506,7 +5423,9 @@ function attachEvents() {
         }
       }
       if (existingTransaction) state.transactions[editingIndex] = { ...existingTransaction, ...transaction };
-      else state.transactions.push(...transactions);
+      else {
+        state.transactions.push(...transactions);
+      }
       saveState();
       closeDialog(els.transactionDialog);
       selectedMonth = transactions.find((entry) => entry.forMonth)?.forMonth || selectedMonth;
@@ -3564,14 +5483,25 @@ function attachEvents() {
     showToast("Month saved");
   });
 
+  els.collectionModeInput.addEventListener("change", () => applyCollectionModeVisibility(els.collectionModeInput.value));
+  els.removeOwnerPasswordButton.addEventListener("click", () => {
+    if (!window.confirm("Remove the owner password? Anyone opening the app can then enter as owner.")) return;
+    state.settings.ownerPasswordHash = "";
+    saveState();
+    renderSettings();
+    showToast("Owner password removed");
+  });
   els.saveSettingsButton.addEventListener("click", () => {
     state.building.name = els.buildingNameInput.value.trim() || state.building.name;
+    state.settings.collectionMode = els.collectionModeInput.value === "fixed" ? "fixed" : "actual";
     state.settings.defaultDueUsd = Number(els.defaultDueInput.value || 0);
     state.settings.lbpPerUsd = Math.max(1, Number(els.conversionRateInput.value || DEFAULT_LBP_PER_USD));
     state.settings.invoiceUploadUrl = els.invoiceUploadUrlInput.value.trim();
     state.settings.cloudSpreadsheetId = els.cloudSpreadsheetIdInput.value.trim();
     state.settings.invoiceUploadFolderId = els.invoiceUploadFolderIdInput.value.trim();
-    state.settings.ownerPassword = els.ownerPasswordInput.value.trim();
+    const newPassword = els.ownerPasswordInput.value.trim();
+    if (newPassword) state.settings.ownerPasswordHash = hashSecret(newPassword, state.security.salt);
+    state.settings.sharedExpensesEnabled = false;
     saveState();
     renderAll();
     updateExpenseConversionPreview();
@@ -3583,11 +5513,96 @@ function attachEvents() {
 
   els.resetButton.addEventListener("click", () => {
     if (!window.confirm("Reset this browser to the imported Excel data? Local edits will be removed.")) return;
+    const nextEpoch = Number(state.meta?.epoch || 0) + 1;
     localStorage.removeItem(STORAGE_KEY);
     state = hydrateState(seedState);
+    state.meta.epoch = nextEpoch;
+    saveState({ sync: false });
     selectedMonth = null;
     renderAll();
     showToast("Data reset");
+  });
+
+  els.startFreshButton.addEventListener("click", () => {
+    if (!window.confirm("This will permanently delete ALL data — tenants, transactions, and settings. This cannot be undone. Continue?")) return;
+    const nextEpoch = Number(state.meta?.epoch || 0) + 1;
+    localStorage.removeItem(STORAGE_KEY);
+    state = hydrateState({});
+    state.meta.epoch = nextEpoch;
+    state.setupComplete = false;
+    saveState({ sync: false });
+    selectedMonth = null;
+    populateTenantSelect();
+    renderAll();
+    openSetupWizard();
+    showToast("All data cleared. Starting fresh.");
+  });
+
+  els.dueBannerClose.addEventListener("click", () => els.dueBanner.classList.add("hidden"));
+  els.newMonthBannerAdd.addEventListener("click", () => {
+    newMonthBannerDismissed = true;
+    els.newMonthBanner.classList.add("hidden");
+    openDialog(els.monthDialog);
+  });
+  els.newMonthBannerDismiss.addEventListener("click", () => {
+    newMonthBannerDismissed = true;
+    els.newMonthBanner.classList.add("hidden");
+  });
+  els.createPollButton.addEventListener("click", openCreatePollDialog);
+  els.pollForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const title = els.pollTitleInput.value.trim();
+    if (!title) return;
+    const poll = {
+      id: `poll-${Date.now()}`,
+      title,
+      description: els.pollDescInput.value.trim(),
+      createdBy: sessionMode === "owner" ? "owner" : sessionTenantId,
+      createdAt: new Date().toISOString(),
+      status: "open",
+      votes: {},
+    };
+    (state.polls ||= []).push(poll);
+    saveState();
+    closeDialog(els.pollDialog);
+    renderPolls();
+    setView("pollsView");
+    showToast("Poll created");
+  });
+  els.closePollDialog.addEventListener("click", () => closeDialog(els.pollDialog));
+  els.cancelPollButton.addEventListener("click", () => closeDialog(els.pollDialog));
+  els.pollList.addEventListener("click", (e) => {
+    const voteBtn = e.target.closest(".vote-btn[data-poll-id]");
+    if (voteBtn) { castVote(voteBtn.dataset.pollId, voteBtn.dataset.vote); return; }
+    const closeBtn = e.target.closest(".poll-close-btn[data-poll-id]");
+    if (closeBtn) { closePoll(closeBtn.dataset.pollId); return; }
+    const delBtn = e.target.closest(".poll-delete-btn[data-poll-id]");
+    if (delBtn) { deletePoll(delBtn.dataset.pollId); return; }
+  });
+
+  els.transactionDistribution.addEventListener("change", updateSharedExpenseInlinePreview);
+
+  els.createProjectButton.addEventListener("click", openCreateProjectDialog);
+  els.closeProjectDialog.addEventListener("click", () => closeDialog(els.projectDialog));
+  els.cancelProjectButton.addEventListener("click", () => closeDialog(els.projectDialog));
+  els.projectForm.addEventListener("submit", submitProject);
+  els.projectBudgetInput.addEventListener("input", updateProjectSharePreview);
+  els.projectDistributionInput.addEventListener("change", updateProjectSharePreview);
+  els.buildingProjectList.addEventListener("click", (e) => {
+    const remindBtn = e.target.closest(".remind-project-btn[data-project-id]");
+    if (remindBtn) {
+      const project = (state.buildingProjects || []).find((p) => p.id === remindBtn.dataset.projectId);
+      if (project) openProjectWhatsAppReminderDialog(project);
+      return;
+    }
+    const collectBtn = e.target.closest(".collect-project-btn[data-project-id]");
+    if (collectBtn) {
+      const project = (state.buildingProjects || []).find((p) => p.id === collectBtn.dataset.projectId);
+      if (project) openCollectForProject(project);
+      return;
+    }
+    const deleteBtn = e.target.closest(".delete-project-btn[data-project-id]");
+    if (deleteBtn) { deleteProject(deleteBtn.dataset.projectId); return; }
   });
 
   els.loginOwnerTab.addEventListener("click", () => {
@@ -3610,6 +5625,67 @@ function attachEvents() {
   els.loginPasswordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
   els.loginPinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
   els.logoutButton.addEventListener("click", logout);
+  els.runWizardButton.addEventListener("click", openSetupWizard);
+  els.wizardCollectionMode.addEventListener("change", applyWizardCollectionModeVisibility);
+  els.wizardStep1Next.addEventListener("click", () => wizardNextStep(1));
+  els.wizardStep2Prev.addEventListener("click", () => wizardPrevStep(2));
+  els.wizardStep2Next.addEventListener("click", () => wizardNextStep(2));
+  els.wizardStep3Prev.addEventListener("click", () => wizardPrevStep(3));
+  els.wizardAddTenantBtn.addEventListener("click", wizardAddTenant);
+  els.wizardTenantList.addEventListener("click", (e) => {
+    const editBtn = e.target.closest(".wizard-tenant-edit[data-edit-idx]");
+    if (editBtn) { wizardEditTenant(parseInt(editBtn.dataset.editIdx, 10)); return; }
+    const removeBtn = e.target.closest(".wizard-tenant-remove[data-idx]");
+    if (!removeBtn) return;
+    const removedIdx = parseInt(removeBtn.dataset.idx, 10);
+    if (wizardEditingIdx === removedIdx) wizardClearTenantForm();
+    else if (wizardEditingIdx !== null && wizardEditingIdx > removedIdx) wizardEditingIdx--;
+    wizardTenants.splice(removedIdx, 1);
+    renderWizardTenants();
+  });
+  els.wizardCancelEditBtn.addEventListener("click", () => { wizardClearTenantForm(); });
+  els.wizardFinishBtn.addEventListener("click", finishSetupWizard);
+  els.wizardTenantName.addEventListener("keydown", (e) => { if (e.key === "Enter") wizardAddTenant(); });
+  els.setupWizardDialog.addEventListener("cancel", (e) => e.preventDefault());
+}
+
+async function syncFromSheet({ silent = false } = {}) {
+  if (!hasCloudConfig()) return;
+  if (document.querySelector("dialog[open]")) return;
+  if (cloudSaveInFlight) return;
+  if (!silent) renderCloudStatus("Syncing from Google Sheet...");
+  try {
+    const result = await postCloudAction("loadState");
+    if (!result.success || !result.state) return;
+    const remote = result.state;
+    const sync = loadSyncMeta();
+    const remoteToken = remote.meta?.token || "";
+    const dirty = localHasUnsyncedChanges();
+
+    if (remoteToken && remoteToken === sync.lastSyncedToken) {
+      // Cloud unchanged since this device last synced.
+      if (dirty) queueCloudSave();
+      return;
+    }
+    if (dirty) {
+      // Foreign changes AND unsynced local changes: merge, then push the result.
+      state = hydrateState(mergeStates(state, remote));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      populateTenantSelect();
+      renderAll();
+      queueCloudSave();
+    } else {
+      // No local changes: safe to adopt the cloud state.
+      state = hydrateState(remote);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      saveSyncMeta({ lastSyncedToken: remoteToken, lastPushedRev: Number(state.meta?.rev || 0) });
+      populateTenantSelect();
+      renderAll();
+    }
+    renderCloudStatus(`Last synced at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+  } catch {
+    if (!silent) renderCloudStatus("Could not reach Google Sheet — showing cached data.");
+  }
 }
 
 async function boot() {
@@ -3617,17 +5693,18 @@ async function boot() {
   seedState = hydrateState(await response.json());
   const stored = localStorage.getItem(STORAGE_KEY);
   state = stored ? hydrateState(JSON.parse(stored)) : hydrateState(seedState);
-  if (ensureAllReceiptReferences()) saveState();
+  if (ensureAllReceiptReferences()) saveState({ sync: false });
 
   attachEvents();
   populateTenantSelect();
   renderAll();
-
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  }
-
   showLoginScreen();
+
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  await syncFromSheet();
+
+  setInterval(() => { if (sessionMode) syncFromSheet({ silent: true }); }, 60000);
 }
 
 boot().catch((error) => {
