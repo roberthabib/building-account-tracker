@@ -1700,6 +1700,21 @@ label {
   margin: 0;
 }
 
+.login-link-btn {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--primary-dark);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .topbar-actions {
   display: flex;
   align-items: center;

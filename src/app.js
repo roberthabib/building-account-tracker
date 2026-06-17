@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v122";
+const APP_VERSION = "v123";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -118,6 +118,14 @@ const els = {
   syncChip: document.querySelector("#syncChip"),
   syncChipText: document.querySelector("#syncChipText"),
   reloadSheetAction: document.querySelector("#reloadSheetAction"),
+  syncSecretInput: document.querySelector("#syncSecretInput"),
+  shareSyncCodeButton: document.querySelector("#shareSyncCodeButton"),
+  connectBuildingButton: document.querySelector("#connectBuildingButton"),
+  connectDialog: document.querySelector("#connectDialog"),
+  closeConnectDialog: document.querySelector("#closeConnectDialog"),
+  cancelConnectButton: document.querySelector("#cancelConnectButton"),
+  connectSubmitButton: document.querySelector("#connectSubmitButton"),
+  connectCodeInput: document.querySelector("#connectCodeInput"),
   startFreshButton: document.querySelector("#startFreshButton"),
   zeroAccountsButton: document.querySelector("#zeroAccountsButton"),
   printStatement: document.querySelector("#printStatement"),
@@ -458,6 +466,7 @@ function hydrateState(rawState) {
   hydrated.settings.invoiceUploadUrl ||= "";
   hydrated.settings.cloudSpreadsheetId ||= "";
   hydrated.settings.invoiceUploadFolderId ||= "";
+  hydrated.settings.syncSecret ||= "";
   hydrated.settings.collectionMode = hydrated.settings.collectionMode === "fixed" ? "fixed" : "actual";
   hydrated.meta ||= {};
   hydrated.meta.rev = Number(hydrated.meta.rev || 0);
@@ -4311,6 +4320,9 @@ function renderSettings() {
   els.invoiceUploadUrlInput.value = state.settings.invoiceUploadUrl || "";
   els.cloudSpreadsheetIdInput.value = state.settings.cloudSpreadsheetId || "";
   els.invoiceUploadFolderIdInput.value = state.settings.invoiceUploadFolderId || "";
+  els.syncSecretInput.value = state.settings.syncSecret || "";
+  els.shareAccessAction = els.shareAccessAction || document.querySelector("#shareAccessAction");
+  if (els.shareAccessAction) els.shareAccessAction.classList.toggle("hidden", !hasCloudConfig());
   els.collectionModeInput.value = state.settings.collectionMode || "actual";
   applyCollectionModeVisibility(els.collectionModeInput.value);
   els.ownerPasswordInput.value = "";
@@ -4819,6 +4831,8 @@ async function postCloudAction(action, payload = {}) {
   if (!config.scriptUrl) throw new Error("Google Apps Script URL not set. Add it in Settings.");
   const body = { action, ...payload };
   if (config.spreadsheetId) body.spreadsheetId = config.spreadsheetId;
+  const secret = String(state?.settings?.syncSecret || "").trim();
+  if (secret) body.token = secret;
   const response = await fetch(config.scriptUrl, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -5000,6 +5014,91 @@ async function loadCloudState() {
     renderCloudStatus(error.message);
     setSyncChip(navigator.onLine === false ? "offline" : "error");
     showToast(error.message);
+  }
+}
+
+// ── Tenant onboarding via a shareable access code ────────────────────────────
+// The code bundles the cloud config (Apps Script URL, Sheet ID, sync secret) so a
+// tenant's fresh device can connect without owner-only Settings access.
+function encodeSyncCode(obj) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+}
+
+function decodeSyncCode(code) {
+  return JSON.parse(decodeURIComponent(escape(atob(String(code).trim()))));
+}
+
+function buildSyncCode() {
+  return encodeSyncCode({
+    u: state.settings.invoiceUploadUrl || "",
+    s: state.settings.cloudSpreadsheetId || "",
+    k: state.settings.syncSecret || "",
+  });
+}
+
+async function shareSyncCode() {
+  if (!hasCloudConfig()) { showToast("Set the Google Apps Script URL first, then Save"); return; }
+  const code = buildSyncCode();
+  const message =
+    `${state.building.name || "Building"} – access code\n\n${code}\n\n` +
+    `On the app login screen, tap "Connect to a building" and paste this code.`;
+  try {
+    if (typeof navigator.share === "function") {
+      await navigator.share({ title: "Building Account access", text: message });
+      return;
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  try {
+    await navigator.clipboard.writeText(code);
+    showToast("Access code copied — send it to your tenants");
+    return;
+  } catch {
+    window.prompt("Copy this access code and send it to your tenants:", code);
+  }
+}
+
+async function applySyncCode(rawCode) {
+  if (!rawCode || !rawCode.trim()) { showToast("Paste the access code first"); return; }
+  let cfg;
+  try {
+    cfg = decodeSyncCode(rawCode);
+  } catch {
+    showToast("That access code is not valid");
+    return;
+  }
+  if (!cfg || !cfg.u) { showToast("That access code is missing the sync address"); return; }
+
+  state.settings.invoiceUploadUrl = String(cfg.u || "").trim();
+  state.settings.cloudSpreadsheetId = String(cfg.s || "").trim();
+  state.settings.syncSecret = String(cfg.k || "").trim();
+  saveState({ sync: false });
+
+  try {
+    renderCloudStatus("Connecting…");
+    setSyncChip("saving");
+    const result = await postCloudAction("loadState");
+    if (!result.state) throw new Error("No building data found at that address");
+    state = hydrateState(result.state);
+    // Preserve the cloud config we just entered, in case the pulled state lacks it.
+    state.settings.invoiceUploadUrl = String(cfg.u || "").trim();
+    state.settings.cloudSpreadsheetId = String(cfg.s || "").trim();
+    state.settings.syncSecret = String(cfg.k || "").trim();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    saveSyncMeta({ lastSyncedToken: state.meta?.token || "", lastPushedRev: Number(state.meta?.rev || 0) });
+    selectedMonth = null;
+    populateTenantSelect();
+    renderAll();
+    setSyncChip("saved");
+    closeDialog(els.connectDialog);
+    els.connectCodeInput.value = "";
+    showLoginScreen();
+    if (!els.loginTenantTab.classList.contains("hidden")) els.loginTenantTab.click();
+    showToast("Connected. Choose your name and enter your PIN.");
+  } catch (error) {
+    setSyncChip(navigator.onLine === false ? "offline" : "error");
+    showToast(error.message || "Could not connect to the building");
   }
 }
 
@@ -6245,6 +6344,7 @@ function attachEvents() {
     state.settings.invoiceUploadUrl = els.invoiceUploadUrlInput.value.trim();
     state.settings.cloudSpreadsheetId = els.cloudSpreadsheetIdInput.value.trim();
     state.settings.invoiceUploadFolderId = els.invoiceUploadFolderIdInput.value.trim();
+    state.settings.syncSecret = els.syncSecretInput.value.trim();
     const newPassword = els.ownerPasswordInput.value.trim();
     if (newPassword) state.settings.ownerPasswordHash = hashSecret(newPassword, state.security.salt);
     state.settings.sharedExpensesEnabled = false;
@@ -6255,6 +6355,15 @@ function attachEvents() {
     showToast("Settings saved");
   });
   els.loadCloudButton.addEventListener("click", loadCloudState);
+  els.shareSyncCodeButton.addEventListener("click", shareSyncCode);
+  els.connectBuildingButton.addEventListener("click", () => {
+    els.connectCodeInput.value = "";
+    openDialog(els.connectDialog);
+    setTimeout(() => els.connectCodeInput.focus(), 50);
+  });
+  els.closeConnectDialog.addEventListener("click", () => closeDialog(els.connectDialog));
+  els.cancelConnectButton.addEventListener("click", () => closeDialog(els.connectDialog));
+  els.connectSubmitButton.addEventListener("click", () => applySyncCode(els.connectCodeInput.value));
   els.downloadBackupButton.addEventListener("click", downloadBackup);
   els.restoreBackupButton.addEventListener("click", () => els.restoreBackupInput.click());
   els.restoreBackupInput.addEventListener("change", () => {

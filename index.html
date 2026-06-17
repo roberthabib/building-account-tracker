@@ -37,8 +37,22 @@
         <p class="login-error hidden" id="loginError">Incorrect password or PIN</p>
         <button class="login-submit-btn" id="loginSubmitBtn" type="button">Enter</button>
         <p class="login-hint hidden" id="loginHint"></p>
+        <button class="login-link-btn" id="connectBuildingButton" type="button">Connect to a building (new device)</button>
       </div>
     </div>
+
+    <dialog id="connectDialog">
+      <div class="dialog-header">
+        <h2>Connect to a building</h2>
+        <button class="icon-button small" id="closeConnectDialog" type="button" aria-label="Close">x</button>
+      </div>
+      <p class="settings-note">Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.</p>
+      <textarea id="connectCodeInput" class="login-input" rows="3" placeholder="Paste access code here"></textarea>
+      <div class="button-row">
+        <button class="primary-button" id="connectSubmitButton" type="button">Connect</button>
+        <button class="secondary-button" id="cancelConnectButton" type="button">Cancel</button>
+      </div>
+    </dialog>
 
     <div class="app-shell">
       <header class="topbar">
@@ -46,7 +60,7 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v122</h1>
+            <h1>BUILDING ACCOUNT TRACKER v123</h1>
           </div>
         </div>
         <div class="topbar-actions">
@@ -328,8 +342,16 @@
               Google Drive invoice folder ID
               <input id="invoiceUploadFolderIdInput" type="text" />
             </label>
+            <label>
+              Sync secret (optional)
+              <input id="syncSecretInput" type="text" placeholder="Match the SYNC_SECRET set in Apps Script" />
+            </label>
             <div class="button-row">
               <button class="primary-button" id="saveSettingsButton" type="button">Save</button>
+            </div>
+            <div class="settings-action" id="shareAccessAction">
+              <div class="settings-action-text"><strong>Share access with tenants</strong><span>Copy a code that lets a tenant's phone connect to this building. They paste it on their login screen.</span></div>
+              <button class="secondary-button" id="shareSyncCodeButton" type="button">Share</button>
             </div>
 
             <p class="settings-section-header">Backup &amp; Restore</p>
