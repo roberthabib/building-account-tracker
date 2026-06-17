@@ -1136,26 +1136,20 @@ label select {
   border-top: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(14px);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.bottom-nav::-webkit-scrollbar {
-  display: none;
 }
 
 .nav-button {
   min-height: 44px;
-  flex: 0 0 auto;
+  flex: 1 1 0;
+  min-width: 0;
   border: 0;
   border-radius: 8px;
   background: transparent;
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
-  padding: 0 9px;
+  padding: 0 4px;
 }
 
 .nav-button.active {
@@ -1397,8 +1391,55 @@ label {
   display: none !important;
 }
 
-.tenant-mode .bottom-nav {
-  grid-template-columns: repeat(5, 1fr);
+.more-sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 520px;
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 8px 14px calc(18px + env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 30px rgba(20, 33, 31, 0.18);
+}
+
+.more-sheet::backdrop {
+  background: rgba(20, 33, 31, 0.4);
+}
+
+.more-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 10px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.more-sheet-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.more-sheet-item {
+  min-height: 60px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.more-sheet-item.is-active {
+  border-color: var(--primary-dark);
+  background: var(--primary-dark);
+  color: #ffffff;
 }
 
 .tenant-mode .tenant-trash-btn,
@@ -2514,3 +2555,98 @@ label {
     font-size: 10px;
   }
 }
+
+/* Generator / Services */
+.generator-reading-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
+.gen-reading-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: end;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.gen-reading-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gen-reading-name strong {
+  font-size: 0.95rem;
+}
+
+.gen-reading-name span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.gen-reading-field {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.72rem;
+  color: var(--muted);
+  gap: 2px;
+}
+
+.gen-reading-field input {
+  width: 84px;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  padding: 0 8px;
+  font: inherit;
+}
+
+.gen-bill-lines {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gen-bill-line {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.gbl-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.gbl-top strong {
+  font-size: 0.95rem;
+}
+
+.gbl-top b {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.gbl-detail {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.delete-readings-btn {
+  color: var(--red);
+}
+

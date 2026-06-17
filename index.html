@@ -46,7 +46,7 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v113</h1>
+            <h1>BUILDING ACCOUNT TRACKER v119</h1>
           </div>
         </div>
         <div class="topbar-actions">
@@ -250,6 +250,18 @@
           <div id="buildingProjectList"></div>
         </section>
 
+        <section class="view" id="servicesView" aria-labelledby="servicesTitle">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Building</p>
+              <h2 id="servicesTitle">Services</h2>
+            </div>
+            <button class="primary-button owner-only" id="addGeneratorBillButton" type="button">Enter Meter Readings</button>
+          </div>
+          <p class="settings-note" id="servicesIntro">Log generator (diesel/maintenance) and water tanker costs with the + button (Services Expenses). Generator: enter monthly meter readings here to split fuel by kWh and maintenance by breaker size. Water: split equally or by coefficient, billed straight away.</p>
+          <div id="generatorBillList"></div>
+        </section>
+
         <section class="view" id="pollsView" aria-labelledby="pollsTitle">
           <div class="section-title">
             <div>
@@ -336,12 +348,23 @@
         <button class="nav-button active" type="button" data-view="dashboardView">Dashboard</button>
         <button class="nav-button" type="button" data-view="paymentsView">Payments</button>
         <button class="nav-button" type="button" data-view="tenantsView">Tenants</button>
-        <button class="nav-button" type="button" data-view="projectsView">Projects</button>
         <button class="nav-button" type="button" data-view="ledgerView">Ledger</button>
-        <button class="nav-button" type="button" data-view="pollsView">Polls</button>
-        <button class="nav-button owner-only" type="button" data-view="settingsView">Settings</button>
+        <button class="nav-button" id="moreNavButton" type="button" aria-haspopup="dialog">More</button>
       </nav>
     </div>
+
+    <dialog id="moreSheet" class="more-sheet" aria-label="More">
+      <div class="more-sheet-header">
+        <span>More</span>
+        <button class="icon-button small" id="closeMoreSheet" type="button" aria-label="Close">x</button>
+      </div>
+      <div class="more-sheet-list">
+        <button class="more-sheet-item" type="button" data-view="projectsView">Projects</button>
+        <button class="more-sheet-item" type="button" data-view="servicesView">Services</button>
+        <button class="more-sheet-item" type="button" data-view="pollsView">Polls</button>
+        <button class="more-sheet-item owner-only" type="button" data-view="settingsView">Settings</button>
+      </div>
+    </dialog>
 
     <section id="printStatement" aria-hidden="true"></section>
 
@@ -357,9 +380,34 @@
           <select id="transactionCategory" required>
             <option>Payments</option>
             <option>Expenses</option>
+            <option>Services Expenses</option>
             <option>Opening Balance</option>
           </select>
         </label>
+
+        <div class="two-col service-fields hidden">
+          <label>
+            Service
+            <select id="transactionService">
+              <option value="generator">Generator</option>
+              <option value="water">Water</option>
+            </select>
+          </label>
+          <label class="service-part-wrap">
+            Cost type
+            <select id="transactionServicePart">
+              <option value="fuel">Fuel / Diesel (consumption)</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </label>
+          <label class="service-split-wrap hidden">
+            Split
+            <select id="transactionServiceSplit">
+              <option value="equal">Equal split</option>
+              <option value="coefficient">By coefficient</option>
+            </select>
+          </label>
+        </div>
 
         <label class="direction-field hidden">
           Direction
@@ -508,6 +556,10 @@
         <label>
           Coefficient (X / 1000)
           <input id="tenantCoefficientInput" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" />
+        </label>
+        <label>
+          Generator breaker size (Amps)
+          <input id="tenantBreakerInput" type="number" min="0" step="1" placeholder="e.g. 20" />
         </label>
         <label>
           Tenant PIN (for app access)
@@ -698,6 +750,28 @@
         <div class="button-row">
           <button class="primary-button" id="projectSubmitButton" type="submit">Create Project</button>
           <button class="secondary-button" id="cancelProjectButton" type="button">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="generatorBillDialog">
+      <form id="generatorBillForm" method="dialog">
+        <div class="dialog-header">
+          <h2 id="generatorBillDialogTitle">Generator Meter Readings</h2>
+          <button class="icon-button small" id="closeGeneratorBillDialog" type="button" aria-label="Close">x</button>
+        </div>
+        <label>
+          Month
+          <input id="generatorBillMonth" type="month" required />
+        </label>
+        <p class="settings-note" id="generatorPoolsSummary"></p>
+        <p class="settings-note">Costs come from the Services Expenses you logged for this month. Fuel is split by each tenant's metered kWh (current − previous); maintenance is split pro-rata by breaker size.</p>
+        <div class="field-label">Meter readings (kWh)</div>
+        <div id="generatorReadingRows" class="generator-reading-rows"></div>
+        <div class="shared-expense-preview hidden" id="generatorBillPreview"></div>
+        <div class="button-row">
+          <button class="primary-button" id="generatorBillSubmitButton" type="submit">Save Readings</button>
+          <button class="secondary-button" id="cancelGeneratorBillButton" type="button">Cancel</button>
         </div>
       </form>
     </dialog>

@@ -5,3 +5,8 @@ node_modules
 # Source workbook and cloud backups contain real resident financial data — never commit
 Naccache 1727 rev3.xlsx
 cloud-state-backup-*.json
+live-sheet-backup-*.json
+# One-off cleanup tool holds the live Apps Script URL / Sheet ID — keep out of the repo
+tools/clean-sheet.mjs
+# Local PDF/screenshot scratch
+_tmp_*.pdf

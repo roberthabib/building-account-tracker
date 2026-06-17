@@ -1,9 +1,13 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v113";
+const APP_VERSION = "v119";
 
 const els = {
   views: document.querySelectorAll(".view"),
   navButtons: document.querySelectorAll(".nav-button"),
+  moreNavButton: document.querySelector("#moreNavButton"),
+  moreSheet: document.querySelector("#moreSheet"),
+  closeMoreSheet: document.querySelector("#closeMoreSheet"),
+  moreSheetItems: document.querySelectorAll(".more-sheet-item"),
   monthSelect: document.querySelector("#monthSelect"),
   kpiGrid: document.querySelector("#kpiGrid"),
   tenantDuesPanel: document.querySelector("#tenantDuesPanel"),
@@ -207,6 +211,22 @@ const els = {
   wizardCollectionMode: document.querySelector("#wizardCollectionMode"),
   wizardCollectionModeNote: document.querySelector("#wizardCollectionModeNote"),
   wizardBudgetField: document.querySelector("#wizardBudgetField"),
+  tenantBreakerInput: document.querySelector("#tenantBreakerInput"),
+  addGeneratorBillButton: document.querySelector("#addGeneratorBillButton"),
+  generatorBillList: document.querySelector("#generatorBillList"),
+  generatorBillDialog: document.querySelector("#generatorBillDialog"),
+  generatorBillDialogTitle: document.querySelector("#generatorBillDialogTitle"),
+  generatorBillForm: document.querySelector("#generatorBillForm"),
+  closeGeneratorBillDialog: document.querySelector("#closeGeneratorBillDialog"),
+  cancelGeneratorBillButton: document.querySelector("#cancelGeneratorBillButton"),
+  generatorBillMonth: document.querySelector("#generatorBillMonth"),
+  generatorPoolsSummary: document.querySelector("#generatorPoolsSummary"),
+  generatorReadingRows: document.querySelector("#generatorReadingRows"),
+  transactionService: document.querySelector("#transactionService"),
+  transactionServicePart: document.querySelector("#transactionServicePart"),
+  transactionServiceSplit: document.querySelector("#transactionServiceSplit"),
+  generatorBillPreview: document.querySelector("#generatorBillPreview"),
+  generatorBillSubmitButton: document.querySelector("#generatorBillSubmitButton"),
 };
 
 let seedState;
@@ -453,6 +473,7 @@ function hydrateState(rawState) {
   hydrated.tenants.forEach((tenant) => {
     tenant.phone ||= "";
     tenant.coefficient ||= 0;
+    tenant.breakerAmps ||= 0;
     if (tenant.pin) tenant.pinHash = hashSecret(tenant.pin, hydrated.security.salt);
     delete tenant.pin;
     tenant.pinHash ||= "";
@@ -465,6 +486,7 @@ function hydrateState(rawState) {
   hydrated.paymentDeclarations ||= [];
   hydrated.sharedExpenses ||= [];
   hydrated.buildingProjects ||= [];
+  hydrated.serviceReadings ||= [];
   hydrated.settings.sharedExpensesEnabled = false; // v108: merged into unified Expenses model
   if (hydrated.setupComplete === undefined) {
     hydrated.setupComplete = Boolean(
@@ -472,9 +494,18 @@ function hydrateState(rawState) {
       hydrated.tenants && hydrated.tenants.length > 0
     );
   }
+  // Legacy (v107) "Services Expenses" had no serviceType — fold those into Expenses.
+  // The current Services Expenses model is identified by a serviceType.
   hydrated.transactions = hydrated.transactions.map((t) =>
-    t.category === "Services Expenses" ? { ...t, category: "Expenses" } : t
+    t.category === "Services Expenses" && !t.serviceType ? { ...t, category: "Expenses" } : t
   );
+  // v116: legacy single-transaction generator bills (v113–v115, identified by a
+  // .generator object) are replaced by the Services Expenses + meter-reading
+  // model. They were test-only; tombstone and drop them so books stay consistent.
+  hydrated.transactions
+    .filter((t) => t.serviceType && t.generator)
+    .forEach((t) => { if (!hydrated.deleted.transactions.includes(t.id)) hydrated.deleted.transactions.push(t.id); });
+  hydrated.transactions = hydrated.transactions.filter((t) => !(t.serviceType && t.generator));
   const deletedTx = new Set(hydrated.deleted.transactions);
   const deletedTenants = new Set(hydrated.deleted.tenants);
   const deletedPolls = new Set(hydrated.deleted.polls);
@@ -555,11 +586,39 @@ function getTenantExpenseShare(tenantId, month = null) {
     state.transactions
       .filter((t) => {
         if (t.category !== "Expenses") return false;
+        if (t.serviceType) return false; // services (e.g. generator) are billed separately
         if (month && monthKey(t.date || t.forMonth || "") !== monthKey(month)) return false;
         return true;
       })
       .reduce((sum, t) => sum + getTenantExpenseShareForTransaction(tenantId, t), 0),
   );
+}
+
+// Services (generator, water, …) are billed to tenants by their own rules and
+// shown as a distinct line, never folded into the general expense share. Each
+// month's accumulated service expenses are split once meter readings exist for
+// that month (see computeServiceDistribution).
+const SERVICE_TYPES = ["generator", "water"];
+
+function getTenantServicesDue(tenantId, { serviceType = null, month = null } = {}) {
+  let total = 0;
+  const want = (st) => !serviceType || serviceType === st;
+  // Generator: split via the monthly meter-reading distribution.
+  if (want("generator")) {
+    getServiceMonths("generator").forEach((m) => {
+      if (month && monthKey(m) !== monthKey(month)) return;
+      total += Number(computeServiceDistribution("generator", m).shares[tenantId] || 0);
+    });
+  }
+  // Water: each tanker carries its own snapshotted share split (equal/coefficient).
+  if (want("water")) {
+    state.transactions.forEach((t) => {
+      if (t.category !== "Services Expenses" || t.serviceType !== "water") return;
+      if (month && monthKey(t.forMonth || t.date || "") !== monthKey(month)) return;
+      total += getTenantExpenseShareForTransaction(tenantId, t);
+    });
+  }
+  return roundUsd(total);
 }
 
 function getTenantPaymentsTotal(tenantId, month = null) {
@@ -614,7 +673,10 @@ function getTenantOpeningNet(tenantId) {
 function getTenantBalance(tenantId) {
   // Positive = tenant owes money; negative = credit
   return roundUsd(
-    getTenantDueBasisTotal(tenantId) - getTenantPaymentsTotal(tenantId) - getTenantOpeningNet(tenantId),
+    getTenantDueBasisTotal(tenantId) +
+      getTenantServicesDue(tenantId) -
+      getTenantPaymentsTotal(tenantId) -
+      getTenantOpeningNet(tenantId),
   );
 }
 
@@ -623,6 +685,7 @@ function getTenantExpensesByCategory(tenantId, month = null) {
   state.transactions
     .filter((t) => {
       if (t.category !== "Expenses") return false;
+      if (t.serviceType) return false; // services shown separately, not in expense breakdown
       if (month && monthKey(t.date || t.forMonth || "") !== monthKey(month)) return false;
       return true;
     })
@@ -653,22 +716,37 @@ function getTenantMonthEndBalance(tenantId, monthIso) {
         .filter((entry) => monthKey(entry.month) <= monthKey(monthIso))
         .reduce((sum, entry) => sum + getExpectedForTenant(tenantId, entry.month), 0)
     : state.transactions
-        .filter((t) => t.category === "Expenses" && t.date && t.date <= endDate)
+        .filter((t) => t.category === "Expenses" && !t.serviceType && t.date && t.date <= endDate)
         .reduce((sum, t) => sum + getTenantExpenseShareForTransaction(tenantId, t), 0);
+  // Services (generator, water) are owed in both collection modes — count any
+  // distributed service activity up to and including this statement month.
+  let services = 0;
+  getServiceMonths("generator").forEach((m) => {
+    if (monthKey(m) <= monthKey(monthIso)) services += Number(computeServiceDistribution("generator", m).shares[tenantId] || 0);
+  });
+  state.transactions.forEach((t) => {
+    if (t.category !== "Services Expenses" || t.serviceType !== "water") return;
+    if (monthKey(t.forMonth || t.date || "") <= monthKey(monthIso)) services += getTenantExpenseShareForTransaction(tenantId, t);
+  });
   const payments = state.transactions
     .filter((t) => t.category === "Payments" && t.tenantId === tenantId && !t.project && t.date && t.date <= endDate)
     .reduce((sum, t) => sum + transactionNetUsd(t), 0);
   const openingNet = state.transactions
     .filter((t) => t.category === "Opening Balance" && t.tenantId === tenantId && (!t.date || t.date <= endDate))
     .reduce((sum, t) => sum + transactionNetUsd(t), 0);
-  return roundUsd(dues - payments - openingNet);
+  return roundUsd(dues + services - payments - openingNet);
+}
+
+function getTenantStatementHasBasis() {
+  return (
+    (isFixedMode() ? state.monthlyExpected.length > 0 : state.transactions.some((t) => t.category === "Expenses" && !t.serviceType)) ||
+    state.transactions.some((t) => t.category === "Services Expenses") ||
+    (state.serviceReadings || []).length > 0
+  );
 }
 
 function getTenantStatementNotification(tenantId) {
-  const hasBasis = isFixedMode()
-    ? state.monthlyExpected.length > 0
-    : state.transactions.some((t) => t.category === "Expenses");
-  if (!hasBasis) return null;
+  if (!getTenantStatementHasBasis()) return null;
   const lastMonth = getLastCompletedMonth();
   const statementBalance = getTenantMonthEndBalance(tenantId, lastMonth);
   if (statementBalance <= 0.005) return null;
@@ -975,6 +1053,372 @@ function renderProjects() {
   );
 }
 
+// ── Services tab (generator) ─────────────────────────────────────────────────
+// Generator costs are logged progressively as "Services Expenses" transactions
+// (fuel + maintenance). Each month's pools are summed live; once the owner enters
+// that month's meter readings, fuel is split by metered kWh and maintenance by
+// breaker amps. The split is computed live, so a late expense is reflected
+// automatically without re-running anything.
+function getServiceMonths(serviceType) {
+  const set = new Set();
+  state.transactions.forEach((t) => {
+    if (t.category === "Services Expenses" && t.serviceType === serviceType && t.forMonth) set.add(t.forMonth);
+  });
+  (state.serviceReadings || []).forEach((r) => {
+    if (r.serviceType === serviceType && r.forMonth) set.add(r.forMonth);
+  });
+  return [...set].sort();
+}
+
+function getServiceMonthPools(serviceType, month) {
+  let fuelUsd = 0, maintenanceUsd = 0, fuelCount = 0, maintCount = 0;
+  state.transactions.forEach((t) => {
+    if (t.category !== "Services Expenses" || t.serviceType !== serviceType) return;
+    if (monthKey(t.forMonth || t.date || "") !== monthKey(month)) return;
+    const amt = toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0));
+    if (t.servicePart === "maintenance") { maintenanceUsd += amt; maintCount += 1; }
+    else { fuelUsd += amt; fuelCount += 1; }
+  });
+  return {
+    fuelUsd: roundUsd(fuelUsd),
+    maintenanceUsd: roundUsd(maintenanceUsd),
+    totalUsd: roundUsd(fuelUsd + maintenanceUsd),
+    fuelCount,
+    maintCount,
+  };
+}
+
+function getServiceReadingRecord(serviceType, month) {
+  return (state.serviceReadings || []).find(
+    (r) => r.serviceType === serviceType && monthKey(r.forMonth) === monthKey(month),
+  ) || null;
+}
+
+function computeServiceDistribution(serviceType, month) {
+  const pools = getServiceMonthPools(serviceType, month);
+  const rec = getServiceReadingRecord(serviceType, month);
+  if (!rec) return { pools, distributed: false, lines: {}, shares: {}, totalKwh: 0 };
+  const ids = Object.keys(rec.lines || {});
+  const kwhById = {};
+  ids.forEach((id) => {
+    const l = rec.lines[id];
+    kwhById[id] = Math.max(0, roundKwh(Number(l.currentReading || 0) - Number(l.previousReading || 0)));
+  });
+  const consShares = allocateByWeight(pools.fuelUsd, ids.map((id) => ({ id, weight: kwhById[id] })));
+  const maintShares = allocateByWeight(pools.maintenanceUsd, ids.map((id) => ({ id, weight: Number(rec.lines[id].breakerAmps || 0) })));
+  const lines = {};
+  const shares = {};
+  ids.forEach((id) => {
+    const c = roundUsd(consShares[id] || 0);
+    const m = roundUsd(maintShares[id] || 0);
+    const total = roundUsd(c + m);
+    lines[id] = {
+      breakerAmps: Number(rec.lines[id].breakerAmps || 0),
+      previousReading: Number(rec.lines[id].previousReading || 0),
+      currentReading: Number(rec.lines[id].currentReading || 0),
+      kwh: kwhById[id],
+      consumptionUsd: c,
+      maintenanceUsd: m,
+      totalUsd: total,
+    };
+    shares[id] = total;
+  });
+  return {
+    pools,
+    distributed: true,
+    lines,
+    shares,
+    totalKwh: roundKwh(Object.values(kwhById).reduce((s, v) => s + v, 0)),
+  };
+}
+
+function readGeneratorFormReadings() {
+  const readings = {};
+  els.generatorReadingRows.querySelectorAll(".gen-reading-row").forEach((row) => {
+    readings[row.dataset.tenantId] = {
+      breakerAmps: Number(row.dataset.breakerAmps || 0),
+      previousReading: Number(row.querySelector(".gen-prev").value || 0),
+      currentReading: Number(row.querySelector(".gen-curr").value || 0),
+    };
+  });
+  return readings;
+}
+
+function buildGeneratorReadingRows(month) {
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const existing = getServiceReadingRecord("generator", month);
+  els.generatorReadingRows.replaceChildren(
+    ...activeTenants.map((tenant) => {
+      const saved = existing?.lines?.[tenant.id];
+      const prev = saved ? Number(saved.previousReading || 0) : getPreviousMeterReading(tenant.id, month);
+      const row = document.createElement("div");
+      row.className = "gen-reading-row";
+      row.dataset.tenantId = tenant.id;
+      row.dataset.breakerAmps = String(tenant.breakerAmps || 0);
+      row.innerHTML = `
+        <div class="gen-reading-name"><strong></strong><span></span></div>
+        <label class="gen-reading-field">Previous<input class="gen-prev" type="number" min="0" step="1" /></label>
+        <label class="gen-reading-field">Current<input class="gen-curr" type="number" min="0" step="1" /></label>
+      `;
+      row.querySelector("strong").textContent = tenant.name;
+      row.querySelector(".gen-reading-name span").textContent =
+        `Unit ${tenant.unit}${tenant.breakerAmps > 0 ? ` · ${tenant.breakerAmps}A` : " · no breaker"}`;
+      row.querySelector(".gen-prev").value = prev || "";
+      if (saved && saved.currentReading) row.querySelector(".gen-curr").value = saved.currentReading;
+      return row;
+    }),
+  );
+}
+
+function updateGeneratorReadingsPreview() {
+  const month = monthIso(els.generatorBillMonth.value);
+  const pools = getServiceMonthPools("generator", month);
+  els.generatorPoolsSummary.textContent = month
+    ? `Fuel ${formatUsd(pools.fuelUsd)} (${pools.fuelCount}) · Maintenance ${formatUsd(pools.maintenanceUsd)} (${pools.maintCount}) · Total ${formatUsd(pools.totalUsd)}`
+    : "";
+  if (pools.totalUsd <= 0) {
+    els.generatorBillPreview.classList.add("hidden");
+    els.generatorBillPreview.replaceChildren();
+    return;
+  }
+  const readings = readGeneratorFormReadings();
+  const ids = Object.keys(readings);
+  const kwhById = {};
+  ids.forEach((id) => { kwhById[id] = Math.max(0, roundKwh(readings[id].currentReading - readings[id].previousReading)); });
+  const consShares = allocateByWeight(pools.fuelUsd, ids.map((id) => ({ id, weight: kwhById[id] })));
+  const maintShares = allocateByWeight(pools.maintenanceUsd, ids.map((id) => ({ id, weight: readings[id].breakerAmps })));
+  const tenantsById = new Map(state.tenants.map((t) => [t.id, t]));
+  const rows = ids.map((id) => {
+    const total = roundUsd((consShares[id] || 0) + (maintShares[id] || 0));
+    const row = document.createElement("div");
+    row.className = "se-preview-row";
+    const name = document.createElement("span");
+    name.textContent = `${tenantsById.get(id)?.name || "?"} (${kwhById[id]} kWh)`;
+    const amount = document.createElement("span");
+    amount.className = "se-preview-amount";
+    amount.textContent = formatUsd(total);
+    row.append(name, amount);
+    return row;
+  });
+  const totalRow = document.createElement("div");
+  totalRow.className = "se-preview-total";
+  const tLabel = document.createElement("strong");
+  tLabel.textContent = "Total billed:";
+  const tVal = document.createElement("strong");
+  tVal.textContent = formatUsd(pools.totalUsd);
+  totalRow.append(tLabel, tVal);
+  els.generatorBillPreview.replaceChildren(...rows, totalRow);
+  els.generatorBillPreview.classList.remove("hidden");
+}
+
+function openGeneratorReadingsDialog(month) {
+  if (sessionMode !== "owner") return;
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  if (!activeTenants.length) { showToast("Add tenants before entering meter readings"); return; }
+  els.generatorBillForm.reset();
+  const m = month ? monthKey(month) : (selectedMonth ? monthKey(selectedMonth) : monthKey(localDateInput()));
+  els.generatorBillMonth.value = m;
+  buildGeneratorReadingRows(monthIso(m));
+  updateGeneratorReadingsPreview();
+  openDialog(els.generatorBillDialog);
+}
+
+function refreshGeneratorReadingRowsForMonth() {
+  buildGeneratorReadingRows(monthIso(els.generatorBillMonth.value));
+  updateGeneratorReadingsPreview();
+}
+
+function submitGeneratorReadings(event) {
+  event.preventDefault();
+  if (sessionMode !== "owner") return;
+  const month = monthIso(els.generatorBillMonth.value);
+  if (!month) { showToast("Select a month"); return; }
+  const readings = readGeneratorFormReadings();
+  const lines = {};
+  Object.keys(readings).forEach((id) => {
+    lines[id] = {
+      breakerAmps: readings[id].breakerAmps,
+      previousReading: readings[id].previousReading,
+      currentReading: readings[id].currentReading,
+    };
+  });
+  state.serviceReadings ||= [];
+  const existing = getServiceReadingRecord("generator", month);
+  if (existing) {
+    existing.lines = lines;
+  } else {
+    state.serviceReadings.push({ id: `rdg-${Date.now()}`, serviceType: "generator", forMonth: month, lines });
+  }
+  saveState();
+  closeDialog(els.generatorBillDialog);
+  selectedMonth = month;
+  renderAll();
+  showToast("Meter readings saved");
+}
+
+function deleteServiceReadings(serviceType, month) {
+  if (sessionMode !== "owner") return;
+  if (!window.confirm(`Remove the meter readings for ${formatMonth(month)}? Tenant charges for that month's generator will be undone until you re-enter readings.`)) return;
+  state.serviceReadings = (state.serviceReadings || []).filter(
+    (r) => !(r.serviceType === serviceType && monthKey(r.forMonth) === monthKey(month)),
+  );
+  saveState();
+  renderAll();
+  showToast("Meter readings removed");
+}
+
+function computeWaterDistribution(month) {
+  const txns = state.transactions.filter(
+    (t) => t.category === "Services Expenses" && t.serviceType === "water" && monthKey(t.forMonth || t.date || "") === monthKey(month),
+  );
+  const totalUsd = roundUsd(txns.reduce((s, t) => s + toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0)), 0));
+  const shares = {};
+  state.tenants.filter((t) => t.active !== false).forEach((t) => {
+    shares[t.id] = roundUsd(txns.reduce((s, tx) => s + getTenantExpenseShareForTransaction(t.id, tx), 0));
+  });
+  const splits = [...new Set(txns.map((t) => t.waterSplit || "equal"))];
+  const splitLabel = splits.length > 1 ? "mixed split" : splits[0] === "coefficient" ? "by coefficient" : "equal split";
+  return { totalUsd, count: txns.length, shares, splitLabel };
+}
+
+function buildServiceCardShell(titleText, metaText) {
+  const card = document.createElement("div");
+  card.className = "project-card";
+  const header = document.createElement("div");
+  header.className = "project-card-header";
+  const info = document.createElement("div");
+  const title = document.createElement("strong");
+  title.className = "project-card-title";
+  title.textContent = titleText;
+  const meta = document.createElement("div");
+  meta.className = "project-card-meta";
+  meta.textContent = metaText;
+  info.append(title, meta);
+  header.append(info);
+  card.append(header);
+  return { card, header };
+}
+
+function buildServiceLine(name, totalText, detailText) {
+  const item = document.createElement("div");
+  item.className = "gen-bill-line";
+  const top = document.createElement("div");
+  top.className = "gbl-top";
+  const nameEl = document.createElement("strong");
+  nameEl.textContent = name;
+  const total = document.createElement("b");
+  total.textContent = totalText;
+  top.append(nameEl, total);
+  const detail = document.createElement("span");
+  detail.className = "gbl-detail";
+  detail.textContent = detailText;
+  item.append(top, detail);
+  return item;
+}
+
+function buildGeneratorCard(month, tenantsById) {
+  const dist = computeServiceDistribution("generator", month);
+  const pools = dist.pools;
+  const { card, header } = buildServiceCardShell(
+    `Generator · ${formatMonth(month)}`,
+    `Fuel ${formatUsd(pools.fuelUsd)} · Maintenance ${formatUsd(pools.maintenanceUsd)} · Total ${formatUsd(pools.totalUsd)}${dist.distributed ? ` · ${dist.totalKwh} kWh` : ""}`,
+  );
+  if (sessionMode === "owner") {
+    const actions = document.createElement("div");
+    actions.className = "project-card-actions";
+    const readBtn = document.createElement("button");
+    readBtn.type = "button";
+    readBtn.className = "mini-button enter-readings-btn";
+    readBtn.dataset.month = month;
+    readBtn.textContent = dist.distributed ? "Update Readings" : "Enter Readings";
+    actions.append(readBtn);
+    if (dist.distributed) {
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "icon-button small delete-readings-btn";
+      delBtn.dataset.month = month;
+      delBtn.title = "Remove meter readings";
+      delBtn.textContent = "×";
+      actions.append(delBtn);
+    }
+    header.append(actions);
+  }
+  if (!dist.distributed) {
+    const note = document.createElement("p");
+    note.className = "settings-note";
+    note.textContent = sessionMode === "owner"
+      ? "Not yet billed — enter this month's meter readings to split the costs among tenants."
+      : "Not yet billed for this month.";
+    card.append(note);
+    return card;
+  }
+  const lineList = document.createElement("div");
+  lineList.className = "gen-bill-lines";
+  const visibleIds = sessionMode === "tenant"
+    ? Object.keys(dist.lines).filter((id) => id === sessionTenantId)
+    : Object.keys(dist.lines);
+  visibleIds.forEach((id) => {
+    const line = dist.lines[id];
+    const tenant = tenantsById.get(id);
+    if (!tenant && sessionMode !== "owner") return;
+    lineList.append(
+      buildServiceLine(
+        tenant ? tenant.name : "(removed)",
+        formatUsd(line.totalUsd),
+        `${line.breakerAmps || 0}A · ${line.kwh || 0} kWh · ${formatUsd(line.consumptionUsd)} consumption + ${formatUsd(line.maintenanceUsd)} maintenance`,
+      ),
+    );
+  });
+  card.append(lineList);
+  return card;
+}
+
+function buildWaterCard(month, tenantsById) {
+  const dist = computeWaterDistribution(month);
+  const { card } = buildServiceCardShell(
+    `Water · ${formatMonth(month)}`,
+    `${dist.count} ${dist.count === 1 ? "tanker" : "tankers"} · Total ${formatUsd(dist.totalUsd)} · ${dist.splitLabel}`,
+  );
+  const lineList = document.createElement("div");
+  lineList.className = "gen-bill-lines";
+  const visibleIds = sessionMode === "tenant"
+    ? Object.keys(dist.shares).filter((id) => id === sessionTenantId)
+    : Object.keys(dist.shares);
+  visibleIds.forEach((id) => {
+    const share = dist.shares[id] || 0;
+    if (share <= 0 && sessionMode === "tenant") return;
+    const tenant = tenantsById.get(id);
+    const pct = dist.totalUsd > 0 ? Math.round((share / dist.totalUsd) * 100) : 0;
+    lineList.append(buildServiceLine(tenant ? tenant.name : "(removed)", formatUsd(share), `${pct}% of bill`));
+  });
+  card.append(lineList);
+  return card;
+}
+
+function renderServices() {
+  const genMonths = getServiceMonths("generator");
+  const waterMonths = getServiceMonths("water");
+  if (!genMonths.length && !waterMonths.length) {
+    const empty = document.createElement("p");
+    empty.className = "settings-note";
+    empty.textContent = sessionMode === "owner"
+      ? "No services yet. Log generator (diesel/maintenance) or water tanker costs with the + button (choose Services Expenses). Generator is split by meter readings entered here; water is split equally or by coefficient."
+      : "No services yet.";
+    els.generatorBillList.replaceChildren(empty);
+    return;
+  }
+  const tenantsById = new Map(state.tenants.map((t) => [t.id, t]));
+  const cards = [
+    ...genMonths.map((m) => ({ month: m, type: "generator" })),
+    ...waterMonths.map((m) => ({ month: m, type: "water" })),
+  ]
+    .sort((a, b) => monthKey(b.month).localeCompare(monthKey(a.month)) || a.type.localeCompare(b.type))
+    .map((entry) =>
+      entry.type === "generator" ? buildGeneratorCard(entry.month, tenantsById) : buildWaterCard(entry.month, tenantsById),
+    );
+  els.generatorBillList.replaceChildren(...cards);
+}
+
 function computeSharedExpenseShares(totalUsd, distribution) {
   const activeTenants = state.tenants.filter((t) => t.active !== false);
   if (!activeTenants.length) return {};
@@ -1006,6 +1450,58 @@ function computeSharedExpenseShares(totalUsd, distribution) {
     }
   });
   return shares;
+}
+
+// ── Generator service billing ────────────────────────────────────────────────
+// Cost-distribution model: the recorded generator expense for a month is split
+// into a maintenance part (pro-rata by breaker amps) and a consumption part
+// (pro-rata by metered kWh). The building collects exactly what it spent.
+function roundKwh(value) {
+  return Math.round(Number(value || 0));
+}
+
+function allocateByWeight(totalUsd, weights) {
+  // weights: [{ id, weight }]. Distributes totalUsd proportionally, with the
+  // rounding remainder going to the last weighted entry. Falls back to an equal
+  // split when no positive weights exist, so the full amount is always allocated.
+  const result = {};
+  weights.forEach((w) => (result[w.id] = 0));
+  const total = roundUsd(totalUsd);
+  if (total <= 0 || !weights.length) return result;
+  const positive = weights.filter((w) => w.weight > 0);
+  const pool = positive.length ? positive : weights;
+  const weightSum = positive.length ? positive.reduce((s, w) => s + w.weight, 0) : pool.length;
+  let allocated = 0;
+  pool.forEach((w, i) => {
+    if (i === pool.length - 1) {
+      result[w.id] = roundUsd(total - allocated);
+    } else {
+      const share = roundUsd(total * ((positive.length ? w.weight : 1) / weightSum));
+      result[w.id] = share;
+      allocated += share;
+    }
+  });
+  return result;
+}
+
+function getPreviousMeterReading(tenantId, beforeMonth) {
+  // Most recent saved reading for this tenant, strictly before the given month;
+  // falls back to 0 for the first month.
+  const priors = (state.serviceReadings || [])
+    .filter(
+      (r) =>
+        r.serviceType === "generator" &&
+        r.forMonth &&
+        (!beforeMonth || monthKey(r.forMonth) < monthKey(beforeMonth)),
+    )
+    .sort((a, b) => monthKey(b.forMonth).localeCompare(monthKey(a.forMonth)));
+  for (const rec of priors) {
+    const line = rec.lines?.[tenantId];
+    if (line && line.currentReading !== undefined && line.currentReading !== null) {
+      return Number(line.currentReading) || 0;
+    }
+  }
+  return 0;
 }
 
 function buildSharedExpensesForMonth(month) {
@@ -1259,7 +1755,7 @@ function getAccountTotals() {
       if (transaction.category === "Advance Payments") {
         acc.advanceUsd += netUsd;
       }
-      if (transaction.category === "Expenses") {
+      if (transaction.category === "Expenses" || transaction.category === "Services Expenses") {
         acc.expenseUsd += toUsd(transaction.debitUsd, transaction.debitLbp);
       }
       return acc;
@@ -1320,6 +1816,11 @@ function getMonthlyActivityRows(month) {
     {
       category: "Expenses",
       note: "Paid expenses, including LBP converted to USD",
+      usd: 0,
+    },
+    {
+      category: "Services Expenses",
+      note: "Generator fuel and maintenance paid",
       usd: 0,
     },
   ];
@@ -1524,6 +2025,20 @@ function renderTenantDuesSummary() {
     });
   }
 
+  // Services due (each shown as its own line, never folded into general dues)
+  [
+    ["Generator", getTenantServicesDue(tenantId, { serviceType: "generator" })],
+    ["Water", getTenantServicesDue(tenantId, { serviceType: "water" })],
+  ].forEach(([label, amount]) => {
+    if (amount <= 0.005) return;
+    const row = document.createElement("article");
+    row.className = "summary-row";
+    row.innerHTML = `<div><strong></strong></div><b class="due-amount"></b>`;
+    row.querySelector("strong").textContent = label;
+    row.querySelector("b").textContent = formatUsd(amount);
+    list.append(row);
+  });
+
   // Opening balance carry-in (only when present)
   if (Math.abs(openingNet) > 0.005) {
     const openingRow = document.createElement("article");
@@ -1584,7 +2099,7 @@ function renderDashboard() {
   }
 
   const totals = getPositionTotals();
-  const totalExpenses = roundUsd(state.transactions.filter((t) => t.category === "Expenses").reduce((s, t) => s + toUsd(t.debitUsd, t.debitLbp), 0));
+  const totalExpenses = roundUsd(state.transactions.filter((t) => t.category === "Expenses" || t.category === "Services Expenses").reduce((s, t) => s + toUsd(t.debitUsd, t.debitLbp), 0));
   els.kpiGrid.replaceChildren(...buildKpiCards(
     isFixedMode()
       ? [
@@ -1649,6 +2164,7 @@ function openSetupWizard() {
     pinHash: t.pinHash || "",
     newPin: "",
     coefficient: t.coefficient || 0,
+    breakerAmps: t.breakerAmps || 0,
     active: t.active !== false,
   }));
   els.wizardBuildingName.value = (state.building && state.building.name) || "";
@@ -1741,11 +2257,13 @@ function wizardAddTenant() {
     pinHash: "",
     newPin: els.wizardTenantPin.value.trim(),
     coefficient: parseInt(els.wizardTenantCoeff.value, 10) || 0,
+    breakerAmps: 0,
   };
   if (wizardEditingIdx !== null) {
     data.id = wizardTenants[wizardEditingIdx].id;
     data.active = wizardTenants[wizardEditingIdx].active;
     data.pinHash = wizardTenants[wizardEditingIdx].pinHash || "";
+    data.breakerAmps = wizardTenants[wizardEditingIdx].breakerAmps || 0;
     wizardTenants[wizardEditingIdx] = data;
   } else {
     wizardTenants.push(data);
@@ -1828,6 +2346,7 @@ function finishSetupWizard() {
     phone: t.phone || "",
     pinHash: t.newPin ? hashSecret(t.newPin, state.security.salt) : (t.pinHash || ""),
     coefficient: t.coefficient || 0,
+    breakerAmps: t.breakerAmps || 0,
     active: t.active !== false,
   }));
   state.setupComplete = true;
@@ -2282,7 +2801,8 @@ function renderTenants() {
       card.querySelector("strong").textContent = tenant.name;
       const unitSpan = card.querySelector(".tenant-unit-line");
       const coeffLabel = tenant.coefficient > 0 ? ` · ${tenant.coefficient}/1000` : "";
-      unitSpan.textContent = `Unit ${tenant.unit}${coeffLabel}${tenant.phone ? "" : " · no phone"}`;
+      const breakerLabel = tenant.breakerAmps > 0 ? ` · ${tenant.breakerAmps}A` : "";
+      unitSpan.textContent = `Unit ${tenant.unit}${coeffLabel}${breakerLabel}${tenant.phone ? "" : " · no phone"}`;
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
@@ -2347,14 +2867,19 @@ function tenantStatementRows(tenantId) {
 
 function tenantStatementSummaryItems(tenant, projectTotal, tenantTotals) {
   const openingNet = getTenantOpeningNet(tenant.id);
-  return [
-    [isFixedMode() ? "Total Monthly Dues" : "Expense Share", formatUsd(getTenantDueBasisTotal(tenant.id))],
-    ["Opening Balance", formatUsd(roundUsd(-openingNet))],
-    ["Payments Made", formatUsd(getTenantPaymentsTotal(tenant.id))],
-    ["Current Balance", formatUsd(getTenantBalance(tenant.id))],
-    ["Project Payments", formatUsd(projectTotal)],
-    ["Advance Balance", formatUsd(tenantTotals.advanceUsd)],
-  ];
+  const generator = getTenantServicesDue(tenant.id, { serviceType: "generator" });
+  const water = getTenantServicesDue(tenant.id, { serviceType: "water" });
+  // Always show the dues basis, payments and the current balance; show the rest
+  // only when non-zero so the summary stays clean for simple accounts.
+  const items = [[isFixedMode() ? "Total Monthly Dues" : "Expense Share", formatUsd(getTenantDueBasisTotal(tenant.id))]];
+  if (Math.abs(generator) > 0.005) items.push(["Generator", formatUsd(generator)]);
+  if (Math.abs(water) > 0.005) items.push(["Water", formatUsd(water)]);
+  if (Math.abs(openingNet) > 0.005) items.push(["Opening Balance", formatUsd(roundUsd(-openingNet))]);
+  items.push(["Payments Made", formatUsd(getTenantPaymentsTotal(tenant.id))]);
+  if (Math.abs(projectTotal) > 0.005) items.push(["Project Payments", formatUsd(projectTotal)]);
+  if (tenantTotals.advanceUsd > 0.005) items.push(["Advance Balance", formatUsd(tenantTotals.advanceUsd)]);
+  items.push(["Current Balance", formatUsd(getTenantBalance(tenant.id))]);
+  return items;
 }
 
 function printTenantStatement(tenantId) {
@@ -2823,6 +3348,41 @@ function buildPdfDocument(content) {
   return new Blob([pdf], { type: PDF_MIME });
 }
 
+function buildMultiPagePdf(pageContents) {
+  // Shared catalog/pages/fonts, one Page + Contents pair per page of commands.
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    null, // 2: Pages — filled once kids are known
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
+  ];
+  const kids = [];
+  pageContents.forEach((content) => {
+    const contentObjNum = objects.length + 1;
+    objects.push(`<< /Length ${content.length} >>\nstream\n${content}endstream`);
+    const pageObjNum = objects.length + 1;
+    objects.push(
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjNum} 0 R >>`,
+    );
+    kids.push(`${pageObjNum} 0 R`);
+  });
+  objects[1] = `<< /Type /Pages /Kids [${kids.join(" ")}] /Count ${pageContents.length} >>`;
+
+  let pdf = "%PDF-1.4\n";
+  const offsets = [0];
+  objects.forEach((object, index) => {
+    offsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  });
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  });
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+  return new Blob([pdf], { type: PDF_MIME });
+}
+
 function pdfTextCommand(text, x, y, size = 10, bold = false) {
   return `BT /${bold ? "F2" : "F1"} ${size} Tf ${x} ${y} Td (${pdfEscape(text)}) Tj ET`;
 }
@@ -2928,7 +3488,10 @@ function buildTenantStatementPdf(tenantId) {
   const tenant = state.tenants.find((entry) => entry.id === tenantId);
   if (!tenant) return null;
 
-  const { rows, totals } = tenantStatementRows(tenant.id);
+  const { rows: allRows, totals } = tenantStatementRows(tenant.id);
+  // Only months with real activity — skip empty $0 / no-due months so the
+  // statement stays readable (totals still cover every month).
+  const rows = allRows.filter((r) => r.due > 0.005 || r.paid > 0.005 || (r.receipts && r.receipts.length));
   const tenantTotals = getTenantTotals(tenant.id);
   const projectRows = state.transactions
     .filter((tx) => isProjectPayment(tx) && tx.tenantId === tenant.id)
@@ -2936,20 +3499,68 @@ function buildTenantStatementPdf(tenantId) {
     .sort((a, b) => transactionDateValue(a).localeCompare(transactionDateValue(b)) || String(a.id).localeCompare(String(b.id)));
   const projectTotal = projectRows.reduce((sum, tx) => sum + transactionNetUsd(tx), 0);
 
-  const commands = ["0.2 w"];
   const left = 50;
   const right = 545;
-  let y = 800;
+  const TOP = 800;
+  const BOTTOM = 60;
+  const ROW_H = 22;
+  const pages = [];
+  let commands;
+  let y;
+  let x;
 
-  // Header
-  commands.push(pdfTextCommand(state.building.name, left, y, 11));
-  commands.push(pdfTextCommand("Tenant Account Statement", left, y - 28, 18, true));
-  commands.push(pdfTextCommand(`${tenant.name} | Unit ${tenant.unit}`, left, y - 48, 11));
-  commands.push(pdfTextCommand(`Date: ${localDateInput()}`, 380, y, 10));
-  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 16, 9));
-  commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+  function flushPage() {
+    if (commands) pages.push(`${commands.join("\n")}\n`);
+  }
+  function startPage(kind) {
+    flushPage();
+    commands = ["0.2 w"];
+    y = TOP;
+    if (kind === "full") {
+      commands.push(pdfTextCommand(state.building.name, left, y, 11));
+      commands.push(pdfTextCommand("Tenant Account Statement", left, y - 28, 18, true));
+      commands.push(pdfTextCommand(`${tenant.name} | Unit ${tenant.unit}`, left, y - 48, 11));
+      commands.push(pdfTextCommand(`Date: ${localDateInput()}`, 380, y, 10));
+      commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 16, 9));
+      commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+      y = TOP - 92;
+    } else {
+      commands.push(pdfTextCommand(`${tenant.name} | Unit ${tenant.unit} — statement (continued)`, left, y, 10, true));
+      commands.push(pdfLineCommand(left, y - 10, right, y - 10));
+      y = TOP - 34;
+    }
+  }
+  function drawColHeader(cols) {
+    x = left;
+    cols.forEach((col) => {
+      commands.push(pdfRectCommand(x, y - 16, col.width, ROW_H));
+      commands.push(pdfTextCommand(col.heading, x + 5, y - 4, 8, true));
+      x += col.width;
+    });
+    y -= ROW_H;
+  }
+  function drawRow(cells, cols, boldFirst) {
+    x = left;
+    cols.forEach((col, index) => {
+      commands.push(pdfRectCommand(x, y - 16, col.width, ROW_H));
+      commands.push(pdfTextCommand(pdfClip(cells[index], Math.floor(col.width / 5.5)), x + 5, y - 4, 8, Boolean(boldFirst) && index === 0));
+      x += col.width;
+    });
+    y -= ROW_H;
+  }
+  function ensureSpace(needed, redraw) {
+    if (y - needed < BOTTOM) {
+      startPage("cont");
+      if (redraw) redraw();
+    }
+  }
+  function sectionTitle(text) {
+    ensureSpace(40);
+    commands.push(pdfTextCommand(text, left, y, 13, true));
+    y -= 20;
+  }
 
-  y -= 120;
+  startPage("full");
 
   // Summary boxes (2 columns)
   const summaryItems = tenantStatementSummaryItems(tenant, projectTotal, tenantTotals);
@@ -2964,13 +3575,9 @@ function buildTenantStatementPdf(tenantId) {
     commands.push(pdfTextCommand(label, bx + 8, by + 26, 8));
     commands.push(pdfTextCommand(pdfClip(value, 42), bx + 8, by + 10, 12, true));
   });
-
   y -= Math.ceil(summaryItems.length / 2) * (boxHeight + 8) + 18;
 
   // Monthly Dues table
-  commands.push(pdfTextCommand("Monthly Dues", left, y, 13, true));
-  y -= 20;
-
   const monthCols = [
     { heading: "Month", width: 80 },
     { heading: "Due USD", width: 80 },
@@ -2979,84 +3586,60 @@ function buildTenantStatementPdf(tenantId) {
     { heading: "Status", width: 60 },
     { heading: "Receipts", width: 115 },
   ];
-
-  let x = left;
-  monthCols.forEach((col) => {
-    commands.push(pdfRectCommand(x, y - 16, col.width, 22));
-    commands.push(pdfTextCommand(col.heading, x + 5, y - 4, 8, true));
-    x += col.width;
-  });
-  y -= 22;
-
+  sectionTitle("Monthly Dues");
+  drawColHeader(monthCols);
+  if (!rows.length) {
+    commands.push(pdfTextCommand("No dues or payments recorded yet.", left, y - 4, 9));
+    y -= ROW_H;
+  }
   rows.forEach((entry) => {
-    x = left;
-    const cells = [
-      formatMonth(entry.month),
-      formatMonthly(entry.due),
-      formatMonthly(entry.paid),
-      formatMonthly(entry.outstanding),
-      entry.status,
-      entry.receipts.join(", "),
-    ];
-    monthCols.forEach((col, index) => {
-      commands.push(pdfRectCommand(x, y - 16, col.width, 22));
-      commands.push(pdfTextCommand(pdfClip(cells[index], Math.floor(col.width / 5.5)), x + 5, y - 4, 8));
-      x += col.width;
-    });
-    y -= 22;
+    ensureSpace(ROW_H, () => drawColHeader(monthCols));
+    drawRow(
+      [
+        formatMonth(entry.month),
+        formatMonthly(entry.due),
+        formatMonthly(entry.paid),
+        formatMonthly(entry.outstanding),
+        entry.status,
+        entry.receipts.join(", "),
+      ],
+      monthCols,
+    );
   });
-
-  // Totals row
-  x = left;
-  const totalCells = ["Total", formatMonthly(totals.due), formatMonthly(totals.paid), formatMonthly(totals.outstanding), "", ""];
-  monthCols.forEach((col, index) => {
-    commands.push(pdfRectCommand(x, y - 16, col.width, 22));
-    commands.push(pdfTextCommand(pdfClip(totalCells[index], Math.floor(col.width / 5.5)), x + 5, y - 4, 8, index === 0));
-    x += col.width;
-  });
-  y -= 22;
+  ensureSpace(ROW_H, () => drawColHeader(monthCols));
+  drawRow(
+    ["Total", formatMonthly(totals.due), formatMonthly(totals.paid), formatMonthly(totals.outstanding), "", ""],
+    monthCols,
+    true,
+  );
 
   // Project payments table
   if (projectRows.length) {
-    y -= 18;
-    commands.push(pdfTextCommand("Project Payments", left, y, 13, true));
-    y -= 20;
-
+    y -= 14;
     const projCols = [
       { heading: "Date", width: 70 },
       { heading: "Project", width: 200 },
       { heading: "Amount USD", width: 90 },
       { heading: "Receipt", width: 135 },
     ];
-
-    x = left;
-    projCols.forEach((col) => {
-      commands.push(pdfRectCommand(x, y - 16, col.width, 22));
-      commands.push(pdfTextCommand(col.heading, x + 5, y - 4, 8, true));
-      x += col.width;
-    });
-    y -= 22;
-
+    sectionTitle("Project Payments");
+    drawColHeader(projCols);
     projectRows.forEach((tx) => {
-      x = left;
-      const cells = [tx.date || "", tx.project || "", formatUsd(transactionNetUsd(tx)), tx.receiptRef || ""];
-      projCols.forEach((col, index) => {
-        commands.push(pdfRectCommand(x, y - 16, col.width, 22));
-        commands.push(pdfTextCommand(pdfClip(cells[index], Math.floor(col.width / 5.5)), x + 5, y - 4, 8));
-        x += col.width;
-      });
-      y -= 22;
+      ensureSpace(ROW_H, () => drawColHeader(projCols));
+      drawRow([tx.date || "", tx.project || "", formatUsd(transactionNetUsd(tx)), tx.receiptRef || ""], projCols);
     });
   }
 
+  ensureSpace(30);
   commands.push(pdfTextCommand(
     "Monthly dues and project payments are separated. Project payments are not applied to monthly fees.",
     left,
-    Math.max(52, y - 18),
+    y - 8,
     9,
   ));
 
-  return buildPdfDocument(`${commands.join("\n")}\n`);
+  flushPage();
+  return buildMultiPagePdf(pages);
 }
 
 async function shareTenantStatementPdf(tenantId) {
@@ -3320,7 +3903,7 @@ function renderLedger() {
       btn.textContent = "Receipt";
       actionGroup.append(btn);
     }
-    if (transaction.category === "Expenses" && sessionMode === "owner") {
+    if (transaction.category === "Expenses" && !transaction.serviceType && sessionMode === "owner") {
       const btn = document.createElement("button");
       btn.className = "ledger-action-btn edit-expense-button";
       btn.type = "button";
@@ -3746,16 +4329,23 @@ function renderAll() {
   renderPayments();
   renderTenants();
   renderProjects();
+  renderServices();
   renderLedger();
   renderPolls();
   renderDatalists();
   renderSettings();
 }
 
+const MORE_VIEWS = ["projectsView", "servicesView", "pollsView", "settingsView"];
+
 function setView(viewId) {
   if (sessionMode === "tenant" && viewId === "settingsView") viewId = "dashboardView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
-  els.navButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === viewId));
+  els.navButtons.forEach((button) => {
+    if (button.id === "moreNavButton") button.classList.toggle("active", MORE_VIEWS.includes(viewId));
+    else button.classList.toggle("active", button.dataset.view === viewId);
+  });
+  els.moreSheetItems.forEach((item) => item.classList.toggle("is-active", item.dataset.view === viewId));
 }
 
 function openDialog(dialog) {
@@ -3830,22 +4420,29 @@ function syncTransactionFormMode() {
   const openingMode = category === "Opening Balance";
   const monthlyPaymentMode = category === "Payments" && !project;
   const expenseMode = category === "Expenses";
+  const serviceMode = category === "Services Expenses";
+  const expenseLike = expenseMode || serviceMode;
   populateTenantSelect(openingMode);
+  document.querySelector(".service-fields").classList.toggle("hidden", !serviceMode);
+  const waterMode = serviceMode && els.transactionService.value === "water";
+  document.querySelector(".service-part-wrap").classList.toggle("hidden", !serviceMode || waterMode);
+  document.querySelector(".service-split-wrap").classList.toggle("hidden", !waterMode);
   document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
-  document.querySelector(".month-field").classList.toggle("hidden", !monthlyPaymentMode);
-  document.querySelector(".lbp-amount-field").classList.toggle("hidden", !expenseMode);
-  document.querySelector(".amount-row").classList.toggle("monthly-usd-only", !expenseMode);
-  document.querySelector(".extra-fields").classList.toggle("hidden", !expenseMode);
+  document.querySelector(".month-field").classList.toggle("hidden", !(monthlyPaymentMode || serviceMode));
+  document.querySelector(".lbp-amount-field").classList.toggle("hidden", !expenseLike);
+  document.querySelector(".amount-row").classList.toggle("monthly-usd-only", !expenseLike);
+  document.querySelector(".extra-fields").classList.toggle("hidden", !expenseLike);
   document.querySelector(".expense-category-field").classList.toggle("hidden", !expenseMode);
-  document.querySelector(".invoice-file-field").classList.toggle("hidden", !expenseMode);
+  document.querySelector(".invoice-file-field").classList.toggle("hidden", !expenseLike);
+  document.querySelector(".project-combobox").closest("label").classList.toggle("hidden", serviceMode);
   document.querySelector(".shared-expense-dist-field").classList.add("hidden");
   els.sharedExpenseInlinePreview.classList.add("hidden");
-  els.expenseConversionPreview.classList.toggle("hidden", !expenseMode);
+  els.expenseConversionPreview.classList.toggle("hidden", !expenseLike);
   els.invoiceAttachmentStatus.classList.toggle("hidden", !expenseMode || !editingExpenseId);
-  els.transactionDescription.required = !tenantMode && !openingMode;
-  els.transactionMonth.required = false;
+  els.transactionDescription.required = !tenantMode && !openingMode && !serviceMode;
+  els.transactionMonth.required = serviceMode;
   updateTransactionDirectionLabels();
   maybeSetNextExpenseInvoiceNumber();
   updateExpenseConversionPreview();
@@ -3853,7 +4450,7 @@ function syncTransactionFormMode() {
 
 function updateExpenseConversionPreview() {
   const cat = els.transactionCategory.value;
-  if (cat !== "Expenses") return;
+  if (cat !== "Expenses" && cat !== "Services Expenses") return;
   const lbp = Number(els.transactionLbp.value || 0);
   const usd = Number(els.transactionUsd.value || 0);
   const rate = getConversionRate();
@@ -3906,7 +4503,9 @@ function addKnownValue(collection, name) {
 
 function createTransactionsFromForm() {
   const category = els.transactionCategory.value;
-  const isExpenseLike = category === "Expenses";
+  const isExpense = category === "Expenses";
+  const isServiceExpense = category === "Services Expenses";
+  const isExpenseLike = isExpense || isServiceExpense;
   const amountLbp = isExpenseLike ? Number(els.transactionLbp.value || 0) : 0;
   const amountUsd = Number(els.transactionUsd.value || 0);
   if (!amountLbp && !amountUsd) throw new Error("Enter an amount");
@@ -3918,16 +4517,28 @@ function createTransactionsFromForm() {
     isExpenseLike ||
     ((category === "Advance Payments" || isOpening) && els.transactionDirection.value === "debit");
   const tenantMode = category === "Payments" || category === "Advance Payments";
+
+  const serviceType = isServiceExpense ? els.transactionService.value : "";
+  const isWater = isServiceExpense && serviceType === "water";
+  const servicePart = isServiceExpense && !isWater ? els.transactionServicePart.value : "";
+  const waterSplit = isWater ? els.transactionServiceSplit.value : "";
+  const serviceForMonth = isServiceExpense ? monthIso(els.transactionMonth.value) : null;
+  if (isServiceExpense && !serviceForMonth) throw new Error("Select the service month");
+
   let description = tenantMode ? tenantName(tenantId) : els.transactionDescription.value.trim();
   if (isOpening && !description) {
     description = openingTenantId ? `Opening balance - ${tenantName(openingTenantId)}` : "Opening balance";
+  }
+  if (isServiceExpense && !description) {
+    if (isWater) description = `Water - ${formatMonth(serviceForMonth)}`;
+    else description = `Generator ${servicePart === "maintenance" ? "maintenance" : "fuel"} - ${formatMonth(serviceForMonth)}`;
   }
   if (!description) throw new Error("Enter a description");
 
   const project = els.transactionProject.value.trim();
   const supplier = els.transactionSupplier.value.trim();
-  const expenseCategory = isExpenseLike ? els.transactionExpenseCategory.value.trim() : "";
-  addKnownValue(state.projects, project);
+  const expenseCategory = isExpense ? els.transactionExpenseCategory.value.trim() : "";
+  if (!isServiceExpense) addKnownValue(state.projects, project);
   addKnownValue(state.suppliers, supplier);
   if (expenseCategory) addKnownValue(state.expenseCategories, expenseCategory);
 
@@ -3936,12 +4547,18 @@ function createTransactionsFromForm() {
     category,
     description,
     tenantId: tenantMode ? tenantId : openingTenantId,
-    forMonth: category === "Payments" && !project ? monthIso(els.transactionMonth.value) : null,
-    project,
+    forMonth: category === "Payments" && !project ? monthIso(els.transactionMonth.value) : serviceForMonth,
+    project: isServiceExpense ? "" : project,
     date: els.transactionDate.value,
     supplier,
     invoice: els.transactionInvoice.value.trim(),
-    expenseCategory,
+    expenseCategory: isWater
+      ? "Water"
+      : isServiceExpense
+        ? (servicePart === "maintenance" ? "Generator Maintenance" : "Generator Fuel")
+        : expenseCategory,
+    serviceType,
+    servicePart,
     debitUsd: isDebit ? amountUsd : 0,
     debitLbp: isDebit ? amountLbp : 0,
     creditUsd: isDebit ? 0 : amountUsd,
@@ -3952,10 +4569,15 @@ function createTransactionsFromForm() {
     sourceRow: null,
   };
 
-  if (isExpenseLike) {
+  // Plain expenses snapshot a per-tenant coefficient split. Water tankers snapshot
+  // an equal or by-coefficient split chosen at entry and bill immediately. Generator
+  // service expenses carry no shares — they bill via the monthly meter readings.
+  if (isExpense) {
     const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), "coefficient");
-    // Snapshot the split when there is a roster to split across; null keeps the
-    // share dynamic so the expense is picked up once tenants are added.
+    baseTransaction.shares = Object.keys(shares).length ? shares : null;
+  } else if (isWater) {
+    baseTransaction.waterSplit = waterSplit;
+    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), waterSplit);
     baseTransaction.shares = Object.keys(shares).length ? shares : null;
   }
 
@@ -4241,6 +4863,7 @@ function mergeStates(local, remote) {
   merged.suppliers = mergeById(older.suppliers, newer.suppliers);
   merged.projects = mergeById(older.projects, newer.projects);
   merged.expenseCategories = mergeById(older.expenseCategories, newer.expenseCategories);
+  merged.serviceReadings = mergeById(older.serviceReadings, newer.serviceReadings);
   merged.monthlyExpected = mergeByMonth(older.monthlyExpected, newer.monthlyExpected);
   merged.meta = {
     rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
@@ -4384,6 +5007,10 @@ function expenseDebitLbp(transaction) {
 function openExpenseEditDialog(transactionId) {
   if (sessionMode !== "owner") return;
   const transaction = state.transactions.find((entry) => entry.id === transactionId);
+  if (transaction?.serviceType === "generator") {
+    showToast("Edit generator bills from the Services tab");
+    return;
+  }
   if (!transaction || transaction.category !== "Expenses") {
     showToast("Only expense entries can be edited here");
     return;
@@ -4967,6 +5594,7 @@ function openAddTenantDialog() {
   els.tenantUnitInput.value = "";
   els.tenantPhoneDialogInput.value = "";
   els.tenantCoefficientInput.value = "";
+  els.tenantBreakerInput.value = "";
   els.tenantPinDialogInput.value = "";
   els.tenantPinDialogInput.placeholder = "Leave blank to disable tenant login";
   els.removeTenantPinButton.classList.add("hidden");
@@ -4984,6 +5612,7 @@ function openEditTenantDialog(tenantId) {
   els.tenantUnitInput.value = tenant.unit;
   els.tenantPhoneDialogInput.value = tenant.phone || "";
   els.tenantCoefficientInput.value = tenant.coefficient > 0 ? String(tenant.coefficient) : "";
+  els.tenantBreakerInput.value = tenant.breakerAmps > 0 ? String(tenant.breakerAmps) : "";
   els.tenantPinDialogInput.value = "";
   els.tenantPinDialogInput.placeholder = tenant.pinHash ? "PIN set — type to change" : "Leave blank to disable tenant login";
   els.removeTenantPinButton.classList.toggle("hidden", !tenant.pinHash);
@@ -4998,6 +5627,7 @@ function handleTenantFormSubmit(event) {
   const unit = els.tenantUnitInput.value.trim();
   const phone = els.tenantPhoneDialogInput.value.trim();
   const coefficient = Math.max(0, Math.min(1000, Number(els.tenantCoefficientInput.value || 0)));
+  const breakerAmps = Math.max(0, Number(els.tenantBreakerInput.value || 0));
   const pinEntered = els.tenantPinDialogInput.value.trim();
   if (!name || !unit) return;
 
@@ -5008,6 +5638,7 @@ function handleTenantFormSubmit(event) {
       tenant.unit = unit;
       tenant.phone = phone;
       tenant.coefficient = coefficient;
+      tenant.breakerAmps = breakerAmps;
       if (pinEntered) tenant.pinHash = hashSecret(pinEntered, state.security.salt);
     }
     showToast("Tenant updated");
@@ -5019,6 +5650,7 @@ function handleTenantFormSubmit(event) {
       active: true,
       phone,
       coefficient,
+      breakerAmps,
       pinHash: pinEntered ? hashSecret(pinEntered, state.security.salt) : "",
     });
     showToast(`${name} added`);
@@ -5246,7 +5878,23 @@ function navigateMonth(direction) {
 }
 
 function attachEvents() {
-  els.navButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+  els.navButtons.forEach((button) => {
+    if (button.id === "moreNavButton") {
+      button.addEventListener("click", () => openDialog(els.moreSheet));
+    } else {
+      button.addEventListener("click", () => setView(button.dataset.view));
+    }
+  });
+  els.moreSheetItems.forEach((item) =>
+    item.addEventListener("click", () => {
+      setView(item.dataset.view);
+      closeDialog(els.moreSheet);
+    }),
+  );
+  els.closeMoreSheet.addEventListener("click", () => closeDialog(els.moreSheet));
+  els.moreSheet.addEventListener("click", (event) => {
+    if (event.target === els.moreSheet) closeDialog(els.moreSheet);
+  });
   els.monthPrev.addEventListener("click", () => navigateMonth(-1));
   els.monthNext.addEventListener("click", () => navigateMonth(1));
   els.dueOnlyToggle.addEventListener("click", () => { dueOnlyFilter = !dueOnlyFilter; renderPayments(); });
@@ -5342,6 +5990,7 @@ function attachEvents() {
   els.closeDialogButton.addEventListener("click", () => closeDialog(els.transactionDialog));
   els.cancelDialogButton.addEventListener("click", () => closeDialog(els.transactionDialog));
   els.transactionCategory.addEventListener("change", applyTransactionCategoryDefaults);
+  els.transactionService.addEventListener("change", syncTransactionFormMode);
   els.transactionTenant.addEventListener("change", () => {
     if (els.transactionCategory.value === "Payments") applyTransactionCategoryDefaults();
     else if (els.transactionCategory.value === "Opening Balance") updateTransactionDirectionLabels();
@@ -5414,7 +6063,7 @@ function attachEvents() {
         transactions.filter(isReceiptablePayment).forEach((entry) => ensureReceiptReference(entry));
       }
       const invoiceFile = selectedInvoiceFile();
-      if (transaction.category === "Expenses" && invoiceFile) {
+      if ((transaction.category === "Expenses" || transaction.category === "Services Expenses") && invoiceFile) {
         showToast(existingTransaction ? "Uploading replacement invoice" : "Uploading invoice picture");
         try {
           transaction.invoiceAttachment = await uploadExpenseInvoice(transaction, invoiceFile);
@@ -5603,6 +6252,19 @@ function attachEvents() {
     }
     const deleteBtn = e.target.closest(".delete-project-btn[data-project-id]");
     if (deleteBtn) { deleteProject(deleteBtn.dataset.projectId); return; }
+  });
+
+  els.addGeneratorBillButton.addEventListener("click", () => openGeneratorReadingsDialog());
+  els.closeGeneratorBillDialog.addEventListener("click", () => closeDialog(els.generatorBillDialog));
+  els.cancelGeneratorBillButton.addEventListener("click", () => closeDialog(els.generatorBillDialog));
+  els.generatorBillForm.addEventListener("submit", submitGeneratorReadings);
+  els.generatorBillMonth.addEventListener("change", refreshGeneratorReadingRowsForMonth);
+  els.generatorReadingRows.addEventListener("input", updateGeneratorReadingsPreview);
+  els.generatorBillList.addEventListener("click", (e) => {
+    const readBtn = e.target.closest(".enter-readings-btn[data-month]");
+    if (readBtn) { openGeneratorReadingsDialog(readBtn.dataset.month); return; }
+    const delBtn = e.target.closest(".delete-readings-btn[data-month]");
+    if (delBtn) { deleteServiceReadings("generator", delBtn.dataset.month); return; }
   });
 
   els.loginOwnerTab.addEventListener("click", () => {
