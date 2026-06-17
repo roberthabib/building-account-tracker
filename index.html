@@ -46,10 +46,11 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v119</h1>
+            <h1>BUILDING ACCOUNT TRACKER v122</h1>
           </div>
         </div>
         <div class="topbar-actions">
+          <button class="sync-chip is-local" id="syncChip" type="button" title="Sync status" aria-label="Sync status"><span class="sync-dot" aria-hidden="true"></span><span id="syncChipText">Local</span></button>
           <button class="icon-button logout-btn hidden" id="logoutButton" type="button" aria-label="Logout" title="Logout">&#128274;</button>
           <button class="icon-button owner-only" id="openAddButton" type="button" aria-label="Add transaction">+</button>
         </div>
@@ -331,14 +332,37 @@
               <button class="primary-button" id="saveSettingsButton" type="button">Save</button>
             </div>
 
-            <p class="settings-section-header">Data Management</p>
-            <div class="settings-data-row">
-              <button class="secondary-button" id="runWizardButton" type="button">Setup Wizard</button>
-              <button class="secondary-button" id="loadCloudButton" type="button">Restore from Sheet</button>
-              <button class="danger-button" id="zeroAccountsButton" type="button">Zero Accounts</button>
-              <button class="danger-button" id="resetButton" type="button">Reset Data</button>
-              <button class="danger-button" id="startFreshButton" type="button">Start Fresh</button>
+            <p class="settings-section-header">Backup &amp; Restore</p>
+            <div class="settings-action">
+              <div class="settings-action-text"><strong>Download backup</strong><span>Save all your data to a file on this device. Keep it somewhere safe.</span></div>
+              <button class="secondary-button" id="downloadBackupButton" type="button">Download</button>
             </div>
+            <div class="settings-action">
+              <div class="settings-action-text"><strong>Restore from a backup file</strong><span>Load data from a backup file you saved before. Replaces the data on this device — a safety copy is downloaded first.</span></div>
+              <button class="secondary-button" id="restoreBackupButton" type="button">Restore</button>
+            </div>
+            <div class="settings-action" id="reloadSheetAction">
+              <div class="settings-action-text"><strong>Reload from Google Sheet</strong><span>Pull the latest copy from the cloud and replace this device's data. Use when setting up a new phone.</span></div>
+              <button class="secondary-button" id="loadCloudButton" type="button">Reload</button>
+            </div>
+
+            <p class="settings-section-header">Reset</p>
+            <div class="settings-action">
+              <div class="settings-action-text"><strong>Clear transactions</strong><span>Delete all payments and expenses but keep your tenants and settings — for example to start a new year.</span></div>
+              <button class="danger-button" id="zeroAccountsButton" type="button">Clear</button>
+            </div>
+            <div class="settings-action">
+              <div class="settings-action-text"><strong>Erase everything</strong><span>Delete all tenants, payments, expenses and settings, then start setup from scratch. This cannot be undone.</span></div>
+              <button class="danger-button" id="startFreshButton" type="button">Erase</button>
+            </div>
+
+            <p class="settings-section-header">App Setup</p>
+            <div class="settings-action">
+              <div class="settings-action-text"><strong>Setup wizard</strong><span>Re-run the guided setup for building details and tenants.</span></div>
+              <button class="secondary-button" id="runWizardButton" type="button">Open</button>
+            </div>
+
+            <input id="restoreBackupInput" class="file-input-hidden" type="file" accept="application/json,.json" />
             <p class="settings-note" id="cloudSyncStatus">Cloud sync is automatic after the script URL and Google Sheet ID are saved.</p>
           </section>
         </section>
@@ -368,14 +392,42 @@
 
     <section id="printStatement" aria-hidden="true"></section>
 
+    <dialog id="entryChooser" class="entry-chooser">
+      <div class="dialog-header">
+        <h2>Add</h2>
+        <button class="icon-button small" id="closeEntryChooser" type="button" aria-label="Close">x</button>
+      </div>
+      <div class="entry-chooser-list">
+        <button class="entry-chooser-btn" type="button" data-category="Payments">
+          <span class="ec-icon" aria-hidden="true">&#128181;</span>
+          <span class="ec-text"><strong>Record a payment</strong><small>A tenant paid their dues</small></span>
+        </button>
+        <button class="entry-chooser-btn" type="button" data-category="Expenses">
+          <span class="ec-icon" aria-hidden="true">&#129534;</span>
+          <span class="ec-text"><strong>Record an expense</strong><small>A shared building cost</small></span>
+        </button>
+        <button class="entry-chooser-btn" type="button" data-category="Services Expenses">
+          <span class="ec-icon" aria-hidden="true">&#9889;</span>
+          <span class="ec-text"><strong>Generator / Water cost</strong><small>Diesel, maintenance or a water tanker</small></span>
+        </button>
+        <button class="entry-chooser-btn" type="button" data-category="Opening Balance">
+          <span class="ec-icon" aria-hidden="true">&#127974;</span>
+          <span class="ec-text"><strong>Opening balance</strong><small>Starting cash or a tenant carry-in</small></span>
+        </button>
+      </div>
+    </dialog>
+
     <dialog id="transactionDialog">
       <form id="transactionForm" method="dialog">
         <div class="dialog-header">
-          <h2 id="transactionDialogTitle">Add Transaction</h2>
+          <div class="dialog-header-left">
+            <button class="icon-button small hidden" id="transactionBackButton" type="button" aria-label="Back">&#8592;</button>
+            <h2 id="transactionDialogTitle">Add Transaction</h2>
+          </div>
           <button class="icon-button small" id="closeDialogButton" type="button" aria-label="Close">x</button>
         </div>
 
-        <label>
+        <label class="type-field">
           Type
           <select id="transactionCategory" required>
             <option>Payments</option>

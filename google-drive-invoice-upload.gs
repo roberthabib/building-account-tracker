@@ -9,6 +9,12 @@ function doPost(event) {
   try {
     const payload = JSON.parse((event.postData && event.postData.contents) || "{}");
 
+    // Optional shared secret: set a Script Property named SYNC_SECRET to require
+    // every request to include a matching "token". Leave it unset for the current
+    // (open) behaviour — this stays backward compatible until you turn it on.
+    const secret = PropertiesService.getScriptProperties().getProperty("SYNC_SECRET");
+    if (secret && payload.token !== secret) throw new Error("Unauthorized");
+
     if (payload.action === "uploadInvoice") return uploadInvoice(payload);
     if (payload.action === "saveState") return saveState(payload);
     if (payload.action === "loadState") return loadState(payload);
@@ -251,7 +257,13 @@ function writeTable(sheet, headers, rows) {
   sheet.setFrozenRows(1);
   sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#163832").setFontColor("#ffffff");
   if (output.length > 1) {
-    sheet.getRange(1, 1, output.length, headers.length).createFilter();
+    try {
+      const existing = sheet.getFilter();
+      if (existing) existing.remove();
+      sheet.getRange(1, 1, output.length, headers.length).createFilter();
+    } catch (filterError) {
+      // A filter is purely cosmetic — never let it fail the save.
+    }
   }
   sheet.autoResizeColumns(1, headers.length);
 }

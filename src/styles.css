@@ -1442,6 +1442,125 @@ label {
   color: #ffffff;
 }
 
+.dialog-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-action-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.settings-action-text strong {
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.settings-action-text span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.settings-action .secondary-button,
+.settings-action .danger-button {
+  flex: 0 0 auto;
+  min-width: 84px;
+}
+
+.sync-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sync-chip .sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex: 0 0 auto;
+}
+
+.sync-chip.is-saved .sync-dot { background: #2e9e6b; }
+.sync-chip.is-saving .sync-dot { background: #c98a1a; }
+.sync-chip.is-error .sync-dot { background: var(--red); }
+.sync-chip.is-offline .sync-dot { background: var(--muted); }
+.sync-chip.is-local { display: none; }
+
+.entry-chooser-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.entry-chooser-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.entry-chooser-btn:active {
+  transform: scale(0.99);
+}
+
+.entry-chooser-btn .ec-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.entry-chooser-btn .ec-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.entry-chooser-btn .ec-text strong {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.entry-chooser-btn .ec-text small {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 .tenant-mode .tenant-trash-btn,
 .tenant-mode .edit-tenant-button,
 .tenant-mode .delete-transaction-button,

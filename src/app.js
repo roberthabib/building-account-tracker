@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v119";
+const APP_VERSION = "v122";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -63,6 +63,10 @@ const els = {
   transactionForm: document.querySelector("#transactionForm"),
   transactionSubmitButton: document.querySelector("#transactionSubmitButton"),
   closeDialogButton: document.querySelector("#closeDialogButton"),
+  entryChooser: document.querySelector("#entryChooser"),
+  closeEntryChooser: document.querySelector("#closeEntryChooser"),
+  entryChooserButtons: document.querySelectorAll(".entry-chooser-btn"),
+  transactionBackButton: document.querySelector("#transactionBackButton"),
   cancelDialogButton: document.querySelector("#cancelDialogButton"),
   transactionCategory: document.querySelector("#transactionCategory"),
   transactionDirection: document.querySelector("#transactionDirection"),
@@ -107,8 +111,13 @@ const els = {
   invoiceUploadFolderIdInput: document.querySelector("#invoiceUploadFolderIdInput"),
   saveSettingsButton: document.querySelector("#saveSettingsButton"),
   loadCloudButton: document.querySelector("#loadCloudButton"),
+  downloadBackupButton: document.querySelector("#downloadBackupButton"),
+  restoreBackupButton: document.querySelector("#restoreBackupButton"),
+  restoreBackupInput: document.querySelector("#restoreBackupInput"),
   cloudSyncStatus: document.querySelector("#cloudSyncStatus"),
-  resetButton: document.querySelector("#resetButton"),
+  syncChip: document.querySelector("#syncChip"),
+  syncChipText: document.querySelector("#syncChipText"),
+  reloadSheetAction: document.querySelector("#reloadSheetAction"),
   startFreshButton: document.querySelector("#startFreshButton"),
   zeroAccountsButton: document.querySelector("#zeroAccountsButton"),
   printStatement: document.querySelector("#printStatement"),
@@ -4321,6 +4330,7 @@ function renderSettings() {
     els.coefficientStatus.textContent = "No coefficients set — all tenants use the same flat monthly amount.";
     els.coefficientStatus.className = "settings-note";
   }
+  els.reloadSheetAction.classList.toggle("hidden", !hasCloudConfig());
   renderCloudStatus();
 }
 
@@ -4759,6 +4769,51 @@ function renderCloudStatus(message = "") {
       : "Cloud sync is off. Enter the Google Apps Script URL in Settings to enable.");
 }
 
+const SYNC_CHIP_TEXT = { saving: "Saving…", saved: "Saved", error: "Sync error", offline: "Offline", local: "Local" };
+
+// Header status chip reflecting cloud-sync state. "local" (no cloud configured)
+// stays hidden via CSS so single-device users aren't shown a meaningless badge.
+function setSyncChip(kind) {
+  if (!els.syncChip) return;
+  const state_ = hasCloudConfig() ? kind : "local";
+  els.syncChip.classList.remove("is-saving", "is-saved", "is-error", "is-offline", "is-local");
+  els.syncChip.classList.add(`is-${state_}`);
+  els.syncChipText.textContent = SYNC_CHIP_TEXT[state_] || "";
+}
+
+function downloadBackup() {
+  const data = JSON.stringify(state, null, 2);
+  downloadBlob(data, "application/json", `building-account-backup-${localDateInput()}.json`);
+  showToast("Backup downloaded");
+}
+
+async function restoreFromBackupFile(file) {
+  if (!file) return;
+  let parsed;
+  try {
+    parsed = JSON.parse(await file.text());
+  } catch {
+    showToast("That file is not a valid backup");
+    return;
+  }
+  if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.tenants) || !Array.isArray(parsed.transactions)) {
+    showToast("That file does not look like a building backup");
+    return;
+  }
+  const summary = `${parsed.tenants.length} tenants, ${parsed.transactions.length} transactions`;
+  if (!window.confirm(`Restore this backup (${summary})? It replaces the data on this device. Your current data will be downloaded first as a safety copy.`)) {
+    return;
+  }
+  // Safety net: download the current data before overwriting it.
+  downloadBlob(JSON.stringify(state, null, 2), "application/json", `building-account-before-restore-${localDateInput()}.json`);
+  state = hydrateState(parsed);
+  saveState({ sync: false }); // local only — does not push the restore to the cloud
+  selectedMonth = null;
+  populateTenantSelect();
+  renderAll();
+  showToast("Backup restored on this device");
+}
+
 async function postCloudAction(action, payload = {}) {
   const config = cloudConfig();
   if (!config.scriptUrl) throw new Error("Google Apps Script URL not set. Add it in Settings.");
@@ -4880,6 +4935,7 @@ function localHasUnsyncedChanges() {
 
 function queueCloudSave() {
   if (!hasCloudConfig()) return;
+  setSyncChip("saving");
   window.clearTimeout(cloudSaveTimer);
   cloudSaveTimer = window.setTimeout(() => saveCloudState({ silent: true }), 900);
 }
@@ -4888,6 +4944,7 @@ async function saveCloudState({ silent = false } = {}) {
   if (cloudSaveInFlight) return;
   window.clearTimeout(cloudSaveTimer);
   cloudSaveInFlight = true;
+  setSyncChip("saving");
   try {
     if (!silent) renderCloudStatus("Saving to Google Sheet...");
     // Check whether another device wrote since this device last synced.
@@ -4913,9 +4970,11 @@ async function saveCloudState({ silent = false } = {}) {
       renderAll();
     }
     renderCloudStatus(`Google Sheet saved at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+    setSyncChip("saved");
     if (!silent) showToast("Saved to Google Sheet");
   } catch (error) {
     renderCloudStatus(error.message);
+    setSyncChip(navigator.onLine === false ? "offline" : "error");
     if (!silent) showToast(error.message);
   } finally {
     cloudSaveInFlight = false;
@@ -4923,6 +4982,7 @@ async function saveCloudState({ silent = false } = {}) {
 }
 
 async function loadCloudState() {
+  if (!window.confirm("Reload from the Google Sheet? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost.")) return;
   try {
     renderCloudStatus("Loading from Google Sheet...");
     const result = await postCloudAction("loadState");
@@ -4934,15 +4994,17 @@ async function loadCloudState() {
     populateTenantSelect();
     renderAll();
     renderCloudStatus("Loaded from Google Sheet");
+    setSyncChip("saved");
     showToast("Loaded from Google Sheet");
   } catch (error) {
     renderCloudStatus(error.message);
+    setSyncChip(navigator.onLine === false ? "offline" : "error");
     showToast(error.message);
   }
 }
 
 async function zeroAccounts() {
-  if (!window.confirm("Set all account balances to zero? This removes all transactions and monthly dues from this device and syncs the empty accounts to the Google Sheet.")) {
+  if (!window.confirm("Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone.")) {
     return;
   }
   state.transactions = [];
@@ -4966,9 +5028,33 @@ async function zeroAccounts() {
   }
 }
 
+const ENTRY_TITLES = {
+  Payments: "Record Payment",
+  Expenses: "Record Expense",
+  "Services Expenses": "Generator / Water Cost",
+  "Opening Balance": "Opening Balance",
+};
+
+// Opened from the "+" chooser: preset the category, hide the Type dropdown
+// (the chooser already picked it), and show a Back arrow to the chooser.
+function openEntryForm(category) {
+  resetTransactionForm();
+  if (category !== "Payments") {
+    els.transactionCategory.value = category;
+    applyTransactionCategoryDefaults();
+  }
+  els.transactionDialogTitle.textContent = ENTRY_TITLES[category] || "Add Transaction";
+  document.querySelector(".type-field").classList.add("hidden");
+  els.transactionBackButton.classList.remove("hidden");
+  openDialog(els.transactionDialog);
+  setTimeout(() => (category === "Payments" ? els.transactionTenant : els.transactionUsd).focus(), 50);
+}
+
 function resetTransactionForm() {
   editingExpenseId = null;
   els.transactionForm.reset();
+  els.transactionBackButton.classList.add("hidden"); // shown only when opened via the chooser
+  document.querySelector(".type-field").classList.remove("hidden");
   els.transactionDialogTitle.textContent = "Add Transaction";
   els.transactionSubmitButton.textContent = "Add";
   els.transactionCategory.disabled = false;
@@ -5983,9 +6069,20 @@ function attachEvents() {
   els.exportExcelButton.addEventListener("click", handleLedgerExcelExport);
   els.exportButton.addEventListener("click", handleLedgerPdfExport);
 
-  els.openAddButton.addEventListener("click", () => {
-    resetTransactionForm();
-    openDialog(els.transactionDialog);
+  els.openAddButton.addEventListener("click", () => openDialog(els.entryChooser));
+  els.closeEntryChooser.addEventListener("click", () => closeDialog(els.entryChooser));
+  els.entryChooser.addEventListener("click", (event) => {
+    if (event.target === els.entryChooser) closeDialog(els.entryChooser);
+  });
+  els.entryChooserButtons.forEach((btn) =>
+    btn.addEventListener("click", () => {
+      closeDialog(els.entryChooser);
+      openEntryForm(btn.dataset.category);
+    }),
+  );
+  els.transactionBackButton.addEventListener("click", () => {
+    closeDialog(els.transactionDialog);
+    openDialog(els.entryChooser);
   });
   els.closeDialogButton.addEventListener("click", () => closeDialog(els.transactionDialog));
   els.cancelDialogButton.addEventListener("click", () => closeDialog(els.transactionDialog));
@@ -6158,22 +6255,22 @@ function attachEvents() {
     showToast("Settings saved");
   });
   els.loadCloudButton.addEventListener("click", loadCloudState);
+  els.downloadBackupButton.addEventListener("click", downloadBackup);
+  els.restoreBackupButton.addEventListener("click", () => els.restoreBackupInput.click());
+  els.restoreBackupInput.addEventListener("change", () => {
+    const file = els.restoreBackupInput.files[0];
+    els.restoreBackupInput.value = "";
+    restoreFromBackupFile(file);
+  });
+  els.syncChip.addEventListener("click", () => {
+    if (hasCloudConfig() && !cloudSaveInFlight) saveCloudState();
+  });
+  window.addEventListener("online", () => { if (hasCloudConfig()) saveCloudState({ silent: true }); });
+  window.addEventListener("offline", () => setSyncChip("offline"));
   els.zeroAccountsButton.addEventListener("click", zeroAccounts);
 
-  els.resetButton.addEventListener("click", () => {
-    if (!window.confirm("Reset this browser to the imported Excel data? Local edits will be removed.")) return;
-    const nextEpoch = Number(state.meta?.epoch || 0) + 1;
-    localStorage.removeItem(STORAGE_KEY);
-    state = hydrateState(seedState);
-    state.meta.epoch = nextEpoch;
-    saveState({ sync: false });
-    selectedMonth = null;
-    renderAll();
-    showToast("Data reset");
-  });
-
   els.startFreshButton.addEventListener("click", () => {
-    if (!window.confirm("This will permanently delete ALL data — tenants, transactions, and settings. This cannot be undone. Continue?")) return;
+    if (!window.confirm("Erase everything? This permanently deletes all tenants, payments, expenses and settings on this device and starts setup over. This cannot be undone.")) return;
     const nextEpoch = Number(state.meta?.epoch || 0) + 1;
     localStorage.removeItem(STORAGE_KEY);
     state = hydrateState({});
@@ -6345,8 +6442,10 @@ async function syncFromSheet({ silent = false } = {}) {
       renderAll();
     }
     renderCloudStatus(`Last synced at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+    setSyncChip("saved");
   } catch {
     if (!silent) renderCloudStatus("Could not reach Google Sheet — showing cached data.");
+    setSyncChip(navigator.onLine === false ? "offline" : "error");
   }
 }
 
@@ -6360,6 +6459,7 @@ async function boot() {
   attachEvents();
   populateTenantSelect();
   renderAll();
+  setSyncChip(hasCloudConfig() ? "saved" : "local");
   showLoginScreen();
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
