@@ -1265,10 +1265,6 @@ label {
   gap: 10px;
 }
 
-.amount-row.monthly-usd-only {
-  grid-template-columns: 1fr;
-}
-
 .conversion-preview {
   border: 1px solid var(--line);
   border-radius: 8px;

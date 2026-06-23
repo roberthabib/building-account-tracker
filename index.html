@@ -60,7 +60,7 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v124</h1>
+            <h1>BUILDING ACCOUNT TRACKER v125</h1>
           </div>
         </div>
         <div class="topbar-actions">
@@ -520,13 +520,16 @@
         </div>
 
         <div class="two-col amount-row">
-          <label class="lbp-amount-field">
-            LBP
-            <input id="transactionLbp" type="number" min="0" step="1" />
+          <label class="amount-value-field">
+            Amount
+            <input id="transactionAmount" type="number" min="0" step="0.01" />
           </label>
-          <label class="usd-amount-field">
-            USD
-            <input id="transactionUsd" type="number" min="0" step="1" />
+          <label class="amount-currency-field">
+            Currency
+            <select id="transactionCurrency">
+              <option value="USD">USD ($)</option>
+              <option value="LBP">LBP (LL)</option>
+            </select>
           </label>
         </div>
         <div class="conversion-preview hidden" id="expenseConversionPreview"></div>

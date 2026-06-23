@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v124";
+const APP_VERSION = "v125";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -76,8 +76,8 @@ const els = {
   transactionDescription: document.querySelector("#transactionDescription"),
   transactionDate: document.querySelector("#transactionDate"),
   transactionMonth: document.querySelector("#transactionMonth"),
-  transactionLbp: document.querySelector("#transactionLbp"),
-  transactionUsd: document.querySelector("#transactionUsd"),
+  transactionAmount: document.querySelector("#transactionAmount"),
+  transactionCurrency: document.querySelector("#transactionCurrency"),
   expenseConversionPreview: document.querySelector("#expenseConversionPreview"),
   transactionSupplier: document.querySelector("#transactionSupplier"),
   supplierDropdownButton: document.querySelector("#supplierDropdownButton"),
@@ -1717,9 +1717,8 @@ function renderPaymentsSharedExpenses() {
 
 function updateSharedExpenseInlinePreview() {
   if (els.transactionCategory.value !== "Services Expenses") return;
-  const lbp = Number(els.transactionLbp.value || 0);
-  const usd = Number(els.transactionUsd.value || 0);
-  const totalUsd = toUsd(usd, lbp);
+  const { amountUsd, amountLbp } = readFormAmount();
+  const totalUsd = toUsd(amountUsd, amountLbp);
   const distribution = els.transactionDistribution.value;
   if (totalUsd <= 0) {
     els.sharedExpenseInlinePreview.classList.add("hidden");
@@ -4523,8 +4522,6 @@ function syncTransactionFormMode() {
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
   document.querySelector(".month-field").classList.toggle("hidden", !(monthlyPaymentMode || serviceMode));
-  document.querySelector(".lbp-amount-field").classList.toggle("hidden", !expenseLike);
-  document.querySelector(".amount-row").classList.toggle("monthly-usd-only", !expenseLike);
   document.querySelector(".extra-fields").classList.toggle("hidden", !expenseLike);
   document.querySelector(".expense-category-field").classList.toggle("hidden", !expenseMode);
   document.querySelector(".invoice-file-field").classList.toggle("hidden", !expenseLike);
@@ -4543,18 +4540,20 @@ function syncTransactionFormMode() {
 function updateExpenseConversionPreview() {
   const cat = els.transactionCategory.value;
   if (cat !== "Expenses" && cat !== "Services Expenses") return;
-  const lbp = Number(els.transactionLbp.value || 0);
-  const usd = Number(els.transactionUsd.value || 0);
+  const { amountUsd, amountLbp } = readFormAmount();
   const rate = getConversionRate();
-  const converted = toUsd(usd, lbp);
-  els.expenseConversionPreview.textContent =
-    `${formatLbp(lbp)} + ${formatUsd(usd)} = ${formatUsd(converted)} balance impact at ${numberFormat.format(rate)} LBP/USD`;
+  if (amountLbp > 0) {
+    els.expenseConversionPreview.textContent =
+      `${formatLbp(amountLbp)} = ${formatUsd(toUsd(amountUsd, amountLbp))} at ${numberFormat.format(rate)} LBP/USD`;
+  } else {
+    els.expenseConversionPreview.textContent = `${formatUsd(amountUsd)} balance impact`;
+  }
 }
 
 function applyTransactionCategoryDefaults() {
   const category = els.transactionCategory.value;
-  els.transactionLbp.value = "";
-  els.transactionUsd.value = "";
+  els.transactionAmount.value = "";
+  els.transactionCurrency.value = "USD";
   if (category !== "Expenses") {
     els.transactionSupplier.value = "";
     els.transactionInvoice.value = "";
@@ -4587,6 +4586,13 @@ function setInvoiceFileSource(source) {
   updateInvoiceFileSelectionStatus();
 }
 
+function readFormAmount() {
+  // Single amount field + currency toggle → the USD/LBP split the rest of the app expects.
+  const amount = Number(els.transactionAmount.value || 0);
+  const isLbp = els.transactionCurrency.value === "LBP";
+  return { amountUsd: isLbp ? 0 : amount, amountLbp: isLbp ? amount : 0 };
+}
+
 function addKnownValue(collection, name) {
   if (!name) return;
   if (collection.some((item) => item.name.toLowerCase() === name.toLowerCase())) return;
@@ -4598,8 +4604,7 @@ function createTransactionsFromForm() {
   const isExpense = category === "Expenses";
   const isServiceExpense = category === "Services Expenses";
   const isExpenseLike = isExpense || isServiceExpense;
-  const amountLbp = isExpenseLike ? Number(els.transactionLbp.value || 0) : 0;
-  const amountUsd = Number(els.transactionUsd.value || 0);
+  const { amountUsd, amountLbp } = readFormAmount();
   if (!amountLbp && !amountUsd) throw new Error("Enter an amount");
 
   const tenantId = els.transactionTenant.value;
@@ -5216,7 +5221,7 @@ function openEntryForm(category) {
   document.querySelector(".type-field").classList.add("hidden");
   els.transactionBackButton.classList.remove("hidden");
   openDialog(els.transactionDialog);
-  setTimeout(() => (category === "Payments" ? els.transactionTenant : els.transactionUsd).focus(), 50);
+  setTimeout(() => (category === "Payments" ? els.transactionTenant : els.transactionAmount).focus(), 50);
 }
 
 function resetTransactionForm() {
@@ -5231,8 +5236,8 @@ function resetTransactionForm() {
   els.transactionDirection.value = "credit";
   els.transactionDate.value = localDateInput();
   els.transactionMonth.value = selectedMonth ? monthKey(selectedMonth) : monthKey(localDateInput());
-  els.transactionLbp.value = "";
-  els.transactionUsd.value = amountInputValue(state.settings.defaultDueUsd);
+  els.transactionCurrency.value = "USD";
+  els.transactionAmount.value = amountInputValue(state.settings.defaultDueUsd);
   clearInvoiceFileSelection();
   els.invoiceAttachmentStatus.textContent = "";
   setProjectDropdownOpen(false);
@@ -5279,8 +5284,15 @@ function openExpenseEditDialog(transactionId) {
   els.transactionCategory.disabled = true;
   els.transactionDescription.value = transaction.description || "";
   els.transactionDate.value = transaction.date || localDateInput();
-  els.transactionLbp.value = amountInputValue(expenseDebitLbp(transaction));
-  els.transactionUsd.value = amountInputValue(expenseDebitUsd(transaction));
+  const editLbp = expenseDebitLbp(transaction);
+  const editUsd = expenseDebitUsd(transaction);
+  if (editLbp > 0 && editUsd === 0) {
+    els.transactionCurrency.value = "LBP";
+    els.transactionAmount.value = amountInputValue(editLbp);
+  } else {
+    els.transactionCurrency.value = "USD";
+    els.transactionAmount.value = amountInputValue(editUsd);
+  }
   els.transactionSupplier.value = transaction.supplier || "";
   els.transactionInvoice.value = transaction.invoice || "";
   els.transactionExpenseCategory.value = transaction.expenseCategory || "";
@@ -5298,8 +5310,8 @@ function openPaymentDialogFor(tenantId, month, amount) {
   els.transactionCategory.value = "Payments";
   els.transactionTenant.value = tenantId;
   els.transactionMonth.value = monthKey(month);
-  els.transactionLbp.value = "";
-  els.transactionUsd.value = amountInputValue(amount);
+  els.transactionCurrency.value = "USD";
+  els.transactionAmount.value = amountInputValue(amount);
   syncTransactionFormMode();
   openDialog(els.transactionDialog);
 }
@@ -6308,8 +6320,8 @@ function attachEvents() {
   els.uploadInvoicePhotoButton.addEventListener("click", () => els.transactionInvoiceFile.click());
   els.transactionInvoiceCameraFile.addEventListener("change", () => setInvoiceFileSource("camera"));
   els.transactionInvoiceFile.addEventListener("change", () => setInvoiceFileSource("upload"));
-  els.transactionLbp.addEventListener("input", updateExpenseConversionPreview);
-  els.transactionUsd.addEventListener("input", updateExpenseConversionPreview);
+  els.transactionAmount.addEventListener("input", updateExpenseConversionPreview);
+  els.transactionCurrency.addEventListener("change", updateExpenseConversionPreview);
   els.transactionForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     setTransactionFormBusy(true);
