@@ -1,24 +1,27 @@
-# Naccache 1727 Building Account Tracker
+# Building Account Tracker
 
-Mobile-first building account tracker generated from `Naccache 1727 rev3.xlsx`.
+A mobile-first progressive web app for managing a residential building's finances — tenant dues and payments, expenses, shared services (generator + water), building projects, and cash/reserve position. Runs in the browser on local storage, with optional Google Sheet sync and invoice-photo upload to Google Drive. Two roles: **owner** (full access) and **tenant** (read-only, PIN login).
 
-## What is included
+## Features
 
-- Dashboard for current LBP/USD balances.
-- Monthly tenant payment matrix.
-- Tenant account cards with paid, advance, and due totals.
-- Ledger with category and text filters.
-- Excel-compatible ledger export from the current Ledger filter/search.
-- Printable PDF ledger export from the current Ledger filter/search.
-- Add payment, advance payment, expense, and opening-balance entries.
-- Expense invoice numbers are suggested sequentially and can still be edited manually.
-- Uploaded invoice photos are named as `YYYY-MM-DD_INV0004_Description.jpg`.
-- Invoice photos can be added either by camera capture or by uploading an existing phone photo.
-- The expense supplier field can reuse previous supplier names from its dropdown while still accepting new names.
-- Ledger entries can be deleted after confirmation.
-- Google Apps Script sync to a Google Sheet in Drive, plus server-side invoice picture upload to a Drive folder.
-- Local browser storage.
-- Offline app shell through `sw.js`.
+- **Dashboard** with a "Needs Attention" strip (overdue tenants, generator months awaiting readings, low reserve) and KPI cards (Cash/Reserve, Total Expenses, Outstanding, Net Position).
+- **Two collection modes:**
+  - *Split actual monthly expenses* — tenants owe their share of recorded expenses.
+  - *Fixed monthly amount + reserve fund* — tenants owe a set amount; surplus builds a reserve.
+- **Coefficient-based splitting** — per-tenant coefficient (X/1000) for proportional shares; otherwise equal.
+- **Payments & monthly status** per tenant, with multi-month allocation, receipts, and WhatsApp reminders.
+- **Expenses** with supplier/category autocomplete, sequential invoice numbers, and invoice-photo upload.
+- **Services tab:**
+  - *Generator* — log diesel/maintenance costs progressively; enter monthly meter readings to split fuel by kWh and maintenance pro-rata by breaker size.
+  - *Water* — split each tanker equally or by coefficient.
+- **Per-tenant opening balances** (carry-in arrears or prepaid credit), separate from building cash.
+- **Building projects** with per-tenant shares and collection tracking; **polls** with voting.
+- **Ledger** with category/expense-category/text/date filters; Excel and multi-page PDF export.
+- **Tenant statements** (multi-page PDF) and payment receipts.
+- **Single amount field + USD/LBP currency toggle**; all figures reconciled to USD.
+- **Backup & restore:** one-tap JSON backup/restore on the device, plus Google Sheet cloud sync with multi-device conflict merging and a header sync-status indicator.
+- **Access control:** owner password and tenant PINs stored as salted hashes; tenants onboard a new device by pasting an access code.
+- Installable PWA with an offline app shell.
 
 ## Run locally
 
@@ -26,65 +29,50 @@ Mobile-first building account tracker generated from `Naccache 1727 rev3.xlsx`.
 node .\local-server.js
 ```
 
-Then open:
+Then open `http://localhost:4180`. For phone testing on the same Wi-Fi, use the computer's IP instead of `localhost`. (The dev server also serves `.pdf` files inline, handy for checking generated statements.)
 
-```text
-http://localhost:4180
-```
+## Install as a phone app
 
-For phone testing on the same Wi-Fi, use the computer IP address instead of `localhost`.
+Deploy to a public HTTPS host (this project uses Vercel: `vercel --prod` from inside the project folder), open the URL on the phone, then:
 
-## Run as a phone app
+- Android Chrome: menu → `Add to Home screen` / `Install app`.
+- iPhone Safari: Share → `Add to Home Screen`.
 
-Deploy the folder to a public static host such as Vercel, then open the deployed HTTPS URL on the phone.
+Open it from the home-screen icon afterwards.
 
-To remove the browser URL bar, install it from the phone browser:
+## First-time setup
 
-- Android Chrome: menu, then `Add to Home screen` or `Install app`.
-- iPhone Safari: Share, then `Add to Home Screen`.
+On first launch the **Setup wizard** collects the building name, owner password, collection mode, monthly budget / LBP rate, and tenants (with coefficient, breaker size, phone, and PIN). You can re-run it any time from **Settings → App Setup → Setup wizard**.
 
-After installing, open it from the home screen icon, not from the browser tab.
+## Google Sheet cloud sync (optional)
 
-## Google Drive and Google Sheet sync
+Sync keeps a backup in a Google Sheet and lets multiple devices share data.
 
-If Google shows `This app is blocked`, use `google-sheet-sync-only.gs` first. Install it from inside the Google Sheet with `Extensions > Apps Script`. This lower-permission version syncs the Sheet but does not upload invoice photos to Drive.
+1. Create a Google Sheet for the building. Copy its **Sheet ID** from the URL.
+2. In the Sheet: **Extensions → Apps Script**, paste `google-sheet-sync-only.gs`, and **Deploy → New deployment → Web app** (Execute as: Me; Who has access: Anyone). Copy the `/exec` URL.
+3. In the app: **Settings → Google Integration** → paste the Apps Script URL and Sheet ID → **Save**.
+4. *(Recommended)* Set a shared secret: add a Script Property `SYNC_SECRET` in Apps Script, and the same value in **Settings → Sync secret**. Requests without it are then rejected, so a leaked URL alone is useless.
+5. The header chip shows **Saved / Saving / Error / Offline**. Data is saved locally first and synced automatically.
 
-1. In Google Drive, create a Google Sheet for the building account.
-2. Copy the Sheet ID from the Google Sheet URL.
-3. In Google Drive, create or choose a folder for invoice pictures.
-4. Copy the folder ID from the folder URL.
-5. Create a Google Apps Script project and paste the code from `google-sheet-sync-only.gs`.
-6. Deploy it as a Web App with `Execute as: Me` and access set to anyone with the link.
-7. Copy the Web App URL into the app Settings as `Google Apps Script URL (Sheet sync)`.
-8. Paste the Sheet ID into `Google Sheet ID`.
-9. Paste the invoice folder ID into `Google Drive invoice folder ID`.
-10. Press `Save`.
+### Onboarding tenants / new devices
 
-Invoice photos are uploaded through the Vercel backend at `api/upload-invoice.js`, not through Apps Script.
+In **Settings → Share access**, copy the access code and send it to the tenant. On their phone they tap **"Connect to a building"** on the login screen and paste it — this configures sync and downloads the data, then they log in with their PIN.
 
-For a normal personal Gmail Drive folder, configure these Vercel environment variables:
+### Invoice photo upload (optional)
 
-- `GOOGLE_CLIENT_ID`: OAuth client ID from Google Cloud.
-- `GOOGLE_CLIENT_SECRET`: OAuth client secret from Google Cloud.
-- `GOOGLE_REFRESH_TOKEN`: refresh token authorized by the Google account that owns the Drive folder.
-- `GOOGLE_DRIVE_FOLDER_ID`: the invoice folder ID.
+On HTTPS, invoice photos upload through the Vercel function `api/upload-invoice.js` to a Drive folder (set the folder ID in Settings). Configure these Vercel environment variables (personal Gmail Drive):
 
-The older service-account method only works with Google Workspace Shared Drives because service accounts do not have storage quota in a normal personal `My Drive` folder. If using a Workspace Shared Drive, configure:
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `GOOGLE_DRIVE_FOLDER_ID`
 
-- `GOOGLE_SERVICE_ACCOUNT_EMAIL`: the `client_email` from the service account JSON key.
-- `GOOGLE_PRIVATE_KEY`: the `private_key` from the JSON key.
-- `GOOGLE_DRIVE_FOLDER_ID`: the invoice folder ID.
+Workspace Shared Drives can instead use `GOOGLE_SERVICE_ACCOUNT_EMAIL` + `GOOGLE_PRIVATE_KEY` + `GOOGLE_DRIVE_FOLDER_ID`. Keep private keys and refresh tokens in Vercel only — never in app Settings.
 
-Private keys and refresh tokens must stay in Vercel only; do not paste them into the app settings.
+## Backup & reset
 
-The app saves data locally first. When cloud settings are configured, changes are backed up to the Google Sheet automatically. The Sheet includes readable tabs for `Ledger`, `Tenants`, `Monthly Expected`, and `Settings`.
+- **Settings → Backup & Restore:** Download Backup (JSON to the device), Restore from a backup file (auto safety-copy first), Reload from Google Sheet.
+- **Settings → Reset:** Clear transactions (keep tenants), or Erase everything (start over).
 
-Use `Restore from Sheet` only when setting up a new phone or recovering data. It intentionally stays manual because loading from the Sheet replaces the data currently stored on the device.
+## Notes for maintainers
 
-When entering an expense, choose or take an invoice picture. The app compresses it, uploads it to Drive, and stores the Drive link in the ledger entry.
-
-## Regenerate Excel seed data
-
-```powershell
-node .\tools\extract-seed.mjs
-```
+- `data/seed.json` is an intentionally empty factory-reset template (no real data or credentials).
+- Bump the version in three places when releasing: `APP_VERSION` (`src/app.js`), the `<h1>` (`index.html`), and `CACHE_NAME` (`sw.js`).
+- See `CLAUDE.md` for architecture, state schema, and conventions.

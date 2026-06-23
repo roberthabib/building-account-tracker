@@ -1,48 +1,48 @@
-# Naccache 1727 Building Account Tracker — Claude Instructions
+# Building Account Tracker — Claude Instructions
 
 ## What this app is
 
-A mobile-first progressive web app (PWA) for managing the accounts of a residential building (Naccache 1727). It tracks tenant monthly payments, expenses, and cash position. It runs entirely in the browser with local storage, optional Google Sheet backup, and invoice photo upload to Google Drive.
+A mobile-first progressive web app (PWA) for managing a residential building's accounts. It tracks tenant dues and payments, building expenses, shared services (generator + water), one-off building projects, cash/reserve position, and simple polls. It runs entirely in the browser on `localStorage`, with optional Google Sheet cloud sync and invoice-photo upload to Google Drive. There are two roles: **owner** (full access) and **tenant** (read-only, scoped via a PIN).
 
 ---
 
 ## File map
 
 ```
-index.html              All HTML markup, dialog templates, bottom navigation
-src/app.js              All application logic — single file, ~2800 lines, vanilla ES modules
+index.html              All HTML markup, dialogs, login screen, bottom nav + More sheet
+src/app.js              All application logic — single file (~6,150 lines), vanilla ES module
 src/styles.css          All CSS, mobile-first, CSS custom properties for theming
-data/seed.json          Seed data extracted from Naccache 1727 rev3.xlsx
-sw.js                   Service worker — offline app shell, cache-first strategy
+data/seed.json          Factory-reset template — intentionally EMPTY (no real data / no credentials)
+sw.js                   Service worker — offline app shell, network-first
 manifest.json           PWA manifest
 api/upload-invoice.js   Vercel serverless function — uploads invoice images to Google Drive
-google-sheet-sync-only.gs           Google Apps Script for Google Sheet sync (no Drive)
-google-drive-invoice-upload.gs      Google Apps Script with Drive invoice upload
-local-server.js         Local dev server on port 4180
-tools/extract-seed.mjs  Regenerates data/seed.json from the Excel workbook
-tools/smoke-test.mjs    Basic smoke tests
-vercel.json             Vercel deployment config (cleanUrls, Cache-Control for sw.js)
+google-sheet-sync-only.gs        Apps Script for Sheet sync (no Drive) — the deployed one
+google-drive-invoice-upload.gs   Apps Script variant that also uploads invoices to Drive
+local-server.js         Local dev server on port 4180 (serves files; also serves .pdf inline)
+tools/extract-seed.mjs  (Legacy) regenerates seed.json from an Excel workbook
+tools/smoke-test.mjs    OUTDATED (describes the v43 UI) — do not trust without updating
+tools/clean-sheet.mjs   One-off Sheet cleanup tool — gitignored (holds the live Apps Script URL)
+vercel.json             Vercel config (cleanUrls, no-cache for sw.js)
 ```
 
 ---
 
 ## Architecture
 
-- **No framework, no build step.** Pure vanilla JavaScript ES modules loaded directly from `index.html`.
-- **Single JS file:** all logic lives in `src/app.js`. Do not split it into multiple files.
-- **Single CSS file:** all styles in `src/styles.css`.
-- **State is a plain JS object** held in the global `state` variable, persisted to `localStorage` under the key `building-account-tracker:v1`.
-- **DOM refs** are all cached at boot in the `els` object (see top of `app.js`). Use `els.*` for all element access; do not call `document.querySelector` inline elsewhere.
-- **Rendering** is done entirely by DOM manipulation — `replaceChildren`, `createElement`, `textContent`. No template literals that set `innerHTML` for user-controlled values (XSS risk). Titles and labels use `.textContent`.
-- **No external runtime dependencies** loaded at runtime. Excel export (XLSX), PDF generation, and ZIP building are all hand-rolled in `app.js`.
+- **No framework, no build step.** Pure vanilla JS ES module loaded directly from `index.html`.
+- **Single JS file** (`src/app.js`) and **single CSS file** (`src/styles.css`). Do not split them.
+- **State** is one plain object in the global `state`, persisted to `localStorage` under `building-account-tracker:v1`. Sync metadata lives under `building-account-tracker:sync`.
+- **DOM refs** are cached at boot in the `els` object (top of `app.js`). Use `els.*`; avoid inline `document.querySelector` elsewhere (a few late-bound exceptions exist).
+- **Rendering** is plain DOM manipulation (`replaceChildren`, `createElement`, `textContent`). Never put user-controlled values through `innerHTML` (XSS). Static structure via `innerHTML` with empty nodes then `.textContent` is the established pattern.
+- **No external runtime dependencies.** XLSX export, multi-page PDF generation, ZIP building, and SHA-256 are all hand-rolled in `app.js`.
 
 ---
 
-## App version
+## App version — THREE places (bump together)
 
-The app version is stored in **two places** — both must be updated together when bumping:
-1. `const APP_VERSION = "v43";` in `src/app.js`
-2. `<h1>BUILDING ACCOUNT TRACKER v43</h1>` in `index.html`
+1. `const APP_VERSION = "v125";` in `src/app.js`
+2. `<h1>BUILDING ACCOUNT TRACKER v125</h1>` in `index.html`
+3. `const CACHE_NAME = "building-account-tracker-v125";` in `sw.js` (forces the service worker to refresh the cached shell)
 
 ---
 
@@ -50,25 +50,33 @@ The app version is stored in **two places** — both must be updated together wh
 
 ```js
 {
-  building: {
-    name: string,           // e.g. "Naccache 1727"
-    version: string,
-    sourceWorkbook: string,
-    importedAt: string,     // ISO timestamp
-  },
+  building: { name, version, sourceWorkbook, importedAt },
   settings: {
-    defaultDueUsd: number,        // default monthly rent in USD
-    lbpPerUsd: number,            // LBP/USD conversion rate (default 89500)
-    invoiceUploadUrl: string,     // Google Apps Script web app URL
-    cloudSpreadsheetId: string,   // Google Sheet ID
-    invoiceUploadFolderId: string,// Google Drive folder ID for invoices
+    collectionMode: "actual" | "fixed", // how tenants are billed (see Collection modes)
+    defaultDueUsd: number,              // monthly amount (fixed mode) / fallback
+    lbpPerUsd: number,                  // conversion rate (default 89500)
+    invoiceUploadUrl: string,           // Apps Script web-app URL  (blank by default)
+    cloudSpreadsheetId: string,         // Google Sheet ID          (blank by default)
+    invoiceUploadFolderId: string,      // Drive folder ID          (blank by default)
+    syncSecret: string,                 // optional shared secret, sent as token on cloud calls
+    ownerPasswordHash: string,          // salted SHA-256 (never plaintext)
+    sharedExpensesEnabled: false,       // legacy, forced false
   },
-  tenants: [{ id, name, unit, active }],
-  transactions: [Transaction],    // see Transaction schema below
+  security: { salt: string },           // per-install salt for password/PIN hashing
+  meta: { rev, epoch, token, updatedAt },// sync conflict metadata (see Cloud sync)
+  deleted: { transactions:[], tenants:[], polls:[], projects:[] }, // tombstones for merge
+  tenants: [{ id, name, unit, active, phone, coefficient, breakerAmps, pinHash }],
+  transactions: [Transaction],
   monthlyExpected: [{ month: "YYYY-MM-01", expectedUsd: number }],
-  projects: [{ id, name }],       // known project names
-  suppliers: [{ id, name }],      // known supplier names
-  categories: string[],           // derived — do not store manually
+  serviceReadings: [{ id, serviceType, forMonth, lines: { [tenantId]: { breakerAmps, previousReading, currentReading } } }],
+  buildingProjects: [{ id, name, description, totalBudget, dueDate, distribution, shares, status, createdAt }],
+  polls: [{ id, title, description, createdBy, createdAt, status, votes: { [voterId]: "yes"|"no"|"abstain" } }],
+  paymentDeclarations: [{ id, tenantId, month, amount, declaredAt, status }],
+  projects: [{ id, name }],          // known project names (autocomplete)
+  suppliers: [{ id, name }],         // known supplier names (autocomplete)
+  expenseCategories: [{ id, name }], // known expense categories (autocomplete)
+  categories: string[],              // derived — do not store manually
+  setupComplete: boolean,
 }
 ```
 
@@ -76,28 +84,20 @@ The app version is stored in **two places** — both must be updated together wh
 
 ```js
 {
-  id: string,                   // "tx-{timestamp}" or "pay-{timestamp}-01"
-  category: string,             // "Opening Balance" | "Payments" | "Expenses"
-  description: string,
-  tenantId: string | null,
-  forMonth: string | null,      // "YYYY-MM-01" — only for monthly Payments
-  project: string,              // non-empty for project payments (not monthly)
-  date: string,                 // "YYYY-MM-DD"
-  supplier: string,             // expenses only
-  invoice: string,              // expenses only, e.g. "INV0004"
-  debitUsd: number,
-  debitLbp: number,
-  creditUsd: number,
-  creditLbp: number,
-  balanceUsd: number,           // legacy field; use creditUsd/debitUsd for new logic
-  balanceLbp: number,           // legacy field
-  invoiceAttachment: null | {
-    fileName, mimeType, size,
-    driveFileId, driveUrl, uploadedAt,
-  },
-  sourceRow: number | null,     // row number from original Excel (seed data only)
-  receiptRef: string,           // "RCT-YYYYMMDD-0001" — auto-assigned for payments
-  paymentGroupId: string,       // groups multi-month payment allocations
+  id, category,                 // see Categories below
+  description, tenantId,        // tenantId set for Payments + tenant Opening Balance
+  forMonth: "YYYY-MM-01" | null,// monthly Payments + Services Expenses month
+  project: string,              // set for project payments
+  date: "YYYY-MM-DD",
+  supplier, invoice, expenseCategory,
+  serviceType: "generator" | "water" | undefined,  // Services Expenses only
+  servicePart: "fuel" | "maintenance" | "",         // generator Services Expenses
+  waterSplit: "equal" | "coefficient" | undefined,  // water Services Expenses
+  debitUsd, debitLbp, creditUsd, creditLbp,
+  balanceUsd, balanceLbp,       // legacy; prefer credit/debit
+  shares: { [tenantId]: number } | null, // snapshotted per-tenant split (expenses + water)
+  invoiceAttachment: null | { fileName, mimeType, size, driveFileId, driveUrl, uploadedAt },
+  sourceRow, receiptRef, paymentGroupId,
 }
 ```
 
@@ -105,157 +105,126 @@ The app version is stored in **two places** — both must be updated together wh
 
 ## Key constants (app.js)
 
-| Constant | Value | Purpose |
-|---|---|---|
-| `STORAGE_KEY` | `"building-account-tracker:v1"` | localStorage key |
-| `APP_VERSION` | `"v43"` | shown in header, receipts, PDFs |
-| `DEFAULT_LBP_PER_USD` | `89500` | fallback conversion rate |
-| `EXPENSE_INVOICE_PREFIX` | `"INV"` | prefix for auto-numbered invoices |
-| `INVOICE_IMAGE_MAX_EDGE` | `1800` | max px edge for compressed invoices |
-| `INVOICE_IMAGE_QUALITY` | `0.82` | JPEG quality for compressed invoices |
-| `INVOICE_UPLOAD_MAX_BYTES` | `3 * 1024 * 1024` | 3 MB upload limit |
-| `SERVER_INVOICE_UPLOAD_PATH` | `"/api/upload-invoice"` | Vercel API endpoint |
-
----
-
-## Core functions to know
-
-| Function | What it does |
+| Constant | Value |
 |---|---|
-| `boot()` | Entry point — loads seed, loads localStorage, renders everything |
-| `hydrateState(raw)` | Normalises raw state from storage or Sheet, fills defaults |
-| `saveState(opts)` | Saves to localStorage; queues cloud save unless `opts.sync=false` |
-| `renderAll()` | Re-renders all five views — call after any state change |
-| `renderDashboard()` | KPI cards, tenant collection status, monthly activity summary |
-| `renderPayments()` | Monthly payment matrix and per-month history |
-| `renderTenants()` | Tenant account cards with totals |
-| `renderLedger()` | Filtered transaction list with export buttons |
-| `renderSettings()` | Settings form values and cloud sync status |
-| `queueCloudSave()` | Debounces cloud sync (900 ms) — called by `saveState` |
-| `allocateMonthlyPayment(amountUsd, startMonth)` | Splits a lump payment across consecutive months |
-| `createTransactionsFromForm()` | Builds transaction object(s) from the dialog form |
-| `getPositionTotals()` | Returns `{cashUsd, receivableUsd, advanceLiabilityUsd, netPositionUsd}` |
-| `getTenantTotals(tenantId)` | Returns `{paidUsd, advanceUsd, dueUsd}` for a tenant |
-| `paymentStatus(tenantId, month)` | Returns `{label, className, paid, expected}` for dashboard pills |
-| `ensureReceiptReference(tx)` | Assigns `RCT-YYYYMMDD-XXXX` reference if missing |
-| `buildSimplePdf(lines)` | Hand-built PDF blob from line objects (used for receipts) |
-| `buildLedgerXlsx()` | Hand-built XLSX blob for ledger export |
+| `STORAGE_KEY` | `"building-account-tracker:v1"` |
+| `SYNC_META_KEY` | `"building-account-tracker:sync"` |
+| `APP_VERSION` | `"v125"` |
+| `DEFAULT_LBP_PER_USD` | `89500` |
+| `DEFAULT_CATEGORIES` | `["Opening Balance","Payments","Expenses"]` |
+| `SERVICE_TYPES` | `["generator","water"]` |
+| `MORE_VIEWS` | views behind the "More" sheet |
+| `EXPENSE_INVOICE_PREFIX` | `"INV"` |
+| `INVOICE_IMAGE_MAX_EDGE` / `_QUALITY` / `_UPLOAD_MAX_BYTES` | 1800 / 0.82 / 3 MB |
 
 ---
 
 ## Views and navigation
 
-Five views, switched by bottom navigation buttons (`data-view` attribute):
-- **dashboardView** — KPIs, collection progress, monthly activity
-- **paymentsView** — per-tenant payment status + month history
-- **tenantsView** — tenant account cards + "Print Statement" per tenant
-- **ledgerView** — filterable transaction list, Excel/PDF export
-- **settingsView** — building config, Google sync, reset/zero options
+Eight `.view` sections, switched by `setView(viewId)`. The **bottom nav shows four** — `dashboardView`, `paymentsView`, `tenantsView`, `ledgerView` — plus a **More** button (`#moreNavButton`) that opens `#moreSheet` containing `projectsView`, `servicesView`, `pollsView`, `settingsView` (`MORE_VIEWS`). `selectedMonth` is shared between the dashboard month nav and the payments month strip.
 
-Both `monthSelect` (Dashboard) and `paymentMonthSelect` (Payments) share the `selectedMonth` global variable.
+- **dashboardView** — "Needs Attention" strip (owner), KPI cards (Cash/Reserve, Expenses, Outstanding, Net Position), tenant balances, monthly activity. Tenant sees their own dues panel + due banner.
+- **paymentsView** — per-tenant payment status + month history (mode-aware).
+- **tenantsView** — tenant cards + statement PDF.
+- **projectsView** — building projects with per-tenant shares + collection.
+- **servicesView** — generator + water bills (see Services).
+- **ledgerView** — filterable transactions, Excel + PDF export (owner-only edit/delete).
+- **pollsView** — building polls/votes.
+- **settingsView** — building config, currency, Google integration + sync secret + share access, backup/restore, reset actions.
+
+Roles: `sessionMode` is `"owner"` or `"tenant"`. `.owner-only` elements are hidden in tenant mode (CSS via `body.tenant-mode`), and owner-only actions are also guarded in JS.
 
 ---
 
 ## Transaction categories
 
-- **Opening Balance** — initial cash entry
-- **Payments** — tenant monthly rent (`forMonth` set, no `project`) or project payment (`project` set, no `forMonth`)
-- **Expenses** — debit entries; have `supplier`, `invoice`, optional `invoiceAttachment`
-- **Advance Payments** — legacy category; still handled but no longer created by the form
+- **Opening Balance** — building cash (no `tenantId`) OR a tenant carry-in (`tenantId` set; debit = owes, credit = prepaid). Tenant openings affect balances, not cash.
+- **Payments** — monthly (`tenantId` + `forMonth`, no `project`) or project (`tenantId` + `project`).
+- **Expenses** — building costs; split among tenants by coefficient (snapshotted in `shares`).
+- **Services Expenses** — generator/water costs (`serviceType` set); cash-out, billed via the Services distribution, NOT folded into the general expense share.
+- **Advance Payments** — legacy; still summed, not created by the form.
 
-A "monthly payment" satisfies: `category === "Payments" && tenantId && forMonth && !project`
-A "project payment" satisfies: `category === "Payments" && tenantId && project`
-
----
-
-## Payment allocation logic
-
-When a tenant pays more than one month's rent, `allocateMonthlyPayment()` splits the amount across consecutive months starting from `forMonth`. Each allocation becomes a separate transaction in the same `paymentGroupId`, all sharing the same `receiptRef`. This is automatic — a $300 payment for a $150/month building creates two transactions.
+Helpers: `isMonthlyPayment`, `isProjectPayment`, `isFixedMode`.
 
 ---
 
-## Receipt references
+## Collection modes (`settings.collectionMode`)
 
-Format: `RCT-YYYYMMDD-0001` (date from `transaction.date`, sequence padded to 4 digits).
-Assigned by `ensureReceiptReference()`. Transactions in the same `paymentGroupId` share a receipt ref. Assigned lazily when printing or on boot via `ensureAllReceiptReferences()`.
+- **`actual`** — tenants owe their share of recorded `Expenses` (`getTenantExpenseShare`, by coefficient).
+- **`fixed`** — tenants owe a fixed monthly amount (`monthlyExpected` / `defaultDueUsd`, split by coefficient when set); surplus builds the **reserve fund** (the cash KPI). The "Add Month" flow and new-month banner only apply here.
+
+`getTenantBalance(id)` = dues basis (mode-aware) **+ services due − payments − opening net**. Expense/water shares are snapshotted on the transaction (`shares`) at entry so later roster changes don't rewrite history.
 
 ---
 
-## Invoice numbering
+## Services (generator + water)
 
-Expense invoices auto-increment: `INV0001`, `INV0002`, etc. The number is suggested when the form opens for a new expense and can be manually overridden. The next number is derived from the highest `expenseInvoiceSequenceNumber()` across all existing expenses.
+Costs are logged progressively via the `+` button as **Services Expenses** (cash-out, in the ledger). Distribution to tenants:
+
+- **Generator** — `servicePart` is `fuel` or `maintenance`. The owner enters monthly **meter readings** on the Services tab (`serviceReadings`); fuel is split by metered kWh, maintenance pro-rata by `breakerAmps`. Computed live by `computeServiceDistribution(serviceType, month)` — a month with costs but no readings is "not yet billed".
+- **Water** — split `equal` or by `coefficient`, snapshotted in `shares` at entry; bills immediately (no readings).
+
+`getTenantServicesDue(tenantId, {serviceType, month})` totals a tenant's service charges.
+
+---
+
+## Auth & onboarding
+
+- Owner password and tenant PINs are stored as **salted SHA-256** (`hashSecret`, `sha256Hex`, salt in `state.security.salt`). Never store plaintext. Legacy plaintext is migrated to hashes in `hydrateState`.
+- **Tenant onboarding:** owner shares an access code (Settings → Share access) bundling `{url, sheetId, syncSecret}` (`buildSyncCode`); a new device pastes it on the login screen ("Connect to a building", `applySyncCode`) to configure sync and pull the data.
+
+---
+
+## Cloud sync (Google Apps Script + Sheet)
+
+- `postCloudAction(action, payload)` POSTs to `settings.invoiceUploadUrl`, including `token: settings.syncSecret` when set. The `.gs` checks a `SYNC_SECRET` Script Property (dormant unless set).
+- `saveState()` bumps `meta.rev`/`updatedAt` and debounces `queueCloudSave()` (900 ms).
+- **Conflict protection:** each push carries a random `meta.token`. On save/sync, if the cloud token differs from this device's last-synced token, states are **merged item-by-item** (`mergeStates`) keyed by id, with `deleted` tombstones preventing resurrection. `meta.epoch` bumps on Zero/Reset so a wipe wins over stale devices. Header sync chip (`setSyncChip`) shows Saving/Saved/Error/Offline.
+- **Backup/restore:** owner can Download Backup / Restore from File (JSON, `downloadBackup`/`restoreFromBackupFile`, auto safety-copy before restore). "Reload from Google Sheet" (`loadCloudState`) overwrites local from the cloud (confirmed).
 
 ---
 
 ## Dual currency
 
-The app operates in both USD and LBP. Amounts are stored separately (`debitUsd`, `debitLbp`, `creditUsd`, `creditLbp`). All financial summaries convert LBP to USD using `getConversionRate()` (from settings, default 89500). `toUsd(usd, lbp)` is the central conversion helper. Financial KPIs are always displayed in USD.
+Amounts are stored as `debitUsd`/`debitLbp`/`creditUsd`/`creditLbp`. The entry form uses a **single Amount field + a USD/LBP currency toggle** (`readFormAmount()` routes to the right field). `toUsd(usd, lbp)` converts via `getConversionRate()` (default 89500). KPIs display USD.
 
 ---
 
-## Cloud sync
+## Statements, receipts, exports
 
-1. **Google Sheet** — via `postCloudAction("saveState", { state })` which POSTs to the configured Apps Script URL. Triggered automatically (debounced 900 ms) after every `saveState()`.
-2. **Invoice upload** — via Vercel serverless `api/upload-invoice.js` when on HTTPS, or via Apps Script when on HTTP. Requires `invoiceUploadFolderId` in settings.
-3. **Restore** — `loadCloudState()` fetches from the Sheet and overwrites local storage. Manual only.
-
----
-
-## Adding a new feature — checklist
-
-1. **HTML**: Add any new elements or dialogs to `index.html`. Keep dialogs as `<dialog>` elements.
-2. **els**: Add new element refs to the `els` object at the top of `app.js`.
-3. **State**: If storing new data, add it to `hydrateState()` with a safe default (so old stored data doesn't break).
-4. **Render**: If the feature affects a view, update or add a `render*()` function. Call it from `renderAll()` if needed.
-5. **Events**: Wire up event listeners in `attachEvents()`.
-6. **saveState**: Call `saveState()` after every state mutation.
-7. **Version**: Bump `APP_VERSION` in `app.js` and the `<h1>` in `index.html`.
+- Tenant statement PDF (`buildTenantStatementPdf`) is **multi-page** (`buildMultiPagePdf`), skips empty months, and shows a non-zero-only summary.
+- Receipts (`buildReceiptLayoutPdf`), ledger PDF, and ledger XLSX (`buildLedgerXlsx`) are all hand-built. `pdfSafeText` strips non-ASCII (no Arabic glyphs in the base PDF fonts yet).
 
 ---
 
-## CSS conventions
+## Adding a feature — checklist
 
-- All colors via CSS custom properties defined in `:root` (see top of `styles.css`).
-- Mobile-first, `max-width: 1180px` container for desktop.
-- Card components: `.panel`, `.kpi`, `.tenant-card`, `.tenant-payment-card`, `.ledger-row`.
-- Status pills: `.status-pill.status-paid`, `.status-partial`, `.status-due`, `.status-none`.
-- Print styles are scoped with `@media print` — `#printStatement` is the print container.
+1. **HTML**: add elements/dialogs to `index.html` (dialogs as `<dialog>`).
+2. **els**: add refs to the `els` object.
+3. **State**: add to `hydrateState()` with a safe default so old data doesn't break.
+4. **Sync**: if it's a new top-level collection, add it to `mergeStates()` so multi-device sync handles it.
+5. **Render**: add/update a `render*()` and call from `renderAll()`.
+6. **Events**: wire in `attachEvents()`.
+7. **saveState** after every mutation.
+8. **Version**: bump all THREE version locations.
 
 ---
 
-## Running locally
+## Running locally & deploying
 
 ```powershell
-node .\local-server.js
-# then open http://localhost:4180
+node .\local-server.js   # http://localhost:4180
 ```
-
-For phone testing on the same Wi-Fi, use the machine's IP instead of `localhost`.
-
----
-
-## Deployment
-
-Deployed to Vercel. `vercel.json` sets `cleanUrls: true` and disables caching on `sw.js`. The Vercel serverless function at `api/upload-invoice.js` handles invoice uploads (requires Google OAuth environment variables set in Vercel).
-
----
-
-## Seed data
-
-`data/seed.json` is the factory-reset snapshot seeded from `Naccache 1727 rev3.xlsx`. To regenerate it:
-```powershell
-node .\tools\extract-seed.mjs
-```
-The seed is loaded fresh on every `boot()` and used as the reset target when the user presses "Reset Data".
+Deploy from inside the `Building Account tracker` folder: `vercel --prod --yes`. Production alias: `building-account-tracker.vercel.app`. The repo is public — keep credentials and real resident data out of committed files.
 
 ---
 
 ## Things to avoid
 
-- **Do not use innerHTML with user-supplied values** — use `.textContent` or create elements programmatically.
-- **Do not add external runtime JS libraries** — the app deliberately has no runtime dependencies.
-- **Do not split app.js into modules** — it is intentionally one file.
-- **Do not use sessionStorage or indexedDB for primary state** — localStorage is the source of truth.
-- **Do not remove the `seedState` variable** — it is what "Reset Data" restores to.
-- **Do not use `alert()` for user messages** — use `showToast(message)` instead.
-- **Do not use `confirm()` except for destructive actions** (delete, reset, zero accounts) — this pattern already exists and is intentional.
+- **No `innerHTML` with user values** — use `.textContent` / created nodes.
+- **No external runtime libraries**; **do not split `app.js`**.
+- **No plaintext passwords/PINs** — always hash with the salt.
+- **Do not hardcode the Apps Script URL / Sheet ID / Drive folder** anywhere (seed.json, app.js, .gs). They are owner-entered in Settings.
+- **Do not commit** `Naccache 1727 rev3.xlsx`, `*-backup-*.json`, or `tools/clean-sheet.mjs` (all gitignored — they hold real data or the live URL).
+- **No `alert()`** — use `showToast(message)`. Reserve `confirm()` for destructive actions.
+- When testing in a browser that has cloud config saved, you will sync to the **live Sheet** — isolate tests with a blank-cloud local state.
