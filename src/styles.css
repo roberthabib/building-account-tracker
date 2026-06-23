@@ -1449,6 +1449,58 @@ label {
   min-width: 0;
 }
 
+.attention-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--muted);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.attention-row:last-child {
+  margin-bottom: 0;
+}
+
+.attention-row.attention-due {
+  border-left-color: var(--red);
+}
+
+.attention-row.attention-warn {
+  border-left-color: #c98a1a;
+}
+
+.attention-row.attention-danger {
+  border-left-color: var(--red);
+}
+
+.attention-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.attention-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.attention-chevron {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
 .settings-action {
   display: flex;
   align-items: center;

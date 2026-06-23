@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v123";
+const APP_VERSION = "v124";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -10,6 +10,8 @@ const els = {
   moreSheetItems: document.querySelectorAll(".more-sheet-item"),
   monthSelect: document.querySelector("#monthSelect"),
   kpiGrid: document.querySelector("#kpiGrid"),
+  attentionPanel: document.querySelector("#attentionPanel"),
+  attentionList: document.querySelector("#attentionList"),
   tenantDuesPanel: document.querySelector("#tenantDuesPanel"),
   tenantDuesList: document.querySelector("#tenantDuesList"),
   collectionRate: document.querySelector("#collectionRate"),
@@ -2007,6 +2009,73 @@ function checkDueBanner() {
   }
 }
 
+function renderAttention() {
+  if (sessionMode !== "owner") {
+    els.attentionPanel.classList.add("hidden");
+    return;
+  }
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const items = [];
+
+  // Tenants who owe money
+  const overdue = activeTenants
+    .map((t) => ({ tenant: t, balance: getTenantBalance(t.id) }))
+    .filter((x) => x.balance > 0.005);
+  if (overdue.length) {
+    const total = roundUsd(overdue.reduce((sum, x) => sum + x.balance, 0));
+    items.push({
+      kind: "due",
+      icon: "💰",
+      text: `${overdue.length} ${overdue.length === 1 ? "tenant owes" : "tenants owe"} ${formatUsd(total)}`,
+      view: "paymentsView",
+    });
+  }
+
+  // Generator months with costs logged but no meter readings yet
+  const genPending = getServiceMonths("generator").filter((m) => {
+    const dist = computeServiceDistribution("generator", m);
+    return dist.pools.totalUsd > 0.005 && !dist.distributed;
+  });
+  if (genPending.length) {
+    items.push({
+      kind: "warn",
+      icon: "⚡",
+      text: `Generator: ${genPending.length} ${genPending.length === 1 ? "month needs" : "months need"} meter readings`,
+      view: "servicesView",
+    });
+  }
+
+  // Negative cash / reserve
+  const totals = getPositionTotals();
+  if (totals.cashUsd < -0.005) {
+    items.push({
+      kind: "danger",
+      icon: "⚠️",
+      text: `${isFixedMode() ? "Reserve fund" : "Cash balance"} is negative (${formatUsd(totals.cashUsd)})`,
+      view: "ledgerView",
+    });
+  }
+
+  if (!items.length) {
+    els.attentionPanel.classList.add("hidden");
+    return;
+  }
+
+  els.attentionList.replaceChildren(
+    ...items.map((item) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = `attention-row attention-${item.kind}`;
+      row.dataset.view = item.view;
+      row.innerHTML = `<span class="attention-icon"></span><span class="attention-text"></span><span class="attention-chevron">&#8250;</span>`;
+      row.querySelector(".attention-icon").textContent = item.icon;
+      row.querySelector(".attention-text").textContent = item.text;
+      return row;
+    }),
+  );
+  els.attentionPanel.classList.remove("hidden");
+}
+
 function renderTenantDuesSummary() {
   if (sessionMode !== "tenant" || !sessionTenantId) {
     els.tenantDuesPanel.classList.add("hidden");
@@ -2134,6 +2203,7 @@ function renderDashboard() {
         ],
   ));
 
+  renderAttention();
   renderTenantDuesSummary();
   renderPaymentDeclarations();
   renderSharedExpenses();
@@ -6106,6 +6176,10 @@ function attachEvents() {
     const button = event.target.closest("button[data-tenant-id]");
     if (!button) return;
     openPaymentDialogFor(button.dataset.tenantId, button.dataset.month, button.dataset.due);
+  });
+  els.attentionList.addEventListener("click", (event) => {
+    const row = event.target.closest(".attention-row[data-view]");
+    if (row) setView(row.dataset.view);
   });
   els.declarationsList.addEventListener("click", (event) => {
     const recordBtn = event.target.closest(".declaration-record-btn[data-decl-id]");
