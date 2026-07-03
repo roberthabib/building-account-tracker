@@ -1,9 +1,11 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v125";
+const APP_VERSION = "v127";
 
 const els = {
   views: document.querySelectorAll(".view"),
   navButtons: document.querySelectorAll(".nav-button"),
+  buildingNameHeading: document.querySelector("#buildingNameHeading"),
+  appVersionLabel: document.querySelector("#appVersionLabel"),
   moreNavButton: document.querySelector("#moreNavButton"),
   moreSheet: document.querySelector("#moreSheet"),
   closeMoreSheet: document.querySelector("#closeMoreSheet"),
@@ -224,6 +226,8 @@ const els = {
   sharedExpenseInlinePreview: document.querySelector("#sharedExpenseInlinePreview"),
   collectionModeInput: document.querySelector("#collectionModeInput"),
   collectionModeNote: document.querySelector("#collectionModeNote"),
+  languageInput: document.querySelector("#languageInput"),
+  wizardLanguage: document.querySelector("#wizardLanguage"),
   monthlyBudgetField: document.querySelector("#monthlyBudgetField"),
   removeOwnerPasswordButton: document.querySelector("#removeOwnerPasswordButton"),
   removeTenantPinButton: document.querySelector("#removeTenantPinButton"),
@@ -278,6 +282,963 @@ const EXPENSE_INVOICE_PREFIX = "INV";
 const INVOICE_IMAGE_MAX_EDGE = 1800;
 const INVOICE_IMAGE_QUALITY = 0.82;
 const INVOICE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024;
+
+// ---------------------------------------------------------------------------
+// Internationalization (English / Arabic) with right-to-left support.
+// Stored strings (category values, service types, etc.) are NEVER translated —
+// only their display. Static HTML is annotated with data-i18n* attributes and
+// refreshed by applyStaticI18n(); dynamic strings use t(key, params).
+// ---------------------------------------------------------------------------
+const LANG_KEY = "building-account-tracker:lang";
+const SUPPORTED_LANGS = ["en", "ar"];
+let currentLang = "en";
+
+const I18N = {
+  en: {
+    // Common / shared
+    "common.cancel": "Cancel",
+    "common.save": "Save",
+    "common.add": "Add",
+    "common.close": "Close",
+    "common.share": "Share",
+    "common.download": "Download",
+    "common.restore": "Restore",
+    "common.reload": "Reload",
+    "common.clear": "Clear",
+    "common.erase": "Erase",
+    "common.open": "Open",
+    "common.next": "Next →",
+    "common.back": "← Back",
+    "common.dismiss": "Dismiss",
+    // Login
+    "login.owner": "Owner",
+    "login.tenant": "Tenant",
+    "login.appName": "Building Account",
+    "login.passwordPh": "Password",
+    "login.pinPh": "PIN",
+    "login.error": "Incorrect password or PIN",
+    "login.enter": "Enter",
+    "login.connect": "Connect to a building (new device)",
+    // Connect dialog
+    "connect.title": "Connect to a building",
+    "connect.note": "Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.",
+    "connect.placeholder": "Paste access code here",
+    "connect.submit": "Connect",
+    // Topbar / sync
+    "topbar.eyebrow": "Building Account",
+    "sync.local": "Local",
+    "sync.saved": "Saved",
+    "sync.saving": "Saving",
+    "sync.error": "Error",
+    "sync.offline": "Offline",
+    "aria.syncStatus": "Sync status",
+    "aria.logout": "Logout",
+    "aria.add": "Add transaction",
+    "aria.prevMonth": "Previous month",
+    "aria.nextMonth": "Next month",
+    "aria.month": "Month",
+    "aria.selectMonth": "Select month",
+    "aria.back": "Back",
+    // Nav
+    "nav.dashboard": "Dashboard",
+    "nav.payments": "Payments",
+    "nav.tenants": "Tenants",
+    "nav.ledger": "Ledger",
+    "nav.more": "More",
+    "nav.projects": "Projects",
+    "nav.services": "Services",
+    "nav.polls": "Polls",
+    "nav.settings": "Settings",
+    // Dashboard
+    "dash.eyebrow": "Overview",
+    "dash.title": "Account Position",
+    "attention.title": "Needs Attention",
+    "tenantDues.title": "My Outstanding Dues",
+    "financial.title": "Building Financial Position",
+    "newMonth.add": "Add Month",
+    "declarations.title": "Payment Notifications",
+    "tenantBalances.title": "Tenant Balances",
+    "monthlyServices.title": "Monthly Services Expenses",
+    "monthlyActivity.title": "Monthly Activity",
+    "expensesByCategory.title": "Expenses by Category",
+    // Payments view
+    "pay.eyebrow": "Collections",
+    "pay.title": "Monthly Payments",
+    "pay.lastReceipt": "Last Receipt",
+    "pay.dueOnly": "Due Only",
+    "pay.messageDue": "Message Due",
+    "pay.addMonth": "Add Month",
+    "pay.monthlyPayments": "Monthly Payments",
+    "pay.monthlyServices": "Monthly Services Expenses",
+    "pay.statusTitle": "Monthly Payment Status",
+    "pay.servicesStatusTitle": "Monthly Services Expenses Status",
+    "pay.monthHistory": "Month History",
+    // Tenants view
+    "ten.eyebrow": "Residents",
+    "ten.title": "Tenant Accounts",
+    "ten.searchPh": "Search tenants or units",
+    "ten.add": "+ Add",
+    // Ledger view
+    "led.eyebrow": "Transactions",
+    "led.title": "Ledger",
+    "led.exportExcel": "Export Excel",
+    "led.exportPdf": "Export PDF",
+    "led.searchPh": "Search ledger",
+    "led.clearFilters": "Clear filters",
+    "aria.categoryFilter": "Category filter",
+    "aria.expenseCategoryFilter": "Expense category filter",
+    "aria.fromDate": "From date",
+    "aria.toDate": "To date",
+    // Projects view
+    "proj.eyebrow": "Building",
+    "proj.title": "Projects",
+    "proj.new": "+ New",
+    // Services view
+    "serv.eyebrow": "Building",
+    "serv.title": "Services",
+    "serv.enterReadings": "Enter Meter Readings",
+    "serv.intro": "Log generator (diesel/maintenance) and water tanker costs with the + button (Services Expenses). Generator: enter monthly meter readings here to split fuel by kWh and maintenance by breaker size. Water: split equally or by coefficient, billed straight away.",
+    // Polls view
+    "poll.eyebrow": "Building",
+    "poll.title": "Polls",
+    "poll.new": "+ New Poll",
+    // Settings
+    "set.eyebrow": "Setup",
+    "set.title": "Settings",
+    "set.accessControl": "Access Control",
+    "set.ownerPassword": "Owner password",
+    "set.ownerPasswordPh": "Leave blank for no password",
+    "set.ownerPasswordSetPh": "Password set — type to change",
+    "set.removePassword": "Remove current password",
+    "set.passwordNote": "Tenants use a PIN set per-tenant (in the Tenants tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.",
+    "set.buildingDetails": "Building Details",
+    "set.buildingName": "Building name",
+    "set.language": "Language",
+    "set.collectionMode": "Collection mode",
+    "set.collectionActual": "Split actual monthly expenses",
+    "set.collectionFixed": "Fixed monthly amount + reserve fund",
+    "set.monthlyBudget": "Total monthly building budget USD",
+    "set.currency": "Currency & Conversion",
+    "set.lbpRate": "LBP per USD conversion rate",
+    "set.google": "Google Integration",
+    "set.appsScriptUrl": "Google Apps Script URL (Sheet sync)",
+    "set.sheetId": "Google Sheet ID",
+    "set.driveFolderId": "Google Drive invoice folder ID",
+    "set.syncSecret": "Sync secret (optional)",
+    "set.syncSecretPh": "Match the SYNC_SECRET set in Apps Script",
+    "set.shareAccessTitle": "Share access with tenants",
+    "set.shareAccessDesc": "Copy a code that lets a tenant's phone connect to this building. They paste it on their login screen.",
+    "set.backup": "Backup & Restore",
+    "set.downloadBackupTitle": "Download backup",
+    "set.downloadBackupDesc": "Save all your data to a file on this device. Keep it somewhere safe.",
+    "set.restoreTitle": "Restore from a backup file",
+    "set.restoreDesc": "Load data from a backup file you saved before. Replaces the data on this device — a safety copy is downloaded first.",
+    "set.reloadSheetTitle": "Reload from Google Sheet",
+    "set.reloadSheetDesc": "Pull the latest copy from the cloud and replace this device's data. Use when setting up a new phone.",
+    "set.reset": "Reset",
+    "set.clearTxTitle": "Clear transactions",
+    "set.clearTxDesc": "Delete all payments and expenses but keep your tenants and settings — for example to start a new year.",
+    "set.eraseTitle": "Erase everything",
+    "set.eraseDesc": "Delete all tenants, payments, expenses and settings, then start setup from scratch. This cannot be undone.",
+    "set.appSetup": "App Setup",
+    "set.wizardTitle": "Setup wizard",
+    "set.wizardDesc": "Re-run the guided setup for building details and tenants.",
+    "set.cloudNote": "Cloud sync is automatic after the script URL and Google Sheet ID are saved.",
+    // More sheet
+    "more.title": "More",
+    // Entry chooser
+    "entry.title": "Add",
+    "entry.paymentTitle": "Record a payment",
+    "entry.paymentDesc": "A tenant paid their dues",
+    "entry.expenseTitle": "Record an expense",
+    "entry.expenseDesc": "A shared building cost",
+    "entry.servicesTitle": "Generator / Water cost",
+    "entry.servicesDesc": "Diesel, maintenance or a water tanker",
+    "entry.openingTitle": "Opening balance",
+    "entry.openingDesc": "Starting cash or a tenant carry-in",
+    // Transaction dialog
+    "tx.addTitle": "Add Transaction",
+    "tx.type": "Type",
+    "tx.service": "Service",
+    "tx.costType": "Cost type",
+    "tx.split": "Split",
+    "tx.direction": "Direction",
+    "tx.tenant": "Tenant",
+    "tx.description": "Description",
+    "tx.date": "Date",
+    "tx.forMonth": "For month",
+    "tx.amount": "Amount",
+    "tx.currency": "Currency",
+    "tx.supplier": "Supplier",
+    "tx.supplierPh": "Type supplier",
+    "tx.invoiceNumber": "Invoice Number",
+    "tx.expenseCategory": "Expense Category",
+    "tx.expenseCategoryPh": "Type category",
+    "tx.splitDistribution": "Split Distribution",
+    "tx.project": "Project",
+    "tx.projectPh": "Type project",
+    "tx.invoicePicture": "Invoice picture",
+    "tx.useCamera": "Use Camera",
+    "tx.uploadPhoto": "Upload Photo",
+    "tx.noPhoto": "No photo selected",
+    "aria.showSuppliers": "Show saved suppliers",
+    "aria.showCategories": "Show saved categories",
+    "aria.showProjects": "Show saved projects",
+    // Option labels
+    "opt.payments": "Payments",
+    "opt.expenses": "Expenses",
+    "opt.servicesExpenses": "Services Expenses",
+    "opt.openingBalance": "Opening Balance",
+    "opt.generator": "Generator",
+    "opt.water": "Water",
+    "opt.fuel": "Fuel / Diesel (consumption)",
+    "opt.maintenance": "Maintenance",
+    "opt.equalSplit": "Equal split",
+    "opt.byCoefficient": "By coefficient",
+    "opt.received": "Received",
+    "opt.appliedPaidOut": "Applied or paid out",
+    "opt.usd": "USD ($)",
+    "opt.lbp": "LBP (LL)",
+    "opt.equalSplitProper": "Equal Split",
+    "opt.byCoefficientProp": "By Coefficient (proportional)",
+    // Tenant dialog
+    "tenant.addTitle": "Add Tenant",
+    "tenant.name": "Name",
+    "tenant.namePh": "e.g. John Smith",
+    "tenant.unit": "Unit number",
+    "tenant.unitPh": "e.g. 01",
+    "tenant.whatsapp": "WhatsApp number",
+    "tenant.coefficient": "Coefficient (X / 1000)",
+    "tenant.coefficientPh": "e.g. 125",
+    "tenant.breaker": "Generator breaker size (Amps)",
+    "tenant.breakerPh": "e.g. 20",
+    "tenant.pin": "Tenant PIN (for app access)",
+    "tenant.pinPh": "Leave blank to disable tenant login",
+    "tenant.removePin": "Remove current PIN",
+    // WhatsApp dialog
+    "wa.title": "Send Payment Reminders",
+    // Month dialog
+    "month.title": "Add Month",
+    "month.month": "Month",
+    "month.budget": "Total Monthly Expected Building Budget USD",
+    // Poll dialog
+    "poll.newTitle": "New Poll",
+    "poll.question": "Question",
+    "poll.questionPh": "Should we...?",
+    "poll.desc": "Description (optional)",
+    "poll.descPh": "Add more details about this project...",
+    "poll.create": "Create Poll",
+    // Setup wizard
+    "wiz.welcomeTitle": "Welcome to Building Account Tracker",
+    "wiz.welcomeSub": "Let's quickly set up your building. You can update these details any time in Settings.",
+    "wiz.buildingName": "Building Name",
+    "wiz.buildingNamePh": "e.g. Naccache 1727",
+    "wiz.ownerPassword": "Owner Password",
+    "wiz.optional": "(optional)",
+    "wiz.language": "Language",
+    "wiz.financialTitle": "Financial Settings",
+    "wiz.financialSub": "Choose how the building collects money and set the LBP/USD exchange rate.",
+    "wiz.collectionMode": "Collection Mode",
+    "wiz.collectionActual": "Split actual monthly expenses among tenants",
+    "wiz.monthlyBudget": "Total Monthly Expected Building Budget (USD)",
+    "wiz.lbpRate": "LBP per USD Rate",
+    "wiz.tenantsTitle": "Add Tenants",
+    "wiz.tenantsSub": "Add your building's tenants. You can add or edit more at any time in the Tenants tab.",
+    "wiz.name": "Name",
+    "wiz.namePh": "Full name",
+    "wiz.unit": "Unit",
+    "wiz.unitPh": "e.g. 3B",
+    "wiz.whatsapp": "WhatsApp Number",
+    "wiz.pin": "PIN (app access)",
+    "wiz.pinPh": "4 digits",
+    "wiz.coefficient": "Coefficient (X / 1000)",
+    "wiz.addTenant": "+ Add Tenant",
+    "wiz.cancelEdit": "Cancel Edit",
+    "wiz.finish": "✓ Finish Setup",
+    // Project dialog
+    "projd.newTitle": "New Project",
+    "projd.name": "Project Name",
+    "projd.namePh": "e.g. Generator Replacement",
+    "projd.desc": "Description",
+    "projd.descPh": "Brief description",
+    "projd.budget": "Total Budget (USD)",
+    "projd.dueDate": "Payment Due Date",
+    "projd.create": "Create Project",
+    // Generator readings dialog
+    "gen.title": "Generator Meter Readings",
+    "gen.month": "Month",
+    "gen.note": "Costs come from the Services Expenses you logged for this month. Fuel is split by each tenant's metered kWh (current − previous); maintenance is split pro-rata by breaker size.",
+    "gen.readings": "Meter readings (kWh)",
+    "gen.save": "Save Readings",
+  },
+  ar: {
+    // Common / shared
+    "common.cancel": "إلغاء",
+    "common.save": "حفظ",
+    "common.add": "إضافة",
+    "common.close": "إغلاق",
+    "common.share": "مشاركة",
+    "common.download": "تنزيل",
+    "common.restore": "استعادة",
+    "common.reload": "إعادة تحميل",
+    "common.clear": "مسح",
+    "common.erase": "محو",
+    "common.open": "فتح",
+    "common.next": "التالي ←",
+    "common.back": "رجوع →",
+    "common.dismiss": "إخفاء",
+    // Login
+    "login.owner": "المالك",
+    "login.tenant": "المستأجر",
+    "login.appName": "حساب المبنى",
+    "login.passwordPh": "كلمة السر",
+    "login.pinPh": "الرمز",
+    "login.error": "كلمة السر أو الرمز غير صحيح",
+    "login.enter": "دخول",
+    "login.connect": "الاتصال بمبنى (جهاز جديد)",
+    // Connect dialog
+    "connect.title": "الاتصال بمبنى",
+    "connect.note": "الصق رمز الوصول الذي شاركه معك مالك المبنى، ثم اضغط اتصال. يربط هذا الجهاز بالمبنى ويحمّل بياناته.",
+    "connect.placeholder": "الصق رمز الوصول هنا",
+    "connect.submit": "اتصال",
+    // Topbar / sync
+    "topbar.eyebrow": "حساب المبنى",
+    "sync.local": "محلي",
+    "sync.saved": "محفوظ",
+    "sync.saving": "جارٍ الحفظ",
+    "sync.error": "خطأ",
+    "sync.offline": "غير متصل",
+    "aria.syncStatus": "حالة المزامنة",
+    "aria.logout": "خروج",
+    "aria.add": "إضافة عملية",
+    "aria.prevMonth": "الشهر السابق",
+    "aria.nextMonth": "الشهر التالي",
+    "aria.month": "الشهر",
+    "aria.selectMonth": "اختر شهراً",
+    "aria.back": "رجوع",
+    // Nav
+    "nav.dashboard": "الرئيسية",
+    "nav.payments": "الدفعات",
+    "nav.tenants": "المستأجرون",
+    "nav.ledger": "السجل",
+    "nav.more": "المزيد",
+    "nav.projects": "المشاريع",
+    "nav.services": "الخدمات",
+    "nav.polls": "التصويت",
+    "nav.settings": "الإعدادات",
+    // Dashboard
+    "dash.eyebrow": "نظرة عامة",
+    "dash.title": "وضع الحساب",
+    "attention.title": "يحتاج انتباهاً",
+    "tenantDues.title": "مستحقاتي المتبقية",
+    "financial.title": "الوضع المالي للمبنى",
+    "newMonth.add": "إضافة شهر",
+    "declarations.title": "إشعارات الدفع",
+    "tenantBalances.title": "أرصدة المستأجرين",
+    "monthlyServices.title": "مصاريف الخدمات الشهرية",
+    "monthlyActivity.title": "الحركة الشهرية",
+    "expensesByCategory.title": "المصاريف حسب الفئة",
+    // Payments view
+    "pay.eyebrow": "التحصيل",
+    "pay.title": "الدفعات الشهرية",
+    "pay.lastReceipt": "آخر إيصال",
+    "pay.dueOnly": "المتأخرون فقط",
+    "pay.messageDue": "تذكير المتأخرين",
+    "pay.addMonth": "إضافة شهر",
+    "pay.monthlyPayments": "الدفعات الشهرية",
+    "pay.monthlyServices": "مصاريف الخدمات الشهرية",
+    "pay.statusTitle": "حالة الدفع الشهري",
+    "pay.servicesStatusTitle": "حالة مصاريف الخدمات الشهرية",
+    "pay.monthHistory": "سجل الأشهر",
+    // Tenants view
+    "ten.eyebrow": "السكان",
+    "ten.title": "حسابات المستأجرين",
+    "ten.searchPh": "ابحث عن مستأجر أو شقة",
+    "ten.add": "+ إضافة",
+    // Ledger view
+    "led.eyebrow": "العمليات",
+    "led.title": "السجل",
+    "led.exportExcel": "تصدير Excel",
+    "led.exportPdf": "تصدير PDF",
+    "led.searchPh": "ابحث في السجل",
+    "led.clearFilters": "مسح الفلاتر",
+    "aria.categoryFilter": "فلتر الفئة",
+    "aria.expenseCategoryFilter": "فلتر فئة المصروف",
+    "aria.fromDate": "من تاريخ",
+    "aria.toDate": "إلى تاريخ",
+    // Projects view
+    "proj.eyebrow": "المبنى",
+    "proj.title": "المشاريع",
+    "proj.new": "+ جديد",
+    // Services view
+    "serv.eyebrow": "المبنى",
+    "serv.title": "الخدمات",
+    "serv.enterReadings": "إدخال قراءات العداد",
+    "serv.intro": "سجّل كلفة المولّد (مازوت/صيانة) وصهاريج المياه بزر + (مصاريف الخدمات). المولّد: أدخل قراءات العداد الشهرية هنا لتقسيم الوقود حسب كيلوواط والصيانة حسب حجم القاطع. المياه: تُقسّم بالتساوي أو حسب المعامل، وتُحتسب فوراً.",
+    // Polls view
+    "poll.eyebrow": "المبنى",
+    "poll.title": "التصويت",
+    "poll.new": "+ تصويت جديد",
+    // Settings
+    "set.eyebrow": "الإعداد",
+    "set.title": "الإعدادات",
+    "set.accessControl": "التحكم بالوصول",
+    "set.ownerPassword": "كلمة سر المالك",
+    "set.ownerPasswordPh": "اتركه فارغاً لعدم وجود كلمة سر",
+    "set.ownerPasswordSetPh": "كلمة السر مضبوطة — اكتب لتغييرها",
+    "set.removePassword": "إزالة كلمة السر الحالية",
+    "set.passwordNote": "يستخدم المستأجرون رمزاً يُحدّد لكل مستأجر (في تبويب المستأجرين). تُخزّن كلمات السر والرموز مُشفّرة. اترك الحقل فارغاً للإبقاء على كلمة السر الحالية.",
+    "set.buildingDetails": "تفاصيل المبنى",
+    "set.buildingName": "اسم المبنى",
+    "set.language": "اللغة",
+    "set.collectionMode": "طريقة التحصيل",
+    "set.collectionActual": "تقسيم المصاريف الشهرية الفعلية",
+    "set.collectionFixed": "مبلغ شهري ثابت + صندوق احتياطي",
+    "set.monthlyBudget": "إجمالي ميزانية المبنى الشهرية بالدولار",
+    "set.currency": "العملة والتحويل",
+    "set.lbpRate": "سعر صرف الليرة مقابل الدولار",
+    "set.google": "تكامل Google",
+    "set.appsScriptUrl": "رابط Google Apps Script (مزامنة الجدول)",
+    "set.sheetId": "معرّف Google Sheet",
+    "set.driveFolderId": "معرّف مجلد الفواتير في Google Drive",
+    "set.syncSecret": "كلمة سر المزامنة (اختياري)",
+    "set.syncSecretPh": "يطابق SYNC_SECRET المحدّد في Apps Script",
+    "set.shareAccessTitle": "مشاركة الوصول مع المستأجرين",
+    "set.shareAccessDesc": "انسخ رمزاً يتيح لهاتف المستأجر الاتصال بهذا المبنى. يلصقونه في شاشة الدخول.",
+    "set.backup": "النسخ الاحتياطي والاستعادة",
+    "set.downloadBackupTitle": "تنزيل نسخة احتياطية",
+    "set.downloadBackupDesc": "احفظ كل بياناتك في ملف على هذا الجهاز. احتفظ به في مكان آمن.",
+    "set.restoreTitle": "الاستعادة من ملف احتياطي",
+    "set.restoreDesc": "حمّل البيانات من ملف احتياطي حفظته سابقاً. يستبدل بيانات هذا الجهاز — تُنزّل نسخة أمان أولاً.",
+    "set.reloadSheetTitle": "إعادة التحميل من Google Sheet",
+    "set.reloadSheetDesc": "اسحب أحدث نسخة من السحابة واستبدل بيانات هذا الجهاز. استخدمه عند إعداد هاتف جديد.",
+    "set.reset": "إعادة تعيين",
+    "set.clearTxTitle": "مسح العمليات",
+    "set.clearTxDesc": "احذف كل الدفعات والمصاريف مع الإبقاء على المستأجرين والإعدادات — مثلاً لبدء سنة جديدة.",
+    "set.eraseTitle": "محو كل شيء",
+    "set.eraseDesc": "احذف كل المستأجرين والدفعات والمصاريف والإعدادات، ثم ابدأ الإعداد من جديد. لا يمكن التراجع.",
+    "set.appSetup": "إعداد التطبيق",
+    "set.wizardTitle": "معالج الإعداد",
+    "set.wizardDesc": "أعد تشغيل الإعداد الموجّه لتفاصيل المبنى والمستأجرين.",
+    "set.cloudNote": "تتم المزامنة السحابية تلقائياً بعد حفظ رابط السكربت ومعرّف Google Sheet.",
+    // More sheet
+    "more.title": "المزيد",
+    // Entry chooser
+    "entry.title": "إضافة",
+    "entry.paymentTitle": "تسجيل دفعة",
+    "entry.paymentDesc": "دفع مستأجر مستحقاته",
+    "entry.expenseTitle": "تسجيل مصروف",
+    "entry.expenseDesc": "كلفة مشتركة للمبنى",
+    "entry.servicesTitle": "كلفة مولّد / مياه",
+    "entry.servicesDesc": "مازوت، صيانة أو صهريج مياه",
+    "entry.openingTitle": "رصيد افتتاحي",
+    "entry.openingDesc": "نقد ابتدائي أو رصيد منقول لمستأجر",
+    // Transaction dialog
+    "tx.addTitle": "إضافة عملية",
+    "tx.type": "النوع",
+    "tx.service": "الخدمة",
+    "tx.costType": "نوع الكلفة",
+    "tx.split": "التقسيم",
+    "tx.direction": "الاتجاه",
+    "tx.tenant": "المستأجر",
+    "tx.description": "الوصف",
+    "tx.date": "التاريخ",
+    "tx.forMonth": "عن شهر",
+    "tx.amount": "المبلغ",
+    "tx.currency": "العملة",
+    "tx.supplier": "المورّد",
+    "tx.supplierPh": "اكتب اسم المورّد",
+    "tx.invoiceNumber": "رقم الفاتورة",
+    "tx.expenseCategory": "فئة المصروف",
+    "tx.expenseCategoryPh": "اكتب الفئة",
+    "tx.splitDistribution": "توزيع التقسيم",
+    "tx.project": "المشروع",
+    "tx.projectPh": "اكتب المشروع",
+    "tx.invoicePicture": "صورة الفاتورة",
+    "tx.useCamera": "استخدام الكاميرا",
+    "tx.uploadPhoto": "رفع صورة",
+    "tx.noPhoto": "لم يتم اختيار صورة",
+    "aria.showSuppliers": "إظهار المورّدين المحفوظين",
+    "aria.showCategories": "إظهار الفئات المحفوظة",
+    "aria.showProjects": "إظهار المشاريع المحفوظة",
+    // Option labels
+    "opt.payments": "دفعات",
+    "opt.expenses": "مصاريف",
+    "opt.servicesExpenses": "مصاريف الخدمات",
+    "opt.openingBalance": "رصيد افتتاحي",
+    "opt.generator": "مولّد",
+    "opt.water": "مياه",
+    "opt.fuel": "وقود / مازوت (استهلاك)",
+    "opt.maintenance": "صيانة",
+    "opt.equalSplit": "تقسيم متساوٍ",
+    "opt.byCoefficient": "حسب المعامل",
+    "opt.received": "مقبوض",
+    "opt.appliedPaidOut": "مطبّق أو مدفوع",
+    "opt.usd": "دولار ($)",
+    "opt.lbp": "ليرة (ل.ل)",
+    "opt.equalSplitProper": "تقسيم متساوٍ",
+    "opt.byCoefficientProp": "حسب المعامل (تناسبي)",
+    // Tenant dialog
+    "tenant.addTitle": "إضافة مستأجر",
+    "tenant.name": "الاسم",
+    "tenant.namePh": "مثال: جون سميث",
+    "tenant.unit": "رقم الشقة",
+    "tenant.unitPh": "مثال: 01",
+    "tenant.whatsapp": "رقم واتساب",
+    "tenant.coefficient": "المعامل (X / 1000)",
+    "tenant.coefficientPh": "مثال: 125",
+    "tenant.breaker": "حجم قاطع المولّد (أمبير)",
+    "tenant.breakerPh": "مثال: 20",
+    "tenant.pin": "رمز المستأجر (للدخول للتطبيق)",
+    "tenant.pinPh": "اتركه فارغاً لتعطيل دخول المستأجر",
+    "tenant.removePin": "إزالة الرمز الحالي",
+    // WhatsApp dialog
+    "wa.title": "إرسال تذكيرات الدفع",
+    // Month dialog
+    "month.title": "إضافة شهر",
+    "month.month": "الشهر",
+    "month.budget": "إجمالي ميزانية المبنى الشهرية المتوقعة بالدولار",
+    // Poll dialog
+    "poll.newTitle": "تصويت جديد",
+    "poll.question": "السؤال",
+    "poll.questionPh": "هل ينبغي أن...؟",
+    "poll.desc": "الوصف (اختياري)",
+    "poll.descPh": "أضف تفاصيل أكثر عن هذا المشروع...",
+    "poll.create": "إنشاء تصويت",
+    // Setup wizard
+    "wiz.welcomeTitle": "أهلاً بك في متتبّع حساب المبنى",
+    "wiz.welcomeSub": "لنُعدّ مبناك بسرعة. يمكنك تحديث هذه التفاصيل في أي وقت من الإعدادات.",
+    "wiz.buildingName": "اسم المبنى",
+    "wiz.buildingNamePh": "مثال: Naccache 1727",
+    "wiz.ownerPassword": "كلمة سر المالك",
+    "wiz.optional": "(اختياري)",
+    "wiz.language": "اللغة",
+    "wiz.financialTitle": "الإعدادات المالية",
+    "wiz.financialSub": "اختر طريقة تحصيل الأموال وحدّد سعر صرف الليرة/الدولار.",
+    "wiz.collectionMode": "طريقة التحصيل",
+    "wiz.collectionActual": "تقسيم المصاريف الشهرية الفعلية بين المستأجرين",
+    "wiz.monthlyBudget": "إجمالي ميزانية المبنى الشهرية المتوقعة (دولار)",
+    "wiz.lbpRate": "سعر الليرة مقابل الدولار",
+    "wiz.tenantsTitle": "إضافة المستأجرين",
+    "wiz.tenantsSub": "أضف مستأجري مبناك. يمكنك الإضافة أو التعديل في أي وقت من تبويب المستأجرين.",
+    "wiz.name": "الاسم",
+    "wiz.namePh": "الاسم الكامل",
+    "wiz.unit": "الشقة",
+    "wiz.unitPh": "مثال: 3B",
+    "wiz.whatsapp": "رقم واتساب",
+    "wiz.pin": "الرمز (للدخول)",
+    "wiz.pinPh": "4 أرقام",
+    "wiz.coefficient": "المعامل (X / 1000)",
+    "wiz.addTenant": "+ إضافة مستأجر",
+    "wiz.cancelEdit": "إلغاء التعديل",
+    "wiz.finish": "✓ إنهاء الإعداد",
+    // Project dialog
+    "projd.newTitle": "مشروع جديد",
+    "projd.name": "اسم المشروع",
+    "projd.namePh": "مثال: استبدال المولّد",
+    "projd.desc": "الوصف",
+    "projd.descPh": "وصف موجز",
+    "projd.budget": "إجمالي الميزانية (دولار)",
+    "projd.dueDate": "تاريخ استحقاق الدفع",
+    "projd.create": "إنشاء مشروع",
+    // Generator readings dialog
+    "gen.title": "قراءات عداد المولّد",
+    "gen.month": "الشهر",
+    "gen.note": "تأتي الكلفة من مصاريف الخدمات التي سجّلتها لهذا الشهر. يُقسّم الوقود حسب كيلوواط كل مستأجر (الحالي − السابق)؛ وتُقسّم الصيانة تناسبياً حسب حجم القاطع.",
+    "gen.readings": "قراءات العداد (ك.و.س)",
+    "gen.save": "حفظ القراءات",
+  },
+};
+
+function t(key, params) {
+  const table = I18N[currentLang] || I18N.en;
+  let str = table[key];
+  if (str == null) str = I18N.en[key];
+  if (str == null) return key;
+  if (params) {
+    for (const name in params) str = str.split(`{${name}}`).join(String(params[name]));
+  }
+  return str;
+}
+
+function normalizeLang(lang) {
+  return SUPPORTED_LANGS.includes(lang) ? lang : "en";
+}
+
+// Reverse map for dynamic strings built in JS (English source → Arabic). Fixed
+// strings are auto-translated inside showToast(); labels use tr(). Parameterized
+// entries use {name} placeholders. Unknown strings pass through unchanged.
+const DYN_AR = {
+  // Toasts
+  "Enter a project name": "أدخل اسم المشروع",
+  "Enter the total budget": "أدخل إجمالي الميزانية",
+  "Select a payment due date": "اختر تاريخ استحقاق الدفع",
+  "Project created": "تم إنشاء المشروع",
+  "Project deleted": "تم حذف المشروع",
+  "Add tenants before entering meter readings": "أضف مستأجرين قبل إدخال قراءات العداد",
+  "Select a month": "اختر شهراً",
+  "Meter readings saved": "تم حفظ قراءات العداد",
+  "Meter readings removed": "تم حذف قراءات العداد",
+  "Please enter the building name.": "الرجاء إدخال اسم المبنى.",
+  "Please enter the tenant name.": "الرجاء إدخال اسم المستأجر.",
+  "Please enter the unit number.": "الرجاء إدخال رقم الشقة.",
+  "Setup complete! Welcome to Building Account Tracker.": "اكتمل الإعداد! أهلاً بك في متتبّع حساب المبنى.",
+  "Owner notified of your payment": "تم إبلاغ المالك بدفعتك",
+  "Tenant not found": "لم يُعثر على المستأجر",
+  "No tenant payment receipt found": "لا يوجد إيصال دفع للمستأجر",
+  "Receipt is available for tenant payments only": "الإيصال متاح لدفعات المستأجرين فقط",
+  "Could not generate statement": "تعذّر إنشاء كشف الحساب",
+  "Statement PDF shared": "تمت مشاركة كشف الحساب PDF",
+  "Sharing cancelled": "تم إلغاء المشاركة",
+  "Statement PDF downloaded": "تم تنزيل كشف الحساب PDF",
+  "Receipt PDF shared": "تمت مشاركة الإيصال PDF",
+  "Receipt PDF downloaded": "تم تنزيل الإيصال PDF",
+  "Poll closed": "تم إغلاق التصويت",
+  "Poll deleted": "تم حذف التصويت",
+  "Backup downloaded": "تم تنزيل النسخة الاحتياطية",
+  "That file is not a valid backup": "هذا الملف ليس نسخة احتياطية صالحة",
+  "That file does not look like a building backup": "لا يبدو أن هذا الملف نسخة احتياطية للمبنى",
+  "Backup restored on this device": "تمت استعادة النسخة الاحتياطية على هذا الجهاز",
+  "Saved to Google Sheet": "تم الحفظ في Google Sheet",
+  "Loaded from Google Sheet": "تم التحميل من Google Sheet",
+  "Set the Google Apps Script URL first, then Save": "حدّد رابط Google Apps Script أولاً ثم احفظ",
+  "Access code copied — send it to your tenants": "تم نسخ رمز الوصول — أرسله لمستأجريك",
+  "Paste the access code first": "الصق رمز الوصول أولاً",
+  "That access code is not valid": "رمز الوصول غير صالح",
+  "That access code is missing the sync address": "رمز الوصول ينقصه عنوان المزامنة",
+  "Connected. Choose your name and enter your PIN.": "تم الاتصال. اختر اسمك وأدخل رمزك.",
+  "Could not connect to the building": "تعذّر الاتصال بالمبنى",
+  "All accounts set to zero and synced": "تم تصفير جميع الحسابات ومزامنتها",
+  "All accounts set to zero": "تم تصفير جميع الحسابات",
+  "Edit generator bills from the Services tab": "عدّل فواتير المولّد من تبويب الخدمات",
+  "Only expense entries can be edited here": "يمكن تعديل قيود المصاريف فقط هنا",
+  "Transaction not found": "لم يُعثر على العملية",
+  "Ledger entry deleted": "تم حذف قيد السجل",
+  "No ledger rows to export": "لا توجد صفوف للتصدير",
+  "Ledger Excel exported": "تم تصدير السجل Excel",
+  "Ledger PDF ready": "السجل PDF جاهز",
+  "Tenant updated": "تم تحديث المستأجر",
+  "No shared expenses for this month": "لا توجد مصاريف مشتركة لهذا الشهر",
+  "All tenants have paid their shared expenses": "دفع جميع المستأجرين مصاريفهم المشتركة",
+  "No due tenants have a phone number saved": "لا يوجد رقم هاتف محفوظ للمستأجرين المتأخرين",
+  "All tenants have paid their share": "دفع جميع المستأجرين حصتهم",
+  "No outstanding statement balances": "لا توجد أرصدة مستحقة",
+  "Tenant PIN removed": "تم حذف رمز المستأجر",
+  "Uploading replacement invoice": "جارٍ رفع الفاتورة البديلة",
+  "Uploading invoice picture": "جارٍ رفع صورة الفاتورة",
+  "Payment added. Receipt saved": "تمت إضافة الدفعة. حُفظ الإيصال",
+  "Expense added. Invoice uploaded": "تمت إضافة المصروف. رُفعت الفاتورة",
+  "Transaction added": "تمت إضافة العملية",
+  "Month saved": "تم حفظ الشهر",
+  "Owner password removed": "تم حذف كلمة سر المالك",
+  "Settings saved": "تم حفظ الإعدادات",
+  "All data cleared. Starting fresh.": "تم مسح كل البيانات. بداية جديدة.",
+  "Poll created": "تم إنشاء التصويت",
+  // Parameterized toasts
+  "Voted {vote}": "تم التصويت بـ {vote}",
+  "{name} added": "تمت إضافة {name}",
+  "{name} removed": "تمت إزالة {name}",
+  "Expense saved. Invoice upload failed: {msg}": "حُفظ المصروف. فشل رفع الفاتورة: {msg}",
+  "Expense updated": "تم تحديث المصروف",
+  "Expense updated. Invoice replaced": "تم تحديث المصروف. استُبدلت الفاتورة",
+  "Expense updated. Invoice upload failed: {msg}": "تم تحديث المصروف. فشل رفع الفاتورة: {msg}",
+  // Confirm dialogs
+  'Delete project "{name}"? Payment transactions linked to this project will remain in the ledger.':
+    'حذف المشروع "{name}"؟ ستبقى دفعات هذا المشروع في السجل.',
+  "Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.":
+    "إزالة قراءات العداد لشهر {month}؟ ستُلغى أعباء المولّد لذلك الشهر حتى تُعيد إدخال القراءات.",
+  "Notify the owner that you've paid {amount} for {month}?":
+    "إبلاغ المالك بأنك دفعت {amount} عن {month}؟",
+  "Delete this poll? This cannot be undone.": "حذف هذا التصويت؟ لا يمكن التراجع.",
+  "Restore this backup ({summary})? It replaces the data on this device. Your current data will be downloaded first as a safety copy.":
+    "استعادة هذه النسخة ({summary})؟ ستستبدل بيانات هذا الجهاز. ستُنزَّل بياناتك الحالية أولاً كنسخة أمان.",
+  "Reload from the Google Sheet? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost.":
+    "إعادة التحميل من Google Sheet؟ ستستبدل بيانات هذا الجهاز بالنسخة السحابية. أي تغييرات لم تُزامَن بعد ستُفقد.",
+  "Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone.":
+    "مسح كل الدفعات والمصاريف؟ سيبقى المستأجرون. استخدمه لبدء فترة جديدة (مثلاً سنة جديدة). لا يمكن التراجع.",
+  "Delete this ledger entry?\n\n{label}\n\nThis removes the record from the app and Google Sheet sync.":
+    "حذف قيد السجل؟\n\n{label}\n\nيزيل هذا القيد من التطبيق ومن مزامنة Google Sheet.",
+  "Remove {name}'s PIN? They will no longer be able to log in.":
+    "إزالة رمز {name}؟ لن يتمكن بعد ذلك من تسجيل الدخول.",
+  "Remove the owner password? Anyone opening the app can then enter as owner.":
+    "إزالة كلمة سر المالك؟ يمكن لأي شخص يفتح التطبيق الدخول كمالك.",
+  "Delete {name}? Their {count} transaction(s) will be kept but unlinked from this tenant.":
+    "حذف {name}؟ ستبقى {count} عملية له لكن ستُفصل عن هذا المستأجر.",
+  "Delete {name}?": "حذف {name}؟",
+  "Erase everything? This permanently deletes all tenants, payments, expenses and settings on this device and starts setup over. This cannot be undone.":
+    "محو كل شيء؟ يحذف هذا نهائياً كل المستأجرين والدفعات والمصاريف والإعدادات على هذا الجهاز ويبدأ الإعداد من جديد. لا يمكن التراجع.",
+  // KPI cards (dashboard)
+  "Cash Balance": "الرصيد النقدي",
+  "Reserve Fund": "الصندوق الاحتياطي",
+  "Ledger net cash": "صافي النقد في السجل",
+  "Collected beyond expenses": "المحصّل فوق المصاريف",
+  "Total Expenses": "إجمالي المصاريف",
+  "All shared building costs": "كل تكاليف المبنى المشتركة",
+  "Outstanding": "المستحق",
+  "Tenant balances owed": "أرصدة المستأجرين المستحقة",
+  "Net Position": "الوضع الصافي",
+  "Cash + outstanding - credits": "النقد + المستحق − الأرصدة الدائنة",
+  "Collected funds minus expenses": "الأموال المحصّلة ناقص المصاريف",
+  "All recorded building costs": "كل تكاليف المبنى المسجّلة",
+  "Tenant dues owed": "مستحقات المستأجرين",
+  "Reserve + outstanding - credits": "الاحتياطي + المستحق − الأرصدة الدائنة",
+  // Monthly activity / category summary
+  "Monthly Payments": "الدفعات الشهرية",
+  "Project Payments": "دفعات المشاريع",
+  "Opening Balance": "الرصيد الافتتاحي",
+  "Expenses": "المصاريف",
+  "Generator & Water": "المولّد والمياه",
+  "Net Cash Movement": "صافي حركة النقد",
+  "Total Expenses:": "إجمالي المصاريف:",
+  "Advance Payments": "دفعات مقدمة",
+  "Uncategorized": "غير مصنّف",
+  "{month} by date": "{month} حسب التاريخ",
+  "No selected month": "لا يوجد شهر محدد",
+  // Tenant status chips / labels
+  "Settled": "مسدّد",
+  "Due": "مستحق",
+  "Paid": "مدفوع",
+  "Partial": "جزئي",
+  "Unpaid": "غير مدفوع",
+  "Advance": "دفعة مقدمة",
+  "Credit": "رصيد دائن",
+  "Owes": "مدين بـ",
+  "Paid in full": "مدفوع بالكامل",
+  "No dues": "لا مستحقات",
+  "No due": "لا مستحقات",
+  "Owes {amount}": "مدين بـ {amount}",
+  "Credit {amount}": "رصيد دائن {amount}",
+  // Attention items
+  "{n} tenant owes {amount}": "{n} مستأجر مدين بمبلغ {amount}",
+  "{n} tenants owe {amount}": "{n} مستأجرون مدينون بمبلغ {amount}",
+  "Generator: {n} month needs meter readings": "المولّد: {n} شهر يحتاج قراءات عداد",
+  "Generator: {n} months need meter readings": "المولّد: {n} أشهر تحتاج قراءات عداد",
+  "Reserve fund is negative ({amount})": "الصندوق الاحتياطي سالب ({amount})",
+  "Net position is negative ({amount})": "الوضع الصافي سالب ({amount})",
+  // Tenant dues summary
+  "Your Monthly Dues": "مستحقاتك الشهرية",
+  "Your Expense Share": "حصتك من المصاريف",
+  "Generator": "المولّد",
+  "Water": "المياه",
+  "Payments Made": "الدفعات المسدّدة",
+  "Projects": "المشاريع",
+  "Current Balance": "الرصيد الحالي",
+  // Tenant card / payments
+  "Your Balance": "رصيدك",
+  "Advance credit": "رصيد مقدّم",
+  "{amount} due": "{amount} مستحق",
+  "{amount} credit": "{amount} رصيد دائن",
+  "Expected": "المتوقع",
+  "Collected": "المحصّل",
+  "Month": "الشهر",
+  "Status": "الحالة",
+  "Receipts": "الإيصالات",
+  // Settings notes
+  "Tenants pay a fixed monthly amount; surplus builds the reserve fund.":
+    "يدفع المستأجرون مبلغاً شهرياً ثابتاً؛ ويُبنى الفائض في الصندوق الاحتياطي.",
+  "Each month's actual expenses are split among tenants.":
+    "تُقسّم مصاريف كل شهر الفعلية بين المستأجرين.",
+  "Tenants pay a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund.":
+    "يدفع المستأجرون مبلغاً شهرياً ثابتاً (يُقسّم حسب المعامل عند ضبطه). يُبنى كل ما يُحصّل فوق المصاريف في الصندوق الاحتياطي.",
+  "Each month's recorded expenses are split among tenants (by coefficient when set). No fixed monthly amount.":
+    "تُقسّم مصاريف كل شهر المسجّلة بين المستأجرين (حسب المعامل عند ضبطه). لا يوجد مبلغ شهري ثابت.",
+  "No coefficients set — all tenants use the same flat monthly amount.":
+    "لم تُضبط معاملات — يستخدم جميع المستأجرين نفس المبلغ الشهري الموحّد.",
+  "Coefficients: {sum}/1000 — all tenants accounted for.":
+    "المعاملات: {sum}/1000 — جميع المستأجرين محتسبون.",
+  "Coefficients: {sum}/1000 — must total 1000. {rest}":
+    "المعاملات: {sum}/1000 — يجب أن يكون المجموع 1000. {rest}",
+  "{n} remaining.": "بقي {n}.",
+  "{n} over.": "زيادة {n}.",
+  // Payment rows
+  "Send WhatsApp Reminder": "إرسال تذكير واتساب",
+  "Set phone to send reminder": "أضف رقم هاتف لإرسال تذكير",
+  "Owner notified ✓": "تم إبلاغ المالك ✓",
+  "I've Paid": "لقد دفعت",
+  "Add Payment": "إضافة دفعة",
+  "Unit {unit}": "شقة {unit}",
+  "Fully paid": "مدفوع بالكامل",
+  "{n}/{m} paid": "{n}/{m} مدفوع",
+  "{n}/{m} settled": "{n}/{m} مسدّد",
+  "{paid} paid of {share}": "{paid} مدفوع من {share}",
+  // Tenant cards
+  "Delete tenant": "حذف المستأجر",
+  "Edit": "تعديل",
+  "Statement": "كشف حساب",
+  "no phone": "بلا هاتف",
+  "Save Changes": "حفظ التغييرات",
+  // Month history
+  "{n}/{m} paid · {rate}%": "{n}/{m} مدفوع · {rate}%",
+  "No months yet": "لا أشهر بعد",
+  // Transaction dialog dynamic titles
+  "Record Payment": "تسجيل دفعة",
+  "Record Expense": "تسجيل مصروف",
+  "Generator / Water Cost": "كلفة مولّد / مياه",
+  "Edit Expense": "تعديل مصروف",
+  "Save": "حفظ",
+  "Saving...": "جارٍ الحفظ...",
+  "Edit Tenant": "تعديل مستأجر",
+  "PIN set — type to change": "الرمز مضبوط — اكتب لتغييره",
+  // Services cards
+  "equal split": "تقسيم متساوٍ",
+  "by coefficient": "حسب المعامل",
+  "mixed split": "تقسيم مختلط",
+  "Update Readings": "تحديث القراءات",
+  "Enter Readings": "إدخال القراءات",
+  "Remove meter readings": "إزالة قراءات العداد",
+  "Not yet billed — enter this month's meter readings to split the costs among tenants.":
+    "لم تُحتسب بعد — أدخل قراءات عداد هذا الشهر لتقسيم الكلفة بين المستأجرين.",
+  "Not yet billed for this month.": "لم تُحتسب لهذا الشهر بعد.",
+  "No services yet.": "لا خدمات بعد.",
+  "No services yet. Log generator (diesel/maintenance) or water tanker costs with the + button (choose Services Expenses). Generator is split by meter readings entered here; water is split equally or by coefficient.":
+    "لا خدمات بعد. سجّل كلفة المولّد (مازوت/صيانة) أو صهاريج المياه بزر + (اختر مصاريف الخدمات). يُقسّم المولّد حسب قراءات العداد المُدخلة هنا؛ وتُقسّم المياه بالتساوي أو حسب المعامل.",
+  "(removed)": "(محذوف)",
+  "Fuel {fuel} · Maintenance {maint} · Total {total}": "وقود {fuel} · صيانة {maint} · الإجمالي {total}",
+  "{kwh} kWh": "{kwh} ك.و.س",
+  "{amps}A · {kwh} kWh · {cons} consumption + {maint} maintenance":
+    "{amps} أمبير · {kwh} ك.و.س · {cons} استهلاك + {maint} صيانة",
+  "{n} tanker · Total {total} · {split}": "{n} صهريج · الإجمالي {total} · {split}",
+  "{n} tankers · Total {total} · {split}": "{n} صهاريج · الإجمالي {total} · {split}",
+  "{pct}% of bill": "{pct}% من الفاتورة",
+  // Projects
+  "No projects yet. Create one with the + New button.": "لا مشاريع بعد. أنشئ مشروعاً بزر + جديد.",
+  "No active projects.": "لا مشاريع نشطة.",
+  "Remind": "تذكير",
+  "Collect": "تحصيل",
+  "Delete project": "حذف المشروع",
+  "{budget} budget": "ميزانية {budget}",
+  "Due {date}": "الاستحقاق {date}",
+  "{collected} collected of {budget}": "{collected} محصّل من {budget}",
+  // Polls
+  "No polls yet. Tap \"+ New Poll\" to start one.": "لا تصويتات بعد. اضغط «+ تصويت جديد» للبدء.",
+  "Open": "مفتوح",
+  "Closed": "مغلق",
+  "Owner": "المالك",
+  "By {name} · {date}": "بواسطة {name} · {date}",
+  "YES {n}": "نعم {n}",
+  "ABSTAIN {n}": "امتناع {n}",
+  "NO {n}": "لا {n}",
+  "YES": "نعم",
+  "NO": "لا",
+  "ABSTAIN": "امتناع",
+  "✓ YES": "✓ نعم",
+  "✓ NO": "✓ لا",
+  "✓ Abstain": "✓ امتناع",
+  "Vote YES": "صوّت نعم",
+  "Vote NO": "صوّت لا",
+  "Abstain": "امتناع",
+  "Close Poll": "إغلاق التصويت",
+  "Delete": "حذف",
+  "No categories saved yet": "لا فئات محفوظة بعد",
+  "No matching categories": "لا فئات مطابقة",
+  // Ledger
+  "No matching transactions": "لا عمليات مطابقة",
+  "Month: {month}": "الشهر: {month}",
+  "Supplier: {v}": "المورّد: {v}",
+  "Project: {v}": "المشروع: {v}",
+  "Invoice: {v}": "الفاتورة: {v}",
+  "Receipt: {v}": "الإيصال: {v}",
+  "Attachment: {v}": "المرفق: {v}",
+  "Receipt": "إيصال",
+  "Invoice": "فاتورة",
+  "All Categories": "كل الفئات",
+  "All Expense Categories": "كل فئات المصاريف",
+  "Showing {n} of {total} transactions": "عرض {n} من {total} عملية",
+  // Month history
+  "No months recorded yet.": "لا أشهر مسجّلة بعد.",
+  "{paid} of {expected} · {rate}%": "{paid} من {expected} · {rate}%",
+  // Declarations
+  "{name} says they paid {amount} for {month}": "يقول {name} إنه دفع {amount} عن {month}",
+  "Record": "تسجيل",
+  "Dismiss": "تجاهل",
+  "{n} pending": "{n} قيد الانتظار",
+  "Notified {date}": "أُبلغ في {date}",
+  "{amount} collected": "{amount} محصّل",
+  "expenses": "مصاريف",
+  // WhatsApp messages (sent to tenants)
+  "{building} – Payment Reminder": "{building} – تذكير بالدفع",
+  "{building} – Shared Expenses Reminder": "{building} – تذكير بالمصاريف المشتركة",
+  "{building} – Project Payment Reminder": "{building} – تذكير بدفعة مشروع",
+  "Hi {name}, your outstanding balance{monthLine} is {amount}.":
+    "مرحباً {name}، رصيدك المستحق{monthLine} هو {amount}.",
+  " as of the {month} statement": " حتى كشف {month}",
+  "Hi {name}, your building payment for {month} is outstanding: {amount}.":
+    "مرحباً {name}، دفعة المبنى لشهر {month} مستحقة: {amount}.",
+  "Hi {name}, your share of the building shared expenses for {month} is outstanding: {amount}.":
+    "مرحباً {name}، حصتك من مصاريف المبنى المشتركة لشهر {month} مستحقة: {amount}.",
+  'Hi {name}, your share for the "{project}" project is {amount}, due by {date}.':
+    'مرحباً {name}، حصتك في مشروع "{project}" هي {amount}، وتستحق بحلول {date}.',
+  "Please settle at your earliest convenience. Thank you.":
+    "يرجى التسديد في أقرب فرصة. شكراً.",
+  // WhatsApp reminder dialog
+  "Shared Expenses Reminders – {month}": "تذكيرات المصاريف المشتركة – {month}",
+  "Reminders – {project}": "تذكيرات – {project}",
+  "Payment Reminders – {month} Statement": "تذكيرات الدفع – كشف {month}",
+  "{names} skipped – no phone number saved in the Tenants tab.":
+    "{names} — تم تجاهلهم لعدم وجود رقم هاتف محفوظ في تبويب المستأجرين.",
+  "{names} skipped – no phone number saved.":
+    "{names} — تم تجاهلهم لعدم وجود رقم هاتف محفوظ.",
+  "Unit {unit} – {amount} due – {month}": "شقة {unit} – {amount} مستحق – {month}",
+  "{amount} outstanding – due {date}": "{amount} مستحق – بحلول {date}",
+  "Unit {unit} – {remaining} remaining (stmt {stmt}, paid {paid})":
+    "شقة {unit} – {remaining} متبقٍ (الكشف {stmt}، مدفوع {paid})",
+  "Unit {unit} – {amount} due ({month} statement)":
+    "شقة {unit} – {amount} مستحق (كشف {month})",
+  "Send": "إرسال",
+  // Amount conversion preview
+  "{amount} balance impact": "{amount} أثر على الرصيد",
+  "{lbp} = {usd} at {rate} LBP/USD": "{lbp} = {usd} بسعر {rate} ل.ل/دولار",
+  // Direction (opening balance)
+  "Tenant has credit (prepaid)": "للمستأجر رصيد (مدفوع مقدماً)",
+  "Tenant owes (opening due)": "على المستأجر (مستحق افتتاحي)",
+  "Cash on hand (add)": "نقد متوفر (إضافة)",
+  "Cash shortfall (subtract)": "عجز نقدي (طرح)",
+  // Generator readings dialog
+  "Previous": "السابق",
+  "Current": "الحالي",
+  "Unit {unit} · {amps}A": "شقة {unit} · {amps} أمبير",
+  "Unit {unit} · no breaker": "شقة {unit} · بلا قاطع",
+  "Fuel {fuel} ({fc}) · Maintenance {maint} ({mc}) · Total {total}":
+    "وقود {fuel} ({fc}) · صيانة {maint} ({mc}) · الإجمالي {total}",
+  "Total billed:": "إجمالي المفوتر:",
+  "Total:": "الإجمالي:",
+};
+
+// Translate a dynamic (JS-built) string via the reverse map, with {param} substitution.
+function tr(en, params) {
+  let str = (currentLang === "ar" && DYN_AR[en] != null) ? DYN_AR[en] : en;
+  if (params) {
+    for (const name in params) str = str.split(`{${name}}`).join(String(params[name]));
+  }
+  return str;
+}
+
+function applyStaticI18n(root = document) {
+  root.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  root.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+  root.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+  root.querySelectorAll("[data-i18n-title]").forEach((el) => { el.title = t(el.dataset.i18nTitle); });
+}
+
+function applyLanguage(lang) {
+  currentLang = normalizeLang(lang);
+  try { localStorage.setItem(LANG_KEY, currentLang); } catch (_) {}
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+  document.body.classList.toggle("rtl", currentLang === "ar");
+  applyStaticI18n();
+}
+
+// Change language from a UI control: persist into state, apply, and re-render.
+function setLanguage(lang) {
+  const next = normalizeLang(lang);
+  if (state && state.settings) {
+    state.settings.language = next;
+    saveState();
+  }
+  applyLanguage(next);
+  if (typeof renderAll === "function" && state) renderAll();
+}
 
 function localDateInput(date = new Date()) {
   const year = date.getFullYear();
@@ -445,7 +1406,7 @@ function transactionNetUsd(transaction) {
 }
 
 function showToast(message) {
-  els.toast.textContent = message;
+  els.toast.textContent = tr(message);
   els.toast.classList.add("visible");
   window.clearTimeout(showToast.timer);
   showToast.timer = window.setTimeout(() => els.toast.classList.remove("visible"), 2200);
@@ -470,6 +1431,7 @@ function hydrateState(rawState) {
   hydrated.settings.invoiceUploadFolderId ||= "";
   hydrated.settings.syncSecret ||= "";
   hydrated.settings.collectionMode = hydrated.settings.collectionMode === "fixed" ? "fixed" : "actual";
+  hydrated.settings.language = normalizeLang(hydrated.settings.language);
   hydrated.meta ||= {};
   hydrated.meta.rev = Number(hydrated.meta.rev || 0);
   hydrated.meta.epoch = Number(hydrated.meta.epoch || 0);
@@ -955,7 +1917,7 @@ function submitProject(event) {
 function deleteProject(projectId) {
   const project = (state.buildingProjects || []).find((p) => p.id === projectId);
   if (!project) return;
-  if (!window.confirm(`Delete project "${project.name}"? Payment transactions linked to this project will remain in the ledger.`)) return;
+  if (!window.confirm(tr('Delete project "{name}"? Payment transactions linked to this project will remain in the ledger.', { name: project.name }))) return;
   state.buildingProjects = state.buildingProjects.filter((p) => p.id !== projectId);
   recordDeletedId("projects", projectId);
   saveState();
@@ -977,8 +1939,8 @@ function renderProjects() {
     const empty = document.createElement("p");
     empty.className = "settings-note";
     empty.textContent = sessionMode === "owner"
-      ? "No projects yet. Create one with the + New button."
-      : "No active projects.";
+      ? tr("No projects yet. Create one with the + New button.")
+      : tr("No active projects.");
     els.buildingProjectList.replaceChildren(empty);
     return;
   }
@@ -1004,7 +1966,7 @@ function renderProjects() {
       title.textContent = project.name;
       const meta = document.createElement("div");
       meta.className = "project-card-meta";
-      const metaParts = [`${formatUsd(totalBudget)} budget`, `Due ${formatDateLabel(project.dueDate)}`];
+      const metaParts = [tr("{budget} budget", { budget: formatUsd(totalBudget) }), tr("Due {date}", { date: formatDateLabel(project.dueDate) })];
       if (project.description) metaParts.unshift(project.description);
       meta.textContent = metaParts.join(" · ");
       info.append(title, meta);
@@ -1021,19 +1983,19 @@ function renderProjects() {
           remindBtn.type = "button";
           remindBtn.className = "mini-button whatsapp-btn remind-project-btn";
           remindBtn.dataset.projectId = project.id;
-          remindBtn.textContent = "Remind";
+          remindBtn.textContent = tr("Remind");
           actions.append(remindBtn);
         }
         const collectBtn = document.createElement("button");
         collectBtn.type = "button";
         collectBtn.className = "mini-button collect-project-btn";
         collectBtn.dataset.projectId = project.id;
-        collectBtn.textContent = "Collect";
+        collectBtn.textContent = tr("Collect");
         const deleteBtn = document.createElement("button");
         deleteBtn.type = "button";
         deleteBtn.className = "icon-button small delete-project-btn";
         deleteBtn.dataset.projectId = project.id;
-        deleteBtn.title = "Delete project";
+        deleteBtn.title = tr("Delete project");
         deleteBtn.textContent = "×";
         actions.append(collectBtn, deleteBtn);
       }
@@ -1050,7 +2012,7 @@ function renderProjects() {
       // Collected / budget summary
       const summary = document.createElement("div");
       summary.className = "project-collected-summary";
-      summary.textContent = `${formatUsd(totalCollected)} collected of ${formatUsd(totalBudget)}`;
+      summary.textContent = tr("{collected} collected of {budget}", { collected: formatUsd(totalCollected), budget: formatUsd(totalBudget) });
 
       // Tenant status grid
       const grid = document.createElement("div");
@@ -1063,7 +2025,7 @@ function renderProjects() {
         statusCard.querySelector("span").textContent = `${formatUsd(paid)} / ${formatUsd(share)}`;
         const pill = statusCard.querySelector(".status-pill");
         pill.classList.add(`status-${className === "none" ? "due" : className}`);
-        pill.textContent = label;
+        pill.textContent = tr(label);
         grid.append(statusCard);
       });
 
@@ -1177,12 +2139,17 @@ function buildGeneratorReadingRows(month) {
       row.dataset.breakerAmps = String(tenant.breakerAmps || 0);
       row.innerHTML = `
         <div class="gen-reading-name"><strong></strong><span></span></div>
-        <label class="gen-reading-field">Previous<input class="gen-prev" type="number" min="0" step="1" /></label>
-        <label class="gen-reading-field">Current<input class="gen-curr" type="number" min="0" step="1" /></label>
+        <label class="gen-reading-field"><span class="grf-label"></span><input class="gen-prev" type="number" min="0" step="1" /></label>
+        <label class="gen-reading-field"><span class="grf-label"></span><input class="gen-curr" type="number" min="0" step="1" /></label>
       `;
+      const grfLabels = row.querySelectorAll(".grf-label");
+      grfLabels[0].textContent = tr("Previous");
+      grfLabels[1].textContent = tr("Current");
       row.querySelector("strong").textContent = tenant.name;
       row.querySelector(".gen-reading-name span").textContent =
-        `Unit ${tenant.unit}${tenant.breakerAmps > 0 ? ` · ${tenant.breakerAmps}A` : " · no breaker"}`;
+        tenant.breakerAmps > 0
+          ? tr("Unit {unit} · {amps}A", { unit: tenant.unit, amps: tenant.breakerAmps })
+          : tr("Unit {unit} · no breaker", { unit: tenant.unit });
       row.querySelector(".gen-prev").value = prev || "";
       if (saved && saved.currentReading) row.querySelector(".gen-curr").value = saved.currentReading;
       return row;
@@ -1194,7 +2161,7 @@ function updateGeneratorReadingsPreview() {
   const month = monthIso(els.generatorBillMonth.value);
   const pools = getServiceMonthPools("generator", month);
   els.generatorPoolsSummary.textContent = month
-    ? `Fuel ${formatUsd(pools.fuelUsd)} (${pools.fuelCount}) · Maintenance ${formatUsd(pools.maintenanceUsd)} (${pools.maintCount}) · Total ${formatUsd(pools.totalUsd)}`
+    ? tr("Fuel {fuel} ({fc}) · Maintenance {maint} ({mc}) · Total {total}", { fuel: formatUsd(pools.fuelUsd), fc: pools.fuelCount, maint: formatUsd(pools.maintenanceUsd), mc: pools.maintCount, total: formatUsd(pools.totalUsd) })
     : "";
   if (pools.totalUsd <= 0) {
     els.generatorBillPreview.classList.add("hidden");
@@ -1213,7 +2180,7 @@ function updateGeneratorReadingsPreview() {
     const row = document.createElement("div");
     row.className = "se-preview-row";
     const name = document.createElement("span");
-    name.textContent = `${tenantsById.get(id)?.name || "?"} (${kwhById[id]} kWh)`;
+    name.textContent = `${tenantsById.get(id)?.name || "?"} (${tr("{kwh} kWh", { kwh: kwhById[id] })})`;
     const amount = document.createElement("span");
     amount.className = "se-preview-amount";
     amount.textContent = formatUsd(total);
@@ -1223,7 +2190,7 @@ function updateGeneratorReadingsPreview() {
   const totalRow = document.createElement("div");
   totalRow.className = "se-preview-total";
   const tLabel = document.createElement("strong");
-  tLabel.textContent = "Total billed:";
+  tLabel.textContent = tr("Total billed:");
   const tVal = document.createElement("strong");
   tVal.textContent = formatUsd(pools.totalUsd);
   totalRow.append(tLabel, tVal);
@@ -1278,7 +2245,7 @@ function submitGeneratorReadings(event) {
 
 function deleteServiceReadings(serviceType, month) {
   if (sessionMode !== "owner") return;
-  if (!window.confirm(`Remove the meter readings for ${formatMonth(month)}? Tenant charges for that month's generator will be undone until you re-enter readings.`)) return;
+  if (!window.confirm(tr("Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.", { month: formatMonth(month) }))) return;
   state.serviceReadings = (state.serviceReadings || []).filter(
     (r) => !(r.serviceType === serviceType && monthKey(r.forMonth) === monthKey(month)),
   );
@@ -1297,7 +2264,7 @@ function computeWaterDistribution(month) {
     shares[t.id] = roundUsd(txns.reduce((s, tx) => s + getTenantExpenseShareForTransaction(t.id, tx), 0));
   });
   const splits = [...new Set(txns.map((t) => t.waterSplit || "equal"))];
-  const splitLabel = splits.length > 1 ? "mixed split" : splits[0] === "coefficient" ? "by coefficient" : "equal split";
+  const splitLabel = splits.length > 1 ? tr("mixed split") : splits[0] === "coefficient" ? tr("by coefficient") : tr("equal split");
   return { totalUsd, count: txns.length, shares, splitLabel };
 }
 
@@ -1340,8 +2307,8 @@ function buildGeneratorCard(month, tenantsById) {
   const dist = computeServiceDistribution("generator", month);
   const pools = dist.pools;
   const { card, header } = buildServiceCardShell(
-    `Generator · ${formatMonth(month)}`,
-    `Fuel ${formatUsd(pools.fuelUsd)} · Maintenance ${formatUsd(pools.maintenanceUsd)} · Total ${formatUsd(pools.totalUsd)}${dist.distributed ? ` · ${dist.totalKwh} kWh` : ""}`,
+    `${tr("Generator")} · ${formatMonth(month)}`,
+    tr("Fuel {fuel} · Maintenance {maint} · Total {total}", { fuel: formatUsd(pools.fuelUsd), maint: formatUsd(pools.maintenanceUsd), total: formatUsd(pools.totalUsd) }) + (dist.distributed ? ` · ${tr("{kwh} kWh", { kwh: dist.totalKwh })}` : ""),
   );
   if (sessionMode === "owner") {
     const actions = document.createElement("div");
@@ -1350,14 +2317,14 @@ function buildGeneratorCard(month, tenantsById) {
     readBtn.type = "button";
     readBtn.className = "mini-button enter-readings-btn";
     readBtn.dataset.month = month;
-    readBtn.textContent = dist.distributed ? "Update Readings" : "Enter Readings";
+    readBtn.textContent = dist.distributed ? tr("Update Readings") : tr("Enter Readings");
     actions.append(readBtn);
     if (dist.distributed) {
       const delBtn = document.createElement("button");
       delBtn.type = "button";
       delBtn.className = "icon-button small delete-readings-btn";
       delBtn.dataset.month = month;
-      delBtn.title = "Remove meter readings";
+      delBtn.title = tr("Remove meter readings");
       delBtn.textContent = "×";
       actions.append(delBtn);
     }
@@ -1367,8 +2334,8 @@ function buildGeneratorCard(month, tenantsById) {
     const note = document.createElement("p");
     note.className = "settings-note";
     note.textContent = sessionMode === "owner"
-      ? "Not yet billed — enter this month's meter readings to split the costs among tenants."
-      : "Not yet billed for this month.";
+      ? tr("Not yet billed — enter this month's meter readings to split the costs among tenants.")
+      : tr("Not yet billed for this month.");
     card.append(note);
     return card;
   }
@@ -1383,9 +2350,9 @@ function buildGeneratorCard(month, tenantsById) {
     if (!tenant && sessionMode !== "owner") return;
     lineList.append(
       buildServiceLine(
-        tenant ? tenant.name : "(removed)",
+        tenant ? tenant.name : tr("(removed)"),
         formatUsd(line.totalUsd),
-        `${line.breakerAmps || 0}A · ${line.kwh || 0} kWh · ${formatUsd(line.consumptionUsd)} consumption + ${formatUsd(line.maintenanceUsd)} maintenance`,
+        tr("{amps}A · {kwh} kWh · {cons} consumption + {maint} maintenance", { amps: line.breakerAmps || 0, kwh: line.kwh || 0, cons: formatUsd(line.consumptionUsd), maint: formatUsd(line.maintenanceUsd) }),
       ),
     );
   });
@@ -1396,8 +2363,8 @@ function buildGeneratorCard(month, tenantsById) {
 function buildWaterCard(month, tenantsById) {
   const dist = computeWaterDistribution(month);
   const { card } = buildServiceCardShell(
-    `Water · ${formatMonth(month)}`,
-    `${dist.count} ${dist.count === 1 ? "tanker" : "tankers"} · Total ${formatUsd(dist.totalUsd)} · ${dist.splitLabel}`,
+    `${tr("Water")} · ${formatMonth(month)}`,
+    tr(dist.count === 1 ? "{n} tanker · Total {total} · {split}" : "{n} tankers · Total {total} · {split}", { n: dist.count, total: formatUsd(dist.totalUsd), split: dist.splitLabel }),
   );
   const lineList = document.createElement("div");
   lineList.className = "gen-bill-lines";
@@ -1409,7 +2376,7 @@ function buildWaterCard(month, tenantsById) {
     if (share <= 0 && sessionMode === "tenant") return;
     const tenant = tenantsById.get(id);
     const pct = dist.totalUsd > 0 ? Math.round((share / dist.totalUsd) * 100) : 0;
-    lineList.append(buildServiceLine(tenant ? tenant.name : "(removed)", formatUsd(share), `${pct}% of bill`));
+    lineList.append(buildServiceLine(tenant ? tenant.name : tr("(removed)"), formatUsd(share), tr("{pct}% of bill", { pct })));
   });
   card.append(lineList);
   return card;
@@ -1422,8 +2389,8 @@ function renderServices() {
     const empty = document.createElement("p");
     empty.className = "settings-note";
     empty.textContent = sessionMode === "owner"
-      ? "No services yet. Log generator (diesel/maintenance) or water tanker costs with the + button (choose Services Expenses). Generator is split by meter readings entered here; water is split equally or by coefficient."
-      : "No services yet.";
+      ? tr("No services yet. Log generator (diesel/maintenance) or water tanker costs with the + button (choose Services Expenses). Generator is split by meter readings entered here; water is split equally or by coefficient.")
+      : tr("No services yet.");
     els.generatorBillList.replaceChildren(empty);
     return;
   }
@@ -1743,7 +2710,7 @@ function updateSharedExpenseInlinePreview() {
   const totalRow = document.createElement("div");
   totalRow.className = "se-preview-total";
   const tLabel = document.createElement("strong");
-  tLabel.textContent = "Total:";
+  tLabel.textContent = tr("Total:");
   const tVal = document.createElement("strong");
   tVal.textContent = formatUsd(totalUsd);
   totalRow.append(tLabel, tVal);
@@ -1807,41 +2774,12 @@ function getPositionTotals() {
 function getMonthlyActivityRows(month) {
   const hasLegacyAdvancePayments = state.transactions.some((transaction) => transaction.category === "Advance Payments");
   const rows = [
-    {
-      category: "Opening Balance",
-      note: "Entries dated in selected month",
-      usd: 0,
-    },
-    {
-      category: "Monthly Payments",
-      note: "Tenant payments received by date",
-      usd: 0,
-      sourceCategory: "Payments",
-    },
-    {
-      category: "Project Payments",
-      note: "Extra tenant payments for selected projects",
-      usd: 0,
-    },
-    ...(hasLegacyAdvancePayments
-      ? [
-          {
-            category: "Advance Payments",
-            note: "Legacy advance entries",
-            usd: 0,
-          },
-        ]
-      : []),
-    {
-      category: "Expenses",
-      note: "Paid expenses, including LBP converted to USD",
-      usd: 0,
-    },
-    {
-      category: "Services Expenses",
-      note: "Generator fuel and maintenance paid",
-      usd: 0,
-    },
+    { category: "Opening Balance", usd: 0 },
+    { category: "Monthly Payments", usd: 0, sourceCategory: "Payments" },
+    { category: "Project Payments", usd: 0 },
+    ...(hasLegacyAdvancePayments ? [{ category: "Advance Payments", usd: 0 }] : []),
+    { category: "Expenses", usd: 0 },
+    { category: "Generator & Water", usd: 0, sourceCategory: "Services Expenses" },
   ];
   const rowByCategory = new Map(rows.map((row) => [row.sourceCategory || row.category, row]));
 
@@ -1853,15 +2791,9 @@ function getMonthlyActivityRows(month) {
     row.usd += transactionNetUsd(transaction);
   });
 
-  return [
-    ...rows,
-    {
-      category: "Net Cash Movement",
-      note: "Cash increase or decrease for selected month",
-      usd: rows.reduce((sum, row) => sum + row.usd, 0),
-      emphasis: true,
-    },
-  ];
+  const net = rows.reduce((sum, row) => sum + row.usd, 0);
+  // Drop $0 lines; always keep the net total.
+  return [...rows.filter((row) => Math.abs(row.usd) > 0.005), { category: "Net Cash Movement", usd: net, emphasis: true }];
 }
 
 function paymentStatus(tenantId, month) {
@@ -2025,7 +2957,7 @@ function renderAttention() {
     items.push({
       kind: "due",
       icon: "💰",
-      text: `${overdue.length} ${overdue.length === 1 ? "tenant owes" : "tenants owe"} ${formatUsd(total)}`,
+      text: tr(overdue.length === 1 ? "{n} tenant owes {amount}" : "{n} tenants owe {amount}", { n: overdue.length, amount: formatUsd(total) }),
       view: "paymentsView",
     });
   }
@@ -2039,20 +2971,20 @@ function renderAttention() {
     items.push({
       kind: "warn",
       icon: "⚡",
-      text: `Generator: ${genPending.length} ${genPending.length === 1 ? "month needs" : "months need"} meter readings`,
+      text: tr(genPending.length === 1 ? "Generator: {n} month needs meter readings" : "Generator: {n} months need meter readings", { n: genPending.length }),
       view: "servicesView",
     });
   }
 
-  // Negative cash / reserve
+  // Money warning. In fixed mode a negative reserve fund means the building
+  // overspent its collections. In actual mode cash is routinely negative
+  // mid-period (expenses logged before they're collected), so warn only when the
+  // net position — cash plus what tenants still owe — is itself negative.
   const totals = getPositionTotals();
-  if (totals.cashUsd < -0.005) {
-    items.push({
-      kind: "danger",
-      icon: "⚠️",
-      text: `${isFixedMode() ? "Reserve fund" : "Cash balance"} is negative (${formatUsd(totals.cashUsd)})`,
-      view: "ledgerView",
-    });
+  if (isFixedMode() && totals.cashUsd < -0.005) {
+    items.push({ kind: "danger", icon: "⚠️", text: tr("Reserve fund is negative ({amount})", { amount: formatUsd(totals.cashUsd) }), view: "ledgerView" });
+  } else if (!isFixedMode() && totals.netPositionUsd < -0.005) {
+    items.push({ kind: "danger", icon: "⚠️", text: tr("Net position is negative ({amount})", { amount: formatUsd(totals.netPositionUsd) }), view: "ledgerView" });
   }
 
   if (!items.length) {
@@ -2095,7 +3027,7 @@ function renderTenantDuesSummary() {
   const dueHeaderRow = document.createElement("article");
   dueHeaderRow.className = "summary-row";
   dueHeaderRow.innerHTML = `<div><strong></strong></div><b></b>`;
-  dueHeaderRow.querySelector("strong").textContent = isFixedMode() ? "Your Monthly Dues" : "Your Expense Share";
+  dueHeaderRow.querySelector("strong").textContent = isFixedMode() ? tr("Your Monthly Dues") : tr("Your Expense Share");
   dueHeaderRow.querySelector("b").textContent = formatUsd(dueBasis);
   list.append(dueHeaderRow);
 
@@ -2105,7 +3037,7 @@ function renderTenantDuesSummary() {
       const row = document.createElement("article");
       row.className = "summary-row summary-row-indent";
       row.innerHTML = `<div><strong></strong></div><b></b>`;
-      row.querySelector("strong").textContent = cat;
+      row.querySelector("strong").textContent = tr(cat);
       row.querySelector("b").textContent = formatUsd(amount);
       list.append(row);
     });
@@ -2120,7 +3052,7 @@ function renderTenantDuesSummary() {
     const row = document.createElement("article");
     row.className = "summary-row";
     row.innerHTML = `<div><strong></strong></div><b class="due-amount"></b>`;
-    row.querySelector("strong").textContent = label;
+    row.querySelector("strong").textContent = tr(label);
     row.querySelector("b").textContent = formatUsd(amount);
     list.append(row);
   });
@@ -2129,7 +3061,8 @@ function renderTenantDuesSummary() {
   if (Math.abs(openingNet) > 0.005) {
     const openingRow = document.createElement("article");
     openingRow.className = "summary-row";
-    openingRow.innerHTML = `<div><strong>Opening Balance</strong></div><b></b>`;
+    openingRow.innerHTML = `<div><strong></strong></div><b></b>`;
+    openingRow.querySelector("strong").textContent = tr("Opening Balance");
     const openingValue = openingRow.querySelector("b");
     if (openingNet < 0) {
       openingValue.textContent = formatUsd(-openingNet);
@@ -2144,7 +3077,8 @@ function renderTenantDuesSummary() {
   // Payments made
   const paymentsRow = document.createElement("article");
   paymentsRow.className = "summary-row";
-  paymentsRow.innerHTML = `<div><strong>Payments Made</strong></div><b class="advance-credit"></b>`;
+  paymentsRow.innerHTML = `<div><strong></strong></div><b class="advance-credit"></b>`;
+  paymentsRow.querySelector("strong").textContent = tr("Payments Made");
   paymentsRow.querySelector("b").textContent = `−${formatUsd(paymentsTotal)}`;
   list.append(paymentsRow);
 
@@ -2152,7 +3086,8 @@ function renderTenantDuesSummary() {
   if (projectsDue > 0) {
     const projRow = document.createElement("article");
     projRow.className = "summary-row";
-    projRow.innerHTML = `<div><strong>Projects</strong></div><b class="due-amount"></b>`;
+    projRow.innerHTML = `<div><strong></strong></div><b class="due-amount"></b>`;
+    projRow.querySelector("strong").textContent = tr("Projects");
     projRow.querySelector("b").textContent = formatUsd(projectsDue);
     list.append(projRow);
   }
@@ -2161,8 +3096,9 @@ function renderTenantDuesSummary() {
   const totalRow = document.createElement("article");
   totalRow.className = "summary-row emphasis";
   const balanceClass = totalDue > 0 ? "due-amount" : balance < -0.005 ? "advance-credit" : "";
-  totalRow.innerHTML = `<div><strong>Current Balance</strong></div><b class="${balanceClass}"></b>`;
-  totalRow.querySelector("b").textContent = totalDue > 0 ? formatUsd(totalDue) : balance < -0.005 ? `Credit ${formatUsd(-balance)}` : "Settled";
+  totalRow.innerHTML = `<div><strong></strong></div><b class="${balanceClass}"></b>`;
+  totalRow.querySelector("strong").textContent = tr("Current Balance");
+  totalRow.querySelector("b").textContent = totalDue > 0 ? formatUsd(totalDue) : balance < -0.005 ? tr("Credit {amount}", { amount: formatUsd(-balance) }) : tr("Settled");
   list.append(totalRow);
 
   els.tenantDuesList.replaceChildren(list);
@@ -2177,9 +3113,9 @@ function renderDashboard() {
       const card = document.createElement("article");
       card.className = "kpi";
       card.innerHTML = `<span></span><strong></strong><small></small>`;
-      card.querySelector("span").textContent = label;
+      card.querySelector("span").textContent = tr(label);
       card.querySelector("strong").textContent = value;
-      card.querySelector("small").textContent = note;
+      card.querySelector("small").textContent = tr(note);
       return card;
     });
   }
@@ -2238,8 +3174,8 @@ function applyWizardCollectionModeVisibility() {
   const fixed = els.wizardCollectionMode.value === "fixed";
   els.wizardBudgetField.classList.toggle("hidden", !fixed);
   els.wizardCollectionModeNote.textContent = fixed
-    ? "Tenants pay a fixed monthly amount; surplus builds the reserve fund."
-    : "Each month's actual expenses are split among tenants.";
+    ? tr("Tenants pay a fixed monthly amount; surplus builds the reserve fund.")
+    : tr("Each month's actual expenses are split among tenants.");
 }
 
 function openSetupWizard() {
@@ -2254,11 +3190,12 @@ function openSetupWizard() {
     breakerAmps: t.breakerAmps || 0,
     active: t.active !== false,
   }));
+  if (els.wizardLanguage) els.wizardLanguage.value = normalizeLang(state.settings.language);
   els.wizardBuildingName.value = (state.building && state.building.name) || "";
   els.wizardOwnerPassword.value = "";
   els.wizardOwnerPassword.placeholder = state.settings.ownerPasswordHash
-    ? "Password set — type to change"
-    : "Leave blank for no password";
+    ? t("set.ownerPasswordSetPh")
+    : t("set.ownerPasswordPh");
   els.wizardCollectionMode.value = state.settings.collectionMode || "actual";
   applyWizardCollectionModeVisibility();
   els.wizardMonthlyBudget.value = state.settings.defaultDueUsd || "";
@@ -2269,7 +3206,7 @@ function openSetupWizard() {
   els.wizardTenantPhone.value = "";
   els.wizardTenantPin.value = "";
   els.wizardTenantCoeff.value = "";
-  els.wizardAddTenantBtn.textContent = "+ Add Tenant";
+  els.wizardAddTenantBtn.textContent = t("wiz.addTenant");
   els.wizardCancelEditBtn.classList.add("hidden");
   showWizardStep(1);
   renderWizardTenants();
@@ -2312,7 +3249,7 @@ function wizardClearTenantForm() {
   els.wizardTenantPin.value = "";
   els.wizardTenantPin.placeholder = "4 digits";
   els.wizardTenantCoeff.value = "";
-  els.wizardAddTenantBtn.textContent = "+ Add Tenant";
+  els.wizardAddTenantBtn.textContent = t("wiz.addTenant");
   els.wizardCancelEditBtn.classList.add("hidden");
   wizardEditingIdx = null;
 }
@@ -2327,7 +3264,7 @@ function wizardEditTenant(idx) {
   els.wizardTenantPin.value = t.newPin || "";
   els.wizardTenantPin.placeholder = t.pinHash ? "PIN set — type to change" : "4 digits";
   els.wizardTenantCoeff.value = t.coefficient > 0 ? String(t.coefficient) : "";
-  els.wizardAddTenantBtn.textContent = "Save Changes";
+  els.wizardAddTenantBtn.textContent = tr("Save Changes");
   els.wizardCancelEditBtn.classList.remove("hidden");
   els.wizardTenantName.focus();
 }
@@ -2448,7 +3385,7 @@ function renderPaymentDeclarations() {
   const pending = (state.paymentDeclarations || []).filter((d) => d.status === "pending");
   els.declarationsPanel.classList.toggle("hidden", pending.length === 0);
   if (!pending.length) return;
-  els.declarationsBadge.textContent = `${pending.length} pending`;
+  els.declarationsBadge.textContent = tr("{n} pending", { n: pending.length });
   els.declarationsList.replaceChildren(
     ...pending.map((decl) => {
       const name = tenantName(decl.tenantId);
@@ -2457,9 +3394,9 @@ function renderPaymentDeclarations() {
       const info = document.createElement("div");
       info.className = "declaration-info";
       const strong = document.createElement("strong");
-      strong.textContent = `${name} says they paid ${formatMonthly(decl.amount)} for ${formatMonth(decl.month)}`;
+      strong.textContent = tr("{name} says they paid {amount} for {month}", { name, amount: formatMonthly(decl.amount), month: formatMonth(decl.month) });
       const sub = document.createElement("span");
-      sub.textContent = decl.declaredAt ? `Notified ${formatDateLabel(decl.declaredAt.slice(0, 10))}` : "";
+      sub.textContent = decl.declaredAt ? tr("Notified {date}", { date: formatDateLabel(decl.declaredAt.slice(0, 10)) }) : "";
       info.append(strong, sub);
       const actions = document.createElement("div");
       actions.className = "declaration-actions";
@@ -2470,12 +3407,12 @@ function renderPaymentDeclarations() {
       recordBtn.dataset.tenantId = decl.tenantId;
       recordBtn.dataset.month = decl.month;
       recordBtn.dataset.amount = String(decl.amount);
-      recordBtn.textContent = "Record Payment";
+      recordBtn.textContent = tr("Record Payment");
       const dismissBtn = document.createElement("button");
       dismissBtn.type = "button";
       dismissBtn.className = "secondary-button declaration-dismiss-btn";
       dismissBtn.dataset.declId = decl.id;
-      dismissBtn.textContent = "Dismiss";
+      dismissBtn.textContent = tr("Dismiss");
       actions.append(recordBtn, dismissBtn);
       item.append(info, actions);
       return item;
@@ -2484,7 +3421,7 @@ function renderPaymentDeclarations() {
 }
 
 function declarePayment(tenantId, month, amount) {
-  if (!window.confirm(`Notify the owner that you've paid ${formatMonthly(amount)} for ${formatMonth(month)}?`)) return;
+  if (!window.confirm(tr("Notify the owner that you've paid {amount} for {month}?", { amount: formatMonthly(amount), month: formatMonth(month) }))) return;
   const decl = {
     id: `decl-${Date.now()}`,
     tenantId,
@@ -2531,10 +3468,10 @@ function renderTenantStatus() {
       const pill = card.querySelector(".status-pill");
       const statusClass = balance > 0.005 ? "due" : "paid";
       pill.classList.add(`status-${statusClass}`);
-      pill.textContent = balance > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
+      pill.textContent = balance > 0.005 ? tr("Due") : balance < -0.005 ? tr("Credit") : tr("Settled");
       card.querySelector("span").textContent = balance > 0.005
-        ? `Owes ${formatUsd(balance)}`
-        : balance < -0.005 ? `Credit ${formatUsd(-balance)}` : "Settled";
+        ? tr("Owes {amount}", { amount: formatUsd(balance) })
+        : balance < -0.005 ? tr("Credit {amount}", { amount: formatUsd(-balance) }) : tr("Settled");
       return card;
     }),
   );
@@ -2551,7 +3488,7 @@ function renderExpenseCategoryBreakdown() {
   }
 
   els.expenseByCategoryPanel.classList.remove("hidden");
-  els.expenseByCategoryPeriod.textContent = selectedMonth ? `${formatMonth(selectedMonth)} by date` : "";
+  els.expenseByCategoryPeriod.textContent = selectedMonth ? tr("{month} by date", { month: formatMonth(selectedMonth) }) : "";
 
   const categoryMap = new Map();
   monthExpenses.forEach((t) => {
@@ -2567,7 +3504,7 @@ function renderExpenseCategoryBreakdown() {
       const row = document.createElement("article");
       row.className = "summary-row";
       row.innerHTML = `<div><strong></strong></div><b></b>`;
-      row.querySelector("strong").textContent = cat;
+      row.querySelector("strong").textContent = tr(cat);
       row.querySelector("b").textContent = formatUsd(amount);
       return row;
     }),
@@ -2575,7 +3512,7 @@ function renderExpenseCategoryBreakdown() {
       const totalRow = document.createElement("article");
       totalRow.className = "summary-row emphasis";
       totalRow.innerHTML = `<div><strong></strong></div><b></b>`;
-      totalRow.querySelector("strong").textContent = "Total Expenses";
+      totalRow.querySelector("strong").textContent = tr("Total Expenses");
       totalRow.querySelector("b").textContent = formatUsd(total);
       return totalRow;
     })(),
@@ -2583,15 +3520,14 @@ function renderExpenseCategoryBreakdown() {
 }
 
 function renderCategorySummary() {
-  els.categorySummaryPeriod.textContent = selectedMonth ? `${formatMonth(selectedMonth)} by date` : "No selected month";
+  els.categorySummaryPeriod.textContent = selectedMonth ? tr("{month} by date", { month: formatMonth(selectedMonth) }) : tr("No selected month");
   els.categorySummary.replaceChildren(
     ...getMonthlyActivityRows(selectedMonth).map((entry) => {
       const row = document.createElement("article");
       row.className = "summary-row";
       row.classList.toggle("emphasis", Boolean(entry.emphasis));
-      row.innerHTML = `<div><strong></strong><span></span></div><b></b>`;
-      row.querySelector("strong").textContent = entry.category;
-      row.querySelector("span").textContent = entry.note;
+      row.innerHTML = `<div><strong></strong></div><b></b>`;
+      row.querySelector("strong").textContent = tr(entry.category);
       row.querySelector("b").textContent = formatUsd(entry.usd);
       return row;
     }),
@@ -2670,9 +3606,9 @@ function renderPayments() {
         <div class="month-progress"><b></b><small></small></div>
       `;
       row.querySelector("strong").textContent = formatMonth(month);
-      row.querySelector("span").textContent = `${formatUsd(monthPaymentsTotal)} collected`;
+      row.querySelector("span").textContent = tr("{amount} collected", { amount: formatUsd(monthPaymentsTotal) });
       row.querySelector("b").textContent = formatUsd(monthExpensesTotal);
-      row.querySelector("small").textContent = "expenses";
+      row.querySelector("small").textContent = tr("expenses");
       return row;
     }),
   );
@@ -2686,13 +3622,13 @@ function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsa
       waBtn.href = whatsappUrl;
       waBtn.target = "_blank";
       waBtn.rel = "noopener";
-      waBtn.textContent = "Send WhatsApp Reminder";
+      waBtn.textContent = tr("Send WhatsApp Reminder");
       row.append(waBtn);
     } else {
       const waBtn = document.createElement("button");
       waBtn.className = "whatsapp-full-btn whatsapp-no-phone owner-only";
       waBtn.type = "button";
-      waBtn.textContent = "Set phone to send reminder";
+      waBtn.textContent = tr("Set phone to send reminder");
       waBtn.dataset.editTenantId = tenant.id;
       row.append(waBtn);
     }
@@ -2705,10 +3641,10 @@ function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsa
     paidBtn.type = "button";
     paidBtn.className = "paid-declaration-btn";
     if (hasPending) {
-      paidBtn.textContent = "Owner notified ✓";
+      paidBtn.textContent = tr("Owner notified ✓");
       paidBtn.disabled = true;
     } else {
-      paidBtn.textContent = "I've Paid";
+      paidBtn.textContent = tr("I've Paid");
       paidBtn.dataset.tenantId = tenant.id;
       paidBtn.dataset.month = month;
       paidBtn.dataset.amount = String(declarationDue);
@@ -2733,15 +3669,16 @@ function buildTenantPaymentRowBase(tenant, amountText, statusLabel, statusClass,
         <span class="status-pill"></span>
         <span class="tpr-detail"></span>
       </div>
-      <button class="mini-button tpr-add-btn owner-only" type="button">Add Payment</button>
+      <button class="mini-button tpr-add-btn owner-only" type="button"></button>
     </div>
   `;
+  row.querySelector(".tpr-add-btn").textContent = tr("Add Payment");
   row.querySelector("strong").textContent = tenant.name;
-  row.querySelector(".tpr-info span").textContent = `Unit ${tenant.unit}`;
+  row.querySelector(".tpr-info span").textContent = tr("Unit {unit}", { unit: tenant.unit });
   row.querySelector(".tpr-amount").textContent = amountText;
   const pill = row.querySelector(".status-pill");
   pill.className = `status-pill status-${statusClass}`;
-  pill.textContent = statusLabel;
+  pill.textContent = tr(statusLabel);
   row.querySelector(".tpr-detail").textContent = detailText;
   return row;
 }
@@ -2749,7 +3686,7 @@ function buildTenantPaymentRowBase(tenant, amountText, statusLabel, statusClass,
 function renderPaymentsFixed() {
   const collection = getMonthCollection(selectedMonth);
   els.paymentMonthRate.textContent = `${collection.rate}%`;
-  els.paymentPaidCount.textContent = `${collection.paidCount}/${collection.tenantStatuses.length} paid`;
+  els.paymentPaidCount.textContent = tr("{n}/{m} paid", { n: collection.paidCount, m: collection.tenantStatuses.length });
 
   els.paymentSummary.replaceChildren(
     ...["Expected", "Collected", "Due"].map((label, i) => {
@@ -2757,7 +3694,7 @@ function renderPaymentsFixed() {
       const card = document.createElement("article");
       card.className = "payment-summary-card";
       card.innerHTML = `<span></span><strong></strong>`;
-      card.querySelector("span").textContent = label;
+      card.querySelector("span").textContent = tr(label);
       card.querySelector("strong").textContent = value;
       return card;
     }),
@@ -2771,7 +3708,7 @@ function renderPaymentsFixed() {
   els.tenantPaymentList.replaceChildren(
     ...visible.map(({ tenant, status }) => {
       const due = roundUsd(Math.max(0, status.expected - status.paid));
-      const detail = due > 0 ? `${formatUsd(due)} due` : status.expected > 0 ? "Fully paid" : "No due";
+      const detail = due > 0 ? tr("{amount} due", { amount: formatUsd(due) }) : status.expected > 0 ? tr("Fully paid") : tr("No due");
       const row = buildTenantPaymentRowBase(
         tenant,
         `${formatUsd(status.paid)} / ${formatUsd(status.expected)}`,
@@ -2809,8 +3746,8 @@ function renderPaymentsActual() {
   const totalExpenses = roundUsd(balanceData.reduce((s, d) => s + d.expenseShare, 0));
   const settledCount = balanceData.filter((d) => d.balance <= 0.005).length;
 
-  els.paymentMonthRate.textContent = `${settledCount}/${activeTenants.length} settled`;
-  els.paymentPaidCount.textContent = `${settledCount}/${activeTenants.length} settled`;
+  els.paymentMonthRate.textContent = tr("{n}/{m} settled", { n: settledCount, m: activeTenants.length });
+  els.paymentPaidCount.textContent = tr("{n}/{m} settled", { n: settledCount, m: activeTenants.length });
 
   els.paymentSummary.replaceChildren(
     ...["Total Expenses", "Collected", "Outstanding"].map((label, i) => {
@@ -2818,7 +3755,7 @@ function renderPaymentsActual() {
       const card = document.createElement("article");
       card.className = "payment-summary-card";
       card.innerHTML = `<span></span><strong></strong>`;
-      card.querySelector("span").textContent = label;
+      card.querySelector("span").textContent = tr(label);
       card.querySelector("strong").textContent = value;
       return card;
     }),
@@ -2832,10 +3769,10 @@ function renderPaymentsActual() {
       const due = Math.max(0, balance);
       const statusClass = balance > 0.005 ? "due" : "paid";
       const statusLabel = balance > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
-      const detail = due > 0 ? `${formatUsd(due)} due` : balance < -0.005 ? `${formatUsd(-balance)} credit` : "Settled";
+      const detail = due > 0 ? tr("{amount} due", { amount: formatUsd(due) }) : balance < -0.005 ? tr("{amount} credit", { amount: formatUsd(-balance) }) : tr("Settled");
       const row = buildTenantPaymentRowBase(
         tenant,
-        `${formatUsd(payments)} paid of ${formatUsd(expenseShare)}`,
+        tr("{paid} paid of {share}", { paid: formatUsd(payments), share: formatUsd(expenseShare) }),
         statusLabel,
         statusClass,
         detail,
@@ -2876,20 +3813,27 @@ function renderTenants() {
           <button class="tenant-trash-btn delete-tenant-button" type="button" aria-label="Delete tenant">&#128465;</button>
         </div>
         <div class="tenant-metrics">
-          <div class="metric metric-paid"><span>&#10003; Paid</span><b></b></div>
-          <div class="metric"><span>Advance</span><b></b></div>
-          <div class="metric metric-due"><span>Due</span><b></b></div>
+          <div class="metric metric-paid"><span></span><b></b></div>
+          <div class="metric"><span></span><b></b></div>
+          <div class="metric metric-due"><span></span><b></b></div>
         </div>
         <div class="tenant-card-footer">
-          <button class="text-link-btn edit-tenant-button" type="button">Edit</button>
-          <button class="text-link-btn print-statement-button" type="button">Statement</button>
+          <button class="text-link-btn edit-tenant-button" type="button"></button>
+          <button class="text-link-btn print-statement-button" type="button"></button>
         </div>
       `;
+      card.querySelector(".delete-tenant-button").setAttribute("aria-label", tr("Delete tenant"));
+      const metricLabels = card.querySelectorAll(".metric span");
+      metricLabels[0].textContent = `✓ ${tr("Paid")}`;
+      metricLabels[1].textContent = tr("Advance");
+      metricLabels[2].textContent = tr("Due");
+      card.querySelector(".edit-tenant-button").textContent = tr("Edit");
+      card.querySelector(".print-statement-button").textContent = tr("Statement");
       card.querySelector("strong").textContent = tenant.name;
       const unitSpan = card.querySelector(".tenant-unit-line");
       const coeffLabel = tenant.coefficient > 0 ? ` · ${tenant.coefficient}/1000` : "";
       const breakerLabel = tenant.breakerAmps > 0 ? ` · ${tenant.breakerAmps}A` : "";
-      unitSpan.textContent = `Unit ${tenant.unit}${coeffLabel}${breakerLabel}${tenant.phone ? "" : " · no phone"}`;
+      unitSpan.textContent = `${tr("Unit {unit}", { unit: tenant.unit })}${coeffLabel}${breakerLabel}${tenant.phone ? "" : ` · ${tr("no phone")}`}`;
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
@@ -3820,7 +4764,7 @@ function renderLedgerFilters() {
     ...["All", ...state.categories].map((category) => {
       const option = document.createElement("option");
       option.value = category;
-      option.textContent = category;
+      option.textContent = category === "All" ? tr("All Categories") : tr(category);
       option.selected = category === current;
       return option;
     }),
@@ -3835,7 +4779,7 @@ function renderLedgerFilters() {
       ...["All", ...expCats.map((c) => c.name)].map((cat) => {
         const option = document.createElement("option");
         option.value = cat;
-        option.textContent = cat === "All" ? "All Categories" : cat;
+        option.textContent = cat === "All" ? tr("All Categories") : tr(cat);
         option.selected = cat === currentExpCat;
         return option;
       }),
@@ -3918,13 +4862,13 @@ function renderLedger() {
   const anyActive = isAnyLedgerFilterActive();
   els.ledgerFilterStatus.classList.toggle("hidden", !anyActive);
   if (anyActive) {
-    els.ledgerCount.textContent = `Showing ${rows.length} of ${total} transactions`;
+    els.ledgerCount.textContent = tr("Showing {n} of {total} transactions", { n: rows.length, total });
   }
 
   if (!rows.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = "No matching transactions";
+    empty.textContent = tr("No matching transactions");
     els.ledgerList.replaceChildren(empty);
     return;
   }
@@ -3951,19 +4895,19 @@ function renderLedger() {
     `;
     item.querySelector(".ledger-date-label").textContent = dateStr ? formatDateLabel(dateStr) : "";
     const title = transaction.tenantId ? tenantName(transaction.tenantId) : transaction.description;
-    item.querySelector("strong").textContent = title || transaction.category;
+    item.querySelector("strong").textContent = title || tr(transaction.category);
     item.querySelector(".ledger-subtitle").textContent = [
-      transaction.category,
-      transaction.expenseCategory || "",
-      transaction.forMonth ? `Month: ${formatMonth(transaction.forMonth)}` : "",
+      tr(transaction.category),
+      transaction.expenseCategory ? tr(transaction.expenseCategory) : "",
+      transaction.forMonth ? tr("Month: {month}", { month: formatMonth(transaction.forMonth) }) : "",
     ].filter(Boolean).join(" · ");
 
     const detailItems = [
-      transaction.supplier ? `Supplier: ${transaction.supplier}` : "",
-      transaction.project ? `Project: ${transaction.project}` : "",
-      transaction.invoice ? `Invoice: ${transaction.invoice}` : "",
-      receiptReference ? `Receipt: ${receiptReference}` : "",
-      transaction.invoiceAttachment?.fileName ? `Attachment: ${transaction.invoiceAttachment.fileName}` : "",
+      transaction.supplier ? tr("Supplier: {v}", { v: transaction.supplier }) : "",
+      transaction.project ? tr("Project: {v}", { v: transaction.project }) : "",
+      transaction.invoice ? tr("Invoice: {v}", { v: transaction.invoice }) : "",
+      receiptReference ? tr("Receipt: {v}", { v: receiptReference }) : "",
+      transaction.invoiceAttachment?.fileName ? tr("Attachment: {v}", { v: transaction.invoiceAttachment.fileName }) : "",
     ].filter(Boolean);
     const expand = item.querySelector(".ledger-expand");
     if (detailItems.length) {
@@ -3987,7 +4931,7 @@ function renderLedger() {
       btn.className = "ledger-action-btn receipt-button";
       btn.type = "button";
       btn.dataset.transactionId = transaction.id;
-      btn.textContent = "Receipt";
+      btn.textContent = tr("Receipt");
       actionGroup.append(btn);
     }
     if (transaction.category === "Expenses" && !transaction.serviceType && sessionMode === "owner") {
@@ -3995,7 +4939,7 @@ function renderLedger() {
       btn.className = "ledger-action-btn edit-expense-button";
       btn.type = "button";
       btn.dataset.transactionId = transaction.id;
-      btn.textContent = "Edit";
+      btn.textContent = tr("Edit");
       actionGroup.append(btn);
     }
     if (transaction.invoiceAttachment?.driveUrl) {
@@ -4004,7 +4948,7 @@ function renderLedger() {
       link.href = transaction.invoiceAttachment.driveUrl;
       link.target = "_blank";
       link.rel = "noopener";
-      link.textContent = "Invoice";
+      link.textContent = tr("Invoice");
       actionGroup.append(link);
     }
     if (sessionMode === "owner") {
@@ -4012,7 +4956,7 @@ function renderLedger() {
       delBtn.className = "ledger-action-btn delete-transaction-button danger-action";
       delBtn.type = "button";
       delBtn.dataset.transactionId = transaction.id;
-      delBtn.textContent = "Delete";
+      delBtn.textContent = tr("Delete");
       actionGroup.append(delBtn);
     }
     return item;
@@ -4144,7 +5088,7 @@ function renderExpenseCategoryDropdown() {
   if (!expenseCategoryOptions().length) {
     const empty = document.createElement("div");
     empty.className = "supplier-dropdown-empty";
-    empty.textContent = "No categories saved yet";
+    empty.textContent = tr("No categories saved yet");
     els.expenseCategoryDropdown.replaceChildren(empty);
     els.expenseCategoryDropdownButton.disabled = true;
     return;
@@ -4153,7 +5097,7 @@ function renderExpenseCategoryDropdown() {
   if (!categories.length) {
     const empty = document.createElement("div");
     empty.className = "supplier-dropdown-empty";
-    empty.textContent = "No matching categories";
+    empty.textContent = tr("No matching categories");
     els.expenseCategoryDropdown.replaceChildren(empty);
     return;
   }
@@ -4187,7 +5131,7 @@ function renderPolls() {
   if (!polls.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = "No polls yet. Tap \"+ New Poll\" to start one.";
+    empty.textContent = tr("No polls yet. Tap \"+ New Poll\" to start one.");
     els.pollList.replaceChildren(empty);
     return;
   }
@@ -4208,7 +5152,7 @@ function buildPollCard(poll) {
   const myVote = votes[myId];
   const isOpen = poll.status === "open";
   const isOwner = sessionMode === "owner";
-  const creatorName = poll.createdBy === "owner" ? "Owner" : tenantName(poll.createdBy);
+  const creatorName = poll.createdBy === "owner" ? tr("Owner") : tenantName(poll.createdBy);
 
   const card = document.createElement("article");
   card.className = "poll-card";
@@ -4220,13 +5164,13 @@ function buildPollCard(poll) {
   titleEl.textContent = poll.title;
   const badge = document.createElement("span");
   badge.className = `poll-status-badge ${poll.status}`;
-  badge.textContent = poll.status === "open" ? "Open" : "Closed";
+  badge.textContent = poll.status === "open" ? tr("Open") : tr("Closed");
   header.append(titleEl, badge);
   card.append(header);
 
   const meta = document.createElement("p");
   meta.className = "poll-meta";
-  meta.textContent = `By ${creatorName} · ${poll.createdAt ? formatDateLabel(poll.createdAt.slice(0, 10)) : ""}`;
+  meta.textContent = tr("By {name} · {date}", { name: creatorName, date: poll.createdAt ? formatDateLabel(poll.createdAt.slice(0, 10)) : "" });
   card.append(meta);
 
   if (poll.description) {
@@ -4257,16 +5201,16 @@ function buildPollCard(poll) {
   labels.className = "poll-tally-labels";
   const yesLbl = document.createElement("span");
   yesLbl.className = "ptl-yes";
-  yesLbl.textContent = `YES ${yesCount}`;
+  yesLbl.textContent = tr("YES {n}", { n: yesCount });
   const abstainLbl = document.createElement("span");
   abstainLbl.className = "ptl-abstain";
-  abstainLbl.textContent = `ABSTAIN ${abstainCount}`;
+  abstainLbl.textContent = tr("ABSTAIN {n}", { n: abstainCount });
   const noLbl = document.createElement("span");
   noLbl.className = "ptl-no";
-  noLbl.textContent = `NO ${noCount}`;
+  noLbl.textContent = tr("NO {n}", { n: noCount });
   const pendingLbl = document.createElement("span");
   pendingLbl.className = "ptl-pending";
-  pendingLbl.textContent = `${pending.length} pending`;
+  pendingLbl.textContent = tr("{n} pending", { n: pending.length });
   labels.append(yesLbl, abstainLbl, noLbl, pendingLbl);
   tally.append(labels, track);
   card.append(tally);
@@ -4275,7 +5219,7 @@ function buildPollCard(poll) {
   resultList.className = "poll-result-list";
   allVoterIds.forEach((voterId) => {
     const voterVote = votes[voterId];
-    const voterName = voterId === "owner" ? "Owner" : tenantName(voterId);
+    const voterName = voterId === "owner" ? tr("Owner") : tenantName(voterId);
     const li = document.createElement("li");
     li.className = "poll-result-row";
     const nameEl = document.createElement("span");
@@ -4283,7 +5227,7 @@ function buildPollCard(poll) {
     nameEl.textContent = voterName;
     const voteEl = document.createElement("span");
     voteEl.className = `prr-vote ${voterVote || "pending"}`;
-    voteEl.textContent = voterVote ? voterVote.toUpperCase() : "—";
+    voteEl.textContent = voterVote ? tr(voterVote.toUpperCase()) : "—";
     li.append(nameEl, voteEl);
     resultList.append(li);
   });
@@ -4297,19 +5241,19 @@ function buildPollCard(poll) {
     yesBtn.className = `vote-btn vote-yes${myVote === "yes" ? " selected" : ""}`;
     yesBtn.dataset.pollId = poll.id;
     yesBtn.dataset.vote = "yes";
-    yesBtn.textContent = myVote === "yes" ? "✓ YES" : "Vote YES";
+    yesBtn.textContent = myVote === "yes" ? tr("✓ YES") : tr("Vote YES");
     const abstainBtn = document.createElement("button");
     abstainBtn.type = "button";
     abstainBtn.className = `vote-btn vote-abstain${myVote === "abstain" ? " selected" : ""}`;
     abstainBtn.dataset.pollId = poll.id;
     abstainBtn.dataset.vote = "abstain";
-    abstainBtn.textContent = myVote === "abstain" ? "✓ Abstain" : "Abstain";
+    abstainBtn.textContent = myVote === "abstain" ? tr("✓ Abstain") : tr("Abstain");
     const noBtn = document.createElement("button");
     noBtn.type = "button";
     noBtn.className = `vote-btn vote-no${myVote === "no" ? " selected" : ""}`;
     noBtn.dataset.pollId = poll.id;
     noBtn.dataset.vote = "no";
-    noBtn.textContent = myVote === "no" ? "✓ NO" : "Vote NO";
+    noBtn.textContent = myVote === "no" ? tr("✓ NO") : tr("Vote NO");
     voteRow.append(yesBtn, abstainBtn, noBtn);
     card.append(voteRow);
   }
@@ -4322,14 +5266,14 @@ function buildPollCard(poll) {
       closeBtn.type = "button";
       closeBtn.className = "secondary-button poll-close-btn";
       closeBtn.dataset.pollId = poll.id;
-      closeBtn.textContent = "Close Poll";
+      closeBtn.textContent = tr("Close Poll");
       actRow.append(closeBtn);
     }
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.className = "danger-button poll-delete-btn";
     delBtn.dataset.pollId = poll.id;
-    delBtn.textContent = "Delete";
+    delBtn.textContent = tr("Delete");
     actRow.append(delBtn);
     card.append(actRow);
   }
@@ -4352,7 +5296,7 @@ function castVote(pollId, vote) {
   poll.votes[myId] = vote;
   saveState();
   renderPolls();
-  showToast(`Voted ${vote.toUpperCase()}`);
+  showToast(tr("Voted {vote}", { vote: vote.toUpperCase() }));
 }
 
 function closePoll(pollId) {
@@ -4365,7 +5309,7 @@ function closePoll(pollId) {
 }
 
 function deletePoll(pollId) {
-  if (!window.confirm("Delete this poll? This cannot be undone.")) return;
+  if (!window.confirm(tr("Delete this poll? This cannot be undone."))) return;
   state.polls = (state.polls || []).filter((p) => p.id !== pollId);
   recordDeletedId("polls", pollId);
   saveState();
@@ -4378,11 +5322,13 @@ function applyCollectionModeVisibility(mode) {
   const fixed = mode === "fixed";
   els.monthlyBudgetField.classList.toggle("hidden", !fixed);
   els.collectionModeNote.textContent = fixed
-    ? "Tenants pay a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund."
-    : "Each month's recorded expenses are split among tenants (by coefficient when set). No fixed monthly amount.";
+    ? tr("Tenants pay a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund.")
+    : tr("Each month's recorded expenses are split among tenants (by coefficient when set). No fixed monthly amount.");
 }
 
 function renderSettings() {
+  els.appVersionLabel.textContent = APP_VERSION;
+  if (els.languageInput) els.languageInput.value = normalizeLang(state.settings.language);
   els.buildingNameInput.value = (state.building && state.building.name) || "";
   els.defaultDueInput.value = amountInputValue(state.settings.defaultDueUsd);
   els.conversionRateInput.value = Number(state.settings.lbpPerUsd || DEFAULT_LBP_PER_USD);
@@ -4396,19 +5342,19 @@ function renderSettings() {
   applyCollectionModeVisibility(els.collectionModeInput.value);
   els.ownerPasswordInput.value = "";
   els.ownerPasswordInput.placeholder = state.settings.ownerPasswordHash
-    ? "Password set — type to change"
-    : "Leave blank for no password";
+    ? t("set.ownerPasswordSetPh")
+    : t("set.ownerPasswordPh");
   els.removeOwnerPasswordButton.classList.toggle("hidden", !state.settings.ownerPasswordHash);
   const coeffSum = state.tenants.reduce((sum, t) => sum + (t.coefficient || 0), 0);
   const tenantsWithCoeff = state.tenants.filter((t) => t.coefficient > 0).length;
   if (tenantsWithCoeff > 0) {
     const ok = coeffSum === 1000;
     els.coefficientStatus.textContent = ok
-      ? `Coefficients: ${coeffSum}/1000 — all tenants accounted for.`
-      : `Coefficients: ${coeffSum}/1000 — must total 1000. ${1000 - coeffSum > 0 ? `${1000 - coeffSum} remaining.` : `${coeffSum - 1000} over.`}`;
+      ? tr("Coefficients: {sum}/1000 — all tenants accounted for.", { sum: coeffSum })
+      : tr("Coefficients: {sum}/1000 — must total 1000. {rest}", { sum: coeffSum, rest: 1000 - coeffSum > 0 ? tr("{n} remaining.", { n: 1000 - coeffSum }) : tr("{n} over.", { n: coeffSum - 1000 }) });
     els.coefficientStatus.className = ok ? "settings-note coeff-ok" : "settings-note coeff-warn";
   } else {
-    els.coefficientStatus.textContent = "No coefficients set — all tenants use the same flat monthly amount.";
+    els.coefficientStatus.textContent = tr("No coefficients set — all tenants use the same flat monthly amount.");
     els.coefficientStatus.className = "settings-note";
   }
   els.reloadSheetAction.classList.toggle("hidden", !hasCloudConfig());
@@ -4416,6 +5362,11 @@ function renderSettings() {
 }
 
 function renderAll() {
+  // Keep the active language in sync with state (e.g. after a cloud reload / restore).
+  const stateLang = normalizeLang(state.settings && state.settings.language);
+  if (stateLang !== currentLang) applyLanguage(stateLang);
+  else applyStaticI18n();
+  els.buildingNameHeading.textContent = (state.building && state.building.name) || t("login.appName");
   renderDashboard();
   renderPayments();
   renderTenants();
@@ -4474,15 +5425,15 @@ function updateTransactionDirectionLabels() {
   const [creditOption, debitOption] = els.transactionDirection.options;
   if (category === "Opening Balance") {
     if (els.transactionTenant.value) {
-      creditOption.textContent = "Tenant has credit (prepaid)";
-      debitOption.textContent = "Tenant owes (opening due)";
+      creditOption.textContent = tr("Tenant has credit (prepaid)");
+      debitOption.textContent = tr("Tenant owes (opening due)");
     } else {
-      creditOption.textContent = "Cash on hand (add)";
-      debitOption.textContent = "Cash shortfall (subtract)";
+      creditOption.textContent = tr("Cash on hand (add)");
+      debitOption.textContent = tr("Cash shortfall (subtract)");
     }
   } else {
-    creditOption.textContent = "Received";
-    debitOption.textContent = "Applied or paid out";
+    creditOption.textContent = t("opt.received");
+    debitOption.textContent = t("opt.appliedPaidOut");
   }
 }
 
@@ -4544,9 +5495,9 @@ function updateExpenseConversionPreview() {
   const rate = getConversionRate();
   if (amountLbp > 0) {
     els.expenseConversionPreview.textContent =
-      `${formatLbp(amountLbp)} = ${formatUsd(toUsd(amountUsd, amountLbp))} at ${numberFormat.format(rate)} LBP/USD`;
+      tr("{lbp} = {usd} at {rate} LBP/USD", { lbp: formatLbp(amountLbp), usd: formatUsd(toUsd(amountUsd, amountLbp)), rate: numberFormat.format(rate) });
   } else {
-    els.expenseConversionPreview.textContent = `${formatUsd(amountUsd)} balance impact`;
+    els.expenseConversionPreview.textContent = tr("{amount} balance impact", { amount: formatUsd(amountUsd) });
   }
 }
 
@@ -4571,7 +5522,7 @@ function selectedInvoiceFile() {
 
 function updateInvoiceFileSelectionStatus() {
   const file = selectedInvoiceFile();
-  els.invoiceFileSelectionStatus.textContent = file ? file.name : "No photo selected";
+  els.invoiceFileSelectionStatus.textContent = file ? file.name : t("tx.noPhoto");
 }
 
 function clearInvoiceFileSelection() {
@@ -4888,7 +5839,7 @@ async function restoreFromBackupFile(file) {
     return;
   }
   const summary = `${parsed.tenants.length} tenants, ${parsed.transactions.length} transactions`;
-  if (!window.confirm(`Restore this backup (${summary})? It replaces the data on this device. Your current data will be downloaded first as a safety copy.`)) {
+  if (!window.confirm(tr("Restore this backup ({summary})? It replaces the data on this device. Your current data will be downloaded first as a safety copy.", { summary }))) {
     return;
   }
   // Safety net: download the current data before overwriting it.
@@ -5071,7 +6022,7 @@ async function saveCloudState({ silent = false } = {}) {
 }
 
 async function loadCloudState() {
-  if (!window.confirm("Reload from the Google Sheet? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost.")) return;
+  if (!window.confirm(tr("Reload from the Google Sheet? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost."))) return;
   try {
     renderCloudStatus("Loading from Google Sheet...");
     const result = await postCloudAction("loadState");
@@ -5178,7 +6129,7 @@ async function applySyncCode(rawCode) {
 }
 
 async function zeroAccounts() {
-  if (!window.confirm("Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone.")) {
+  if (!window.confirm(tr("Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone."))) {
     return;
   }
   state.transactions = [];
@@ -5217,7 +6168,7 @@ function openEntryForm(category) {
     els.transactionCategory.value = category;
     applyTransactionCategoryDefaults();
   }
-  els.transactionDialogTitle.textContent = ENTRY_TITLES[category] || "Add Transaction";
+  els.transactionDialogTitle.textContent = ENTRY_TITLES[category] ? tr(ENTRY_TITLES[category]) : t("tx.addTitle");
   document.querySelector(".type-field").classList.add("hidden");
   els.transactionBackButton.classList.remove("hidden");
   openDialog(els.transactionDialog);
@@ -5229,8 +6180,8 @@ function resetTransactionForm() {
   els.transactionForm.reset();
   els.transactionBackButton.classList.add("hidden"); // shown only when opened via the chooser
   document.querySelector(".type-field").classList.remove("hidden");
-  els.transactionDialogTitle.textContent = "Add Transaction";
-  els.transactionSubmitButton.textContent = "Add";
+  els.transactionDialogTitle.textContent = t("tx.addTitle");
+  els.transactionSubmitButton.textContent = t("common.add");
   els.transactionCategory.disabled = false;
   els.transactionCategory.value = "Payments";
   els.transactionDirection.value = "credit";
@@ -5253,7 +6204,7 @@ function setTransactionFormBusy(isBusy) {
   els.uploadInvoicePhotoButton.disabled = isBusy;
   els.projectDropdownButton.disabled = isBusy;
   els.expenseCategoryDropdownButton.disabled = isBusy;
-  els.transactionSubmitButton.textContent = isBusy ? "Saving..." : editingExpenseId ? "Save" : "Add";
+  els.transactionSubmitButton.textContent = isBusy ? tr("Saving...") : editingExpenseId ? tr("Save") : t("common.add");
 }
 
 function expenseDebitUsd(transaction) {
@@ -5278,8 +6229,8 @@ function openExpenseEditDialog(transactionId) {
 
   resetTransactionForm();
   editingExpenseId = transaction.id;
-  els.transactionDialogTitle.textContent = "Edit Expense";
-  els.transactionSubmitButton.textContent = "Save";
+  els.transactionDialogTitle.textContent = tr("Edit Expense");
+  els.transactionSubmitButton.textContent = tr("Save");
   els.transactionCategory.value = "Expenses";
   els.transactionCategory.disabled = true;
   els.transactionDescription.value = transaction.description || "";
@@ -5327,7 +6278,7 @@ function deleteLedgerTransaction(transactionId) {
   const label = [transaction.category, transaction.description || tenantName(transaction.tenantId), transaction.date]
     .filter(Boolean)
     .join(" | ");
-  if (!window.confirm(`Delete this ledger entry?\n\n${label}\n\nThis removes the record from the app and Google Sheet sync.`)) {
+  if (!window.confirm(tr("Delete this ledger entry?\n\n{label}\n\nThis removes the record from the app and Google Sheet sync.", { label }))) {
     return;
   }
 
@@ -5856,16 +6807,16 @@ function generateTenantId(name) {
 
 function openAddTenantDialog() {
   editingTenantId = null;
-  els.tenantDialogTitle.textContent = "Add Tenant";
+  els.tenantDialogTitle.textContent = t("tenant.addTitle");
   els.tenantNameInput.value = "";
   els.tenantUnitInput.value = "";
   els.tenantPhoneDialogInput.value = "";
   els.tenantCoefficientInput.value = "";
   els.tenantBreakerInput.value = "";
   els.tenantPinDialogInput.value = "";
-  els.tenantPinDialogInput.placeholder = "Leave blank to disable tenant login";
+  els.tenantPinDialogInput.placeholder = t("tenant.pinPh");
   els.removeTenantPinButton.classList.add("hidden");
-  els.tenantSubmitButton.textContent = "Add";
+  els.tenantSubmitButton.textContent = t("common.add");
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
 }
@@ -5874,16 +6825,16 @@ function openEditTenantDialog(tenantId) {
   const tenant = state.tenants.find((t) => t.id === tenantId);
   if (!tenant) return;
   editingTenantId = tenantId;
-  els.tenantDialogTitle.textContent = "Edit Tenant";
+  els.tenantDialogTitle.textContent = tr("Edit Tenant");
   els.tenantNameInput.value = tenant.name;
   els.tenantUnitInput.value = tenant.unit;
   els.tenantPhoneDialogInput.value = tenant.phone || "";
   els.tenantCoefficientInput.value = tenant.coefficient > 0 ? String(tenant.coefficient) : "";
   els.tenantBreakerInput.value = tenant.breakerAmps > 0 ? String(tenant.breakerAmps) : "";
   els.tenantPinDialogInput.value = "";
-  els.tenantPinDialogInput.placeholder = tenant.pinHash ? "PIN set — type to change" : "Leave blank to disable tenant login";
+  els.tenantPinDialogInput.placeholder = tenant.pinHash ? tr("PIN set — type to change") : t("tenant.pinPh");
   els.removeTenantPinButton.classList.toggle("hidden", !tenant.pinHash);
-  els.tenantSubmitButton.textContent = "Save";
+  els.tenantSubmitButton.textContent = tr("Save");
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
 }
@@ -5920,7 +6871,7 @@ function handleTenantFormSubmit(event) {
       breakerAmps,
       pinHash: pinEntered ? hashSecret(pinEntered, state.security.salt) : "",
     });
-    showToast(`${name} added`);
+    showToast(tr("{name} added", { name }));
   }
 
   saveState();
@@ -5935,24 +6886,24 @@ function deleteTenant(tenantId) {
   if (!tenant) return;
   const txCount = state.transactions.filter((t) => t.tenantId === tenantId).length;
   const msg = txCount > 0
-    ? `Delete ${tenant.name}? Their ${txCount} transaction(s) will be kept but unlinked from this tenant.`
-    : `Delete ${tenant.name}?`;
+    ? tr("Delete {name}? Their {count} transaction(s) will be kept but unlinked from this tenant.", { name: tenant.name, count: txCount })
+    : tr("Delete {name}?", { name: tenant.name });
   if (!window.confirm(msg)) return;
   state.tenants = state.tenants.filter((t) => t.id !== tenantId);
   recordDeletedId("tenants", tenantId);
   saveState();
   renderAll();
-  showToast(`${tenant.name} removed`);
+  showToast(tr("{name} removed", { name: tenant.name }));
 }
 
 function buildWhatsAppUrl(tenant, dueAmount, statementMonth = null) {
   const phone = (tenant.phone || "").replace(/\D/g, "");
   if (!phone) return null;
-  const monthLine = statementMonth ? ` as of the ${formatMonth(statementMonth)} statement` : "";
+  const monthLine = statementMonth ? tr(" as of the {month} statement", { month: formatMonth(statementMonth) }) : "";
   const message = [
-    `${state.building.name} – Payment Reminder`,
-    `Hi ${tenant.name}, your outstanding balance${monthLine} is ${formatUsd(dueAmount)}.`,
-    `Please settle at your earliest convenience. Thank you.`,
+    tr("{building} – Payment Reminder", { building: state.building.name }),
+    tr("Hi {name}, your outstanding balance{monthLine} is {amount}.", { name: tenant.name, monthLine, amount: formatUsd(dueAmount) }),
+    tr("Please settle at your earliest convenience. Thank you."),
   ].join("\n");
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
@@ -5961,9 +6912,9 @@ function buildMonthlyDueWhatsAppUrl(tenant, owed, month) {
   const phone = (tenant.phone || "").replace(/\D/g, "");
   if (!phone) return null;
   const message = [
-    `${state.building.name} – Payment Reminder`,
-    `Hi ${tenant.name}, your building payment for ${formatMonth(month)} is outstanding: ${formatUsd(owed)}.`,
-    `Please settle at your earliest convenience. Thank you.`,
+    tr("{building} – Payment Reminder", { building: state.building.name }),
+    tr("Hi {name}, your building payment for {month} is outstanding: {amount}.", { name: tenant.name, month: formatMonth(month), amount: formatUsd(owed) }),
+    tr("Please settle at your earliest convenience. Thank you."),
   ].join("\n");
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
@@ -5972,9 +6923,9 @@ function buildSharedExpensesWhatsAppUrl(tenant, owed, month) {
   const phone = (tenant.phone || "").replace(/\D/g, "");
   if (!phone) return null;
   const message = [
-    `${state.building.name} – Shared Expenses Reminder`,
-    `Hi ${tenant.name}, your share of the building shared expenses for ${formatMonth(month)} is outstanding: ${formatMonthly(owed)}.`,
-    `Please settle at your earliest convenience. Thank you.`,
+    tr("{building} – Shared Expenses Reminder", { building: state.building.name }),
+    tr("Hi {name}, your share of the building shared expenses for {month} is outstanding: {amount}.", { name: tenant.name, month: formatMonth(month), amount: formatMonthly(owed) }),
+    tr("Please settle at your earliest convenience. Thank you."),
   ].join("\n");
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
@@ -5989,9 +6940,9 @@ function openSharedExpensesWhatsAppReminderDialog() {
   const withPhone = dueStatuses.filter(({ tenant }) => tenant.phone);
   const withoutPhone = dueStatuses.filter(({ tenant }) => !tenant.phone);
 
-  els.whatsappDialogTitle.textContent = `Shared Expenses Reminders – ${formatMonth(selectedMonth)}`;
+  els.whatsappDialogTitle.textContent = tr("Shared Expenses Reminders – {month}", { month: formatMonth(selectedMonth) });
   els.whatsappDialogNote.textContent = withoutPhone.length
-    ? `${withoutPhone.map(({ tenant }) => tenant.name).join(", ")} skipped – no phone number saved in the Tenants tab.`
+    ? tr("{names} skipped – no phone number saved in the Tenants tab.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
     : "";
   els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
 
@@ -6007,14 +6958,14 @@ function openSharedExpensesWhatsAppReminderDialog() {
       const name = document.createElement("strong");
       name.textContent = tenant.name;
       const detail = document.createElement("span");
-      detail.textContent = `Unit ${tenant.unit} – ${formatMonthly(owed)} due – ${formatMonth(selectedMonth)}`;
+      detail.textContent = tr("Unit {unit} – {amount} due – {month}", { unit: tenant.unit, amount: formatMonthly(owed), month: formatMonth(selectedMonth) });
       info.append(name, detail);
       const link = document.createElement("a");
       link.className = "mini-button whatsapp-btn";
       link.href = url;
       link.target = "_blank";
       link.rel = "noopener";
-      link.textContent = "Send";
+      link.textContent = tr("Send");
       row.append(info, link);
       return row;
     }),
@@ -6027,9 +6978,9 @@ function buildProjectWhatsAppUrl(tenant, project, owedAmount) {
   const phone = (tenant.phone || "").replace(/\D/g, "");
   if (!phone) return null;
   const message = [
-    `${state.building.name} – Project Payment Reminder`,
-    `Hi ${tenant.name}, your share for the "${project.name}" project is ${formatMonthly(owedAmount)}, due by ${formatDateLabel(project.dueDate)}.`,
-    `Please settle at your earliest convenience. Thank you.`,
+    tr("{building} – Project Payment Reminder", { building: state.building.name }),
+    tr('Hi {name}, your share for the "{project}" project is {amount}, due by {date}.', { name: tenant.name, project: project.name, amount: formatMonthly(owedAmount), date: formatDateLabel(project.dueDate) }),
+    tr("Please settle at your earliest convenience. Thank you."),
   ].join("\n");
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
@@ -6048,9 +6999,9 @@ function openProjectWhatsAppReminderDialog(project) {
   const withPhone = dueStatuses.filter(({ tenant }) => tenant.phone);
   const withoutPhone = dueStatuses.filter(({ tenant }) => !tenant.phone);
 
-  els.whatsappDialogTitle.textContent = `Reminders – ${project.name}`;
+  els.whatsappDialogTitle.textContent = tr("Reminders – {project}", { project: project.name });
   els.whatsappDialogNote.textContent = withoutPhone.length
-    ? `${withoutPhone.map(({ tenant }) => tenant.name).join(", ")} skipped – no phone number saved in the Tenants tab.`
+    ? tr("{names} skipped – no phone number saved in the Tenants tab.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
     : "";
   els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
 
@@ -6069,14 +7020,14 @@ function openProjectWhatsAppReminderDialog(project) {
       const name = document.createElement("strong");
       name.textContent = tenant.name;
       const detail = document.createElement("span");
-      detail.textContent = `${formatMonthly(owed)} outstanding – due ${formatDateLabel(project.dueDate)}`;
+      detail.textContent = tr("{amount} outstanding – due {date}", { amount: formatMonthly(owed), date: formatDateLabel(project.dueDate) });
       info.append(name, detail);
       const link = document.createElement("a");
       link.className = "mini-button whatsapp-btn";
       link.href = url;
       link.target = "_blank";
       link.rel = "noopener";
-      link.textContent = "Send";
+      link.textContent = tr("Send");
       row.append(info, link);
       return row;
     }),
@@ -6087,7 +7038,7 @@ function openProjectWhatsAppReminderDialog(project) {
 
 function openWhatsAppReminderDialog() {
   const lastMonth = getLastCompletedMonth();
-  els.whatsappDialogTitle.textContent = `Payment Reminders – ${formatMonth(lastMonth)} Statement`;
+  els.whatsappDialogTitle.textContent = tr("Payment Reminders – {month} Statement", { month: formatMonth(lastMonth) });
 
   const activeTenants = state.tenants.filter((t) => t.active !== false);
   const dueEntries = activeTenants
@@ -6100,7 +7051,7 @@ function openWhatsAppReminderDialog() {
   const withoutPhone = dueEntries.filter(({ tenant }) => !tenant.phone);
 
   els.whatsappDialogNote.textContent = withoutPhone.length
-    ? `${withoutPhone.map(({ tenant }) => tenant.name).join(", ")} skipped – no phone number saved.`
+    ? tr("{names} skipped – no phone number saved.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
     : "";
   els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
 
@@ -6117,15 +7068,15 @@ function openWhatsAppReminderDialog() {
       name.textContent = tenant.name;
       const detail = document.createElement("span");
       detail.textContent = paidSince > 0
-        ? `Unit ${tenant.unit} – ${formatUsd(remaining)} remaining (stmt ${formatUsd(statementBalance)}, paid ${formatUsd(paidSince)})`
-        : `Unit ${tenant.unit} – ${formatUsd(remaining)} due (${formatMonth(month)} statement)`;
+        ? tr("Unit {unit} – {remaining} remaining (stmt {stmt}, paid {paid})", { unit: tenant.unit, remaining: formatUsd(remaining), stmt: formatUsd(statementBalance), paid: formatUsd(paidSince) })
+        : tr("Unit {unit} – {amount} due ({month} statement)", { unit: tenant.unit, amount: formatUsd(remaining), month: formatMonth(month) });
       info.append(name, detail);
       const link = document.createElement("a");
       link.className = "mini-button whatsapp-btn";
       link.href = url;
       link.target = "_blank";
       link.rel = "noopener";
-      link.textContent = "Send";
+      link.textContent = tr("Send");
       row.append(info, link);
       return row;
     }),
@@ -6214,7 +7165,7 @@ function attachEvents() {
   els.cancelTenantButton.addEventListener("click", () => closeDialog(els.tenantDialog));
   els.removeTenantPinButton.addEventListener("click", () => {
     const tenant = state.tenants.find((t) => t.id === editingTenantId);
-    if (!tenant || !window.confirm(`Remove ${tenant.name}'s PIN? They will no longer be able to log in.`)) return;
+    if (!tenant || !window.confirm(tr("Remove {name}'s PIN? They will no longer be able to log in.", { name: tenant.name }))) return;
     tenant.pinHash = "";
     saveState();
     els.removeTenantPinButton.classList.add("hidden");
@@ -6364,7 +7315,7 @@ function attachEvents() {
       if (existingTransaction) {
         showToast(
           invoiceUploadError
-            ? `Expense updated. Invoice upload failed: ${invoiceUploadError.message}`
+            ? tr("Expense updated. Invoice upload failed: {msg}", { msg: invoiceUploadError.message })
             : invoiceFile
               ? "Expense updated. Invoice replaced"
               : "Expense updated",
@@ -6372,15 +7323,15 @@ function attachEvents() {
       } else if (transactions.some(isReceiptablePayment)) {
         showToast("Payment added. Receipt saved");
       } else if (invoiceUploadError) {
-        showToast(`Expense saved. Invoice upload failed: ${invoiceUploadError.message}`);
+        showToast(tr("Expense saved. Invoice upload failed: {msg}", { msg: invoiceUploadError.message }));
       } else if (transaction.invoiceAttachment?.driveUrl) {
         showToast("Expense added. Invoice uploaded");
       } else {
         showToast("Transaction added");
       }
       editingExpenseId = null;
-      els.transactionDialogTitle.textContent = "Add Transaction";
-      els.transactionSubmitButton.textContent = "Add";
+      els.transactionDialogTitle.textContent = t("tx.addTitle");
+      els.transactionSubmitButton.textContent = t("common.add");
       els.transactionCategory.disabled = false;
     } catch (error) {
       showToast(error.message);
@@ -6415,8 +7366,9 @@ function attachEvents() {
   });
 
   els.collectionModeInput.addEventListener("change", () => applyCollectionModeVisibility(els.collectionModeInput.value));
+  if (els.languageInput) els.languageInput.addEventListener("change", () => setLanguage(els.languageInput.value));
   els.removeOwnerPasswordButton.addEventListener("click", () => {
-    if (!window.confirm("Remove the owner password? Anyone opening the app can then enter as owner.")) return;
+    if (!window.confirm(tr("Remove the owner password? Anyone opening the app can then enter as owner."))) return;
     state.settings.ownerPasswordHash = "";
     saveState();
     renderSettings();
@@ -6465,7 +7417,7 @@ function attachEvents() {
   els.zeroAccountsButton.addEventListener("click", zeroAccounts);
 
   els.startFreshButton.addEventListener("click", () => {
-    if (!window.confirm("Erase everything? This permanently deletes all tenants, payments, expenses and settings on this device and starts setup over. This cannot be undone.")) return;
+    if (!window.confirm(tr("Erase everything? This permanently deletes all tenants, payments, expenses and settings on this device and starts setup over. This cannot be undone."))) return;
     const nextEpoch = Number(state.meta?.epoch || 0) + 1;
     localStorage.removeItem(STORAGE_KEY);
     state = hydrateState({});
@@ -6581,6 +7533,7 @@ function attachEvents() {
   els.logoutButton.addEventListener("click", logout);
   els.runWizardButton.addEventListener("click", openSetupWizard);
   els.wizardCollectionMode.addEventListener("change", applyWizardCollectionModeVisibility);
+  if (els.wizardLanguage) els.wizardLanguage.addEventListener("change", () => setLanguage(els.wizardLanguage.value));
   els.wizardStep1Next.addEventListener("click", () => wizardNextStep(1));
   els.wizardStep2Prev.addEventListener("click", () => wizardPrevStep(2));
   els.wizardStep2Next.addEventListener("click", () => wizardNextStep(2));
@@ -6645,11 +7598,14 @@ async function syncFromSheet({ silent = false } = {}) {
 }
 
 async function boot() {
+  // Apply the last-used language immediately so the login screen renders correctly.
+  applyLanguage(localStorage.getItem(LANG_KEY) || "en");
   const response = await fetch("data/seed.json", { cache: "no-store" });
   seedState = hydrateState(await response.json());
   const stored = localStorage.getItem(STORAGE_KEY);
   state = stored ? hydrateState(JSON.parse(stored)) : hydrateState(seedState);
   if (ensureAllReceiptReferences()) saveState({ sync: false });
+  applyLanguage(state.settings.language);
 
   attachEvents();
   populateTenantSelect();

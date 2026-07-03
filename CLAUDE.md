@@ -38,11 +38,24 @@ vercel.json             Vercel config (cleanUrls, no-cache for sw.js)
 
 ---
 
-## App version — THREE places (bump together)
+## Internationalization (English / Arabic, right-to-left)
 
-1. `const APP_VERSION = "v125";` in `src/app.js`
-2. `<h1>BUILDING ACCOUNT TRACKER v125</h1>` in `index.html`
-3. `const CACHE_NAME = "building-account-tracker-v125";` in `sw.js` (forces the service worker to refresh the cached shell)
+The app is fully bilingual. Language lives in `state.settings.language` (`"en"` | `"ar"`), mirrored to `localStorage["building-account-tracker:lang"]` so the pre-login screen renders correctly. `applyLanguage()` sets `<html lang/dir>` and toggles `body.rtl`; RTL layout is achieved almost entirely by `dir="rtl"` + the existing flexbox (no bespoke RTL CSS was needed). The language picker appears in the setup wizard (step 1) and **Settings → Building Details**; `setLanguage()` persists + re-renders.
+
+Two translation mechanisms, both near the top of `app.js`:
+- **Static HTML** → the `I18N` dictionary (semantic keys like `nav.dashboard`) + `t(key, params)`. Markup carries `data-i18n` / `data-i18n-ph` (placeholder) / `data-i18n-aria` / `data-i18n-title`; `applyStaticI18n()` walks them on every render. **Never** put `data-i18n` on a `<label>` that wraps an input — wrap the caption in a `<span>` instead (setting `textContent` would delete the input).
+- **Dynamic JS strings** → the `DYN_AR` reverse map (English source string → Arabic) + `tr(en, params)`. `showToast()` runs its message through `tr()` automatically, so fixed toast strings need no call-site change; only parameterized ones do. Params use `{name}` placeholders.
+
+When adding UI text: static markup gets a `data-i18n*` attribute + an `I18N` entry; JS-built text gets wrapped in `tr("English", {params})` + a `DYN_AR` entry. Category/status values that double as **stored data** (e.g. `"Payments"`, `"Expenses"`) are only ever translated at display time — never change the stored value. Generated **PDF statements/receipts stay English** (the hand-rolled PDF engine has no Arabic shaping/bidi).
+
+---
+
+## App version — TWO places (bump together)
+
+1. `const APP_VERSION = "v126";` in `src/app.js` (shown to users in Settings)
+2. `const CACHE_NAME = "building-account-tracker-v126";` in `sw.js` (forces the service worker to refresh the cached shell)
+
+The header no longer shows the version (it shows the building name); the version is displayed in Settings from `APP_VERSION`.
 
 ---
 

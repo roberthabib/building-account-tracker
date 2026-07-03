@@ -20,37 +20,37 @@
           <img src="assets/icon.svg" alt="" />
           <div>
             <p class="eyebrow">Naccache 1727</p>
-            <p class="login-app-name">Building Account</p>
+            <p class="login-app-name" data-i18n="login.appName">Building Account</p>
           </div>
         </div>
         <div class="login-tabs">
-          <button class="login-tab active" id="loginOwnerTab" type="button">Owner</button>
-          <button class="login-tab" id="loginTenantTab" type="button">Tenant</button>
+          <button class="login-tab active" id="loginOwnerTab" type="button" data-i18n="login.owner">Owner</button>
+          <button class="login-tab" id="loginTenantTab" type="button" data-i18n="login.tenant">Tenant</button>
         </div>
         <div id="loginOwnerForm">
-          <input class="login-input" id="loginPasswordInput" type="password" placeholder="Password" autocomplete="current-password" />
+          <input class="login-input" id="loginPasswordInput" type="password" placeholder="Password" data-i18n-ph="login.passwordPh" autocomplete="current-password" />
         </div>
         <div id="loginTenantForm" class="hidden">
           <select class="login-input" id="loginTenantSelect"></select>
-          <input class="login-input" id="loginPinInput" type="password" placeholder="PIN" autocomplete="current-password" />
+          <input class="login-input" id="loginPinInput" type="password" placeholder="PIN" data-i18n-ph="login.pinPh" autocomplete="current-password" />
         </div>
-        <p class="login-error hidden" id="loginError">Incorrect password or PIN</p>
-        <button class="login-submit-btn" id="loginSubmitBtn" type="button">Enter</button>
+        <p class="login-error hidden" id="loginError" data-i18n="login.error">Incorrect password or PIN</p>
+        <button class="login-submit-btn" id="loginSubmitBtn" type="button" data-i18n="login.enter">Enter</button>
         <p class="login-hint hidden" id="loginHint"></p>
-        <button class="login-link-btn" id="connectBuildingButton" type="button">Connect to a building (new device)</button>
+        <button class="login-link-btn" id="connectBuildingButton" type="button" data-i18n="login.connect">Connect to a building (new device)</button>
       </div>
     </div>
 
     <dialog id="connectDialog">
       <div class="dialog-header">
-        <h2>Connect to a building</h2>
-        <button class="icon-button small" id="closeConnectDialog" type="button" aria-label="Close">x</button>
+        <h2 data-i18n="connect.title">Connect to a building</h2>
+        <button class="icon-button small" id="closeConnectDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
-      <p class="settings-note">Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.</p>
-      <textarea id="connectCodeInput" class="login-input" rows="3" placeholder="Paste access code here"></textarea>
+      <p class="settings-note" data-i18n="connect.note">Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.</p>
+      <textarea id="connectCodeInput" class="login-input" rows="3" placeholder="Paste access code here" data-i18n-ph="connect.placeholder"></textarea>
       <div class="button-row">
-        <button class="primary-button" id="connectSubmitButton" type="button">Connect</button>
-        <button class="secondary-button" id="cancelConnectButton" type="button">Cancel</button>
+        <button class="primary-button" id="connectSubmitButton" type="button" data-i18n="connect.submit">Connect</button>
+        <button class="secondary-button" id="cancelConnectButton" type="button" data-i18n="common.cancel">Cancel</button>
       </div>
     </dialog>
 
@@ -59,14 +59,14 @@
         <div class="brand-lockup">
           <img src="assets/icon.svg" alt="" />
           <div>
-            <p class="eyebrow">Naccache 1727</p>
-            <h1>BUILDING ACCOUNT TRACKER v125</h1>
+            <p class="eyebrow" data-i18n="topbar.eyebrow">Building Account</p>
+            <h1 id="buildingNameHeading">Building Account</h1>
           </div>
         </div>
         <div class="topbar-actions">
-          <button class="sync-chip is-local" id="syncChip" type="button" title="Sync status" aria-label="Sync status"><span class="sync-dot" aria-hidden="true"></span><span id="syncChipText">Local</span></button>
-          <button class="icon-button logout-btn hidden" id="logoutButton" type="button" aria-label="Logout" title="Logout">&#128274;</button>
-          <button class="icon-button owner-only" id="openAddButton" type="button" aria-label="Add transaction">+</button>
+          <button class="sync-chip is-local" id="syncChip" type="button" title="Sync status" aria-label="Sync status" data-i18n-title="aria.syncStatus" data-i18n-aria="aria.syncStatus"><span class="sync-dot" aria-hidden="true"></span><span id="syncChipText">Local</span></button>
+          <button class="icon-button logout-btn hidden" id="logoutButton" type="button" aria-label="Logout" title="Logout" data-i18n-aria="aria.logout" data-i18n-title="aria.logout">&#128274;</button>
+          <button class="icon-button owner-only" id="openAddButton" type="button" aria-label="Add transaction" data-i18n-aria="aria.add">+</button>
         </div>
       </header>
 
@@ -82,33 +82,33 @@
         <section class="view active" id="dashboardView" aria-labelledby="dashboardTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Overview</p>
-              <h2 id="dashboardTitle">Account Position</h2>
+              <p class="eyebrow" data-i18n="dash.eyebrow">Overview</p>
+              <h2 id="dashboardTitle" data-i18n="dash.title">Account Position</h2>
             </div>
             <div class="month-nav">
-              <button class="month-nav-btn" id="monthPrev" type="button" aria-label="Previous month">&#8249;</button>
-              <select id="monthSelect" aria-label="Month"></select>
-              <button class="month-nav-btn" id="monthNext" type="button" aria-label="Next month">&#8250;</button>
+              <button class="month-nav-btn" id="monthPrev" type="button" aria-label="Previous month" data-i18n-aria="aria.prevMonth">&#8249;</button>
+              <select id="monthSelect" aria-label="Month" data-i18n-aria="aria.month"></select>
+              <button class="month-nav-btn" id="monthNext" type="button" aria-label="Next month" data-i18n-aria="aria.nextMonth">&#8250;</button>
             </div>
           </div>
 
           <section class="panel owner-only hidden" id="attentionPanel">
             <div class="panel-header">
-              <h3>Needs Attention</h3>
+              <h3 data-i18n="attention.title">Needs Attention</h3>
             </div>
             <div id="attentionList"></div>
           </section>
 
           <section class="panel hidden" id="tenantDuesPanel">
             <div class="panel-header">
-              <h3>My Outstanding Dues</h3>
+              <h3 data-i18n="tenantDues.title">My Outstanding Dues</h3>
             </div>
             <div id="tenantDuesList"></div>
           </section>
 
           <section class="panel">
             <div class="panel-header">
-              <h3>Building Financial Position</h3>
+              <h3 data-i18n="financial.title">Building Financial Position</h3>
             </div>
             <div class="kpi-grid" id="kpiGrid"></div>
           </section>
@@ -119,14 +119,14 @@
               <span id="newMonthBannerText"></span>
             </div>
             <div class="new-month-banner-actions">
-              <button id="newMonthBannerAdd" class="primary-button" type="button">Add Month</button>
-              <button id="newMonthBannerDismiss" class="icon-button" type="button" aria-label="Dismiss">&#x2715;</button>
+              <button id="newMonthBannerAdd" class="primary-button" type="button" data-i18n="newMonth.add">Add Month</button>
+              <button id="newMonthBannerDismiss" class="icon-button" type="button" aria-label="Dismiss" data-i18n-aria="common.dismiss">&#x2715;</button>
             </div>
           </div>
 
           <section class="panel owner-only hidden" id="declarationsPanel">
             <div class="panel-header">
-              <h3>Payment Notifications</h3>
+              <h3 data-i18n="declarations.title">Payment Notifications</h3>
               <span id="declarationsBadge" class="declarations-badge"></span>
             </div>
             <div id="declarationsList"></div>
@@ -134,7 +134,7 @@
 
           <section class="panel">
             <div class="panel-header">
-              <h3>Tenant Balances</h3>
+              <h3 data-i18n="tenantBalances.title">Tenant Balances</h3>
               <span id="collectionRate"></span>
             </div>
             <div class="progress-track" aria-hidden="true">
@@ -145,7 +145,7 @@
 
           <section class="panel hidden" id="sharedExpensesPanel">
             <div class="panel-header">
-              <h3>Monthly Services Expenses</h3>
+              <h3 data-i18n="monthlyServices.title">Monthly Services Expenses</h3>
               <span id="sharedExpensesRate"></span>
             </div>
             <div class="progress-track hidden" id="sharedExpensesProgress" aria-hidden="true">
@@ -156,7 +156,7 @@
 
           <section class="panel">
             <div class="panel-header">
-              <h3>Monthly Activity</h3>
+              <h3 data-i18n="monthlyActivity.title">Monthly Activity</h3>
               <span id="categorySummaryPeriod"></span>
             </div>
             <div class="summary-list" id="categorySummary"></div>
@@ -164,7 +164,7 @@
 
           <section class="panel hidden" id="expenseByCategoryPanel">
             <div class="panel-header">
-              <h3>Expenses by Category</h3>
+              <h3 data-i18n="expensesByCategory.title">Expenses by Category</h3>
               <span id="expenseByCategoryPeriod"></span>
             </div>
             <div class="summary-list" id="expenseByCategoryList"></div>
@@ -174,34 +174,34 @@
         <section class="view" id="paymentsView" aria-labelledby="paymentsTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Collections</p>
-              <h2 id="paymentsTitle">Monthly Payments</h2>
+              <p class="eyebrow" data-i18n="pay.eyebrow">Collections</p>
+              <h2 id="paymentsTitle" data-i18n="pay.title">Monthly Payments</h2>
             </div>
           </div>
           <div class="payment-actions-bar">
-            <button class="secondary-button owner-only" id="lastReceiptButton" type="button">Last Receipt</button>
-            <button class="secondary-button owner-only" id="dueOnlyToggle" type="button">Due Only</button>
-            <button class="secondary-button whatsapp-all-btn owner-only" id="whatsappAllDueButton" type="button">Message Due</button>
-            <button class="secondary-button owner-only" id="addMonthButton" type="button">Add Month</button>
+            <button class="secondary-button owner-only" id="lastReceiptButton" type="button" data-i18n="pay.lastReceipt">Last Receipt</button>
+            <button class="secondary-button owner-only" id="dueOnlyToggle" type="button" data-i18n="pay.dueOnly">Due Only</button>
+            <button class="secondary-button whatsapp-all-btn owner-only" id="whatsappAllDueButton" type="button" data-i18n="pay.messageDue">Message Due</button>
+            <button class="secondary-button owner-only" id="addMonthButton" type="button" data-i18n="pay.addMonth">Add Month</button>
           </div>
           <div class="month-strip-wrap">
-            <div class="month-strip" id="paymentMonthStrip" aria-label="Select month"></div>
+            <div class="month-strip" id="paymentMonthStrip" aria-label="Select month" data-i18n-aria="aria.selectMonth"></div>
           </div>
-          <p class="payment-summary-label">Monthly Payments <span id="paymentPaidCount" class="summary-paid-badge"></span></p>
+          <p class="payment-summary-label"><span data-i18n="pay.monthlyPayments">Monthly Payments</span> <span id="paymentPaidCount" class="summary-paid-badge"></span></p>
           <div class="payment-summary-grid" id="paymentSummary"></div>
-          <p class="payment-summary-label hidden" id="paymentSharedSummaryLabel">Monthly Services Expenses <span id="paymentSharedPaidCount" class="summary-paid-badge"></span></p>
+          <p class="payment-summary-label hidden" id="paymentSharedSummaryLabel"><span data-i18n="pay.monthlyServices">Monthly Services Expenses</span> <span id="paymentSharedPaidCount" class="summary-paid-badge"></span></p>
           <div class="payment-summary-grid hidden" id="paymentSharedSummary"></div>
           <div class="payment-content">
             <section class="payment-section">
               <div class="panel-header">
-                <h3>Monthly Payment Status</h3>
+                <h3 data-i18n="pay.statusTitle">Monthly Payment Status</h3>
                 <span id="paymentMonthRate"></span>
               </div>
               <div class="tenant-payment-list" id="tenantPaymentList"></div>
             </section>
             <section class="payment-section hidden" id="paymentSharedExpensesSection">
               <div class="panel-header">
-                <h3>Monthly Services Expenses Status</h3>
+                <h3 data-i18n="pay.servicesStatusTitle">Monthly Services Expenses Status</h3>
                 <span id="paymentSharedExpensesRate"></span>
               </div>
               <div class="progress-track hidden" id="paymentSharedExpensesProgress" aria-hidden="true">
@@ -212,7 +212,7 @@
 
             <section class="payment-section">
               <div class="panel-header">
-                <h3>Month History</h3>
+                <h3 data-i18n="pay.monthHistory">Month History</h3>
               </div>
               <div class="month-overview-list" id="monthOverviewList"></div>
             </section>
@@ -222,12 +222,12 @@
         <section class="view" id="tenantsView" aria-labelledby="tenantsTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Residents</p>
-              <h2 id="tenantsTitle">Tenant Accounts</h2>
+              <p class="eyebrow" data-i18n="ten.eyebrow">Residents</p>
+              <h2 id="tenantsTitle" data-i18n="ten.title">Tenant Accounts</h2>
             </div>
             <div class="section-actions">
-              <input id="tenantSearch" class="compact-input" type="search" placeholder="Search tenants or units" />
-              <button class="secondary-button owner-only" id="addTenantButton" type="button">+ Add</button>
+              <input id="tenantSearch" class="compact-input" type="search" placeholder="Search tenants or units" data-i18n-ph="ten.searchPh" />
+              <button class="secondary-button owner-only" id="addTenantButton" type="button" data-i18n="ten.add">+ Add</button>
             </div>
           </div>
           <div class="tenant-list" id="tenantList"></div>
@@ -236,27 +236,27 @@
         <section class="view" id="ledgerView" aria-labelledby="ledgerTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Transactions</p>
-              <h2 id="ledgerTitle">Ledger</h2>
+              <p class="eyebrow" data-i18n="led.eyebrow">Transactions</p>
+              <h2 id="ledgerTitle" data-i18n="led.title">Ledger</h2>
             </div>
             <div class="section-actions">
-              <button class="secondary-button owner-only" id="exportExcelButton" type="button">Export Excel</button>
-              <button class="secondary-button owner-only" id="exportButton" type="button">Export PDF</button>
+              <button class="secondary-button owner-only" id="exportExcelButton" type="button" data-i18n="led.exportExcel">Export Excel</button>
+              <button class="secondary-button owner-only" id="exportButton" type="button" data-i18n="led.exportPdf">Export PDF</button>
             </div>
           </div>
           <div class="filters">
-            <select id="categoryFilter" aria-label="Category filter"></select>
-            <select id="expenseCategoryFilter" class="hidden" aria-label="Expense category filter"></select>
-            <input id="ledgerSearch" type="search" placeholder="Search ledger" />
+            <select id="categoryFilter" aria-label="Category filter" data-i18n-aria="aria.categoryFilter"></select>
+            <select id="expenseCategoryFilter" class="hidden" aria-label="Expense category filter" data-i18n-aria="aria.expenseCategoryFilter"></select>
+            <input id="ledgerSearch" type="search" placeholder="Search ledger" data-i18n-ph="led.searchPh" />
             <div class="date-range-filter">
-              <input id="ledgerDateFrom" type="date" aria-label="From date" title="From date" />
+              <input id="ledgerDateFrom" type="date" aria-label="From date" title="From date" data-i18n-aria="aria.fromDate" data-i18n-title="aria.fromDate" />
               <span class="date-range-sep">–</span>
-              <input id="ledgerDateTo" type="date" aria-label="To date" title="To date" />
+              <input id="ledgerDateTo" type="date" aria-label="To date" title="To date" data-i18n-aria="aria.toDate" data-i18n-title="aria.toDate" />
             </div>
           </div>
           <div class="ledger-filter-status hidden" id="ledgerFilterStatus">
             <span id="ledgerCount"></span>
-            <button class="mini-button" id="clearLedgerFilters" type="button">Clear filters</button>
+            <button class="mini-button" id="clearLedgerFilters" type="button" data-i18n="led.clearFilters">Clear filters</button>
           </div>
           <div class="ledger-list" id="ledgerList"></div>
         </section>
@@ -264,10 +264,10 @@
         <section class="view" id="projectsView" aria-labelledby="projectsTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Building</p>
-              <h2 id="projectsTitle">Projects</h2>
+              <p class="eyebrow" data-i18n="proj.eyebrow">Building</p>
+              <h2 id="projectsTitle" data-i18n="proj.title">Projects</h2>
             </div>
-            <button class="primary-button owner-only" id="createProjectButton" type="button">+ New</button>
+            <button class="primary-button owner-only" id="createProjectButton" type="button" data-i18n="proj.new">+ New</button>
           </div>
           <div id="buildingProjectList"></div>
         </section>
@@ -275,22 +275,22 @@
         <section class="view" id="servicesView" aria-labelledby="servicesTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Building</p>
-              <h2 id="servicesTitle">Services</h2>
+              <p class="eyebrow" data-i18n="serv.eyebrow">Building</p>
+              <h2 id="servicesTitle" data-i18n="serv.title">Services</h2>
             </div>
-            <button class="primary-button owner-only" id="addGeneratorBillButton" type="button">Enter Meter Readings</button>
+            <button class="primary-button owner-only" id="addGeneratorBillButton" type="button" data-i18n="serv.enterReadings">Enter Meter Readings</button>
           </div>
-          <p class="settings-note" id="servicesIntro">Log generator (diesel/maintenance) and water tanker costs with the + button (Services Expenses). Generator: enter monthly meter readings here to split fuel by kWh and maintenance by breaker size. Water: split equally or by coefficient, billed straight away.</p>
+          <p class="settings-note" id="servicesIntro" data-i18n="serv.intro">Log generator (diesel/maintenance) and water tanker costs with the + button (Services Expenses). Generator: enter monthly meter readings here to split fuel by kWh and maintenance by breaker size. Water: split equally or by coefficient, billed straight away.</p>
           <div id="generatorBillList"></div>
         </section>
 
         <section class="view" id="pollsView" aria-labelledby="pollsTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Building</p>
-              <h2 id="pollsTitle">Polls</h2>
+              <p class="eyebrow" data-i18n="poll.eyebrow">Building</p>
+              <h2 id="pollsTitle" data-i18n="poll.title">Polls</h2>
             </div>
-            <button class="primary-button" id="createPollButton" type="button">+ New Poll</button>
+            <button class="primary-button" id="createPollButton" type="button" data-i18n="poll.new">+ New Poll</button>
           </div>
           <div id="pollList"></div>
         </section>
@@ -298,124 +298,132 @@
         <section class="view" id="settingsView" aria-labelledby="settingsTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow">Setup</p>
-              <h2 id="settingsTitle">Settings</h2>
+              <p class="eyebrow" data-i18n="set.eyebrow">Setup</p>
+              <h2 id="settingsTitle" data-i18n="set.title">Settings</h2>
             </div>
           </div>
           <section class="panel">
-            <p class="settings-section-header">Access Control</p>
+            <p class="settings-section-header" data-i18n="set.accessControl">Access Control</p>
             <label>
-              Owner password
+              <span data-i18n="set.ownerPassword">Owner password</span>
               <input id="ownerPasswordInput" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
             </label>
-            <button class="mini-button hidden" id="removeOwnerPasswordButton" type="button">Remove current password</button>
-            <p class="settings-note" style="margin:0 0 4px">Tenants use a PIN set per-tenant (in the Tenants tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.</p>
+            <button class="mini-button hidden" id="removeOwnerPasswordButton" type="button" data-i18n="set.removePassword">Remove current password</button>
+            <p class="settings-note" style="margin:0 0 4px" data-i18n="set.passwordNote">Tenants use a PIN set per-tenant (in the Tenants tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.</p>
 
-            <p class="settings-section-header">Building Details</p>
+            <p class="settings-section-header" data-i18n="set.buildingDetails">Building Details</p>
             <label>
-              Building name
+              <span data-i18n="set.buildingName">Building name</span>
               <input id="buildingNameInput" type="text" />
             </label>
             <label>
-              Collection mode
+              <span data-i18n="set.language">Language</span>
+              <select id="languageInput">
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="set.collectionMode">Collection mode</span>
               <select id="collectionModeInput">
-                <option value="actual">Split actual monthly expenses</option>
-                <option value="fixed">Fixed monthly amount + reserve fund</option>
+                <option value="actual" data-i18n="set.collectionActual">Split actual monthly expenses</option>
+                <option value="fixed" data-i18n="set.collectionFixed">Fixed monthly amount + reserve fund</option>
               </select>
             </label>
             <p class="settings-note" id="collectionModeNote"></p>
             <label id="monthlyBudgetField">
-              Total monthly building budget USD
+              <span data-i18n="set.monthlyBudget">Total monthly building budget USD</span>
               <input id="defaultDueInput" type="number" min="0" step="1" />
             </label>
             <p class="settings-note" id="coefficientStatus"></p>
 
-            <p class="settings-section-header">Currency &amp; Conversion</p>
+            <p class="settings-section-header" data-i18n="set.currency">Currency &amp; Conversion</p>
             <label>
-              LBP per USD conversion rate
+              <span data-i18n="set.lbpRate">LBP per USD conversion rate</span>
               <input id="conversionRateInput" type="number" min="1" step="1" />
             </label>
 
-            <p class="settings-section-header">Google Integration</p>
+            <p class="settings-section-header" data-i18n="set.google">Google Integration</p>
             <label>
-              Google Apps Script URL (Sheet sync)
+              <span data-i18n="set.appsScriptUrl">Google Apps Script URL (Sheet sync)</span>
               <input id="invoiceUploadUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
             </label>
             <label>
-              Google Sheet ID
+              <span data-i18n="set.sheetId">Google Sheet ID</span>
               <input id="cloudSpreadsheetIdInput" type="text" />
             </label>
             <label>
-              Google Drive invoice folder ID
+              <span data-i18n="set.driveFolderId">Google Drive invoice folder ID</span>
               <input id="invoiceUploadFolderIdInput" type="text" />
             </label>
             <label>
-              Sync secret (optional)
-              <input id="syncSecretInput" type="text" placeholder="Match the SYNC_SECRET set in Apps Script" />
+              <span data-i18n="set.syncSecret">Sync secret (optional)</span>
+              <input id="syncSecretInput" type="text" placeholder="Match the SYNC_SECRET set in Apps Script" data-i18n-ph="set.syncSecretPh" />
             </label>
             <div class="button-row">
-              <button class="primary-button" id="saveSettingsButton" type="button">Save</button>
+              <button class="primary-button" id="saveSettingsButton" type="button" data-i18n="common.save">Save</button>
             </div>
             <div class="settings-action" id="shareAccessAction">
-              <div class="settings-action-text"><strong>Share access with tenants</strong><span>Copy a code that lets a tenant's phone connect to this building. They paste it on their login screen.</span></div>
-              <button class="secondary-button" id="shareSyncCodeButton" type="button">Share</button>
+              <div class="settings-action-text"><strong data-i18n="set.shareAccessTitle">Share access with tenants</strong><span data-i18n="set.shareAccessDesc">Copy a code that lets a tenant's phone connect to this building. They paste it on their login screen.</span></div>
+              <button class="secondary-button" id="shareSyncCodeButton" type="button" data-i18n="common.share">Share</button>
             </div>
 
-            <p class="settings-section-header">Backup &amp; Restore</p>
+            <p class="settings-section-header" data-i18n="set.backup">Backup &amp; Restore</p>
             <div class="settings-action">
-              <div class="settings-action-text"><strong>Download backup</strong><span>Save all your data to a file on this device. Keep it somewhere safe.</span></div>
-              <button class="secondary-button" id="downloadBackupButton" type="button">Download</button>
+              <div class="settings-action-text"><strong data-i18n="set.downloadBackupTitle">Download backup</strong><span data-i18n="set.downloadBackupDesc">Save all your data to a file on this device. Keep it somewhere safe.</span></div>
+              <button class="secondary-button" id="downloadBackupButton" type="button" data-i18n="common.download">Download</button>
             </div>
             <div class="settings-action">
-              <div class="settings-action-text"><strong>Restore from a backup file</strong><span>Load data from a backup file you saved before. Replaces the data on this device — a safety copy is downloaded first.</span></div>
-              <button class="secondary-button" id="restoreBackupButton" type="button">Restore</button>
+              <div class="settings-action-text"><strong data-i18n="set.restoreTitle">Restore from a backup file</strong><span data-i18n="set.restoreDesc">Load data from a backup file you saved before. Replaces the data on this device — a safety copy is downloaded first.</span></div>
+              <button class="secondary-button" id="restoreBackupButton" type="button" data-i18n="common.restore">Restore</button>
             </div>
             <div class="settings-action" id="reloadSheetAction">
-              <div class="settings-action-text"><strong>Reload from Google Sheet</strong><span>Pull the latest copy from the cloud and replace this device's data. Use when setting up a new phone.</span></div>
-              <button class="secondary-button" id="loadCloudButton" type="button">Reload</button>
+              <div class="settings-action-text"><strong data-i18n="set.reloadSheetTitle">Reload from Google Sheet</strong><span data-i18n="set.reloadSheetDesc">Pull the latest copy from the cloud and replace this device's data. Use when setting up a new phone.</span></div>
+              <button class="secondary-button" id="loadCloudButton" type="button" data-i18n="common.reload">Reload</button>
             </div>
 
-            <p class="settings-section-header">Reset</p>
+            <p class="settings-section-header" data-i18n="set.reset">Reset</p>
             <div class="settings-action">
-              <div class="settings-action-text"><strong>Clear transactions</strong><span>Delete all payments and expenses but keep your tenants and settings — for example to start a new year.</span></div>
-              <button class="danger-button" id="zeroAccountsButton" type="button">Clear</button>
+              <div class="settings-action-text"><strong data-i18n="set.clearTxTitle">Clear transactions</strong><span data-i18n="set.clearTxDesc">Delete all payments and expenses but keep your tenants and settings — for example to start a new year.</span></div>
+              <button class="danger-button" id="zeroAccountsButton" type="button" data-i18n="common.clear">Clear</button>
             </div>
             <div class="settings-action">
-              <div class="settings-action-text"><strong>Erase everything</strong><span>Delete all tenants, payments, expenses and settings, then start setup from scratch. This cannot be undone.</span></div>
-              <button class="danger-button" id="startFreshButton" type="button">Erase</button>
+              <div class="settings-action-text"><strong data-i18n="set.eraseTitle">Erase everything</strong><span data-i18n="set.eraseDesc">Delete all tenants, payments, expenses and settings, then start setup from scratch. This cannot be undone.</span></div>
+              <button class="danger-button" id="startFreshButton" type="button" data-i18n="common.erase">Erase</button>
             </div>
 
-            <p class="settings-section-header">App Setup</p>
+            <p class="settings-section-header" data-i18n="set.appSetup">App Setup</p>
             <div class="settings-action">
-              <div class="settings-action-text"><strong>Setup wizard</strong><span>Re-run the guided setup for building details and tenants.</span></div>
-              <button class="secondary-button" id="runWizardButton" type="button">Open</button>
+              <div class="settings-action-text"><strong data-i18n="set.wizardTitle">Setup wizard</strong><span data-i18n="set.wizardDesc">Re-run the guided setup for building details and tenants.</span></div>
+              <button class="secondary-button" id="runWizardButton" type="button" data-i18n="common.open">Open</button>
             </div>
 
             <input id="restoreBackupInput" class="file-input-hidden" type="file" accept="application/json,.json" />
-            <p class="settings-note" id="cloudSyncStatus">Cloud sync is automatic after the script URL and Google Sheet ID are saved.</p>
+            <p class="settings-note" id="cloudSyncStatus" data-i18n="set.cloudNote">Cloud sync is automatic after the script URL and Google Sheet ID are saved.</p>
+            <p class="settings-note app-version-note">Building Account Tracker · <span id="appVersionLabel"></span></p>
           </section>
         </section>
       </main>
 
       <nav class="bottom-nav" aria-label="Primary">
-        <button class="nav-button active" type="button" data-view="dashboardView">Dashboard</button>
-        <button class="nav-button" type="button" data-view="paymentsView">Payments</button>
-        <button class="nav-button" type="button" data-view="tenantsView">Tenants</button>
-        <button class="nav-button" type="button" data-view="ledgerView">Ledger</button>
-        <button class="nav-button" id="moreNavButton" type="button" aria-haspopup="dialog">More</button>
+        <button class="nav-button active" type="button" data-view="dashboardView" data-i18n="nav.dashboard">Dashboard</button>
+        <button class="nav-button" type="button" data-view="paymentsView" data-i18n="nav.payments">Payments</button>
+        <button class="nav-button" type="button" data-view="tenantsView" data-i18n="nav.tenants">Tenants</button>
+        <button class="nav-button" type="button" data-view="ledgerView" data-i18n="nav.ledger">Ledger</button>
+        <button class="nav-button" id="moreNavButton" type="button" aria-haspopup="dialog" data-i18n="nav.more">More</button>
       </nav>
     </div>
 
     <dialog id="moreSheet" class="more-sheet" aria-label="More">
       <div class="more-sheet-header">
-        <span>More</span>
-        <button class="icon-button small" id="closeMoreSheet" type="button" aria-label="Close">x</button>
+        <span data-i18n="more.title">More</span>
+        <button class="icon-button small" id="closeMoreSheet" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
       <div class="more-sheet-list">
-        <button class="more-sheet-item" type="button" data-view="projectsView">Projects</button>
-        <button class="more-sheet-item" type="button" data-view="servicesView">Services</button>
-        <button class="more-sheet-item" type="button" data-view="pollsView">Polls</button>
-        <button class="more-sheet-item owner-only" type="button" data-view="settingsView">Settings</button>
+        <button class="more-sheet-item" type="button" data-view="projectsView" data-i18n="nav.projects">Projects</button>
+        <button class="more-sheet-item" type="button" data-view="servicesView" data-i18n="nav.services">Services</button>
+        <button class="more-sheet-item" type="button" data-view="pollsView" data-i18n="nav.polls">Polls</button>
+        <button class="more-sheet-item owner-only" type="button" data-view="settingsView" data-i18n="nav.settings">Settings</button>
       </div>
     </dialog>
 
@@ -423,25 +431,25 @@
 
     <dialog id="entryChooser" class="entry-chooser">
       <div class="dialog-header">
-        <h2>Add</h2>
-        <button class="icon-button small" id="closeEntryChooser" type="button" aria-label="Close">x</button>
+        <h2 data-i18n="entry.title">Add</h2>
+        <button class="icon-button small" id="closeEntryChooser" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
       <div class="entry-chooser-list">
         <button class="entry-chooser-btn" type="button" data-category="Payments">
           <span class="ec-icon" aria-hidden="true">&#128181;</span>
-          <span class="ec-text"><strong>Record a payment</strong><small>A tenant paid their dues</small></span>
+          <span class="ec-text"><strong data-i18n="entry.paymentTitle">Record a payment</strong><small data-i18n="entry.paymentDesc">A tenant paid their dues</small></span>
         </button>
         <button class="entry-chooser-btn" type="button" data-category="Expenses">
           <span class="ec-icon" aria-hidden="true">&#129534;</span>
-          <span class="ec-text"><strong>Record an expense</strong><small>A shared building cost</small></span>
+          <span class="ec-text"><strong data-i18n="entry.expenseTitle">Record an expense</strong><small data-i18n="entry.expenseDesc">A shared building cost</small></span>
         </button>
         <button class="entry-chooser-btn" type="button" data-category="Services Expenses">
           <span class="ec-icon" aria-hidden="true">&#9889;</span>
-          <span class="ec-text"><strong>Generator / Water cost</strong><small>Diesel, maintenance or a water tanker</small></span>
+          <span class="ec-text"><strong data-i18n="entry.servicesTitle">Generator / Water cost</strong><small data-i18n="entry.servicesDesc">Diesel, maintenance or a water tanker</small></span>
         </button>
         <button class="entry-chooser-btn" type="button" data-category="Opening Balance">
           <span class="ec-icon" aria-hidden="true">&#127974;</span>
-          <span class="ec-text"><strong>Opening balance</strong><small>Starting cash or a tenant carry-in</small></span>
+          <span class="ec-text"><strong data-i18n="entry.openingTitle">Opening balance</strong><small data-i18n="entry.openingDesc">Starting cash or a tenant carry-in</small></span>
         </button>
       </div>
     </dialog>
@@ -450,85 +458,85 @@
       <form id="transactionForm" method="dialog">
         <div class="dialog-header">
           <div class="dialog-header-left">
-            <button class="icon-button small hidden" id="transactionBackButton" type="button" aria-label="Back">&#8592;</button>
-            <h2 id="transactionDialogTitle">Add Transaction</h2>
+            <button class="icon-button small hidden" id="transactionBackButton" type="button" aria-label="Back" data-i18n-aria="aria.back">&#8592;</button>
+            <h2 id="transactionDialogTitle" data-i18n="tx.addTitle">Add Transaction</h2>
           </div>
-          <button class="icon-button small" id="closeDialogButton" type="button" aria-label="Close">x</button>
+          <button class="icon-button small" id="closeDialogButton" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
         </div>
 
         <label class="type-field">
-          Type
+          <span data-i18n="tx.type">Type</span>
           <select id="transactionCategory" required>
-            <option>Payments</option>
-            <option>Expenses</option>
-            <option>Services Expenses</option>
-            <option>Opening Balance</option>
+            <option value="Payments" data-i18n="opt.payments">Payments</option>
+            <option value="Expenses" data-i18n="opt.expenses">Expenses</option>
+            <option value="Services Expenses" data-i18n="opt.servicesExpenses">Services Expenses</option>
+            <option value="Opening Balance" data-i18n="opt.openingBalance">Opening Balance</option>
           </select>
         </label>
 
         <div class="two-col service-fields hidden">
           <label>
-            Service
+            <span data-i18n="tx.service">Service</span>
             <select id="transactionService">
-              <option value="generator">Generator</option>
-              <option value="water">Water</option>
+              <option value="generator" data-i18n="opt.generator">Generator</option>
+              <option value="water" data-i18n="opt.water">Water</option>
             </select>
           </label>
           <label class="service-part-wrap">
-            Cost type
+            <span data-i18n="tx.costType">Cost type</span>
             <select id="transactionServicePart">
-              <option value="fuel">Fuel / Diesel (consumption)</option>
-              <option value="maintenance">Maintenance</option>
+              <option value="fuel" data-i18n="opt.fuel">Fuel / Diesel (consumption)</option>
+              <option value="maintenance" data-i18n="opt.maintenance">Maintenance</option>
             </select>
           </label>
           <label class="service-split-wrap hidden">
-            Split
+            <span data-i18n="tx.split">Split</span>
             <select id="transactionServiceSplit">
-              <option value="equal">Equal split</option>
-              <option value="coefficient">By coefficient</option>
+              <option value="equal" data-i18n="opt.equalSplit">Equal split</option>
+              <option value="coefficient" data-i18n="opt.byCoefficient">By coefficient</option>
             </select>
           </label>
         </div>
 
         <label class="direction-field hidden">
-          Direction
+          <span data-i18n="tx.direction">Direction</span>
           <select id="transactionDirection">
-            <option value="credit">Received</option>
-            <option value="debit">Applied or paid out</option>
+            <option value="credit" data-i18n="opt.received">Received</option>
+            <option value="debit" data-i18n="opt.appliedPaidOut">Applied or paid out</option>
           </select>
         </label>
 
         <label class="tenant-field">
-          Tenant
+          <span data-i18n="tx.tenant">Tenant</span>
           <select id="transactionTenant"></select>
         </label>
 
         <label class="description-field">
-          Description
+          <span data-i18n="tx.description">Description</span>
           <input id="transactionDescription" type="text" />
         </label>
 
         <div class="two-col">
           <label>
-            Date
+            <span data-i18n="tx.date">Date</span>
             <input id="transactionDate" type="date" required />
           </label>
           <label class="month-field">
-            For month
+            <span data-i18n="tx.forMonth">For month</span>
             <input id="transactionMonth" type="month" />
           </label>
         </div>
 
         <div class="two-col amount-row">
           <label class="amount-value-field">
-            Amount
+            <span data-i18n="tx.amount">Amount</span>
             <input id="transactionAmount" type="number" min="0" step="0.01" />
           </label>
           <label class="amount-currency-field">
-            Currency
+            <span data-i18n="tx.currency">Currency</span>
             <select id="transactionCurrency">
-              <option value="USD">USD ($)</option>
-              <option value="LBP">LBP (LL)</option>
+              <option value="USD" data-i18n="opt.usd">USD ($)</option>
+              <option value="LBP" data-i18n="opt.lbp">LBP (LL)</option>
             </select>
           </label>
         </div>
@@ -536,76 +544,79 @@
 
         <div class="two-col extra-fields">
           <label class="supplier-field">
-            Supplier
+            <span data-i18n="tx.supplier">Supplier</span>
             <div class="supplier-combobox">
               <input
                 id="transactionSupplier"
                 type="text"
                 placeholder="Type supplier"
+                data-i18n-ph="tx.supplierPh"
                 autocomplete="off"
                 aria-controls="supplierDropdown"
                 aria-expanded="false"
               />
-              <button id="supplierDropdownButton" type="button" aria-label="Show saved suppliers">▼</button>
+              <button id="supplierDropdownButton" type="button" aria-label="Show saved suppliers" data-i18n-aria="aria.showSuppliers">▼</button>
               <div class="supplier-dropdown hidden" id="supplierDropdown" role="listbox"></div>
             </div>
           </label>
           <label>
-            Invoice Number
+            <span data-i18n="tx.invoiceNumber">Invoice Number</span>
             <input id="transactionInvoice" type="text" />
           </label>
         </div>
 
         <label class="expense-category-field hidden">
-          Expense Category
+          <span data-i18n="tx.expenseCategory">Expense Category</span>
           <div class="expense-category-combobox">
             <input
               id="transactionExpenseCategory"
               type="text"
               placeholder="Type category"
+              data-i18n-ph="tx.expenseCategoryPh"
               autocomplete="off"
               aria-controls="expenseCategoryDropdown"
               aria-expanded="false"
             />
-            <button id="expenseCategoryDropdownButton" type="button" aria-label="Show saved categories">▼</button>
+            <button id="expenseCategoryDropdownButton" type="button" aria-label="Show saved categories" data-i18n-aria="aria.showCategories">▼</button>
             <div class="supplier-dropdown hidden" id="expenseCategoryDropdown" role="listbox"></div>
           </div>
         </label>
 
         <label class="shared-expense-dist-field hidden">
-          Split Distribution
+          <span data-i18n="tx.splitDistribution">Split Distribution</span>
           <select id="transactionDistribution">
-            <option value="equal">Equal Split</option>
-            <option value="coefficient">By Coefficient (proportional)</option>
+            <option value="equal" data-i18n="opt.equalSplitProper">Equal Split</option>
+            <option value="coefficient" data-i18n="opt.byCoefficientProp">By Coefficient (proportional)</option>
           </select>
         </label>
         <div class="shared-expense-preview hidden" id="sharedExpenseInlinePreview"></div>
 
         <label>
-          Project
+          <span data-i18n="tx.project">Project</span>
           <div class="project-combobox">
             <input
               id="transactionProject"
               type="text"
               placeholder="Type project"
+              data-i18n-ph="tx.projectPh"
               autocomplete="off"
               aria-controls="projectDropdown"
               aria-expanded="false"
             />
-            <button id="projectDropdownButton" type="button" aria-label="Show saved projects">▼</button>
+            <button id="projectDropdownButton" type="button" aria-label="Show saved projects" data-i18n-aria="aria.showProjects">▼</button>
             <div class="supplier-dropdown hidden" id="projectDropdown" role="listbox"></div>
           </div>
         </label>
 
         <div class="invoice-file-field hidden">
-          <span class="field-label">Invoice picture</span>
+          <span class="field-label" data-i18n="tx.invoicePicture">Invoice picture</span>
           <div class="invoice-source-row">
-            <button class="secondary-button" id="takeInvoicePhotoButton" type="button">Use Camera</button>
-            <button class="secondary-button" id="uploadInvoicePhotoButton" type="button">Upload Photo</button>
+            <button class="secondary-button" id="takeInvoicePhotoButton" type="button" data-i18n="tx.useCamera">Use Camera</button>
+            <button class="secondary-button" id="uploadInvoicePhotoButton" type="button" data-i18n="tx.uploadPhoto">Upload Photo</button>
           </div>
           <input id="transactionInvoiceCameraFile" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
           <input id="transactionInvoiceFile" class="file-input-hidden" type="file" accept="image/*" />
-          <span class="file-selection-status" id="invoiceFileSelectionStatus">No photo selected</span>
+          <span class="file-selection-status" id="invoiceFileSelectionStatus" data-i18n="tx.noPhoto">No photo selected</span>
         </div>
         <div class="attachment-status hidden" id="invoiceAttachmentStatus"></div>
 
@@ -613,8 +624,8 @@
         <datalist id="projectList"></datalist>
 
         <div class="button-row">
-          <button class="primary-button" id="transactionSubmitButton" type="submit">Add</button>
-          <button class="secondary-button" id="cancelDialogButton" type="button">Cancel</button>
+          <button class="primary-button" id="transactionSubmitButton" type="submit" data-i18n="common.add">Add</button>
+          <button class="secondary-button" id="cancelDialogButton" type="button" data-i18n="common.cancel">Cancel</button>
         </div>
       </form>
     </dialog>
@@ -622,45 +633,45 @@
     <dialog id="tenantDialog">
       <form id="tenantForm" method="dialog">
         <div class="dialog-header">
-          <h2 id="tenantDialogTitle">Add Tenant</h2>
-          <button class="icon-button small" id="closeTenantDialog" type="button" aria-label="Close">x</button>
+          <h2 id="tenantDialogTitle" data-i18n="tenant.addTitle">Add Tenant</h2>
+          <button class="icon-button small" id="closeTenantDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
         </div>
         <label>
-          Name
-          <input id="tenantNameInput" type="text" required placeholder="e.g. John Smith" />
+          <span data-i18n="tenant.name">Name</span>
+          <input id="tenantNameInput" type="text" required placeholder="e.g. John Smith" data-i18n-ph="tenant.namePh" />
         </label>
         <label>
-          Unit number
-          <input id="tenantUnitInput" type="text" required placeholder="e.g. 01" />
+          <span data-i18n="tenant.unit">Unit number</span>
+          <input id="tenantUnitInput" type="text" required placeholder="e.g. 01" data-i18n-ph="tenant.unitPh" />
         </label>
         <label>
-          WhatsApp number
+          <span data-i18n="tenant.whatsapp">WhatsApp number</span>
           <input id="tenantPhoneDialogInput" type="tel" placeholder="+961 71 000 000" />
         </label>
         <label>
-          Coefficient (X / 1000)
-          <input id="tenantCoefficientInput" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" />
+          <span data-i18n="tenant.coefficient">Coefficient (X / 1000)</span>
+          <input id="tenantCoefficientInput" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" data-i18n-ph="tenant.coefficientPh" />
         </label>
         <label>
-          Generator breaker size (Amps)
-          <input id="tenantBreakerInput" type="number" min="0" step="1" placeholder="e.g. 20" />
+          <span data-i18n="tenant.breaker">Generator breaker size (Amps)</span>
+          <input id="tenantBreakerInput" type="number" min="0" step="1" placeholder="e.g. 20" data-i18n-ph="tenant.breakerPh" />
         </label>
         <label>
-          Tenant PIN (for app access)
-          <input id="tenantPinDialogInput" type="password" placeholder="Leave blank to disable tenant login" maxlength="20" autocomplete="new-password" />
+          <span data-i18n="tenant.pin">Tenant PIN (for app access)</span>
+          <input id="tenantPinDialogInput" type="password" placeholder="Leave blank to disable tenant login" data-i18n-ph="tenant.pinPh" maxlength="20" autocomplete="new-password" />
         </label>
-        <button class="mini-button hidden" id="removeTenantPinButton" type="button">Remove current PIN</button>
+        <button class="mini-button hidden" id="removeTenantPinButton" type="button" data-i18n="tenant.removePin">Remove current PIN</button>
         <div class="button-row">
-          <button class="primary-button" id="tenantSubmitButton" type="submit">Add</button>
-          <button class="secondary-button" id="cancelTenantButton" type="button">Cancel</button>
+          <button class="primary-button" id="tenantSubmitButton" type="submit" data-i18n="common.add">Add</button>
+          <button class="secondary-button" id="cancelTenantButton" type="button" data-i18n="common.cancel">Cancel</button>
         </div>
       </form>
     </dialog>
 
     <dialog id="whatsappDialog">
       <div class="dialog-header">
-        <h2 id="whatsappDialogTitle">Send Payment Reminders</h2>
-        <button class="icon-button small" id="closeWhatsappDialog" type="button" aria-label="Close">x</button>
+        <h2 id="whatsappDialogTitle" data-i18n="wa.title">Send Payment Reminders</h2>
+        <button class="icon-button small" id="closeWhatsappDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
       <p class="settings-note" id="whatsappDialogNote"></p>
       <div id="whatsappReminderList"></div>
@@ -669,20 +680,20 @@
     <dialog id="monthDialog">
       <form id="monthForm" method="dialog">
         <div class="dialog-header">
-          <h2>Add Month</h2>
-          <button class="icon-button small" id="closeMonthButton" type="button" aria-label="Close">x</button>
+          <h2 data-i18n="month.title">Add Month</h2>
+          <button class="icon-button small" id="closeMonthButton" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
         </div>
         <label>
-          Month
+          <span data-i18n="month.month">Month</span>
           <input id="newMonthInput" type="month" required />
         </label>
         <label>
-          Total Monthly Expected Building Budget USD
+          <span data-i18n="month.budget">Total Monthly Expected Building Budget USD</span>
           <input id="newMonthAmountInput" type="number" min="0" step="1" required />
         </label>
         <div class="button-row">
-          <button class="primary-button" type="submit">Add</button>
-          <button class="secondary-button" id="cancelMonthButton" type="button">Cancel</button>
+          <button class="primary-button" type="submit" data-i18n="common.add">Add</button>
+          <button class="secondary-button" id="cancelMonthButton" type="button" data-i18n="common.cancel">Cancel</button>
         </div>
       </form>
     </dialog>
@@ -690,20 +701,20 @@
     <dialog id="pollDialog">
       <form id="pollForm" method="dialog">
         <div class="dialog-header">
-          <h2 class="dialog-title">New Poll</h2>
-          <button type="button" id="closePollDialog" class="icon-button" aria-label="Close">&#x2715;</button>
+          <h2 class="dialog-title" data-i18n="poll.newTitle">New Poll</h2>
+          <button type="button" id="closePollDialog" class="icon-button" aria-label="Close" data-i18n-aria="common.close">&#x2715;</button>
         </div>
         <label class="field-label">
-          Question <span class="required">*</span>
-          <input id="pollTitleInput" type="text" placeholder="Should we...?" required />
+          <span data-i18n="poll.question">Question</span> <span class="required">*</span>
+          <input id="pollTitleInput" type="text" placeholder="Should we...?" data-i18n-ph="poll.questionPh" required />
         </label>
         <label class="field-label">
-          Description (optional)
-          <textarea id="pollDescInput" rows="3" placeholder="Add more details about this project..."></textarea>
+          <span data-i18n="poll.desc">Description (optional)</span>
+          <textarea id="pollDescInput" rows="3" placeholder="Add more details about this project..." data-i18n-ph="poll.descPh"></textarea>
         </label>
         <div class="dialog-footer">
-          <button type="button" id="cancelPollButton" class="secondary-button">Cancel</button>
-          <button type="submit" id="pollSubmitButton" class="primary-button">Create Poll</button>
+          <button type="button" id="cancelPollButton" class="secondary-button" data-i18n="common.cancel">Cancel</button>
+          <button type="submit" id="pollSubmitButton" class="primary-button" data-i18n="poll.create">Create Poll</button>
         </div>
       </form>
     </dialog>
@@ -717,86 +728,93 @@
 
       <div class="wizard-step" id="wizardStep1">
         <div class="wizard-hero">&#127970;</div>
-        <h2 class="wizard-title">Welcome to Building Account Tracker</h2>
-        <p class="wizard-subtitle">Let's quickly set up your building. You can update these details any time in Settings.</p>
+        <h2 class="wizard-title" data-i18n="wiz.welcomeTitle">Welcome to Building Account Tracker</h2>
+        <p class="wizard-subtitle" data-i18n="wiz.welcomeSub">Let's quickly set up your building. You can update these details any time in Settings.</p>
         <label class="wizard-field">
-          Building Name
-          <input id="wizardBuildingName" class="wizard-input" type="text" placeholder="e.g. Naccache 1727" />
+          <span data-i18n="wiz.language">Language</span>
+          <select id="wizardLanguage" class="wizard-input">
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+          </select>
         </label>
         <label class="wizard-field">
-          Owner Password <span class="wizard-opt">(optional)</span>
-          <input id="wizardOwnerPassword" class="wizard-input" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
+          <span data-i18n="wiz.buildingName">Building Name</span>
+          <input id="wizardBuildingName" class="wizard-input" type="text" placeholder="e.g. Naccache 1727" data-i18n-ph="wiz.buildingNamePh" />
+        </label>
+        <label class="wizard-field">
+          <span data-i18n="wiz.ownerPassword">Owner Password</span> <span class="wizard-opt" data-i18n="wiz.optional">(optional)</span>
+          <input id="wizardOwnerPassword" class="wizard-input" type="password" placeholder="Leave blank for no password" data-i18n-ph="set.ownerPasswordPh" autocomplete="new-password" />
         </label>
         <div class="wizard-footer wizard-footer-right">
-          <button id="wizardStep1Next" class="primary-button" type="button">Next &#8594;</button>
+          <button id="wizardStep1Next" class="primary-button" type="button" data-i18n="common.next">Next &#8594;</button>
         </div>
       </div>
 
       <div class="wizard-step hidden" id="wizardStep2">
         <div class="wizard-hero">&#128176;</div>
-        <h2 class="wizard-title">Financial Settings</h2>
-        <p class="wizard-subtitle">Choose how the building collects money and set the LBP/USD exchange rate.</p>
+        <h2 class="wizard-title" data-i18n="wiz.financialTitle">Financial Settings</h2>
+        <p class="wizard-subtitle" data-i18n="wiz.financialSub">Choose how the building collects money and set the LBP/USD exchange rate.</p>
         <label class="wizard-field">
-          Collection Mode
+          <span data-i18n="wiz.collectionMode">Collection Mode</span>
           <select id="wizardCollectionMode" class="wizard-input">
-            <option value="actual">Split actual monthly expenses among tenants</option>
-            <option value="fixed">Fixed monthly amount + reserve fund</option>
+            <option value="actual" data-i18n="wiz.collectionActual">Split actual monthly expenses among tenants</option>
+            <option value="fixed" data-i18n="set.collectionFixed">Fixed monthly amount + reserve fund</option>
           </select>
         </label>
         <p class="wizard-coeff-status" id="wizardCollectionModeNote"></p>
         <label class="wizard-field" id="wizardBudgetField">
-          Total Monthly Expected Building Budget (USD)
+          <span data-i18n="wiz.monthlyBudget">Total Monthly Expected Building Budget (USD)</span>
           <input id="wizardMonthlyBudget" class="wizard-input" type="number" min="0" step="1" placeholder="e.g. 1500" />
         </label>
         <label class="wizard-field">
-          LBP per USD Rate
+          <span data-i18n="wiz.lbpRate">LBP per USD Rate</span>
           <input id="wizardLbpRate" class="wizard-input" type="number" min="1" step="1" placeholder="e.g. 89500" />
         </label>
         <div class="wizard-footer">
-          <button id="wizardStep2Prev" class="secondary-button" type="button">&#8592; Back</button>
-          <button id="wizardStep2Next" class="primary-button" type="button">Next &#8594;</button>
+          <button id="wizardStep2Prev" class="secondary-button" type="button" data-i18n="common.back">&#8592; Back</button>
+          <button id="wizardStep2Next" class="primary-button" type="button" data-i18n="common.next">Next &#8594;</button>
         </div>
       </div>
 
       <div class="wizard-step hidden" id="wizardStep3">
         <div class="wizard-hero">&#128101;</div>
-        <h2 class="wizard-title">Add Tenants</h2>
-        <p class="wizard-subtitle">Add your building's tenants. You can add or edit more at any time in the Tenants tab.</p>
+        <h2 class="wizard-title" data-i18n="wiz.tenantsTitle">Add Tenants</h2>
+        <p class="wizard-subtitle" data-i18n="wiz.tenantsSub">Add your building's tenants. You can add or edit more at any time in the Tenants tab.</p>
         <div id="wizardTenantList" class="wizard-tenant-list"></div>
         <div class="wizard-tenant-form">
           <div class="wizard-two-col">
             <label class="wizard-field">
-              Name
-              <input id="wizardTenantName" class="wizard-input" type="text" placeholder="Full name" />
+              <span data-i18n="wiz.name">Name</span>
+              <input id="wizardTenantName" class="wizard-input" type="text" placeholder="Full name" data-i18n-ph="wiz.namePh" />
             </label>
             <label class="wizard-field">
-              Unit
-              <input id="wizardTenantUnit" class="wizard-input" type="text" placeholder="e.g. 3B" />
+              <span data-i18n="wiz.unit">Unit</span>
+              <input id="wizardTenantUnit" class="wizard-input" type="text" placeholder="e.g. 3B" data-i18n-ph="wiz.unitPh" />
             </label>
           </div>
           <div class="wizard-two-col">
             <label class="wizard-field">
-              WhatsApp Number
+              <span data-i18n="wiz.whatsapp">WhatsApp Number</span>
               <input id="wizardTenantPhone" class="wizard-input" type="tel" placeholder="+961 71 000 000" />
             </label>
             <label class="wizard-field">
-              PIN (app access)
-              <input id="wizardTenantPin" class="wizard-input" type="password" placeholder="4 digits" maxlength="20" autocomplete="new-password" />
+              <span data-i18n="wiz.pin">PIN (app access)</span>
+              <input id="wizardTenantPin" class="wizard-input" type="password" placeholder="4 digits" data-i18n-ph="wiz.pinPh" maxlength="20" autocomplete="new-password" />
             </label>
           </div>
           <label class="wizard-field">
-            Coefficient (X / 1000)
+            <span data-i18n="wiz.coefficient">Coefficient (X / 1000)</span>
             <input id="wizardTenantCoeff" class="wizard-input" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" />
           </label>
           <div class="wizard-add-row">
-            <button id="wizardAddTenantBtn" class="secondary-button" type="button">+ Add Tenant</button>
-            <button id="wizardCancelEditBtn" class="text-link-btn hidden" type="button">Cancel Edit</button>
+            <button id="wizardAddTenantBtn" class="secondary-button" type="button" data-i18n="wiz.addTenant">+ Add Tenant</button>
+            <button id="wizardCancelEditBtn" class="text-link-btn hidden" type="button" data-i18n="wiz.cancelEdit">Cancel Edit</button>
           </div>
           <p id="wizardCoeffStatus" class="wizard-coeff-status"></p>
         </div>
         <div class="wizard-footer">
-          <button id="wizardStep3Prev" class="secondary-button" type="button">&#8592; Back</button>
-          <button id="wizardFinishBtn" class="primary-button" type="button">&#10003; Finish Setup</button>
+          <button id="wizardStep3Prev" class="secondary-button" type="button" data-i18n="common.back">&#8592; Back</button>
+          <button id="wizardFinishBtn" class="primary-button" type="button" data-i18n="wiz.finish">&#10003; Finish Setup</button>
         </div>
       </div>
     </dialog>
@@ -804,36 +822,36 @@
     <dialog id="projectDialog">
       <form id="projectForm" method="dialog">
         <div class="dialog-header">
-          <h2>New Project</h2>
-          <button class="icon-button small" id="closeProjectDialog" type="button" aria-label="Close">x</button>
+          <h2 data-i18n="projd.newTitle">New Project</h2>
+          <button class="icon-button small" id="closeProjectDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
         </div>
         <label>
-          Project Name
-          <input id="projectNameInput" type="text" required placeholder="e.g. Generator Replacement" />
+          <span data-i18n="projd.name">Project Name</span>
+          <input id="projectNameInput" type="text" required placeholder="e.g. Generator Replacement" data-i18n-ph="projd.namePh" />
         </label>
         <label>
-          Description <span style="font-weight:400;font-size:0.8rem">(optional)</span>
-          <input id="projectDescInput" type="text" placeholder="Brief description" />
+          <span data-i18n="projd.desc">Description</span> <span style="font-weight:400;font-size:0.8rem" data-i18n="wiz.optional">(optional)</span>
+          <input id="projectDescInput" type="text" placeholder="Brief description" data-i18n-ph="projd.descPh" />
         </label>
         <label>
-          Total Budget (USD)
+          <span data-i18n="projd.budget">Total Budget (USD)</span>
           <input id="projectBudgetInput" type="number" min="0" step="1" required placeholder="0" />
         </label>
         <label>
-          Payment Due Date
+          <span data-i18n="projd.dueDate">Payment Due Date</span>
           <input id="projectDueDateInput" type="date" required />
         </label>
         <label>
-          Split Distribution
+          <span data-i18n="tx.splitDistribution">Split Distribution</span>
           <select id="projectDistributionInput">
-            <option value="equal">Equal Split</option>
-            <option value="coefficient">By Coefficient (proportional)</option>
+            <option value="equal" data-i18n="opt.equalSplitProper">Equal Split</option>
+            <option value="coefficient" data-i18n="opt.byCoefficientProp">By Coefficient (proportional)</option>
           </select>
         </label>
         <div class="shared-expense-preview hidden" id="projectSharePreview"></div>
         <div class="button-row">
-          <button class="primary-button" id="projectSubmitButton" type="submit">Create Project</button>
-          <button class="secondary-button" id="cancelProjectButton" type="button">Cancel</button>
+          <button class="primary-button" id="projectSubmitButton" type="submit" data-i18n="projd.create">Create Project</button>
+          <button class="secondary-button" id="cancelProjectButton" type="button" data-i18n="common.cancel">Cancel</button>
         </div>
       </form>
     </dialog>
@@ -841,21 +859,21 @@
     <dialog id="generatorBillDialog">
       <form id="generatorBillForm" method="dialog">
         <div class="dialog-header">
-          <h2 id="generatorBillDialogTitle">Generator Meter Readings</h2>
-          <button class="icon-button small" id="closeGeneratorBillDialog" type="button" aria-label="Close">x</button>
+          <h2 id="generatorBillDialogTitle" data-i18n="gen.title">Generator Meter Readings</h2>
+          <button class="icon-button small" id="closeGeneratorBillDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
         </div>
         <label>
-          Month
+          <span data-i18n="gen.month">Month</span>
           <input id="generatorBillMonth" type="month" required />
         </label>
         <p class="settings-note" id="generatorPoolsSummary"></p>
-        <p class="settings-note">Costs come from the Services Expenses you logged for this month. Fuel is split by each tenant's metered kWh (current − previous); maintenance is split pro-rata by breaker size.</p>
-        <div class="field-label">Meter readings (kWh)</div>
+        <p class="settings-note" data-i18n="gen.note">Costs come from the Services Expenses you logged for this month. Fuel is split by each tenant's metered kWh (current − previous); maintenance is split pro-rata by breaker size.</p>
+        <div class="field-label" data-i18n="gen.readings">Meter readings (kWh)</div>
         <div id="generatorReadingRows" class="generator-reading-rows"></div>
         <div class="shared-expense-preview hidden" id="generatorBillPreview"></div>
         <div class="button-row">
-          <button class="primary-button" id="generatorBillSubmitButton" type="submit">Save Readings</button>
-          <button class="secondary-button" id="cancelGeneratorBillButton" type="button">Cancel</button>
+          <button class="primary-button" id="generatorBillSubmitButton" type="submit" data-i18n="gen.save">Save Readings</button>
+          <button class="secondary-button" id="cancelGeneratorBillButton" type="button" data-i18n="common.cancel">Cancel</button>
         </div>
       </form>
     </dialog>

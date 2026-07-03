@@ -48,7 +48,7 @@ button {
   justify-content: space-between;
   gap: 16px;
   max-width: 1180px;
-  margin: 0 auto 18px;
+  margin: 0 auto 12px;
 }
 
 .brand-lockup {
@@ -115,7 +115,7 @@ main {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .section-actions {
@@ -279,9 +279,9 @@ label select {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  padding: 14px;
+  padding: 12px 14px;
   box-shadow: var(--shadow);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .panel-header {

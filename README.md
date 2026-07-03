@@ -18,6 +18,7 @@ A mobile-first progressive web app for managing a residential building's finance
 - **Building projects** with per-tenant shares and collection tracking; **polls** with voting.
 - **Ledger** with category/expense-category/text/date filters; Excel and multi-page PDF export.
 - **Tenant statements** (multi-page PDF) and payment receipts.
+- **Bilingual (English / Arabic)** with full right-to-left layout; pick the language in the setup wizard or Settings and the whole UI — including WhatsApp reminder messages — switches instantly.
 - **Single amount field + USD/LBP currency toggle**; all figures reconciled to USD.
 - **Backup & restore:** one-tap JSON backup/restore on the device, plus Google Sheet cloud sync with multi-device conflict merging and a header sync-status indicator.
 - **Access control:** owner password and tenant PINs stored as salted hashes; tenants onboard a new device by pasting an access code.
@@ -42,7 +43,7 @@ Open it from the home-screen icon afterwards.
 
 ## First-time setup
 
-On first launch the **Setup wizard** collects the building name, owner password, collection mode, monthly budget / LBP rate, and tenants (with coefficient, breaker size, phone, and PIN). You can re-run it any time from **Settings → App Setup → Setup wizard**.
+On first launch the **Setup wizard** collects the language (English/Arabic), building name, owner password, collection mode, monthly budget / LBP rate, and tenants (with coefficient, breaker size, phone, and PIN). You can re-run it any time from **Settings → App Setup → Setup wizard**, and change the language any time in **Settings → Building Details → Language**.
 
 ## Google Sheet cloud sync (optional)
 
@@ -74,5 +75,5 @@ Workspace Shared Drives can instead use `GOOGLE_SERVICE_ACCOUNT_EMAIL` + `GOOGLE
 ## Notes for maintainers
 
 - `data/seed.json` is an intentionally empty factory-reset template (no real data or credentials).
-- Bump the version in three places when releasing: `APP_VERSION` (`src/app.js`), the `<h1>` (`index.html`), and `CACHE_NAME` (`sw.js`).
+- Bump the version in two places when releasing: `APP_VERSION` (`src/app.js`, shown in Settings) and `CACHE_NAME` (`sw.js`).
 - See `CLAUDE.md` for architecture, state schema, and conventions.
