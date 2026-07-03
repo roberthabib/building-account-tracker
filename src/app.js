@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v128";
+const APP_VERSION = "v129";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -250,6 +250,7 @@ const els = {
   transactionServiceSplit: document.querySelector("#transactionServiceSplit"),
   generatorBillPreview: document.querySelector("#generatorBillPreview"),
   generatorBillSubmitButton: document.querySelector("#generatorBillSubmitButton"),
+  deleteGeneratorReadingsButton: document.querySelector("#deleteGeneratorReadingsButton"),
 };
 
 let seedState;
@@ -569,6 +570,7 @@ const I18N = {
     "gen.month": "Month",
     "gen.note": "Costs come from the Services Expenses you logged for this month. Fuel is split by each tenant's metered kWh (current − previous); maintenance is split pro-rata by breaker size.",
     "gen.readings": "Meter readings (kWh)",
+    "gen.removeReadings": "Remove meter readings",
     "gen.save": "Save Readings",
   },
   ar: {
@@ -846,6 +848,7 @@ const I18N = {
     "gen.month": "الشهر",
     "gen.note": "تأتي الكلفة من مصاريف الخدمات التي سجّلتها لهذا الشهر. يُقسّم الوقود حسب كيلوواط كل مستأجر (الحالي − السابق)؛ وتُقسّم الصيانة تناسبياً حسب حجم القاطع.",
     "gen.readings": "قراءات العداد (ك.و.س)",
+    "gen.removeReadings": "إزالة قراءات العداد",
     "gen.save": "حفظ القراءات",
   },
 };
@@ -1994,10 +1997,11 @@ function renderProjects() {
         collectBtn.textContent = tr("Collect");
         const deleteBtn = document.createElement("button");
         deleteBtn.type = "button";
-        deleteBtn.className = "icon-button small delete-project-btn";
+        deleteBtn.className = "tenant-trash-btn delete-project-btn";
         deleteBtn.dataset.projectId = project.id;
         deleteBtn.title = tr("Delete project");
-        deleteBtn.textContent = "×";
+        deleteBtn.setAttribute("aria-label", tr("Delete project"));
+        deleteBtn.textContent = "\u{1F5D1}";
         actions.append(collectBtn, deleteBtn);
       }
       header.append(info, actions);
@@ -2208,12 +2212,22 @@ function openGeneratorReadingsDialog(month) {
   els.generatorBillMonth.value = m;
   buildGeneratorReadingRows(monthIso(m));
   updateGeneratorReadingsPreview();
+  updateGeneratorDeleteVisibility();
   openDialog(els.generatorBillDialog);
 }
 
 function refreshGeneratorReadingRowsForMonth() {
   buildGeneratorReadingRows(monthIso(els.generatorBillMonth.value));
   updateGeneratorReadingsPreview();
+  updateGeneratorDeleteVisibility();
+}
+
+// The "Remove meter readings" button only appears when the selected month
+// already has saved readings to remove.
+function updateGeneratorDeleteVisibility() {
+  const month = monthIso(els.generatorBillMonth.value);
+  const hasReadings = Boolean(month && getServiceReadingRecord("generator", month));
+  els.deleteGeneratorReadingsButton.classList.toggle("hidden", !hasReadings);
 }
 
 function submitGeneratorReadings(event) {
@@ -2245,14 +2259,15 @@ function submitGeneratorReadings(event) {
 }
 
 function deleteServiceReadings(serviceType, month) {
-  if (sessionMode !== "owner") return;
-  if (!window.confirm(tr("Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.", { month: formatMonth(month) }))) return;
+  if (sessionMode !== "owner") return false;
+  if (!window.confirm(tr("Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.", { month: formatMonth(month) }))) return false;
   state.serviceReadings = (state.serviceReadings || []).filter(
     (r) => !(r.serviceType === serviceType && monthKey(r.forMonth) === monthKey(month)),
   );
   saveState();
   renderAll();
   showToast("Meter readings removed");
+  return true;
 }
 
 function computeWaterDistribution(month) {
@@ -2320,15 +2335,8 @@ function buildGeneratorCard(month, tenantsById) {
     readBtn.dataset.month = month;
     readBtn.textContent = dist.distributed ? tr("Update Readings") : tr("Enter Readings");
     actions.append(readBtn);
-    if (dist.distributed) {
-      const delBtn = document.createElement("button");
-      delBtn.type = "button";
-      delBtn.className = "icon-button small delete-readings-btn";
-      delBtn.dataset.month = month;
-      delBtn.title = tr("Remove meter readings");
-      delBtn.textContent = "×";
-      actions.append(delBtn);
-    }
+    // Removing readings is destructive — it lives inside the readings dialog
+    // now, not as a one-tap × on the card.
     header.append(actions);
   }
   if (!dist.distributed) {
@@ -7225,7 +7233,13 @@ function attachEvents() {
     const deleteButton = event.target.closest(".delete-transaction-button[data-transaction-id]");
     if (deleteButton) { deleteLedgerTransaction(deleteButton.dataset.transactionId); return; }
     const textArea = event.target.closest(".ledger-text");
-    if (textArea) textArea.querySelector(".ledger-expand")?.classList.toggle("is-open");
+    if (textArea) {
+      // Tap the row text to expand details; Delete is only revealed while open
+      // so it's never one accidental tap away.
+      const item = textArea.closest(".ledger-item");
+      const open = item.classList.toggle("is-open");
+      textArea.querySelector(".ledger-expand")?.classList.toggle("is-open", open);
+    }
   });
   els.exportExcelButton.addEventListener("click", handleLedgerExcelExport);
   els.exportButton.addEventListener("click", handleLedgerPdfExport);
@@ -7529,11 +7543,13 @@ function attachEvents() {
   els.generatorBillForm.addEventListener("submit", submitGeneratorReadings);
   els.generatorBillMonth.addEventListener("change", refreshGeneratorReadingRowsForMonth);
   els.generatorReadingRows.addEventListener("input", updateGeneratorReadingsPreview);
+  els.deleteGeneratorReadingsButton.addEventListener("click", () => {
+    const month = monthIso(els.generatorBillMonth.value);
+    if (month && deleteServiceReadings("generator", month)) closeDialog(els.generatorBillDialog);
+  });
   els.generatorBillList.addEventListener("click", (e) => {
     const readBtn = e.target.closest(".enter-readings-btn[data-month]");
     if (readBtn) { openGeneratorReadingsDialog(readBtn.dataset.month); return; }
-    const delBtn = e.target.closest(".delete-readings-btn[data-month]");
-    if (delBtn) { deleteServiceReadings("generator", delBtn.dataset.month); return; }
   });
 
   els.loginOwnerTab.addEventListener("click", () => {

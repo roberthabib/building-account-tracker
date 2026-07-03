@@ -828,6 +828,26 @@ label select {
   background: rgba(255, 255, 255, 0.85);
 }
 
+/* Delete is destructive: hidden until the row is expanded (tap the row text). */
+.ledger-item .delete-transaction-button {
+  display: none;
+}
+
+.ledger-item.is-open .delete-transaction-button {
+  display: inline-flex;
+}
+
+.ledger-text {
+  cursor: pointer;
+}
+
+/* Subtle red variant of .mini-button for in-dialog destructive actions. */
+.mini-button.danger-mini {
+  color: #772c2c;
+  border-color: #e7bcbc;
+  align-self: flex-start;
+}
+
 .ledger-card-body {
   display: flex;
   justify-content: space-between;
