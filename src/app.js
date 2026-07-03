@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v127";
+const APP_VERSION = "v128";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -1027,6 +1027,7 @@ const DYN_AR = {
   "Your Balance": "رصيدك",
   "Advance credit": "رصيد مقدّم",
   "{amount} due": "{amount} مستحق",
+  "{amount} due (incl. {proj} project)": "{amount} مستحق (منها {proj} للمشاريع)",
   "{amount} credit": "{amount} رصيد دائن",
   "Expected": "المتوقع",
   "Collected": "المحصّل",
@@ -3481,8 +3482,13 @@ function renderExpenseCategoryBreakdown() {
   const monthExpenses = state.transactions.filter(
     (t) => t.category === "Expenses" && monthKey(t.date || t.forMonth || "") === monthKey(selectedMonth),
   );
+  // Generator/water costs are part of the month's spend too — include them as
+  // one line so this panel's total matches Monthly Activity above it.
+  const monthServices = state.transactions.filter(
+    (t) => t.category === "Services Expenses" && t.serviceType && monthKey(t.date || t.forMonth || "") === monthKey(selectedMonth),
+  );
 
-  if (!monthExpenses.length) {
+  if (!monthExpenses.length && !monthServices.length) {
     els.expenseByCategoryPanel.classList.add("hidden");
     return;
   }
@@ -3495,6 +3501,8 @@ function renderExpenseCategoryBreakdown() {
     const cat = t.expenseCategory || "Uncategorized";
     categoryMap.set(cat, (categoryMap.get(cat) || 0) + toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0)));
   });
+  const servicesTotal = monthServices.reduce((s, t) => s + toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0)), 0);
+  if (servicesTotal > 0.005) categoryMap.set("Generator & Water", (categoryMap.get("Generator & Water") || 0) + servicesTotal);
 
   const rows = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
   const total = rows.reduce((sum, [, amount]) => sum + amount, 0);
@@ -3734,17 +3742,30 @@ function renderPaymentsFixed() {
 
 function renderPaymentsActual() {
   const activeTenants = state.tenants.filter((t) => t.active !== false);
-  const balanceData = activeTenants.map((tenant) => ({
-    tenant,
-    balance: getTenantBalance(tenant.id),
-    expenseShare: getTenantExpenseShare(tenant.id),
-    payments: getTenantPaymentsTotal(tenant.id),
-  }));
+  // One consistent basis everywhere: "charged" is everything billed to the
+  // tenant (expense share + generator/water + opening carry-in), so
+  // charged − payments = balance. "totalDue" adds project shares, matching the
+  // Tenants cards (getTenantTotals) and the dashboard Outstanding KPI.
+  const balanceData = activeTenants.map((tenant) => {
+    const balance = getTenantBalance(tenant.id);
+    const payments = getTenantPaymentsTotal(tenant.id);
+    const projectsDue = getTenantProjectOutstanding(tenant.id);
+    return {
+      tenant,
+      balance,
+      payments,
+      projectsDue,
+      charged: roundUsd(balance + payments),
+      totalDue: roundUsd(Math.max(0, balance) + projectsDue),
+    };
+  });
 
-  const totalOutstanding = roundUsd(balanceData.reduce((s, d) => s + Math.max(0, d.balance), 0));
+  const totalOutstanding = roundUsd(balanceData.reduce((s, d) => s + d.totalDue, 0));
   const totalCollected = roundUsd(balanceData.reduce((s, d) => s + d.payments, 0));
-  const totalExpenses = roundUsd(balanceData.reduce((s, d) => s + d.expenseShare, 0));
-  const settledCount = balanceData.filter((d) => d.balance <= 0.005).length;
+  const totalExpenses = roundUsd(
+    balanceData.reduce((s, d) => s + getTenantDueBasisTotal(d.tenant.id) + getTenantServicesDue(d.tenant.id), 0),
+  );
+  const settledCount = balanceData.filter((d) => d.totalDue <= 0.005).length;
 
   els.paymentMonthRate.textContent = tr("{n}/{m} settled", { n: settledCount, m: activeTenants.length });
   els.paymentPaidCount.textContent = tr("{n}/{m} settled", { n: settledCount, m: activeTenants.length });
@@ -3762,17 +3783,21 @@ function renderPaymentsActual() {
   );
 
   els.dueOnlyToggle.classList.toggle("is-active", dueOnlyFilter);
-  const visibleData = dueOnlyFilter ? balanceData.filter((d) => d.balance > 0.005) : balanceData;
+  const visibleData = dueOnlyFilter ? balanceData.filter((d) => d.totalDue > 0.005) : balanceData;
 
   els.tenantPaymentList.replaceChildren(
-    ...visibleData.map(({ tenant, balance, expenseShare, payments }) => {
+    ...visibleData.map(({ tenant, balance, payments, projectsDue, charged, totalDue }) => {
       const due = Math.max(0, balance);
-      const statusClass = balance > 0.005 ? "due" : "paid";
-      const statusLabel = balance > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
-      const detail = due > 0 ? tr("{amount} due", { amount: formatUsd(due) }) : balance < -0.005 ? tr("{amount} credit", { amount: formatUsd(-balance) }) : tr("Settled");
+      const statusClass = totalDue > 0.005 ? "due" : "paid";
+      const statusLabel = totalDue > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
+      const detail = totalDue > 0.005
+        ? (projectsDue > 0.005
+            ? tr("{amount} due (incl. {proj} project)", { amount: formatUsd(totalDue), proj: formatUsd(projectsDue) })
+            : tr("{amount} due", { amount: formatUsd(totalDue) }))
+        : balance < -0.005 ? tr("{amount} credit", { amount: formatUsd(-balance) }) : tr("Settled");
       const row = buildTenantPaymentRowBase(
         tenant,
-        tr("{paid} paid of {share}", { paid: formatUsd(payments), share: formatUsd(expenseShare) }),
+        tr("{paid} paid of {share}", { paid: formatUsd(payments), share: formatUsd(charged) }),
         statusLabel,
         statusClass,
         detail,
