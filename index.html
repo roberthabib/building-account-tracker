@@ -249,9 +249,12 @@
             <select id="expenseCategoryFilter" class="hidden" aria-label="Expense category filter" data-i18n-aria="aria.expenseCategoryFilter"></select>
             <input id="ledgerSearch" type="search" placeholder="Search ledger" data-i18n-ph="led.searchPh" />
             <div class="date-range-filter">
-              <input id="ledgerDateFrom" type="date" aria-label="From date" title="From date" data-i18n-aria="aria.fromDate" data-i18n-title="aria.fromDate" />
-              <span class="date-range-sep">–</span>
-              <input id="ledgerDateTo" type="date" aria-label="To date" title="To date" data-i18n-aria="aria.toDate" data-i18n-title="aria.toDate" />
+              <button class="mini-button date-filter-toggle" id="toggleDateFilter" type="button" aria-expanded="false" data-i18n="led.dates">&#128197; Dates</button>
+              <span class="date-range-inputs hidden" id="dateRangeInputs">
+                <input id="ledgerDateFrom" type="date" aria-label="From date" title="From date" data-i18n-aria="aria.fromDate" data-i18n-title="aria.fromDate" />
+                <span class="date-range-sep">–</span>
+                <input id="ledgerDateTo" type="date" aria-label="To date" title="To date" data-i18n-aria="aria.toDate" data-i18n-title="aria.toDate" />
+              </span>
             </div>
           </div>
           <div class="ledger-filter-status hidden" id="ledgerFilterStatus">

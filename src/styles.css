@@ -475,9 +475,10 @@ label select {
 .payment-summary-card strong {
   display: block;
   margin-top: 6px;
-  font-size: 1.15rem;
+  font-size: clamp(0.9rem, 4.2vw, 1.15rem);
   line-height: 1.1;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .summary-paid-badge {
@@ -550,12 +551,41 @@ label select {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Compact WhatsApp / add-phone action inside the payment row status line. */
+.tpr-wa-btn {
+  min-height: 30px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.tpr-status-row .tpr-add-btn,
+.tpr-status-row .tpr-wa-btn {
+  flex-shrink: 0;
+}
+
+/* Status detail sits on its own line so long breakdowns never squeeze. */
+.tpr-detail {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
+.tpr-detail:empty {
+  display: none;
 }
 
 .tpr-status-left {
   display: flex;
   align-items: center;
   gap: 6px;
+  /* The status text gets the line; action buttons wrap below when tight. */
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 0.8rem;
   color: var(--muted);
   flex: 1;
@@ -678,7 +708,9 @@ label select {
 
 .tenant-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Columns match the number of visible metrics (the Advance box hides at $0). */
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 6px;
 }
 
@@ -882,6 +914,41 @@ label select {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.date-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.date-range-inputs.hidden {
+  display: none;
+}
+
+.date-filter-toggle {
+  min-height: 34px;
+  flex-shrink: 0;
+}
+
+.date-filter-toggle.is-active {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Month group label between ledger cards. */
+.ledger-month-header {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 14px 2px 6px;
+}
+
+.ledger-month-header:first-child {
+  margin-top: 2px;
 }
 
 .date-range-filter input[type="date"] {
@@ -2538,6 +2605,8 @@ label {
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 10px;
+  /* Long titles push the action buttons onto their own line instead of cramming. */
+  flex-wrap: wrap;
 }
 
 .project-card-title {

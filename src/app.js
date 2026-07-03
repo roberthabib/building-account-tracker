@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v129";
+const APP_VERSION = "v130";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -44,6 +44,8 @@ const els = {
   expenseCategoryFilter: document.querySelector("#expenseCategoryFilter"),
   ledgerDateFrom: document.querySelector("#ledgerDateFrom"),
   ledgerDateTo: document.querySelector("#ledgerDateTo"),
+  toggleDateFilter: document.querySelector("#toggleDateFilter"),
+  dateRangeInputs: document.querySelector("#dateRangeInputs"),
   ledgerFilterStatus: document.querySelector("#ledgerFilterStatus"),
   ledgerCount: document.querySelector("#ledgerCount"),
   clearLedgerFilters: document.querySelector("#clearLedgerFilters"),
@@ -236,6 +238,7 @@ const els = {
   wizardBudgetField: document.querySelector("#wizardBudgetField"),
   tenantBreakerInput: document.querySelector("#tenantBreakerInput"),
   addGeneratorBillButton: document.querySelector("#addGeneratorBillButton"),
+  servicesIntro: document.querySelector("#servicesIntro"),
   generatorBillList: document.querySelector("#generatorBillList"),
   generatorBillDialog: document.querySelector("#generatorBillDialog"),
   generatorBillDialogTitle: document.querySelector("#generatorBillDialogTitle"),
@@ -377,7 +380,7 @@ const I18N = {
     // Tenants view
     "ten.eyebrow": "Residents",
     "ten.title": "Tenant Accounts",
-    "ten.searchPh": "Search tenants or units",
+    "ten.searchPh": "Search tenants",
     "ten.add": "+ Add",
     // Ledger view
     "led.eyebrow": "Transactions",
@@ -386,6 +389,7 @@ const I18N = {
     "led.exportPdf": "Export PDF",
     "led.searchPh": "Search ledger",
     "led.clearFilters": "Clear filters",
+    "led.dates": "📅 Dates",
     "aria.categoryFilter": "Category filter",
     "aria.expenseCategoryFilter": "Expense category filter",
     "aria.fromDate": "From date",
@@ -655,7 +659,7 @@ const I18N = {
     // Tenants view
     "ten.eyebrow": "السكان",
     "ten.title": "حسابات المستأجرين",
-    "ten.searchPh": "ابحث عن مستأجر أو شقة",
+    "ten.searchPh": "بحث عن مستأجر",
     "ten.add": "+ إضافة",
     // Ledger view
     "led.eyebrow": "العمليات",
@@ -664,6 +668,7 @@ const I18N = {
     "led.exportPdf": "تصدير PDF",
     "led.searchPh": "ابحث في السجل",
     "led.clearFilters": "مسح الفلاتر",
+    "led.dates": "📅 التواريخ",
     "aria.categoryFilter": "فلتر الفئة",
     "aria.expenseCategoryFilter": "فلتر فئة المصروف",
     "aria.fromDate": "من تاريخ",
@@ -1030,7 +1035,7 @@ const DYN_AR = {
   "Your Balance": "رصيدك",
   "Advance credit": "رصيد مقدّم",
   "{amount} due": "{amount} مستحق",
-  "{amount} due (incl. {proj} project)": "{amount} مستحق (منها {proj} للمشاريع)",
+  "{amount} due · {proj} project": "{amount} مستحق · {proj} للمشاريع",
   "{amount} credit": "{amount} رصيد دائن",
   "Expected": "المتوقع",
   "Collected": "المحصّل",
@@ -1057,6 +1062,8 @@ const DYN_AR = {
   // Payment rows
   "Send WhatsApp Reminder": "إرسال تذكير واتساب",
   "Set phone to send reminder": "أضف رقم هاتف لإرسال تذكير",
+  "WhatsApp": "واتساب",
+  "Add phone": "أضف هاتفاً",
   "Owner notified ✓": "تم إبلاغ المالك ✓",
   "I've Paid": "لقد دفعت",
   "Add Payment": "إضافة دفعة",
@@ -2323,7 +2330,7 @@ function buildGeneratorCard(month, tenantsById) {
   const dist = computeServiceDistribution("generator", month);
   const pools = dist.pools;
   const { card, header } = buildServiceCardShell(
-    `${tr("Generator")} · ${formatMonth(month)}`,
+    `⚡ ${tr("Generator")} · ${formatMonth(month)}`,
     tr("Fuel {fuel} · Maintenance {maint} · Total {total}", { fuel: formatUsd(pools.fuelUsd), maint: formatUsd(pools.maintenanceUsd), total: formatUsd(pools.totalUsd) }) + (dist.distributed ? ` · ${tr("{kwh} kWh", { kwh: dist.totalKwh })}` : ""),
   );
   if (sessionMode === "owner") {
@@ -2372,7 +2379,7 @@ function buildGeneratorCard(month, tenantsById) {
 function buildWaterCard(month, tenantsById) {
   const dist = computeWaterDistribution(month);
   const { card } = buildServiceCardShell(
-    `${tr("Water")} · ${formatMonth(month)}`,
+    `💧 ${tr("Water")} · ${formatMonth(month)}`,
     tr(dist.count === 1 ? "{n} tanker · Total {total} · {split}" : "{n} tankers · Total {total} · {split}", { n: dist.count, total: formatUsd(dist.totalUsd), split: dist.splitLabel }),
   );
   const lineList = document.createElement("div");
@@ -2394,12 +2401,15 @@ function buildWaterCard(month, tenantsById) {
 function renderServices() {
   const genMonths = getServiceMonths("generator");
   const waterMonths = getServiceMonths("water");
-  if (!genMonths.length && !waterMonths.length) {
+  const hasCards = Boolean(genMonths.length || waterMonths.length);
+  // The long how-it-works intro only matters before the first service exists;
+  // the header readings button is redundant once cards carry their own.
+  els.servicesIntro.classList.toggle("hidden", hasCards || sessionMode !== "owner");
+  els.addGeneratorBillButton.classList.toggle("hidden", genMonths.length > 0);
+  if (!hasCards) {
     const empty = document.createElement("p");
     empty.className = "settings-note";
-    empty.textContent = sessionMode === "owner"
-      ? tr("No services yet. Log generator (diesel/maintenance) or water tanker costs with the + button (choose Services Expenses). Generator is split by meter readings entered here; water is split equally or by coefficient.")
-      : tr("No services yet.");
+    empty.textContent = tr("No services yet.");
     els.generatorBillList.replaceChildren(empty);
     return;
   }
@@ -3631,22 +3641,27 @@ function renderPayments() {
 }
 
 function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsappUrl = null, declarationDue = 0 } = {}) {
-  if (reminderDue > 0 && sessionMode === "owner") {
+  // WhatsApp reminder is a compact action next to "Add Payment" — not a
+  // full-width banner per tenant.
+  const statusRow = row.querySelector(".tpr-status-row");
+  if (reminderDue > 0 && sessionMode === "owner" && statusRow) {
     if (whatsappUrl) {
       const waBtn = document.createElement("a");
-      waBtn.className = "whatsapp-full-btn owner-only";
+      waBtn.className = "mini-button whatsapp-btn tpr-wa-btn owner-only";
       waBtn.href = whatsappUrl;
       waBtn.target = "_blank";
       waBtn.rel = "noopener";
-      waBtn.textContent = tr("Send WhatsApp Reminder");
-      row.append(waBtn);
+      waBtn.title = tr("Send WhatsApp Reminder");
+      waBtn.textContent = tr("WhatsApp");
+      statusRow.append(waBtn);
     } else {
       const waBtn = document.createElement("button");
-      waBtn.className = "whatsapp-full-btn whatsapp-no-phone owner-only";
+      waBtn.className = "mini-button whatsapp-no-phone tpr-wa-btn owner-only";
       waBtn.type = "button";
-      waBtn.textContent = tr("Set phone to send reminder");
+      waBtn.title = tr("Set phone to send reminder");
+      waBtn.textContent = tr("Add phone");
       waBtn.dataset.editTenantId = tenant.id;
-      row.append(waBtn);
+      statusRow.append(waBtn);
     }
   }
   if (sessionMode === "tenant" && tenant.id === sessionTenantId && declarationDue > 0) {
@@ -3683,10 +3698,10 @@ function buildTenantPaymentRowBase(tenant, amountText, statusLabel, statusClass,
     <div class="tpr-status-row">
       <div class="tpr-status-left">
         <span class="status-pill"></span>
-        <span class="tpr-detail"></span>
       </div>
       <button class="mini-button tpr-add-btn owner-only" type="button"></button>
     </div>
+    <span class="tpr-detail"></span>
   `;
   row.querySelector(".tpr-add-btn").textContent = tr("Add Payment");
   row.querySelector("strong").textContent = tenant.name;
@@ -3800,7 +3815,7 @@ function renderPaymentsActual() {
       const statusLabel = totalDue > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
       const detail = totalDue > 0.005
         ? (projectsDue > 0.005
-            ? tr("{amount} due (incl. {proj} project)", { amount: formatUsd(totalDue), proj: formatUsd(projectsDue) })
+            ? tr("{amount} due · {proj} project", { amount: formatUsd(totalDue), proj: formatUsd(projectsDue) })
             : tr("{amount} due", { amount: formatUsd(totalDue) }))
         : balance < -0.005 ? tr("{amount} credit", { amount: formatUsd(-balance) }) : tr("Settled");
       const row = buildTenantPaymentRowBase(
@@ -3847,7 +3862,7 @@ function renderTenants() {
         </div>
         <div class="tenant-metrics">
           <div class="metric metric-paid"><span></span><b></b></div>
-          <div class="metric"><span></span><b></b></div>
+          <div class="metric metric-advance"><span></span><b></b></div>
           <div class="metric metric-due"><span></span><b></b></div>
         </div>
         <div class="tenant-card-footer">
@@ -3873,6 +3888,8 @@ function renderTenants() {
       metrics[2].textContent = formatMonthly(totals.dueUsd);
       if (totals.paidUsd > 0) card.querySelector(".metric-paid").classList.add("is-filled");
       if (totals.dueUsd > 0) card.querySelector(".metric-due").classList.add("has-due");
+      // Advance credit is rare — hide the always-$0 box unless there is one.
+      if (totals.advanceUsd <= 0.005) card.querySelector(".metric-advance").classList.add("hidden");
       card.querySelector(".edit-tenant-button").dataset.tenantId = tenant.id;
       card.querySelector(".print-statement-button").dataset.tenantId = tenant.id;
       card.querySelector(".delete-tenant-button").dataset.tenantId = tenant.id;
@@ -4884,6 +4901,9 @@ function clearAllLedgerFilters() {
   els.ledgerSearch.value = "";
   els.ledgerDateFrom.value = "";
   els.ledgerDateTo.value = "";
+  els.dateRangeInputs.classList.add("hidden");
+  els.toggleDateFilter.setAttribute("aria-expanded", "false");
+  els.toggleDateFilter.classList.remove("is-active");
   renderLedger();
 }
 
@@ -4995,7 +5015,21 @@ function renderLedger() {
     return item;
   }
 
-  els.ledgerList.replaceChildren(...rows.slice(0, 160).map(buildLedgerItem));
+  // Group the (date-descending) rows under small month headers for scanning.
+  const items = [];
+  let lastMonthKey = null;
+  rows.slice(0, 160).forEach((transaction) => {
+    const mk = monthKey(transaction.date || transaction.forMonth || "");
+    if (mk && mk !== lastMonthKey) {
+      lastMonthKey = mk;
+      const header = document.createElement("div");
+      header.className = "ledger-month-header";
+      header.textContent = formatMonth(mk);
+      items.push(header);
+    }
+    items.push(buildLedgerItem(transaction));
+  });
+  els.ledgerList.replaceChildren(...items);
 }
 
 function renderDatalists() {
@@ -7219,6 +7253,18 @@ function attachEvents() {
   els.expenseCategoryFilter.addEventListener("change", renderLedger);
   els.ledgerDateFrom.addEventListener("change", renderLedger);
   els.ledgerDateTo.addEventListener("change", renderLedger);
+  els.toggleDateFilter.addEventListener("click", () => {
+    const open = els.dateRangeInputs.classList.toggle("hidden");
+    els.toggleDateFilter.setAttribute("aria-expanded", String(!open));
+    els.toggleDateFilter.classList.toggle("is-active", !open);
+    // Collapsing the date row also clears any active date filter so nothing
+    // keeps filtering invisibly.
+    if (open && (els.ledgerDateFrom.value || els.ledgerDateTo.value)) {
+      els.ledgerDateFrom.value = "";
+      els.ledgerDateTo.value = "";
+      renderLedger();
+    }
+  });
   els.ledgerList.addEventListener("click", (event) => {
     const receiptButton = event.target.closest(".receipt-button[data-transaction-id]");
     if (receiptButton) {
