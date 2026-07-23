@@ -59,8 +59,8 @@
         <div class="brand-lockup">
           <img src="assets/icon.svg" alt="" />
           <div>
-            <p class="eyebrow" data-i18n="topbar.eyebrow">Building Account</p>
-            <h1 id="buildingNameHeading">Building Account</h1>
+            <p class="eyebrow" id="buildingNameHeading">Building Account</p>
+            <h1 data-i18n="topbar.appName">Building Account Tracker</h1>
           </div>
         </div>
         <div class="topbar-actions">
@@ -85,12 +85,8 @@
               <p class="eyebrow" data-i18n="dash.eyebrow">Overview</p>
               <h2 id="dashboardTitle" data-i18n="dash.title">Account Position</h2>
             </div>
-            <div class="month-nav">
-              <button class="month-nav-btn" id="monthPrev" type="button" aria-label="Previous month" data-i18n-aria="aria.prevMonth">&#8249;</button>
-              <select id="monthSelect" aria-label="Month" data-i18n-aria="aria.month"></select>
-              <button class="month-nav-btn" id="monthNext" type="button" aria-label="Next month" data-i18n-aria="aria.nextMonth">&#8250;</button>
-            </div>
           </div>
+          <div class="month-chips segmented on-card" id="monthChips" role="tablist" aria-label="Month"></div>
 
           <section class="panel owner-only hidden" id="attentionPanel">
             <div class="panel-header">
@@ -264,10 +260,35 @@
           <div class="ledger-list" id="ledgerList"></div>
         </section>
 
-        <section class="view" id="projectsView" aria-labelledby="projectsTitle">
+        <section class="view sub-view" id="moreView" aria-labelledby="moreTitle">
           <div class="section-title">
             <div>
-              <p class="eyebrow" data-i18n="proj.eyebrow">Building</p>
+              <p class="eyebrow" data-i18n="more.eyebrow">Menu</p>
+              <h2 id="moreTitle" data-i18n="nav.more">More</h2>
+            </div>
+          </div>
+          <div class="more-menu" id="moreMenu">
+            <button class="more-menu-item" type="button" data-view="projectsView" data-nav-icon="folder">
+              <span class="mm-text"><strong data-i18n="nav.projects">Projects</strong><span data-i18n="more.projectsSub">Building works &amp; collection</span></span>
+            </button>
+            <button class="more-menu-item" type="button" data-view="servicesView" data-nav-icon="zap">
+              <span class="mm-text"><strong data-i18n="nav.services">Services</strong><span data-i18n="more.servicesSub">Generator &amp; water bills</span></span>
+            </button>
+            <button class="more-menu-item" type="button" data-view="pollsView" data-nav-icon="vote">
+              <span class="mm-text"><strong data-i18n="nav.polls">Polls</strong><span data-i18n="more.pollsSub">Building votes</span></span>
+            </button>
+            <button class="more-menu-item owner-only" type="button" data-view="settingsView" data-nav-icon="gear">
+              <span class="mm-text"><strong data-i18n="nav.settings">Settings</strong><span data-i18n="more.settingsSub">Building, currency, sync &amp; access</span></span>
+            </button>
+          </div>
+          <p class="settings-note app-version-note" style="text-align:center">Building Account Tracker · <span id="appVersionLabelMore"></span></p>
+        </section>
+
+        <section class="view sub-view" id="projectsView" aria-labelledby="projectsTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
               <h2 id="projectsTitle" data-i18n="proj.title">Projects</h2>
             </div>
             <button class="primary-button owner-only" id="createProjectButton" type="button" data-i18n="proj.new">+ New</button>
@@ -275,22 +296,24 @@
           <div id="buildingProjectList"></div>
         </section>
 
-        <section class="view" id="servicesView" aria-labelledby="servicesTitle">
-          <div class="section-title">
+        <section class="view sub-view" id="servicesView" aria-labelledby="servicesTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
             <div>
-              <p class="eyebrow" data-i18n="serv.eyebrow">Building</p>
+              <p class="eyebrow" data-i18n="more.title">More</p>
               <h2 id="servicesTitle" data-i18n="serv.title">Services</h2>
             </div>
-            <button class="primary-button owner-only" id="addGeneratorBillButton" type="button" data-i18n="serv.enterReadings">Enter Meter Readings</button>
           </div>
+          <button class="primary-button block-button owner-only" id="addGeneratorBillButton" type="button" data-i18n="serv.enterReadings">Enter Meter Readings</button>
           <p class="settings-note" id="servicesIntro" data-i18n="serv.intro">Log generator (diesel/maintenance) and water tanker costs with the + button (Services Expenses). Generator: enter monthly meter readings here to split fuel by kWh and maintenance by breaker size. Water: split equally or by coefficient, billed straight away.</p>
           <div id="generatorBillList"></div>
         </section>
 
-        <section class="view" id="pollsView" aria-labelledby="pollsTitle">
-          <div class="section-title">
+        <section class="view sub-view" id="pollsView" aria-labelledby="pollsTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
             <div>
-              <p class="eyebrow" data-i18n="poll.eyebrow">Building</p>
+              <p class="eyebrow" data-i18n="more.title">More</p>
               <h2 id="pollsTitle" data-i18n="poll.title">Polls</h2>
             </div>
             <button class="primary-button" id="createPollButton" type="button" data-i18n="poll.new">+ New Poll</button>
@@ -298,10 +321,11 @@
           <div id="pollList"></div>
         </section>
 
-        <section class="view" id="settingsView" aria-labelledby="settingsTitle">
-          <div class="section-title">
+        <section class="view sub-view" id="settingsView" aria-labelledby="settingsTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
             <div>
-              <p class="eyebrow" data-i18n="set.eyebrow">Setup</p>
+              <p class="eyebrow" data-i18n="more.title">More</p>
               <h2 id="settingsTitle" data-i18n="set.title">Settings</h2>
             </div>
           </div>
@@ -409,26 +433,13 @@
       </main>
 
       <nav class="bottom-nav" aria-label="Primary">
-        <button class="nav-button active" type="button" data-view="dashboardView" data-i18n="nav.dashboard">Dashboard</button>
-        <button class="nav-button" type="button" data-view="paymentsView" data-i18n="nav.payments">Payments</button>
-        <button class="nav-button" type="button" data-view="tenantsView" data-i18n="nav.tenants">Tenants</button>
-        <button class="nav-button" type="button" data-view="ledgerView" data-i18n="nav.ledger">Ledger</button>
-        <button class="nav-button" id="moreNavButton" type="button" aria-haspopup="dialog" data-i18n="nav.more">More</button>
+        <button class="nav-button active" type="button" data-view="dashboardView" data-nav-icon="home"><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></button>
+        <button class="nav-button" type="button" data-view="paymentsView" data-nav-icon="wallet"><span class="nav-label" data-i18n="nav.payments">Payments</span></button>
+        <button class="nav-button" type="button" data-view="tenantsView" data-nav-icon="users"><span class="nav-label" data-i18n="nav.tenants">Tenants</span></button>
+        <button class="nav-button" type="button" data-view="ledgerView" data-nav-icon="receipt"><span class="nav-label" data-i18n="nav.ledger">Ledger</span></button>
+        <button class="nav-button" id="moreNavButton" type="button" data-view="moreView" data-nav-icon="grid"><span class="nav-label" data-i18n="nav.more">More</span></button>
       </nav>
     </div>
-
-    <dialog id="moreSheet" class="more-sheet" aria-label="More">
-      <div class="more-sheet-header">
-        <span data-i18n="more.title">More</span>
-        <button class="icon-button small" id="closeMoreSheet" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
-      </div>
-      <div class="more-sheet-list">
-        <button class="more-sheet-item" type="button" data-view="projectsView" data-i18n="nav.projects">Projects</button>
-        <button class="more-sheet-item" type="button" data-view="servicesView" data-i18n="nav.services">Services</button>
-        <button class="more-sheet-item" type="button" data-view="pollsView" data-i18n="nav.polls">Polls</button>
-        <button class="more-sheet-item owner-only" type="button" data-view="settingsView" data-i18n="nav.settings">Settings</button>
-      </div>
-    </dialog>
 
     <section id="printStatement" aria-hidden="true"></section>
 

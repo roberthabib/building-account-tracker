@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v130";
+const APP_VERSION = "v131";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -7,10 +7,9 @@ const els = {
   buildingNameHeading: document.querySelector("#buildingNameHeading"),
   appVersionLabel: document.querySelector("#appVersionLabel"),
   moreNavButton: document.querySelector("#moreNavButton"),
-  moreSheet: document.querySelector("#moreSheet"),
-  closeMoreSheet: document.querySelector("#closeMoreSheet"),
-  moreSheetItems: document.querySelectorAll(".more-sheet-item"),
-  monthSelect: document.querySelector("#monthSelect"),
+  moreMenu: document.querySelector("#moreMenu"),
+  appVersionLabelMore: document.querySelector("#appVersionLabelMore"),
+  monthChips: document.querySelector("#monthChips"),
   kpiGrid: document.querySelector("#kpiGrid"),
   attentionPanel: document.querySelector("#attentionPanel"),
   attentionList: document.querySelector("#attentionList"),
@@ -330,6 +329,7 @@ const I18N = {
     "connect.submit": "Connect",
     // Topbar / sync
     "topbar.eyebrow": "Building Account",
+    "topbar.appName": "Building Account Tracker",
     "sync.local": "Local",
     "sync.saved": "Saved",
     "sync.saving": "Saving",
@@ -449,8 +449,13 @@ const I18N = {
     "set.wizardTitle": "Setup wizard",
     "set.wizardDesc": "Re-run the guided setup for building details and tenants.",
     "set.cloudNote": "Cloud sync is automatic after the script URL and Google Sheet ID are saved.",
-    // More sheet
+    // More menu
     "more.title": "More",
+    "more.eyebrow": "Menu",
+    "more.projectsSub": "Building works & collection",
+    "more.servicesSub": "Generator & water bills",
+    "more.pollsSub": "Building votes",
+    "more.settingsSub": "Building, currency, sync & access",
     // Entry chooser
     "entry.title": "Add",
     "entry.paymentTitle": "Record a payment",
@@ -609,6 +614,7 @@ const I18N = {
     "connect.submit": "اتصال",
     // Topbar / sync
     "topbar.eyebrow": "حساب المبنى",
+    "topbar.appName": "متتبّع حساب المبنى",
     "sync.local": "محلي",
     "sync.saved": "محفوظ",
     "sync.saving": "جارٍ الحفظ",
@@ -728,8 +734,13 @@ const I18N = {
     "set.wizardTitle": "معالج الإعداد",
     "set.wizardDesc": "أعد تشغيل الإعداد الموجّه لتفاصيل المبنى والمستأجرين.",
     "set.cloudNote": "تتم المزامنة السحابية تلقائياً بعد حفظ رابط السكربت ومعرّف Google Sheet.",
-    // More sheet
+    // More menu
     "more.title": "المزيد",
+    "more.eyebrow": "القائمة",
+    "more.projectsSub": "أعمال المبنى والتحصيل",
+    "more.servicesSub": "فواتير المولّد والمياه",
+    "more.pollsSub": "تصويتات المبنى",
+    "more.settingsSub": "المبنى، العملة، المزامنة والوصول",
     // Entry chooser
     "entry.title": "إضافة",
     "entry.paymentTitle": "تسجيل دفعة",
@@ -1000,6 +1011,13 @@ const DYN_AR = {
   "Total Expenses:": "إجمالي المصاريف:",
   "Advance Payments": "دفعات مقدمة",
   "Uncategorized": "غير مصنّف",
+  "Entries dated in the selected month": "قيود بتاريخ الشهر المحدد",
+  "Tenant payments received by date": "دفعات المستأجرين المقبوضة حسب التاريخ",
+  "Payments toward building projects": "دفعات لمشاريع المبنى",
+  "Prepaid tenant credit": "رصيد مستأجر مدفوع مقدماً",
+  "Paid expenses, LBP converted to USD": "المصاريف المدفوعة، محوّلة من الليرة للدولار",
+  "Generator fuel, maintenance and water": "وقود المولّد والصيانة والمياه",
+  "Cash increase or decrease this month": "زيادة أو نقصان النقد هذا الشهر",
   "{month} by date": "{month} حسب التاريخ",
   "No selected month": "لا يوجد شهر محدد",
   // Tenant status chips / labels
@@ -1012,6 +1030,7 @@ const DYN_AR = {
   "Credit": "رصيد دائن",
   "Owes": "مدين بـ",
   "Paid in full": "مدفوع بالكامل",
+  "Settled in full": "مسدّد بالكامل",
   "No dues": "لا مستحقات",
   "No due": "لا مستحقات",
   "Owes {amount}": "مدين بـ {amount}",
@@ -1072,6 +1091,7 @@ const DYN_AR = {
   "{n}/{m} paid": "{n}/{m} مدفوع",
   "{n}/{m} settled": "{n}/{m} مسدّد",
   "{paid} paid of {share}": "{paid} مدفوع من {share}",
+  "of {amount}": "من {amount}",
   // Tenant cards
   "Delete tenant": "حذف المستأجر",
   "Edit": "تعديل",
@@ -1222,6 +1242,73 @@ function tr(en, params) {
     for (const name in params) str = str.split(`{${name}}`).join(String(params[name]));
   }
   return str;
+}
+
+// ---------------------------------------------------------------------------
+// Lucide line-icons, inlined as SVG (no runtime dependency). lucide(name)
+// returns an <svg> element; stroke defaults to currentColor so CSS controls
+// the colour. Path data copied from lucide.dev (ISC licensed).
+// ---------------------------------------------------------------------------
+const LUCIDE_ICONS = {
+  home: [["path", { d: "m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" }], ["path", { d: "M9 22V12h6v10" }]],
+  wallet: [["path", { d: "M21 12V7H5a2 2 0 0 1 0-4h14v4" }], ["path", { d: "M3 5v14a2 2 0 0 0 2 2h16v-5" }], ["path", { d: "M18 12a2 2 0 0 0 0 4h4v-4Z" }]],
+  users: [["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" }], ["circle", { cx: 9, cy: 7, r: 4 }], ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87" }], ["path", { d: "M16 3.13a4 4 0 0 1 0 7.75" }]],
+  receipt: [["path", { d: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" }], ["path", { d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" }], ["path", { d: "M12 17.5v-11" }]],
+  grid: [["rect", { width: 7, height: 7, x: 3, y: 3, rx: 1 }], ["rect", { width: 7, height: 7, x: 14, y: 3, rx: 1 }], ["rect", { width: 7, height: 7, x: 14, y: 14, rx: 1 }], ["rect", { width: 7, height: 7, x: 3, y: 14, rx: 1 }]],
+  alert: [["path", { d: "m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" }], ["path", { d: "M12 9v4" }], ["path", { d: "M12 17h.01" }]],
+  check: [["path", { d: "M21.801 10A10 10 0 1 1 17 3.335" }], ["path", { d: "m9 11 3 3L22 4" }]],
+  chevronRight: [["path", { d: "m9 18 6-6-6-6" }]],
+  chevronLeft: [["path", { d: "m15 18-6-6 6-6" }]],
+  chevronDown: [["path", { d: "m6 9 6 6 6-6" }]],
+  trash: [["path", { d: "M3 6h18" }], ["path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" }], ["path", { d: "M10 11v6" }], ["path", { d: "M14 11v6" }]],
+  search: [["circle", { cx: 11, cy: 11, r: 8 }], ["path", { d: "m21 21-4.3-4.3" }]],
+  folder: [["path", { d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" }]],
+  zap: [["path", { d: "M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 12 10h8a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 12 14z" }]],
+  vote: [["path", { d: "m9 12 2 2 4-4" }], ["rect", { width: 18, height: 18, x: 3, y: 3, rx: 2 }]],
+  gear: [["path", { d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" }], ["circle", { cx: 12, cy: 12, r: 3 }]],
+  plus: [["path", { d: "M5 12h14" }], ["path", { d: "M12 5v14" }]],
+  camera: [["path", { d: "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" }], ["circle", { cx: 12, cy: 13, r: 3 }]],
+};
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+function lucide(name, { size = 22, color = "currentColor", stroke = 1.9 } = {}) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size);
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", color);
+  svg.setAttribute("stroke-width", stroke);
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  (LUCIDE_ICONS[name] || []).forEach(([tag, attrs]) => {
+    const node = document.createElementNS(SVG_NS, tag);
+    for (const k in attrs) node.setAttribute(k, attrs[k]);
+    svg.appendChild(node);
+  });
+  return svg;
+}
+
+// Initials for an avatar chip: first letters of the first two words.
+function initials(name) {
+  return String(name || "?")
+    .trim()
+    .split(/\s+/)
+    .map((w) => w[0] || "")
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "?";
+}
+
+// Build an avatar chip element (initials on a tinted square).
+function avatarChip(name, size = 32) {
+  const el = document.createElement("span");
+  el.className = "avatar";
+  el.style.width = `${size}px`;
+  el.style.height = `${size}px`;
+  el.style.fontSize = size >= 38 ? "0.8rem" : "0.74rem";
+  el.textContent = initials(name);
+  return el;
 }
 
 function applyStaticI18n(root = document) {
@@ -2032,9 +2119,9 @@ function renderProjects() {
       tenantStatuses.forEach(({ tenant, share, paid, label, className }) => {
         const statusCard = document.createElement("article");
         statusCard.className = "status-card";
-        statusCard.innerHTML = `<strong></strong><span></span><div class="status-pill"></div>`;
+        statusCard.innerHTML = `<strong class="sc-name"></strong><div class="status-card-bottom"><span class="tnum"></span><span class="status-pill"></span></div>`;
         statusCard.querySelector("strong").textContent = tenant.name;
-        statusCard.querySelector("span").textContent = `${formatUsd(paid)} / ${formatUsd(share)}`;
+        statusCard.querySelector(".status-card-bottom span:first-child").textContent = `${formatUsd(paid)} / ${formatUsd(share)}`;
         const pill = statusCard.querySelector(".status-pill");
         pill.classList.add(`status-${className === "none" ? "due" : className}`);
         pill.textContent = tr(label);
@@ -2312,17 +2399,18 @@ function buildServiceCardShell(titleText, metaText) {
 function buildServiceLine(name, totalText, detailText) {
   const item = document.createElement("div");
   item.className = "gen-bill-line";
-  const top = document.createElement("div");
-  top.className = "gbl-top";
+  const text = document.createElement("div");
+  text.className = "gbl-text";
   const nameEl = document.createElement("strong");
   nameEl.textContent = name;
-  const total = document.createElement("b");
-  total.textContent = totalText;
-  top.append(nameEl, total);
   const detail = document.createElement("span");
   detail.className = "gbl-detail";
   detail.textContent = detailText;
-  item.append(top, detail);
+  text.append(nameEl, detail);
+  const total = document.createElement("b");
+  total.className = "tnum";
+  total.textContent = totalText;
+  item.append(avatarChip(name, 32), text, total);
   return item;
 }
 
@@ -2793,12 +2881,12 @@ function getPositionTotals() {
 function getMonthlyActivityRows(month) {
   const hasLegacyAdvancePayments = state.transactions.some((transaction) => transaction.category === "Advance Payments");
   const rows = [
-    { category: "Opening Balance", usd: 0 },
-    { category: "Monthly Payments", usd: 0, sourceCategory: "Payments" },
-    { category: "Project Payments", usd: 0 },
-    ...(hasLegacyAdvancePayments ? [{ category: "Advance Payments", usd: 0 }] : []),
-    { category: "Expenses", usd: 0 },
-    { category: "Generator & Water", usd: 0, sourceCategory: "Services Expenses" },
+    { category: "Opening Balance", usd: 0, desc: "Entries dated in the selected month" },
+    { category: "Monthly Payments", usd: 0, sourceCategory: "Payments", desc: "Tenant payments received by date" },
+    { category: "Project Payments", usd: 0, desc: "Payments toward building projects" },
+    ...(hasLegacyAdvancePayments ? [{ category: "Advance Payments", usd: 0, desc: "Prepaid tenant credit" }] : []),
+    { category: "Expenses", usd: 0, desc: "Paid expenses, LBP converted to USD" },
+    { category: "Generator & Water", usd: 0, sourceCategory: "Services Expenses", desc: "Generator fuel, maintenance and water" },
   ];
   const rowByCategory = new Map(rows.map((row) => [row.sourceCategory || row.category, row]));
 
@@ -2812,7 +2900,7 @@ function getMonthlyActivityRows(month) {
 
   const net = rows.reduce((sum, row) => sum + row.usd, 0);
   // Drop $0 lines; always keep the net total.
-  return [...rows.filter((row) => Math.abs(row.usd) > 0.005), { category: "Net Cash Movement", usd: net, emphasis: true }];
+  return [...rows.filter((row) => Math.abs(row.usd) > 0.005), { category: "Net Cash Movement", usd: net, emphasis: true, desc: "Cash increase or decrease this month" }];
 }
 
 function paymentStatus(tenantId, month) {
@@ -2832,21 +2920,20 @@ function renderMonthSelect() {
       [...months].reverse().find((month) => getExpectedMonthlyUsd(month) || hasPaymentInMonth(month)) || months.at(-1);
   }
 
-  els.monthSelect.innerHTML = "";
-  months
-    .slice()
-    .reverse()
-    .forEach((month) => {
-      const option = document.createElement("option");
-      option.value = month;
-      option.textContent = formatMonth(month);
-      option.selected = month === selectedMonth;
-      els.monthSelect.append(option);
-    });
-
-  const idx = months.indexOf(selectedMonth);
-  els.monthPrev.disabled = idx <= 0;
-  els.monthNext.disabled = idx >= months.length - 1;
+  // Segmented month chips (newest last), horizontally scrollable when many.
+  els.monthChips.replaceChildren(
+    ...months.map((month) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = month === selectedMonth ? "is-active" : "";
+      chip.dataset.month = month;
+      chip.textContent = formatMonth(month);
+      return chip;
+    }),
+  );
+  // Keep the active chip in view.
+  const active = els.monthChips.querySelector(".is-active");
+  if (active) active.scrollIntoView({ inline: "center", block: "nearest" });
 }
 
 function hasPaymentInMonth(month) {
@@ -3011,15 +3098,36 @@ function renderAttention() {
     return;
   }
 
+  const TONE = {
+    due: { tint: "#f6e2e2", color: "var(--red)", icon: "alert" },
+    danger: { tint: "#f6e2e2", color: "var(--red)", icon: "alert" },
+    warn: { tint: "#f6ecd7", color: "var(--amber)", icon: "alert" },
+    success: { tint: "var(--green-tint-bg)", color: "var(--primary)", icon: "check" },
+  };
   els.attentionList.replaceChildren(
     ...items.map((item) => {
+      const tone = TONE[item.kind] || TONE.warn;
       const row = document.createElement("button");
       row.type = "button";
-      row.className = `attention-row attention-${item.kind}`;
+      row.className = "attention-row";
       row.dataset.view = item.view;
-      row.innerHTML = `<span class="attention-icon"></span><span class="attention-text"></span><span class="attention-chevron">&#8250;</span>`;
-      row.querySelector(".attention-icon").textContent = item.icon;
-      row.querySelector(".attention-text").textContent = item.text;
+      const chip = document.createElement("span");
+      chip.className = "attention-icon";
+      chip.style.background = tone.tint;
+      chip.appendChild(lucide(tone.icon, { size: 20, color: tone.color }));
+      const text = document.createElement("span");
+      text.className = "attention-text";
+      const titleEl = document.createElement("strong");
+      titleEl.textContent = item.text;
+      text.appendChild(titleEl);
+      if (item.meta) {
+        const meta = document.createElement("span");
+        meta.textContent = item.meta;
+        text.appendChild(meta);
+      }
+      const chev = lucide("chevronRight", { size: 18, color: "#b3bbb6", stroke: 2.2 });
+      chev.classList.add("attention-chevron");
+      row.append(chip, text, chev);
       return row;
     }),
   );
@@ -3128,12 +3236,14 @@ function renderDashboard() {
   renderMonthSelect();
 
   function buildKpiCards(kpis) {
-    return kpis.map(([label, value, note]) => {
+    return kpis.map(({ label, value, note, valueClass, hero }) => {
       const card = document.createElement("article");
-      card.className = "kpi";
+      card.className = hero ? "kpi kpi-hero" : "kpi";
       card.innerHTML = `<span></span><strong></strong><small></small>`;
       card.querySelector("span").textContent = tr(label);
-      card.querySelector("strong").textContent = value;
+      const strong = card.querySelector("strong");
+      strong.textContent = value;
+      if (valueClass) strong.classList.add(valueClass);
       card.querySelector("small").textContent = tr(note);
       return card;
     });
@@ -3141,19 +3251,21 @@ function renderDashboard() {
 
   const totals = getPositionTotals();
   const totalExpenses = roundUsd(state.transactions.filter((t) => t.category === "Expenses" || t.category === "Services Expenses").reduce((s, t) => s + toUsd(t.debitUsd, t.debitLbp), 0));
+  const cashNegative = totals.cashUsd < -0.005 ? "is-negative" : "";
+  const outstandingAmber = totals.receivableUsd > 0.005 ? "is-amber" : "";
   els.kpiGrid.replaceChildren(...buildKpiCards(
     isFixedMode()
       ? [
-          ["Reserve Fund", formatUsd(totals.cashUsd), "Collected funds minus expenses"],
-          ["Total Expenses", formatUsd(totalExpenses), "All recorded building costs"],
-          ["Outstanding", formatUsd(totals.receivableUsd), "Tenant dues owed"],
-          ["Net Position", formatUsd(totals.netPositionUsd), "Reserve + outstanding - credits"],
+          { label: "Reserve Fund", value: formatUsd(totals.cashUsd), note: "Collected funds minus expenses", valueClass: cashNegative },
+          { label: "Total Expenses", value: formatUsd(totalExpenses), note: "All recorded building costs" },
+          { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Tenant dues owed", valueClass: outstandingAmber },
+          { label: "Net Position", value: formatUsd(totals.netPositionUsd), note: "Reserve + outstanding - credits", hero: true },
         ]
       : [
-          ["Cash Balance", formatUsd(totals.cashUsd), "Ledger net cash"],
-          ["Total Expenses", formatUsd(totalExpenses), "All shared building costs"],
-          ["Outstanding", formatUsd(totals.receivableUsd), "Tenant balances owed"],
-          ["Net Position", formatUsd(totals.netPositionUsd), "Cash + outstanding - credits"],
+          { label: "Cash Balance", value: formatUsd(totals.cashUsd), note: "Ledger net cash", valueClass: cashNegative },
+          { label: "Total Expenses", value: formatUsd(totalExpenses), note: "All shared building costs" },
+          { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Tenant balances owed", valueClass: outstandingAmber },
+          { label: "Net Position", value: formatUsd(totals.netPositionUsd), note: "Cash + outstanding - credits", hero: true },
         ],
   ));
 
@@ -3480,17 +3592,25 @@ function renderTenantStatus() {
   els.collectionProgress.style.width = `${rate}%`;
   els.tenantStatusGrid.replaceChildren(
     ...balanceData.map(({ tenant, balance }) => {
+      const due = balance > 0.005;
       const card = document.createElement("article");
       card.className = "status-card";
-      card.innerHTML = `<strong></strong><span></span><div class="status-pill"></div>`;
-      card.querySelector("strong").textContent = tenant.name;
-      const pill = card.querySelector(".status-pill");
-      const statusClass = balance > 0.005 ? "due" : "paid";
-      pill.classList.add(`status-${statusClass}`);
-      pill.textContent = balance > 0.005 ? tr("Due") : balance < -0.005 ? tr("Credit") : tr("Settled");
-      card.querySelector("span").textContent = balance > 0.005
+      const top = document.createElement("div");
+      top.className = "status-card-top";
+      const nameEl = document.createElement("strong");
+      nameEl.textContent = tenant.name;
+      top.append(avatarChip(tenant.name, 32), nameEl);
+      const bottom = document.createElement("div");
+      bottom.className = "status-card-bottom";
+      const sub = document.createElement("span");
+      sub.textContent = due
         ? tr("Owes {amount}", { amount: formatUsd(balance) })
-        : balance < -0.005 ? tr("Credit {amount}", { amount: formatUsd(-balance) }) : tr("Settled");
+        : balance < -0.005 ? tr("Credit {amount}", { amount: formatUsd(-balance) }) : tr("Settled in full");
+      const pill = document.createElement("span");
+      pill.className = `status-pill status-${due ? "due" : "paid"}`;
+      pill.textContent = due ? tr("Due") : tr("Settled");
+      bottom.append(sub, pill);
+      card.append(top, bottom);
       return card;
     }),
   );
@@ -3524,14 +3644,16 @@ function renderExpenseCategoryBreakdown() {
 
   const rows = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
   const total = rows.reduce((sum, [, amount]) => sum + amount, 0);
+  const maxAmount = Math.max(1, ...rows.map(([, a]) => a));
 
   els.expenseByCategoryList.replaceChildren(
     ...rows.map(([cat, amount]) => {
       const row = document.createElement("article");
-      row.className = "summary-row";
-      row.innerHTML = `<div><strong></strong></div><b></b>`;
+      row.className = "cat-row";
+      row.innerHTML = `<div class="cat-row-head"><strong></strong><b class="tnum"></b></div><div class="cat-bar"><div class="cat-bar-fill"></div></div>`;
       row.querySelector("strong").textContent = tr(cat);
       row.querySelector("b").textContent = formatUsd(amount);
+      row.querySelector(".cat-bar-fill").style.width = `${Math.round((amount / maxAmount) * 100)}%`;
       return row;
     }),
     (() => {
@@ -3552,9 +3674,16 @@ function renderCategorySummary() {
       const row = document.createElement("article");
       row.className = "summary-row";
       row.classList.toggle("emphasis", Boolean(entry.emphasis));
-      row.innerHTML = `<div><strong></strong></div><b></b>`;
+      row.innerHTML = `<div><strong></strong><span></span></div><b></b>`;
       row.querySelector("strong").textContent = tr(entry.category);
-      row.querySelector("b").textContent = formatUsd(entry.usd);
+      const desc = row.querySelector("span");
+      if (entry.desc) desc.textContent = tr(entry.desc); else desc.remove();
+      const b = row.querySelector("b");
+      b.textContent = formatUsd(entry.usd);
+      // Colour the value by sign (muted at zero).
+      if (entry.usd < -0.005) b.style.color = "var(--red)";
+      else if (entry.usd > 0.005) b.style.color = "var(--primary)";
+      else b.style.color = "var(--label-muted)";
       return row;
     }),
   );
@@ -3641,10 +3770,9 @@ function renderPayments() {
 }
 
 function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsappUrl = null, declarationDue = 0 } = {}) {
-  // WhatsApp reminder is a compact action next to "Add Payment" — not a
-  // full-width banner per tenant.
-  const statusRow = row.querySelector(".tpr-status-row");
-  if (reminderDue > 0 && sessionMode === "owner" && statusRow) {
+  // WhatsApp reminder is a compact action alongside "Add Payment".
+  const actions = row.querySelector(".tpr-actions");
+  if (reminderDue > 0 && sessionMode === "owner" && actions) {
     if (whatsappUrl) {
       const waBtn = document.createElement("a");
       waBtn.className = "mini-button whatsapp-btn tpr-wa-btn owner-only";
@@ -3653,7 +3781,7 @@ function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsa
       waBtn.rel = "noopener";
       waBtn.title = tr("Send WhatsApp Reminder");
       waBtn.textContent = tr("WhatsApp");
-      statusRow.append(waBtn);
+      actions.append(waBtn);
     } else {
       const waBtn = document.createElement("button");
       waBtn.className = "mini-button whatsapp-no-phone tpr-wa-btn owner-only";
@@ -3661,7 +3789,7 @@ function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsa
       waBtn.title = tr("Set phone to send reminder");
       waBtn.textContent = tr("Add phone");
       waBtn.dataset.editTenantId = tenant.id;
-      statusRow.append(waBtn);
+      actions.append(waBtn);
     }
   }
   if (sessionMode === "tenant" && tenant.id === sessionTenantId && declarationDue > 0) {
@@ -3684,33 +3812,55 @@ function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsa
   }
 }
 
-function buildTenantPaymentRowBase(tenant, amountText, statusLabel, statusClass, detailText) {
+function buildTenantPaymentRowBase({ tenant, paidStr, ofStr, pct, barClass, statusClass, pillText }) {
   const row = document.createElement("div");
   row.className = "tenant-payment-row";
-  row.innerHTML = `
-    <div class="tpr-main">
-      <div class="tpr-info">
-        <strong></strong>
-        <span></span>
-      </div>
-      <div class="tpr-amount"></div>
-    </div>
-    <div class="tpr-status-row">
-      <div class="tpr-status-left">
-        <span class="status-pill"></span>
-      </div>
-      <button class="mini-button tpr-add-btn owner-only" type="button"></button>
-    </div>
-    <span class="tpr-detail"></span>
-  `;
-  row.querySelector(".tpr-add-btn").textContent = tr("Add Payment");
-  row.querySelector("strong").textContent = tenant.name;
-  row.querySelector(".tpr-info span").textContent = tr("Unit {unit}", { unit: tenant.unit });
-  row.querySelector(".tpr-amount").textContent = amountText;
-  const pill = row.querySelector(".status-pill");
+
+  const top = document.createElement("div");
+  top.className = "tpr-top";
+  const idCol = document.createElement("div");
+  idCol.className = "tpr-id";
+  const idText = document.createElement("div");
+  idText.className = "tpr-id-text";
+  const nameEl = document.createElement("strong");
+  nameEl.textContent = tenant.name;
+  const unitEl = document.createElement("span");
+  unitEl.textContent = tr("Unit {unit}", { unit: tenant.unit });
+  idText.append(nameEl, unitEl);
+  idCol.append(avatarChip(tenant.name, 32), idText);
+  const paidCol = document.createElement("div");
+  paidCol.className = "tpr-paid";
+  const paidStrong = document.createElement("strong");
+  paidStrong.className = "tnum";
+  paidStrong.textContent = paidStr;
+  const ofEl = document.createElement("span");
+  ofEl.className = "tnum";
+  ofEl.textContent = ofStr;
+  paidCol.append(paidStrong, ofEl);
+  top.append(idCol, paidCol);
+
+  const bar = document.createElement("div");
+  bar.className = "tpr-bar";
+  const fill = document.createElement("div");
+  fill.className = `tpr-bar-fill ${barClass}`;
+  fill.style.width = pct;
+  bar.append(fill);
+
+  const foot = document.createElement("div");
+  foot.className = "tpr-foot";
+  const pill = document.createElement("span");
   pill.className = `status-pill status-${statusClass}`;
-  pill.textContent = tr(statusLabel);
-  row.querySelector(".tpr-detail").textContent = detailText;
+  pill.textContent = pillText;
+  const actions = document.createElement("div");
+  actions.className = "tpr-actions";
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "mini-button tpr-add-btn owner-only";
+  addBtn.textContent = tr("Add Payment");
+  actions.append(addBtn);
+  foot.append(pill, actions);
+
+  row.append(top, bar, foot);
   return row;
 }
 
@@ -3723,7 +3873,7 @@ function renderPaymentsFixed() {
     ...["Expected", "Collected", "Due"].map((label, i) => {
       const value = [formatUsd(collection.expectedTotal), formatUsd(collection.paidTotal), formatUsd(collection.dueTotal)][i];
       const card = document.createElement("article");
-      card.className = "payment-summary-card";
+      card.className = `payment-summary-card${i === 1 ? " is-collected" : i === 2 ? " is-due" : ""}`;
       card.innerHTML = `<span></span><strong></strong>`;
       card.querySelector("span").textContent = tr(label);
       card.querySelector("strong").textContent = value;
@@ -3739,14 +3889,18 @@ function renderPaymentsFixed() {
   els.tenantPaymentList.replaceChildren(
     ...visible.map(({ tenant, status }) => {
       const due = roundUsd(Math.max(0, status.expected - status.paid));
-      const detail = due > 0 ? tr("{amount} due", { amount: formatUsd(due) }) : status.expected > 0 ? tr("Fully paid") : tr("No due");
-      const row = buildTenantPaymentRowBase(
+      const settled = due <= 0.005 && status.expected > 0;
+      const pillText = due > 0 ? tr("{amount} due", { amount: formatUsd(due) }) : status.expected > 0 ? tr("Fully paid") : tr("No due");
+      const pct = status.expected > 0 ? `${Math.min(100, Math.round((status.paid / status.expected) * 100))}%` : (status.paid > 0 ? "100%" : "0%");
+      const row = buildTenantPaymentRowBase({
         tenant,
-        `${formatUsd(status.paid)} / ${formatUsd(status.expected)}`,
-        status.label,
-        status.className,
-        detail,
-      );
+        paidStr: formatUsd(status.paid),
+        ofStr: tr("of {amount}", { amount: formatUsd(status.expected) }),
+        pct,
+        barClass: settled ? "is-green" : "is-gold",
+        statusClass: due > 0 ? "due" : "paid",
+        pillText,
+      });
       const addBtn = row.querySelector(".tpr-add-btn");
       addBtn.dataset.tenantId = tenant.id;
       addBtn.dataset.month = selectedMonth;
@@ -3797,7 +3951,7 @@ function renderPaymentsActual() {
     ...["Total Expenses", "Collected", "Outstanding"].map((label, i) => {
       const value = [formatUsd(totalExpenses), formatUsd(totalCollected), formatUsd(totalOutstanding)][i];
       const card = document.createElement("article");
-      card.className = "payment-summary-card";
+      card.className = `payment-summary-card${i === 1 ? " is-collected" : i === 2 ? " is-due" : ""}`;
       card.innerHTML = `<span></span><strong></strong>`;
       card.querySelector("span").textContent = tr(label);
       card.querySelector("strong").textContent = value;
@@ -3811,20 +3965,21 @@ function renderPaymentsActual() {
   els.tenantPaymentList.replaceChildren(
     ...visibleData.map(({ tenant, balance, payments, projectsDue, charged, totalDue }) => {
       const due = Math.max(0, balance);
-      const statusClass = totalDue > 0.005 ? "due" : "paid";
-      const statusLabel = totalDue > 0.005 ? "Due" : balance < -0.005 ? "Credit" : "Settled";
-      const detail = totalDue > 0.005
+      const pillText = totalDue > 0.005
         ? (projectsDue > 0.005
             ? tr("{amount} due · {proj} project", { amount: formatUsd(totalDue), proj: formatUsd(projectsDue) })
             : tr("{amount} due", { amount: formatUsd(totalDue) }))
         : balance < -0.005 ? tr("{amount} credit", { amount: formatUsd(-balance) }) : tr("Settled");
-      const row = buildTenantPaymentRowBase(
+      const pct = charged > 0.005 ? `${Math.min(100, Math.round((payments / charged) * 100))}%` : "100%";
+      const row = buildTenantPaymentRowBase({
         tenant,
-        tr("{paid} paid of {share}", { paid: formatUsd(payments), share: formatUsd(charged) }),
-        statusLabel,
-        statusClass,
-        detail,
-      );
+        paidStr: formatUsd(payments),
+        ofStr: tr("of {amount}", { amount: formatUsd(charged) }),
+        pct,
+        barClass: totalDue > 0.005 ? "is-gold" : "is-green",
+        statusClass: totalDue > 0.005 ? "due" : "paid",
+        pillText,
+      });
       const addBtn = row.querySelector(".tpr-add-btn");
       addBtn.dataset.tenantId = tenant.id;
       addBtn.dataset.month = selectedMonth;
@@ -3854,11 +4009,13 @@ function renderTenants() {
       card.className = "tenant-card";
       card.innerHTML = `
         <div class="tenant-card-top">
-          <div>
-            <strong></strong>
-            <span class="tenant-unit-line"></span>
+          <div class="tenant-id">
+            <div class="tenant-id-text">
+              <strong></strong>
+              <span class="tenant-unit-line"></span>
+            </div>
           </div>
-          <button class="tenant-trash-btn delete-tenant-button" type="button" aria-label="Delete tenant">&#128465;</button>
+          <button class="tenant-trash-btn delete-tenant-button" type="button" aria-label="Delete tenant"></button>
         </div>
         <div class="tenant-metrics">
           <div class="metric metric-paid"><span></span><b></b></div>
@@ -3870,7 +4027,10 @@ function renderTenants() {
           <button class="text-link-btn print-statement-button" type="button"></button>
         </div>
       `;
-      card.querySelector(".delete-tenant-button").setAttribute("aria-label", tr("Delete tenant"));
+      card.querySelector(".tenant-id").insertBefore(avatarChip(tenant.name, 38), card.querySelector(".tenant-id-text"));
+      const trashBtn = card.querySelector(".delete-tenant-button");
+      trashBtn.setAttribute("aria-label", tr("Delete tenant"));
+      trashBtn.appendChild(lucide("trash", { size: 17, color: "var(--label-muted)" }));
       const metricLabels = card.querySelectorAll(".metric span");
       metricLabels[0].textContent = `✓ ${tr("Paid")}`;
       metricLabels[1].textContent = tr("Advance");
@@ -3886,10 +4046,7 @@ function renderTenants() {
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
       metrics[2].textContent = formatMonthly(totals.dueUsd);
-      if (totals.paidUsd > 0) card.querySelector(".metric-paid").classList.add("is-filled");
-      if (totals.dueUsd > 0) card.querySelector(".metric-due").classList.add("has-due");
-      // Advance credit is rare — hide the always-$0 box unless there is one.
-      if (totals.advanceUsd <= 0.005) card.querySelector(".metric-advance").classList.add("hidden");
+      if (totals.dueUsd > 0.005) card.querySelector(".metric-due").classList.add("has-due");
       card.querySelector(".edit-tenant-button").dataset.tenantId = tenant.id;
       card.querySelector(".print-statement-button").dataset.tenantId = tenant.id;
       card.querySelector(".delete-tenant-button").dataset.tenantId = tenant.id;
@@ -4933,23 +5090,24 @@ function renderLedger() {
     const dateStr = transaction.date || (transaction.forMonth ? transaction.forMonth.slice(0, 10) : "");
     const receiptReference = isReceiptablePayment(transaction) ? transaction.receiptRef : "";
     item.innerHTML = `
-      <div class="ledger-card-top">
-        <span class="ledger-date-label"></span>
-        <div class="ledger-action-group"></div>
-      </div>
-      <div class="ledger-card-body">
+      <div class="ledger-row-main">
+        <span class="ledger-dot"></span>
         <div class="ledger-text">
           <strong></strong>
           <span class="ledger-subtitle"></span>
-          <div class="ledger-expand"></div>
         </div>
-        <div class="ledger-amount"></div>
+        <strong class="ledger-amount tnum"></strong>
+      </div>
+      <div class="ledger-expand">
+        <div class="ledger-action-group"></div>
       </div>
     `;
-    item.querySelector(".ledger-date-label").textContent = dateStr ? formatDateLabel(dateStr) : "";
+    // Income = green dot, expense/outflow = muddy-red dot.
+    if (amountValue < 0) item.querySelector(".ledger-dot").classList.add("is-out");
     const title = transaction.tenantId ? tenantName(transaction.tenantId) : transaction.description;
     item.querySelector("strong").textContent = title || tr(transaction.category);
     item.querySelector(".ledger-subtitle").textContent = [
+      dateStr ? formatDateLabel(dateStr) : "",
       tr(transaction.category),
       transaction.expenseCategory ? tr(transaction.expenseCategory) : "",
       transaction.forMonth ? tr("Month: {month}", { month: formatMonth(transaction.forMonth) }) : "",
@@ -4963,22 +5121,22 @@ function renderLedger() {
       transaction.invoiceAttachment?.fileName ? tr("Attachment: {v}", { v: transaction.invoiceAttachment.fileName }) : "",
     ].filter(Boolean);
     const expand = item.querySelector(".ledger-expand");
+    const actionGroup = item.querySelector(".ledger-action-group");
     if (detailItems.length) {
+      const details = document.createElement("div");
+      details.className = "ledger-details";
       detailItems.forEach((text) => {
         const p = document.createElement("p");
         p.textContent = text;
-        expand.append(p);
+        details.append(p);
       });
-    } else {
-      expand.remove();
+      expand.insertBefore(details, actionGroup);
     }
 
     const amount = item.querySelector(".ledger-amount");
-    amount.textContent = formatUsd(amountValue);
+    amount.textContent = `${amountValue >= 0 ? "+" : ""}${formatUsd(amountValue)}`;
     amount.classList.toggle("positive", amountValue >= 0);
     amount.classList.toggle("negative", amountValue < 0);
-
-    const actionGroup = item.querySelector(".ledger-action-group");
     if (isReceiptablePayment(transaction)) {
       const btn = document.createElement("button");
       btn.className = "ledger-action-btn receipt-button";
@@ -5395,6 +5553,7 @@ function applyCollectionModeVisibility(mode) {
 
 function renderSettings() {
   els.appVersionLabel.textContent = APP_VERSION;
+  if (els.appVersionLabelMore) els.appVersionLabelMore.textContent = APP_VERSION;
   if (els.languageInput) els.languageInput.value = normalizeLang(state.settings.language);
   els.buildingNameInput.value = (state.building && state.building.name) || "";
   els.defaultDueInput.value = amountInputValue(state.settings.defaultDueUsd);
@@ -5445,16 +5604,48 @@ function renderAll() {
   renderSettings();
 }
 
-const MORE_VIEWS = ["projectsView", "servicesView", "pollsView", "settingsView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView"];
 
 function setView(viewId) {
-  if (sessionMode === "tenant" && viewId === "settingsView") viewId = "dashboardView";
+  if (sessionMode === "tenant" && viewId === "settingsView") viewId = "moreView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
+  // Re-run the enter animation each time a view is shown.
+  const active = document.getElementById(viewId);
+  if (active) { active.style.animation = "none"; void active.offsetWidth; active.style.animation = ""; }
   els.navButtons.forEach((button) => {
     if (button.id === "moreNavButton") button.classList.toggle("active", MORE_VIEWS.includes(viewId));
     else button.classList.toggle("active", button.dataset.view === viewId);
   });
-  els.moreSheetItems.forEach((item) => item.classList.toggle("is-active", item.dataset.view === viewId));
+  // Scroll back to top when switching views.
+  window.scrollTo({ top: 0 });
+}
+
+// Inject a Lucide icon into each element carrying data-nav-icon (nav buttons,
+// more-menu rows). Idempotent — skips ones already populated.
+function renderNavIcons() {
+  document.querySelectorAll("[data-nav-icon]").forEach((el) => {
+    if (el.dataset.navIconDone) return;
+    el.dataset.navIconDone = "1";
+    const inMenu = el.classList.contains("more-menu-item");
+    const icon = lucide(el.dataset.navIcon, { size: inMenu ? 22 : 22, color: inMenu ? "var(--avatar-text)" : "currentColor" });
+    if (inMenu) {
+      const chip = document.createElement("span");
+      chip.className = "mm-icon";
+      chip.appendChild(icon);
+      el.insertBefore(chip, el.firstChild);
+      const chev = lucide("chevronRight", { size: 19, color: "#b3bbb6", stroke: 2.2 });
+      chev.classList.add("mm-chevron");
+      el.appendChild(chev);
+    } else {
+      el.insertBefore(icon, el.firstChild);
+    }
+  });
+  // Back buttons get a chevron (CSS mirrors it under RTL).
+  document.querySelectorAll(".back-btn").forEach((el) => {
+    if (el.dataset.navIconDone) return;
+    el.dataset.navIconDone = "1";
+    el.appendChild(lucide("chevronLeft", { size: 20, color: "var(--primary-dark)", stroke: 2.2 }));
+  });
 }
 
 function openDialog(dialog) {
@@ -7163,31 +7354,27 @@ function navigateMonth(direction) {
 }
 
 function attachEvents() {
+  renderNavIcons();
   els.navButtons.forEach((button) => {
-    if (button.id === "moreNavButton") {
-      button.addEventListener("click", () => openDialog(els.moreSheet));
-    } else {
-      button.addEventListener("click", () => setView(button.dataset.view));
-    }
+    button.addEventListener("click", () => setView(button.dataset.view));
   });
-  els.moreSheetItems.forEach((item) =>
-    item.addEventListener("click", () => {
-      setView(item.dataset.view);
-      closeDialog(els.moreSheet);
-    }),
-  );
-  els.closeMoreSheet.addEventListener("click", () => closeDialog(els.moreSheet));
-  els.moreSheet.addEventListener("click", (event) => {
-    if (event.target === els.moreSheet) closeDialog(els.moreSheet);
+  // More-menu rows open their sub-view.
+  els.moreMenu.addEventListener("click", (event) => {
+    const item = event.target.closest(".more-menu-item[data-view]");
+    if (item) setView(item.dataset.view);
   });
-  els.monthPrev.addEventListener("click", () => navigateMonth(-1));
-  els.monthNext.addEventListener("click", () => navigateMonth(1));
+  // Sub-view back buttons return to the More menu.
+  document.querySelectorAll(".back-btn[data-back-to]").forEach((btn) => {
+    btn.addEventListener("click", () => setView(btn.dataset.backTo));
+  });
   els.dueOnlyToggle.addEventListener("click", () => { dueOnlyFilter = !dueOnlyFilter; renderPayments(); });
   els.whatsappAllDueButton.addEventListener("click", openWhatsAppReminderDialog);
   els.closeWhatsappDialog.addEventListener("click", () => closeDialog(els.whatsappDialog));
   els.clearLedgerFilters.addEventListener("click", clearAllLedgerFilters);
-  els.monthSelect.addEventListener("change", () => {
-    selectedMonth = els.monthSelect.value;
+  els.monthChips.addEventListener("click", (event) => {
+    const chip = event.target.closest("button[data-month]");
+    if (!chip) return;
+    selectedMonth = chip.dataset.month;
     renderDashboard();
     renderPayments();
   });
@@ -7278,13 +7465,10 @@ function attachEvents() {
     }
     const deleteButton = event.target.closest(".delete-transaction-button[data-transaction-id]");
     if (deleteButton) { deleteLedgerTransaction(deleteButton.dataset.transactionId); return; }
-    const textArea = event.target.closest(".ledger-text");
-    if (textArea) {
-      // Tap the row text to expand details; Delete is only revealed while open
-      // so it's never one accidental tap away.
-      const item = textArea.closest(".ledger-item");
-      const open = item.classList.toggle("is-open");
-      textArea.querySelector(".ledger-expand")?.classList.toggle("is-open", open);
+    const mainRow = event.target.closest(".ledger-row-main");
+    if (mainRow) {
+      // Tap a row to reveal its details + actions (Delete never one tap away).
+      mainRow.closest(".ledger-item").classList.toggle("is-open");
     }
   });
   els.exportExcelButton.addEventListener("click", handleLedgerExcelExport);

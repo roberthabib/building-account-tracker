@@ -1,19 +1,119 @@
 :root {
   color-scheme: light;
-  --bg: #f6f7f5;
+  --bg: #f4f6f3;
   --surface: #ffffff;
-  --surface-2: #eef4ef;
+  --surface-soft: #fbfcfb; /* nested/inset cards, list rows */
+  --surface-2: #eef4ef; /* emphasis rows (net total) */
   --ink: #14211f;
-  --muted: #61706b;
-  --line: #d9e0dc;
+  --muted: #61706b; /* body-muted */
+  --label-muted: #8a938f; /* lighter caption/eyebrow tint */
+  --line: #e4e9e4; /* hairline */
+  --line-inner: #f0f2ef; /* rule-divided list dividers */
   --primary: #1f6b5a;
   --primary-dark: #163832;
+  --accent-green: #2e9e6b; /* progress-bar end, dots */
   --blue: #315f9d;
   --amber: #a7661b;
   --red: #a23b3b;
-  --shadow: 0 1px 3px rgba(22, 56, 50, 0.07), 0 4px 14px rgba(22, 56, 50, 0.09);
+  --red-tint-bg: #f6dede;
+  --red-tint-text: #8a3232;
+  --green-tint-bg: #dcefe8;
+  --green-tint-text: #0f513f;
+  --avatar-bg: #e7f0ea;
+  --avatar-text: #1f6b5a;
+  --radius-card: 16px;
+  --radius-inner: 13px;
+  --radius-control: 11px;
+  --shadow: 0 2px 6px rgba(22, 56, 50, 0.05);
+  --shadow-hero: 0 6px 16px rgba(22, 56, 50, 0.22);
+  --shadow-sheet: 0 -12px 44px rgba(0, 0, 0, 0.3);
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Numbers align and read as a set. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@keyframes refin {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sheetup {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.view.active {
+  animation: refin 0.22s ease both;
+}
+
+/* Avatar initials chip. */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: var(--avatar-bg);
+  color: var(--avatar-text);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Segmented pill control (month / language / currency / split). */
+.segmented {
+  display: flex;
+  gap: 5px;
+  background: var(--surface-2-soft, #eef1ee);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.segmented.on-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(22, 56, 50, 0.04);
+}
+
+.segmented button {
+  flex: 1;
+  min-height: 36px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+
+.segmented button.is-active {
+  background: var(--primary-dark);
+  color: #fff;
+}
+
+/* Dashboard month strip: segmented look, scrolls horizontally when many. */
+.month-chips {
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.month-chips::-webkit-scrollbar {
+  height: 0;
+}
+.month-chips button {
+  flex: 0 0 auto;
+  padding: 0 16px;
+  white-space: nowrap;
 }
 
 * {
@@ -39,7 +139,7 @@ button {
 
 .app-shell {
   min-height: 100vh;
-  padding: 18px 16px 88px;
+  padding: 16px 16px calc(104px + env(safe-area-inset-bottom));
 }
 
 .topbar {
@@ -58,9 +158,10 @@ button {
 }
 
 .brand-lockup img {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(22, 56, 50, 0.28);
 }
 
 h1,
@@ -72,27 +173,30 @@ p {
 
 h1 {
   max-width: 13rem;
-  font-size: 1.05rem;
-  line-height: 1.15;
-  letter-spacing: 0;
+  font-size: 1.02rem;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 h2 {
-  font-size: 1.35rem;
-  line-height: 1.15;
-  letter-spacing: 0;
+  font-size: 1.5rem;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 h3 {
-  font-size: 1rem;
-  letter-spacing: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .eyebrow {
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  color: var(--label-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -246,42 +350,66 @@ label select {
 }
 
 .kpi {
-  min-height: 98px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--surface);
-  padding: 14px;
+  padding: 15px 15px 14px;
   box-shadow: var(--shadow);
 }
 
 .kpi span {
-  color: var(--muted);
-  font-size: 0.78rem;
+  color: var(--label-muted);
+  font-size: 0.7rem;
   font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .kpi strong {
   display: block;
-  margin-top: 8px;
-  font-size: clamp(1.08rem, 4.8vw, 1.65rem);
-  line-height: 1.1;
-  overflow-wrap: anywhere;
-  color: var(--text);
+  margin-top: 9px;
+  font-size: 1.7rem;
+  line-height: 1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
 .kpi small {
   display: block;
-  margin-top: 4px;
-  color: var(--muted);
+  margin-top: 6px;
+  color: var(--label-muted);
+  font-size: 0.72rem;
+}
+
+.kpi strong.is-negative {
+  color: var(--red);
+}
+.kpi strong.is-amber {
+  color: var(--amber);
+}
+
+.kpi.kpi-hero {
+  border-color: var(--primary-dark);
+  background: var(--primary-dark);
+  box-shadow: var(--shadow-hero);
+}
+.kpi.kpi-hero span,
+.kpi.kpi-hero small {
+  color: #9fc3b4;
+}
+.kpi.kpi-hero strong {
+  color: #fff;
 }
 
 .panel {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--surface);
-  padding: 12px 14px;
+  padding: 14px;
   box-shadow: var(--shadow);
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .panel-header {
@@ -293,76 +421,90 @@ label select {
 }
 
 .panel-header span {
-  color: var(--muted);
-  font-size: 0.86rem;
-  font-weight: 800;
+  color: var(--label-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .progress-track {
-  height: 10px;
+  height: 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: #e0e5e1;
-  margin-bottom: 12px;
+  background: #e7ece7;
+  margin-bottom: 14px;
 }
 
 .progress-bar {
   width: 0;
   height: 100%;
-  border-radius: inherit;
-  background: var(--primary);
-  transition: width 180ms ease;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--accent-green));
+  transition: width 0.4s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .tenant-status-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 9px;
 }
 
-.status-card,
-.tenant-card,
-.ledger-item,
-.summary-row,
-.payment-month-row {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-}
-
+/* Inset "soft" card used for dashboard tenant chips + project share tiles. */
 .status-card {
-  min-height: 72px;
-  padding: 10px;
+  border: 1px solid var(--line-inner);
+  border-radius: var(--radius-inner);
+  background: var(--surface-soft);
+  padding: 11px;
 }
 
-.status-card strong,
-.tenant-card strong,
-.ledger-item strong {
+.status-card-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 9px;
+}
+
+.status-card-top strong {
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  min-width: 0;
+}
+
+.status-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.status-card-bottom span:first-child {
+  color: var(--label-muted);
+  font-size: 0.75rem;
+  min-width: 0;
+}
+
+.status-card .sc-name {
   display: block;
+  font-size: 0.84rem;
+  font-weight: 700;
   line-height: 1.2;
-}
-
-.status-card span,
-.tenant-card span,
-.ledger-item span {
-  color: var(--muted);
-  font-size: 0.82rem;
+  margin-bottom: 6px;
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
-  height: 24px;
-  margin-top: 8px;
-  padding: 0 8px;
+  height: 22px;
+  padding: 0 9px;
   border-radius: 999px;
-  font-size: 0.74rem;
+  font-size: 0.68rem;
   font-weight: 800;
 }
 
 .status-paid {
-  color: #0f513f;
-  background: #dcefe8;
+  color: var(--green-tint-text);
+  background: var(--green-tint-bg);
 }
 
 .status-partial {
@@ -371,74 +513,136 @@ label select {
 }
 
 .status-due {
-  color: #772c2c;
-  background: #f3d8d8;
+  color: var(--red-tint-text);
+  background: var(--red-tint-bg);
 }
 
+.status-none {
+  color: var(--label-muted);
+  background: #f2f4f1;
+}
+
+/* Rule-divided lists: rows separated by a hairline top-border, no per-row card. */
 .summary-list,
-.month-overview-list {
-  display: grid;
-  gap: 8px;
-}
-
+.month-overview-list,
+.tenant-payment-list,
 .ledger-list {
   display: block;
 }
 
-.tenant-payment-list {
-  display: block;
-}
-
 .tenant-list {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
 }
 
 .summary-row,
 .payment-month-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 11px 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-inner);
+  background: none;
+  text-align: start;
+}
+
+.summary-row:first-child,
+.payment-month-row:first-child {
+  border-top: 0;
 }
 
 .summary-row.emphasis {
+  margin-top: 10px;
+  padding: 13px 14px;
+  border-top: 0;
+  border-radius: var(--radius-inner);
   background: var(--surface-2);
-  border-color: #b8c8bf;
 }
 
 .summary-row.summary-row-indent {
-  padding-left: 20px;
-  background: none;
-  border-color: transparent;
-  font-size: 0.88rem;
+  padding-inline-start: 14px;
   color: var(--muted);
 }
 
 .due-amount {
-  color: #772c2c;
-  font-weight: 700;
+  color: var(--red);
+  font-weight: 800;
 }
 
 .advance-credit {
-  color: #2a6e2a;
-  font-weight: 700;
+  color: var(--primary);
+  font-weight: 800;
 }
 
 .summary-row strong,
 .payment-month-row strong {
   display: block;
   line-height: 1.2;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.summary-row b,
+.payment-month-row b {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
   font-size: 0.95rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.summary-row.emphasis strong {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+.summary-row.emphasis b {
+  font-size: 1.05rem;
 }
 
 .summary-row span,
 .payment-month-row span {
   display: block;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 0.8rem;
+  margin-top: 2px;
+  color: var(--label-muted);
+  font-size: 0.73rem;
+  line-height: 1.3;
+}
+
+/* Expenses-by-category rows with a thin proportion bar. */
+.cat-row {
+  padding: 12px 0;
+  border-top: 1px solid var(--line-inner);
+}
+.cat-row:first-child {
+  border-top: 0;
+}
+.cat-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.cat-row-head strong {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.cat-row-head b {
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+.cat-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: #eef1ee;
+  overflow: hidden;
+}
+.cat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #c3d4cb;
 }
 
 
@@ -460,26 +664,33 @@ label select {
 
 .payment-summary-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--surface);
   padding: 12px;
   box-shadow: var(--shadow);
 }
 
 .payment-summary-card span {
-  color: var(--muted);
-  font-size: 0.76rem;
-  font-weight: 800;
+  display: block;
+  color: var(--label-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .payment-summary-card strong {
   display: block;
-  margin-top: 6px;
-  font-size: clamp(0.9rem, 4.2vw, 1.15rem);
+  margin-top: 7px;
+  font-size: clamp(0.9rem, 4.2vw, 1.12rem);
   line-height: 1.1;
   white-space: nowrap;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
+.payment-summary-card.is-collected strong { color: var(--primary); }
+.payment-summary-card.is-due strong { color: var(--red); }
 
 .summary-paid-badge {
   display: inline-block;
@@ -500,7 +711,7 @@ label select {
 
 .payment-section {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--surface);
   padding: 14px;
   box-shadow: var(--shadow);
@@ -508,93 +719,101 @@ label select {
 
 .tenant-payment-row {
   padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-  display: grid;
-  gap: 8px;
+  border-top: 1px solid var(--line-inner);
 }
 
-.tenant-payment-row:last-child {
-  border-bottom: none;
-  padding-bottom: 2px;
+.tenant-payment-row:first-child {
+  border-top: 0;
 }
 
-.tpr-main {
+.tpr-top {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
 }
 
-.tpr-info strong {
+.tpr-id {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.tpr-id-text {
+  min-width: 0;
+}
+
+.tpr-id-text strong {
   display: block;
-  font-size: 0.95rem;
-  line-height: 1.2;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.15;
 }
 
-.tpr-info span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin-top: 2px;
+.tpr-id-text span {
+  color: var(--label-muted);
+  font-size: 0.73rem;
 }
 
-.tpr-amount {
-  font-weight: 800;
-  font-size: 0.9rem;
-  text-align: right;
-  flex-shrink: 0;
+.tpr-paid {
+  text-align: end;
   white-space: nowrap;
 }
 
-.tpr-status-row {
+.tpr-paid strong {
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.tpr-paid span {
+  display: block;
+  color: var(--label-muted);
+  font-size: 0.72rem;
+}
+
+.tpr-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: #eef1ee;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.tpr-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+.tpr-bar-fill.is-green { background: var(--primary); }
+.tpr-bar-fill.is-gold { background: #c9a227; }
+
+.tpr-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
-/* Compact WhatsApp / add-phone action inside the payment row status line. */
-.tpr-wa-btn {
-  min-height: 30px;
-  padding: 3px 10px;
-  font-size: 0.75rem;
-  margin: 0;
+.tpr-foot .status-pill {
+  height: 24px;
+  padding: 0 10px;
+  font-size: 0.7rem;
 }
 
-.tpr-status-row .tpr-add-btn,
-.tpr-status-row .tpr-wa-btn {
-  flex-shrink: 0;
-}
-
-/* Status detail sits on its own line so long breakdowns never squeeze. */
-.tpr-detail {
-  display: block;
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin-top: 6px;
-}
-
-.tpr-detail:empty {
-  display: none;
-}
-
-.tpr-status-left {
+.tpr-actions {
   display: flex;
-  align-items: center;
   gap: 6px;
-  /* The status text gets the line; action buttons wrap below when tight. */
-  flex: 1 1 auto;
-  min-width: 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
 }
 
-.tpr-status-left .status-pill {
-  margin-top: 0;
-  flex-shrink: 0;
+.tpr-add-btn,
+.tpr-wa-btn {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.74rem;
+  margin: 0;
 }
 
 .whatsapp-full-btn {
@@ -665,14 +884,14 @@ label select {
   font-size: 0.76rem;
 }
 
-.tenant-card,
-.ledger-item {
-  padding: 12px;
-}
-
 .tenant-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: 14px;
+  box-shadow: var(--shadow);
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .tenant-card-top {
@@ -682,85 +901,105 @@ label select {
   gap: 8px;
 }
 
+.tenant-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tenant-id-text {
+  min-width: 0;
+}
+
 .tenant-card-top strong {
   display: block;
-  font-size: 0.95rem;
-  line-height: 1.2;
-  margin-bottom: 2px;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .tenant-unit-line {
   display: block;
-  color: var(--muted);
-  font-size: 0.8rem;
+  color: var(--label-muted);
+  font-size: 0.75rem;
+  margin-top: 1px;
 }
 
 .tenant-trash-btn {
-  background: none;
-  border: none;
-  padding: 2px 4px;
-  font-size: 1.05rem;
-  color: var(--red);
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 9px;
+  background: #f6f8f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  line-height: 1;
-  flex-shrink: 0;
+  transition: background 0.14s;
+}
+.tenant-trash-btn:active {
+  background: var(--red-tint-bg);
 }
 
 .tenant-metrics {
   display: grid;
-  /* Columns match the number of visible metrics (the Advance box hides at $0). */
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .metric {
-  border-radius: 8px;
-  background: var(--surface-2);
-  padding: 7px 8px;
-  border: 1px solid transparent;
+  border-radius: 11px;
+  background: #f2f4f1;
+  padding: 9px 10px;
 }
 
 .metric span {
   display: block;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--muted);
-  margin-bottom: 2px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--label-muted);
+  margin-bottom: 4px;
 }
 
 .metric b {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.98rem;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
 
-.metric-paid.is-filled {
-  background: var(--primary);
-  border-color: var(--primary);
+.metric-paid {
+  background: #eaf3ee;
 }
-
-.metric-paid.is-filled span,
-.metric-paid.is-filled b {
-  color: #ffffff;
+.metric-paid span {
+  color: #4c7a67;
+}
+.metric-paid b {
+  color: #166a4a;
 }
 
 .metric-due.has-due {
-  background: #f3d8d8;
-  border-color: #e7bcbc;
+  background: #f8ecec;
 }
-
-.metric-due.has-due span,
+.metric-due.has-due span {
+  color: #a05656;
+}
 .metric-due.has-due b {
-  color: #772c2c;
+  color: var(--red-tint-text);
 }
 
 .tenant-card-footer {
   display: flex;
-  gap: 14px;
-  padding-top: 6px;
-  border-top: 1px solid var(--line);
+  gap: 18px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line-inner);
 }
 
 .text-link-btn {
@@ -802,51 +1041,64 @@ label select {
 
 .ledger-item {
   display: block;
-  margin-bottom: 8px;
-  border-radius: 10px;
+  border-top: 1px solid var(--line-inner);
 }
 
-.ledger-payment {
-  background: #edf7f2;
-  border-color: #c3e6d0;
+.ledger-item:first-child {
+  border-top: 0;
 }
 
-.ledger-expense {
-  background: #fdf2f2;
-  border-color: #f0c9c9;
-}
-
-.ledger-card-top {
+.ledger-row-main {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 12px;
+  padding: 13px 0;
+  cursor: pointer;
 }
 
-.ledger-item .ledger-date-label {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--muted);
+.ledger-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--accent-green);
+}
+.ledger-dot.is-out {
+  background: #cf7a7a;
 }
 
 .ledger-action-group {
   display: flex;
-  gap: 5px;
+  gap: 6px;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  padding: 0 0 12px 21px;
+}
+body.rtl .ledger-action-group,
+body.rtl .ledger-details {
+  padding-left: 0;
+  padding-right: 21px;
+}
+
+.ledger-details {
+  padding: 0 0 8px 21px;
+}
+.ledger-details p {
+  margin: 2px 0;
+  color: var(--label-muted);
+  font-size: 0.75rem;
 }
 
 .ledger-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 9px;
-  min-height: 28px;
+  padding: 3px 12px;
+  min-height: 30px;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.85);
+  border-radius: 9px;
+  background: var(--surface);
   color: var(--ink);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
@@ -856,21 +1108,8 @@ label select {
 
 .danger-action {
   border-color: #e7bcbc;
-  color: #772c2c;
-  background: rgba(255, 255, 255, 0.85);
-}
-
-/* Delete is destructive: hidden until the row is expanded (tap the row text). */
-.ledger-item .delete-transaction-button {
-  display: none;
-}
-
-.ledger-item.is-open .delete-transaction-button {
-  display: inline-flex;
-}
-
-.ledger-text {
-  cursor: pointer;
+  color: var(--red-tint-text);
+  background: var(--surface);
 }
 
 /* Subtle red variant of .mini-button for in-dialog destructive actions. */
@@ -880,17 +1119,11 @@ label select {
   align-self: flex-start;
 }
 
-.ledger-card-body {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
 .ledger-amount {
-  text-align: right;
+  text-align: end;
+  font-size: 0.95rem;
   font-weight: 800;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 
@@ -1189,26 +1422,33 @@ label select {
 }
 
 .ledger-text {
-  cursor: pointer;
+  flex: 1 1 auto;
   min-width: 0;
+}
+
+.ledger-text strong {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ledger-subtitle {
+  display: block;
+  color: var(--label-muted);
+  font-size: 0.72rem;
+  line-height: 1.3;
 }
 
 .ledger-expand {
   display: none;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
 }
 
-.ledger-expand.is-open {
-  display: grid;
-  gap: 3px;
-}
-
-.ledger-expand p {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--muted);
+.ledger-item.is-open .ledger-expand {
+  display: block;
 }
 
 .bottom-nav {
@@ -1219,24 +1459,36 @@ label select {
   display: flex;
   flex-wrap: nowrap;
   gap: 4px;
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  padding: 8px 10px calc(12px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
 }
 
 .nav-button {
-  min-height: 44px;
+  min-height: 52px;
   flex: 1 1 0;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 13px;
   background: transparent;
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 800;
+  color: var(--label-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   padding: 0 4px;
+  transition: background 0.16s, color 0.16s;
+}
+
+.nav-button svg {
+  width: 22px;
+  height: 22px;
 }
 
 .nav-button.active {
@@ -1244,51 +1496,162 @@ label select {
   color: #ffffff;
 }
 
+/* Sub-view back header (More → Projects/Services/Polls/Settings). */
+.sub-header {
+  align-items: center;
+}
+
+.back-btn {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.back-btn:active {
+  background: #f1f4f1;
+}
+body.rtl .back-btn svg {
+  transform: scaleX(-1);
+}
+
+/* More menu (icon-chip rows). */
+.more-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.more-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  text-align: start;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.14s;
+}
+.more-menu-item:active {
+  background: var(--surface-soft);
+}
+.mm-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-inner);
+  background: var(--avatar-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mm-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.mm-text strong {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.mm-text span {
+  color: var(--label-muted);
+  font-size: 0.78rem;
+}
+.mm-chevron {
+  flex: 0 0 auto;
+}
+body.rtl .mm-chevron {
+  transform: scaleX(-1);
+}
+
+/* Full-width primary action (e.g. Enter Meter Readings). */
+.block-button {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  border-radius: var(--radius-inner);
+  margin-bottom: 14px;
+}
+
 .icon-button,
 .primary-button,
 .secondary-button,
 .danger-button {
   min-height: 44px;
-  border-radius: 8px;
+  border-radius: var(--radius-inner);
   border: 1px solid transparent;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .icon-button {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 14px;
   background: var(--primary-dark);
   color: #ffffff;
-  font-size: 1.55rem;
+  font-size: 1.5rem;
   line-height: 1;
+  box-shadow: var(--shadow-hero);
+  transition: transform 0.12s;
+}
+
+.icon-button:active {
+  transform: translateY(1px);
 }
 
 .icon-button.small {
-  width: 38px;
-  height: 38px;
-  font-size: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ecefec;
+  color: var(--muted);
+  font-size: 1.05rem;
+  box-shadow: none;
 }
 
 .primary-button {
   background: var(--primary-dark);
   color: #ffffff;
   padding: 0 16px;
+  box-shadow: var(--shadow-hero);
+}
+.primary-button:active {
+  transform: translateY(1px);
 }
 
 .secondary-button {
-  border-color: var(--line);
+  border-color: #d7ded9;
   background: var(--surface);
-  color: var(--ink);
+  color: var(--primary-dark);
   padding: 0 14px;
 }
 
 .danger-button {
-  background: #f3d8d8;
-  color: #772c2c;
+  background: var(--red-tint-bg);
+  color: var(--red-tint-text);
   padding: 0 14px;
+}
+
+/* In sheet button rows, primary fills and cancel hugs its label. */
+.button-row .primary-button {
+  flex: 1;
+}
+.button-row .secondary-button {
+  flex: 0 0 auto;
 }
 
 .full-width {
@@ -1300,23 +1663,44 @@ button:disabled {
   opacity: 0.72;
 }
 
+/* Dialogs render as bottom sheets: docked to the bottom, rounded top, slide-up. */
 dialog {
-  width: min(94vw, 520px);
-  max-height: 88vh;
+  width: 100%;
+  max-width: 520px;
+  max-height: 94vh;
+  margin: auto auto 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: 22px 22px 0 0;
   padding: 0;
-  box-shadow: 0 24px 70px rgba(20, 33, 31, 0.3);
+  background: var(--bg);
+  box-shadow: var(--shadow-sheet);
+  overflow: hidden;
+}
+
+dialog[open] {
+  animation: sheetup 0.3s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+/* Grabber handle at the top of every sheet. */
+dialog::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: 10px auto 0;
+  border-radius: 999px;
+  background: #cfd6d0;
 }
 
 dialog::backdrop {
   background: rgba(20, 33, 31, 0.45);
+  animation: fadein 0.2s ease both;
 }
 
 form {
   display: grid;
-  gap: 12px;
-  padding: 16px;
+  gap: 14px;
+  padding: 16px 18px calc(18px + env(safe-area-inset-bottom));
 }
 
 .dialog-header,
@@ -1327,18 +1711,63 @@ form {
   gap: 10px;
 }
 
+.dialog-header h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 label {
   display: grid;
   gap: 6px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 800;
+  color: var(--ink);
+  font-size: 0.76rem;
+  font-weight: 700;
 }
 
 .field-label {
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 800;
+  color: var(--ink);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+/* Non-form sheets (entry chooser, WhatsApp, connect) get side padding. */
+dialog > *:not(form) {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+dialog > .dialog-header {
+  padding-top: 4px;
+  padding-bottom: 10px;
+}
+dialog > *:last-child:not(form) {
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+/* Modern form controls inside sheets and settings panels. */
+dialog label input:not([type="checkbox"]),
+dialog label select,
+dialog label textarea,
+dialog > form > label input,
+.panel label input:not([type="checkbox"]),
+.panel label select,
+#connectCodeInput {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding: 0 12px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+
+dialog label textarea,
+#connectCodeInput {
+  min-height: 70px;
+  padding: 10px 12px;
+  line-height: 1.4;
 }
 
 .invoice-file-field {
@@ -1532,45 +1961,40 @@ label {
   min-width: 0;
 }
 
+#attentionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .attention-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  text-align: left;
+  text-align: start;
   padding: 12px;
-  margin-bottom: 8px;
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--muted);
-  border-radius: 10px;
-  background: var(--surface);
+  border: 1px solid var(--line-inner);
+  border-radius: var(--radius-inner);
+  background: var(--surface-soft);
   color: var(--ink);
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
   cursor: pointer;
+  transition: background 0.14s;
 }
 
-.attention-row:last-child {
-  margin-bottom: 0;
-}
-
-.attention-row.attention-due {
-  border-left-color: var(--red);
-}
-
-.attention-row.attention-warn {
-  border-left-color: #c98a1a;
-}
-
-.attention-row.attention-danger {
-  border-left-color: var(--red);
+.attention-row:active {
+  background: #f1f4f1;
 }
 
 .attention-icon {
-  font-size: 1.15rem;
-  line-height: 1;
+  width: 38px;
+  height: 38px;
   flex: 0 0 auto;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .attention-text {
@@ -1578,10 +2002,24 @@ label {
   min-width: 0;
 }
 
+.attention-text strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.attention-text span {
+  font-size: 0.76rem;
+  color: var(--label-muted);
+}
+
 .attention-chevron {
   flex: 0 0 auto;
-  color: var(--muted);
-  font-size: 1.2rem;
+}
+body.rtl .attention-chevron {
+  transform: scaleX(-1);
 }
 
 .settings-action {
@@ -1622,29 +2060,32 @@ label {
   align-items: center;
   gap: 6px;
   height: 30px;
-  padding: 0 10px;
-  border: 1px solid var(--line);
+  padding: 0 11px;
+  border: 0;
   border-radius: 999px;
-  background: var(--surface);
-  color: var(--muted);
+  background: var(--avatar-bg);
+  color: var(--green-tint-text);
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .sync-chip .sync-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--muted);
+  background: var(--accent-green);
   flex: 0 0 auto;
 }
 
-.sync-chip.is-saved .sync-dot { background: #2e9e6b; }
+.sync-chip.is-saved .sync-dot { background: var(--accent-green); }
+.sync-chip.is-saving { background: #f6ecd7; color: #6e4410; }
 .sync-chip.is-saving .sync-dot { background: #c98a1a; }
+.sync-chip.is-error { background: var(--red-tint-bg); color: var(--red-tint-text); }
 .sync-chip.is-error .sync-dot { background: var(--red); }
+.sync-chip.is-offline { background: #eef1ee; color: var(--muted); }
 .sync-chip.is-offline .sync-dot { background: var(--muted); }
 .sync-chip.is-local { display: none; }
 
@@ -2881,40 +3322,41 @@ label {
 }
 
 .gen-bill-lines {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  margin-top: 6px;
 }
 
 .gen-bill-line {
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface);
-}
-
-.gbl-top {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-inner);
 }
 
-.gbl-top strong {
-  font-size: 0.95rem;
+.gbl-text {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.gbl-top b {
-  font-size: 0.95rem;
+.gbl-text strong {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.gen-bill-line b {
+  font-size: 0.92rem;
+  font-weight: 800;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .gbl-detail {
   display: block;
   margin-top: 2px;
-  font-size: 0.78rem;
-  color: var(--muted);
+  font-size: 0.72rem;
+  color: var(--label-muted);
 }
 
 .delete-readings-btn {
