@@ -2099,42 +2099,99 @@ body.rtl .attention-chevron {
 .entry-chooser-btn {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 13px;
   width: 100%;
-  text-align: left;
-  padding: 14px 16px;
+  text-align: start;
+  padding: 15px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 15px;
   background: var(--surface);
   color: var(--ink);
   font: inherit;
   cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.14s;
 }
 
 .entry-chooser-btn:active {
-  transform: scale(0.99);
+  background: #f1f4f1;
 }
 
 .entry-chooser-btn .ec-icon {
-  font-size: 1.6rem;
-  line-height: 1;
+  width: 44px;
+  height: 44px;
   flex: 0 0 auto;
+  border-radius: 13px;
+  background: var(--avatar-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .entry-chooser-btn .ec-text {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
 .entry-chooser-btn .ec-text strong {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .entry-chooser-btn .ec-text small {
-  font-size: 0.8rem;
-  color: var(--muted);
+  font-size: 0.78rem;
+  color: var(--label-muted);
+}
+
+.entry-chooser-btn .ec-chevron {
+  flex: 0 0 auto;
+}
+body.rtl .entry-chooser-btn .ec-chevron {
+  transform: scaleX(-1);
+}
+
+/* Amount + USD/LBP segmented toggle. */
+.currency-select-hidden {
+  display: none;
+}
+
+.amount-field .field-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.amount-field .amount-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.amount-field .amount-row #transactionAmount {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding: 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+
+.currency-toggle {
+  flex: 0 0 auto;
+  align-self: stretch;
+}
+
+.currency-toggle button {
+  min-width: 50px;
+  flex: 0 0 auto;
+  padding: 0 4px;
 }
 
 .tenant-mode .tenant-trash-btn,

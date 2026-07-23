@@ -449,20 +449,20 @@
         <button class="icon-button small" id="closeEntryChooser" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
       <div class="entry-chooser-list">
-        <button class="entry-chooser-btn" type="button" data-category="Payments">
-          <span class="ec-icon" aria-hidden="true">&#128181;</span>
+        <button class="entry-chooser-btn" type="button" data-category="Payments" data-entry-icon="wallet">
+          <span class="ec-icon" aria-hidden="true"></span>
           <span class="ec-text"><strong data-i18n="entry.paymentTitle">Record a payment</strong><small data-i18n="entry.paymentDesc">A tenant paid their dues</small></span>
         </button>
-        <button class="entry-chooser-btn" type="button" data-category="Expenses">
-          <span class="ec-icon" aria-hidden="true">&#129534;</span>
+        <button class="entry-chooser-btn" type="button" data-category="Expenses" data-entry-icon="receipt">
+          <span class="ec-icon" aria-hidden="true"></span>
           <span class="ec-text"><strong data-i18n="entry.expenseTitle">Record an expense</strong><small data-i18n="entry.expenseDesc">A shared building cost</small></span>
         </button>
-        <button class="entry-chooser-btn" type="button" data-category="Services Expenses">
-          <span class="ec-icon" aria-hidden="true">&#9889;</span>
+        <button class="entry-chooser-btn" type="button" data-category="Services Expenses" data-entry-icon="zap">
+          <span class="ec-icon" aria-hidden="true"></span>
           <span class="ec-text"><strong data-i18n="entry.servicesTitle">Generator / Water cost</strong><small data-i18n="entry.servicesDesc">Diesel, maintenance or a water tanker</small></span>
         </button>
-        <button class="entry-chooser-btn" type="button" data-category="Opening Balance">
-          <span class="ec-icon" aria-hidden="true">&#127974;</span>
+        <button class="entry-chooser-btn" type="button" data-category="Opening Balance" data-entry-icon="home">
+          <span class="ec-icon" aria-hidden="true"></span>
           <span class="ec-text"><strong data-i18n="entry.openingTitle">Opening balance</strong><small data-i18n="entry.openingDesc">Starting cash or a tenant carry-in</small></span>
         </button>
       </div>
@@ -541,18 +541,19 @@
           </label>
         </div>
 
-        <div class="two-col amount-row">
-          <label class="amount-value-field">
-            <span data-i18n="tx.amount">Amount</span>
-            <input id="transactionAmount" type="number" min="0" step="0.01" />
-          </label>
-          <label class="amount-currency-field">
-            <span data-i18n="tx.currency">Currency</span>
-            <select id="transactionCurrency">
-              <option value="USD" data-i18n="opt.usd">USD ($)</option>
-              <option value="LBP" data-i18n="opt.lbp">LBP (LL)</option>
-            </select>
-          </label>
+        <div class="amount-field">
+          <span class="field-label" data-i18n="tx.amount">Amount</span>
+          <div class="amount-row">
+            <input id="transactionAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+            <div class="segmented currency-toggle" id="currencyToggle" role="group" aria-label="Currency">
+              <button type="button" data-currency="USD">USD</button>
+              <button type="button" data-currency="LBP">LBP</button>
+            </div>
+          </div>
+          <select id="transactionCurrency" class="currency-select-hidden" aria-hidden="true" tabindex="-1">
+            <option value="USD">USD ($)</option>
+            <option value="LBP">LBP (LL)</option>
+          </select>
         </div>
         <div class="conversion-preview hidden" id="expenseConversionPreview"></div>
 

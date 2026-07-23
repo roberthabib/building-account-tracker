@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v131";
+const APP_VERSION = "v132";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -81,6 +81,7 @@ const els = {
   transactionMonth: document.querySelector("#transactionMonth"),
   transactionAmount: document.querySelector("#transactionAmount"),
   transactionCurrency: document.querySelector("#transactionCurrency"),
+  currencyToggle: document.querySelector("#currencyToggle"),
   expenseConversionPreview: document.querySelector("#expenseConversionPreview"),
   transactionSupplier: document.querySelector("#transactionSupplier"),
   supplierDropdownButton: document.querySelector("#supplierDropdownButton"),
@@ -457,7 +458,7 @@ const I18N = {
     "more.pollsSub": "Building votes",
     "more.settingsSub": "Building, currency, sync & access",
     // Entry chooser
-    "entry.title": "Add",
+    "entry.title": "Add Entry",
     "entry.paymentTitle": "Record a payment",
     "entry.paymentDesc": "A tenant paid their dues",
     "entry.expenseTitle": "Record an expense",
@@ -742,7 +743,7 @@ const I18N = {
     "more.pollsSub": "تصويتات المبنى",
     "more.settingsSub": "المبنى، العملة، المزامنة والوصول",
     // Entry chooser
-    "entry.title": "إضافة",
+    "entry.title": "إضافة عملية",
     "entry.paymentTitle": "تسجيل دفعة",
     "entry.paymentDesc": "دفع مستأجر مستحقاته",
     "entry.expenseTitle": "تسجيل مصروف",
@@ -1104,6 +1105,8 @@ const DYN_AR = {
   // Transaction dialog dynamic titles
   "Record Payment": "تسجيل دفعة",
   "Record Expense": "تسجيل مصروف",
+  "Record a Payment": "تسجيل دفعة",
+  "Record an Expense": "تسجيل مصروف",
   "Generator / Water Cost": "كلفة مولّد / مياه",
   "Edit Expense": "تعديل مصروف",
   "Save": "حفظ",
@@ -5646,6 +5649,16 @@ function renderNavIcons() {
     el.dataset.navIconDone = "1";
     el.appendChild(lucide("chevronLeft", { size: 20, color: "var(--primary-dark)", stroke: 2.2 }));
   });
+  // Entry-chooser rows: tinted icon chip + trailing chevron.
+  document.querySelectorAll(".entry-chooser-btn[data-entry-icon]").forEach((el) => {
+    if (el.dataset.navIconDone) return;
+    el.dataset.navIconDone = "1";
+    const chip = el.querySelector(".ec-icon");
+    if (chip) chip.appendChild(lucide(el.dataset.entryIcon, { size: 22, color: "var(--avatar-text)" }));
+    const chev = lucide("chevronRight", { size: 18, color: "#b3bbb6", stroke: 2.2 });
+    chev.classList.add("ec-chevron");
+    el.appendChild(chev);
+  });
 }
 
 function openDialog(dialog) {
@@ -5744,6 +5757,7 @@ function syncTransactionFormMode() {
   updateTransactionDirectionLabels();
   maybeSetNextExpenseInvoiceNumber();
   updateExpenseConversionPreview();
+  syncCurrencyToggle();
 }
 
 function updateExpenseConversionPreview() {
@@ -5800,6 +5814,21 @@ function readFormAmount() {
   const amount = Number(els.transactionAmount.value || 0);
   const isLbp = els.transactionCurrency.value === "LBP";
   return { amountUsd: isLbp ? 0 : amount, amountLbp: isLbp ? amount : 0 };
+}
+
+// Reflect the (hidden) currency select's value on the USD/LBP segmented toggle.
+function syncCurrencyToggle() {
+  if (!els.currencyToggle) return;
+  const cur = els.transactionCurrency.value;
+  els.currencyToggle.querySelectorAll("button").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.currency === cur);
+  });
+}
+
+function setTransactionCurrency(cur) {
+  els.transactionCurrency.value = cur === "LBP" ? "LBP" : "USD";
+  syncCurrencyToggle();
+  updateExpenseConversionPreview();
 }
 
 function addKnownValue(collection, name) {
@@ -6412,8 +6441,8 @@ async function zeroAccounts() {
 }
 
 const ENTRY_TITLES = {
-  Payments: "Record Payment",
-  Expenses: "Record Expense",
+  Payments: "Record a Payment",
+  Expenses: "Record an Expense",
   "Services Expenses": "Generator / Water Cost",
   "Opening Balance": "Opening Balance",
 };
@@ -7542,6 +7571,10 @@ function attachEvents() {
   els.transactionInvoiceFile.addEventListener("change", () => setInvoiceFileSource("upload"));
   els.transactionAmount.addEventListener("input", updateExpenseConversionPreview);
   els.transactionCurrency.addEventListener("change", updateExpenseConversionPreview);
+  els.currencyToggle.addEventListener("click", (event) => {
+    const btn = event.target.closest("button[data-currency]");
+    if (btn) setTransactionCurrency(btn.dataset.currency);
+  });
   els.transactionForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     setTransactionFormBusy(true);
