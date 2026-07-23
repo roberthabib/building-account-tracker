@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v132";
+const APP_VERSION = "v133";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -157,6 +157,8 @@ const els = {
   dueBannerClose: document.querySelector("#dueBannerClose"),
   newMonthBanner: document.querySelector("#newMonthBanner"),
   newMonthBannerText: document.querySelector("#newMonthBannerText"),
+  newMonthBannerTitle: document.querySelector("#newMonthBannerTitle"),
+  newMonthBannerIcon: document.querySelector("#newMonthBannerIcon"),
   newMonthBannerAdd: document.querySelector("#newMonthBannerAdd"),
   newMonthBannerDismiss: document.querySelector("#newMonthBannerDismiss"),
   declarationsPanel: document.querySelector("#declarationsPanel"),
@@ -1012,6 +1014,8 @@ const DYN_AR = {
   "Total Expenses:": "إجمالي المصاريف:",
   "Advance Payments": "دفعات مقدمة",
   "Uncategorized": "غير مصنّف",
+  "{month} isn't set up yet": "لم يُضبط {month} بعد",
+  "Add it to start tracking this month's payments.": "أضِفه لبدء تتبّع دفعات هذا الشهر.",
   "Entries dated in the selected month": "قيود بتاريخ الشهر المحدد",
   "Tenant payments received by date": "دفعات المستأجرين المقبوضة حسب التاريخ",
   "Payments toward building projects": "دفعات لمشاريع المبنى",
@@ -1271,6 +1275,7 @@ const LUCIDE_ICONS = {
   gear: [["path", { d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" }], ["circle", { cx: 12, cy: 12, r: 3 }]],
   plus: [["path", { d: "M5 12h14" }], ["path", { d: "M12 5v14" }]],
   camera: [["path", { d: "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" }], ["circle", { cx: 12, cy: 13, r: 3 }]],
+  calendar: [["path", { d: "M8 2v4" }], ["path", { d: "M16 2v4" }], ["rect", { width: 18, height: 18, x: 3, y: 4, rx: 2 }], ["path", { d: "M3 10h18" }]],
 };
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -3295,7 +3300,11 @@ function checkNewMonthBanner() {
     els.newMonthBanner.classList.add("hidden");
   } else {
     const label = now.toLocaleString("default", { month: "long", year: "numeric" });
-    els.newMonthBannerText.textContent = `${label} has not been set up yet. Add it to start tracking this month's payments.`;
+    if (els.newMonthBannerIcon && !els.newMonthBannerIcon.childElementCount) {
+      els.newMonthBannerIcon.appendChild(lucide("calendar", { size: 22, color: "#3f5b8c" }));
+    }
+    els.newMonthBannerTitle.textContent = tr("{month} isn't set up yet", { month: label });
+    els.newMonthBannerText.textContent = tr("Add it to start tracking this month's payments.");
     els.newMonthBanner.classList.remove("hidden");
   }
 }

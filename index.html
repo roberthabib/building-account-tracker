@@ -110,14 +110,15 @@
           </section>
 
           <div id="newMonthBanner" class="new-month-banner hidden" role="alert">
-            <div class="new-month-banner-body">
-              <span class="new-month-banner-icon">&#128197;</span>
-              <span id="newMonthBannerText"></span>
+            <div class="new-month-banner-top">
+              <span class="new-month-banner-icon" id="newMonthBannerIcon"></span>
+              <div class="new-month-banner-body">
+                <strong id="newMonthBannerTitle"></strong>
+                <span id="newMonthBannerText"></span>
+              </div>
+              <button id="newMonthBannerDismiss" class="new-month-banner-dismiss" type="button" aria-label="Dismiss" data-i18n-aria="common.dismiss">&#x2715;</button>
             </div>
-            <div class="new-month-banner-actions">
-              <button id="newMonthBannerAdd" class="primary-button" type="button" data-i18n="newMonth.add">Add Month</button>
-              <button id="newMonthBannerDismiss" class="icon-button" type="button" aria-label="Dismiss" data-i18n-aria="common.dismiss">&#x2715;</button>
-            </div>
+            <button id="newMonthBannerAdd" class="primary-button block-button" type="button" data-i18n="newMonth.add">Add Month</button>
           </div>
 
           <section class="panel owner-only hidden" id="declarationsPanel">
