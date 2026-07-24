@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v133";
+const APP_VERSION = "v134";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -4820,7 +4820,10 @@ function buildTenantStatementPdf(tenantId) {
     const column = index % 2;
     const row = Math.floor(index / 2);
     const bx = left + column * (boxWidth + 18);
-    const by = y - row * (boxHeight + 8);
+    // y marks the TOP of the summary block; each box hangs below its top edge
+    // (rects are drawn from the bottom-left, so subtract the box height).
+    const boxTop = y - row * (boxHeight + 8);
+    const by = boxTop - boxHeight;
     commands.push(pdfRectCommand(bx, by, boxWidth, boxHeight));
     commands.push(pdfTextCommand(label, bx + 8, by + 26, 8));
     commands.push(pdfTextCommand(pdfClip(value, 42), bx + 8, by + 10, 12, true));
