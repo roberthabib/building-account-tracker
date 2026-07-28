@@ -36,3 +36,26 @@ create policy "anon insert building_state"
 
 create policy "anon update building_state"
   on public.building_state for update to anon using (true) with check (true);
+
+
+-- ── Invoice photos ──────────────────────────────────────────────────────────
+-- Invoice pictures live in Supabase Storage (replacing Google Drive), so the
+-- whole app runs on one backend. The bucket is public: the app stores the file
+-- URL on the transaction and opens it later, and photo paths include a random
+-- token so they are not guessable. Phase 2 can switch this to a private bucket
+-- with signed URLs once real per-user auth exists.
+
+insert into storage.buckets (id, name, public)
+values ('invoices', 'invoices', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "anon upload invoices" on storage.objects;
+drop policy if exists "anon read invoices"   on storage.objects;
+
+create policy "anon upload invoices"
+  on storage.objects for insert to anon
+  with check (bucket_id = 'invoices');
+
+create policy "anon read invoices"
+  on storage.objects for select to anon
+  using (bucket_id = 'invoices');

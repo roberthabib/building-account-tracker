@@ -371,34 +371,8 @@
               <input id="conversionRateInput" type="number" min="1" step="1" />
             </label>
 
-            <p class="settings-section-header" data-i18n="set.cloudDb">Cloud database (Supabase)</p>
-            <label>
-              <span data-i18n="set.supabaseUrl">Supabase project URL</span>
-              <input id="supabaseUrlInput" type="url" placeholder="https://xxxxx.supabase.co" autocomplete="off" />
-            </label>
-            <label>
-              <span data-i18n="set.supabaseKey">Supabase anon public key</span>
-              <input id="supabaseAnonKeyInput" type="text" placeholder="eyJhbGciOi… (anon public key)" autocomplete="off" />
-            </label>
-            <p class="settings-note" data-i18n="set.supabaseNote">Create a free project at supabase.com, run the setup SQL, then paste the Project URL and the anon public key here. Never paste the service_role key.</p>
-
-            <p class="settings-section-header" data-i18n="set.google">Google Integration (legacy)</p>
-            <label>
-              <span data-i18n="set.appsScriptUrl">Google Apps Script URL (Sheet sync)</span>
-              <input id="invoiceUploadUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
-            </label>
-            <label>
-              <span data-i18n="set.sheetId">Google Sheet ID</span>
-              <input id="cloudSpreadsheetIdInput" type="text" />
-            </label>
-            <label>
-              <span data-i18n="set.driveFolderId">Google Drive invoice folder ID</span>
-              <input id="invoiceUploadFolderIdInput" type="text" />
-            </label>
-            <label>
-              <span data-i18n="set.syncSecret">Sync secret (optional)</span>
-              <input id="syncSecretInput" type="text" placeholder="Match the SYNC_SECRET set in Apps Script" data-i18n-ph="set.syncSecretPh" />
-            </label>
+            <p class="settings-section-header" data-i18n="set.cloudDb">Cloud database</p>
+            <p class="settings-note" id="cloudDbNote" data-i18n="set.cloudDbBuiltIn">Connected to the building's cloud database. Data and invoice photos sync automatically — nothing to set up on this device.</p>
             <div class="button-row">
               <button class="primary-button" id="saveSettingsButton" type="button" data-i18n="common.save">Save</button>
             </div>

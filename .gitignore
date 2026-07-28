@@ -10,3 +10,7 @@ live-sheet-backup-*.json
 tools/clean-sheet.mjs
 # Local PDF/screenshot scratch
 _tmp_*.pdf
+# Built-in Supabase keys: this repo is public, and until per-user auth exists
+# the anon key grants read/write to the building's data. Deployed via
+# .vercelignore, never committed.
+src/cloud-config.js

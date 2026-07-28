@@ -1,0 +1,20 @@
+# Deploy list for Vercel. This file REPLACES .gitignore for deployments, which
+# is deliberate: src/cloud-config.js is gitignored (it holds the Supabase keys,
+# and the GitHub repo is public) but must still be deployed so the live app is
+# preconfigured. Keep this in sync with .gitignore for everything else.
+.vercel
+node_modules
+*.log
+
+# Real resident financial data / credential-bearing tools — never deploy
+Naccache 1727 rev3.xlsx
+cloud-state-backup-*.json
+live-sheet-backup-*.json
+tools/
+
+# Local scratch and dev-only files
+_tmp_*.pdf
+.playwright-mcp/
+supabase/
+local-server.js
+CLAUDE.md

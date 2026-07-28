@@ -1,5 +1,16 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v135";
+const APP_VERSION = "v136";
+
+// Built-in cloud configuration (src/cloud-config.js). Deployed but not
+// committed, so the live app is preconfigured while the public repo stays free
+// of keys. Absent in a fresh clone — the app then falls back to Settings.
+let EMBEDDED_CLOUD = { supabaseUrl: "", supabaseAnonKey: "" };
+try {
+  const mod = await import("./cloud-config.js");
+  if (mod?.CLOUD_CONFIG) EMBEDDED_CLOUD = { ...EMBEDDED_CLOUD, ...mod.CLOUD_CONFIG };
+} catch (_) {
+  // No built-in config bundled; Settings values (if any) are used instead.
+}
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -115,6 +126,7 @@ const els = {
   invoiceUploadUrlInput: document.querySelector("#invoiceUploadUrlInput"),
   supabaseUrlInput: document.querySelector("#supabaseUrlInput"),
   supabaseAnonKeyInput: document.querySelector("#supabaseAnonKeyInput"),
+  googleLegacySection: document.querySelector("#googleLegacySection"),
   cloudSpreadsheetIdInput: document.querySelector("#cloudSpreadsheetIdInput"),
   invoiceUploadFolderIdInput: document.querySelector("#invoiceUploadFolderIdInput"),
   saveSettingsButton: document.querySelector("#saveSettingsButton"),
@@ -430,7 +442,8 @@ const I18N = {
     "set.monthlyBudget": "Total monthly building budget USD",
     "set.currency": "Currency & Conversion",
     "set.lbpRate": "LBP per USD conversion rate",
-    "set.cloudDb": "Cloud database (Supabase)",
+    "set.cloudDb": "Cloud database",
+    "set.cloudDbBuiltIn": "Connected to the building's cloud database. Data and invoice photos sync automatically — nothing to set up on this device.",
     "set.supabaseUrl": "Supabase project URL",
     "set.supabaseKey": "Supabase anon public key",
     "set.supabaseNote": "Create a free project at supabase.com, run the setup SQL, then paste the Project URL and the anon public key here. Never paste the service_role key.",
@@ -719,7 +732,8 @@ const I18N = {
     "set.monthlyBudget": "إجمالي ميزانية المبنى الشهرية بالدولار",
     "set.currency": "العملة والتحويل",
     "set.lbpRate": "سعر صرف الليرة مقابل الدولار",
-    "set.cloudDb": "قاعدة البيانات السحابية (Supabase)",
+    "set.cloudDb": "قاعدة البيانات السحابية",
+    "set.cloudDbBuiltIn": "متصل بقاعدة بيانات المبنى السحابية. تُزامَن البيانات وصور الفواتير تلقائياً — لا حاجة لأي إعداد على هذا الجهاز.",
     "set.supabaseUrl": "رابط مشروع Supabase",
     "set.supabaseKey": "مفتاح Supabase العام (anon)",
     "set.supabaseNote": "أنشئ مشروعاً مجانياً على supabase.com، ونفّذ سكربت الإعداد، ثم الصق رابط المشروع والمفتاح العام (anon) هنا. لا تلصق مفتاح service_role أبداً.",
@@ -5185,10 +5199,10 @@ function renderLedger() {
       btn.textContent = tr("Edit");
       actionGroup.append(btn);
     }
-    if (transaction.invoiceAttachment?.driveUrl) {
+    if (attachmentUrl(transaction.invoiceAttachment)) {
       const link = document.createElement("a");
       link.className = "ledger-action-btn attachment-button";
-      link.href = transaction.invoiceAttachment.driveUrl;
+      link.href = attachmentUrl(transaction.invoiceAttachment);
       link.target = "_blank";
       link.rel = "noopener";
       link.textContent = tr("Invoice");
@@ -5590,12 +5604,14 @@ function renderSettings() {
   els.buildingNameInput.value = (state.building && state.building.name) || "";
   els.defaultDueInput.value = amountInputValue(state.settings.defaultDueUsd);
   els.conversionRateInput.value = Number(state.settings.lbpPerUsd || DEFAULT_LBP_PER_USD);
-  els.invoiceUploadUrlInput.value = state.settings.invoiceUploadUrl || "";
-  els.supabaseUrlInput.value = state.settings.supabaseUrl || "";
-  els.supabaseAnonKeyInput.value = state.settings.supabaseAnonKey || "";
-  els.cloudSpreadsheetIdInput.value = state.settings.cloudSpreadsheetId || "";
-  els.invoiceUploadFolderIdInput.value = state.settings.invoiceUploadFolderId || "";
-  els.syncSecretInput.value = state.settings.syncSecret || "";
+  // Cloud config is built in (src/cloud-config.js); these inputs only exist in
+  // builds without it, so every access is optional.
+  if (els.invoiceUploadUrlInput) els.invoiceUploadUrlInput.value = state.settings.invoiceUploadUrl || "";
+  if (els.supabaseUrlInput) els.supabaseUrlInput.value = state.settings.supabaseUrl || "";
+  if (els.supabaseAnonKeyInput) els.supabaseAnonKeyInput.value = state.settings.supabaseAnonKey || "";
+  if (els.cloudSpreadsheetIdInput) els.cloudSpreadsheetIdInput.value = state.settings.cloudSpreadsheetId || "";
+  if (els.invoiceUploadFolderIdInput) els.invoiceUploadFolderIdInput.value = state.settings.invoiceUploadFolderId || "";
+  if (els.syncSecretInput) els.syncSecretInput.value = state.settings.syncSecret || "";
   els.shareAccessAction = els.shareAccessAction || document.querySelector("#shareAccessAction");
   if (els.shareAccessAction) els.shareAccessAction.classList.toggle("hidden", !hasCloudConfig());
   els.collectionModeInput.value = state.settings.collectionMode || "actual";
@@ -6045,6 +6061,56 @@ function invoiceAttachmentFromResult(result, prepared) {
   };
 }
 
+// Where an invoice photo can be viewed. `url` is used by Supabase Storage
+// uploads; `driveUrl` is kept so photos uploaded to Google Drive before the
+// migration still open.
+function attachmentUrl(attachment) {
+  return attachment?.url || attachment?.driveUrl || "";
+}
+
+const SUPABASE_INVOICE_BUCKET = "invoices";
+
+function base64ToBytes(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+// Upload the compressed JPEG straight into Supabase Storage. The bucket is
+// public, so the returned URL can be stored and opened later like the old
+// Drive link.
+async function uploadInvoiceToSupabase(transaction, prepared) {
+  const c = cloudConfig();
+  const path = `${(transaction.date || localDateInput()).slice(0, 4)}/${randomToken()}-${prepared.fileName}`;
+  const res = await fetch(
+    `${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`,
+    {
+      method: "POST",
+      headers: {
+        apikey: c.supabaseKey,
+        Authorization: `Bearer ${c.supabaseKey}`,
+        "Content-Type": prepared.mimeType,
+        "x-upsert": "false",
+      },
+      body: base64ToBytes(prepared.dataBase64),
+    },
+  );
+  if (!res.ok) {
+    let msg = `Invoice upload failed (${res.status})`;
+    try { const j = await res.json(); msg = j.message || j.error || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return {
+    fileName: prepared.fileName,
+    mimeType: prepared.mimeType,
+    size: prepared.size,
+    storagePath: path,
+    url: `${c.supabaseUrl}/storage/v1/object/public/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`,
+    uploadedAt: new Date().toISOString(),
+  };
+}
+
 function canUseServerInvoiceUpload() {
   return window.location.protocol === "https:";
 }
@@ -6093,12 +6159,16 @@ async function uploadInvoiceThroughScript(transaction, prepared, folderId) {
 }
 
 async function uploadExpenseInvoice(transaction, file) {
-  const folderId = state.settings.invoiceUploadFolderId.trim();
-  if (!folderId) {
-    throw new Error("Set the Google Drive invoice folder ID in Settings");
-  }
-
   const prepared = await prepareInvoiceUpload(transaction, file);
+  // Supabase Storage is the current home for invoice photos. The Google Drive
+  // paths below remain only for buildings still on the legacy Sheet setup.
+  if (cloudProvider() === "supabase") {
+    return uploadInvoiceToSupabase(transaction, prepared);
+  }
+  const folderId = String(state.settings.invoiceUploadFolderId || "").trim();
+  if (!folderId) {
+    throw new Error("Set up the cloud database in Settings to attach invoice photos");
+  }
   if (canUseServerInvoiceUpload()) {
     return uploadInvoiceThroughServer(transaction, prepared, folderId);
   }
@@ -6109,8 +6179,9 @@ function cloudConfig() {
   return {
     scriptUrl: String(state.settings.invoiceUploadUrl || "").trim(),
     spreadsheetId: String(state.settings.cloudSpreadsheetId || "").trim(),
-    supabaseUrl: String(state.settings.supabaseUrl || "").trim().replace(/\/+$/, ""),
-    supabaseKey: String(state.settings.supabaseAnonKey || "").trim(),
+    // Built-in config wins; Settings values act as an override/escape hatch.
+    supabaseUrl: String(EMBEDDED_CLOUD.supabaseUrl || state.settings.supabaseUrl || "").trim().replace(/\/+$/, ""),
+    supabaseKey: String(EMBEDDED_CLOUD.supabaseAnonKey || state.settings.supabaseAnonKey || "").trim(),
   };
 }
 
@@ -6643,7 +6714,7 @@ function openExpenseEditDialog(transactionId) {
   els.transactionExpenseCategory.value = transaction.expenseCategory || "";
   els.transactionProject.value = transaction.project || "";
   clearInvoiceFileSelection();
-  els.invoiceAttachmentStatus.textContent = transaction.invoiceAttachment?.driveUrl
+  els.invoiceAttachmentStatus.textContent = attachmentUrl(transaction.invoiceAttachment)
     ? "Existing invoice photo will be kept unless you choose a new picture."
     : "No invoice photo is attached. Choose a picture to add one.";
   syncTransactionFormMode();
@@ -6719,7 +6790,7 @@ function ledgerExcelRows() {
     creditLbp: Number(transaction.creditLbp || 0),
     netUsd: transactionNetUsd(transaction),
     receiptRef: transaction.receiptRef || "",
-    invoicePhoto: transaction.invoiceAttachment?.driveUrl || "",
+    invoicePhoto: attachmentUrl(transaction.invoiceAttachment),
     expenseCategory: transaction.expenseCategory || "",
   }));
 }
@@ -7166,7 +7237,7 @@ function handleLedgerPdfExport() {
     appendCell(row, formatUsd(Number(transaction.debitUsd || 0)), "numeric");
     appendCell(row, formatUsd(Number(transaction.creditUsd || 0)), "numeric");
     appendCell(row, formatUsd(transactionNetUsd(transaction)), "numeric");
-    appendOptionalLinkCell(row, transaction.invoiceAttachment?.driveUrl ? "Open" : "", transaction.invoiceAttachment?.driveUrl || "");
+    appendOptionalLinkCell(row, attachmentUrl(transaction.invoiceAttachment) ? "Open" : "", attachmentUrl(transaction.invoiceAttachment));
     tbody.append(row);
   });
 
@@ -7733,7 +7804,7 @@ function attachEvents() {
         showToast("Payment added. Receipt saved");
       } else if (invoiceUploadError) {
         showToast(tr("Expense saved. Invoice upload failed: {msg}", { msg: invoiceUploadError.message }));
-      } else if (transaction.invoiceAttachment?.driveUrl) {
+      } else if (attachmentUrl(transaction.invoiceAttachment)) {
         showToast("Expense added. Invoice uploaded");
       } else {
         showToast("Transaction added");
@@ -7788,12 +7859,13 @@ function attachEvents() {
     state.settings.collectionMode = els.collectionModeInput.value === "fixed" ? "fixed" : "actual";
     state.settings.defaultDueUsd = Number(els.defaultDueInput.value || 0);
     state.settings.lbpPerUsd = Math.max(1, Number(els.conversionRateInput.value || DEFAULT_LBP_PER_USD));
-    state.settings.invoiceUploadUrl = els.invoiceUploadUrlInput.value.trim();
-    state.settings.supabaseUrl = els.supabaseUrlInput.value.trim().replace(/\/+$/, "");
-    state.settings.supabaseAnonKey = els.supabaseAnonKeyInput.value.trim();
-    state.settings.cloudSpreadsheetId = els.cloudSpreadsheetIdInput.value.trim();
-    state.settings.invoiceUploadFolderId = els.invoiceUploadFolderIdInput.value.trim();
-    state.settings.syncSecret = els.syncSecretInput.value.trim();
+    // Only present in builds without a bundled cloud-config.js.
+    if (els.invoiceUploadUrlInput) state.settings.invoiceUploadUrl = els.invoiceUploadUrlInput.value.trim();
+    if (els.supabaseUrlInput) state.settings.supabaseUrl = els.supabaseUrlInput.value.trim().replace(/\/+$/, "");
+    if (els.supabaseAnonKeyInput) state.settings.supabaseAnonKey = els.supabaseAnonKeyInput.value.trim();
+    if (els.cloudSpreadsheetIdInput) state.settings.cloudSpreadsheetId = els.cloudSpreadsheetIdInput.value.trim();
+    if (els.invoiceUploadFolderIdInput) state.settings.invoiceUploadFolderId = els.invoiceUploadFolderIdInput.value.trim();
+    if (els.syncSecretInput) state.settings.syncSecret = els.syncSecretInput.value.trim();
     const newPassword = els.ownerPasswordInput.value.trim();
     if (newPassword) state.settings.ownerPasswordHash = hashSecret(newPassword, state.security.salt);
     state.settings.sharedExpensesEnabled = false;
