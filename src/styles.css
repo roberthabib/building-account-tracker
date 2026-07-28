@@ -1654,6 +1654,19 @@ body.rtl .mm-chevron {
   flex: 0 0 auto;
 }
 
+/* Keep a form's action row visible while the rest of the sheet scrolls, so
+   Add/Save is always reachable no matter how tall the form is. */
+dialog form .button-row {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  /* Bleed to the sheet edges so the backdrop covers content scrolling beneath. */
+  margin: 4px -18px 0;
+  padding: 12px 18px;
+  background: var(--bg);
+  box-shadow: 0 -8px 18px rgba(22, 56, 50, 0.06);
+}
+
 .full-width {
   width: 100%;
 }
@@ -1674,7 +1687,12 @@ dialog {
   padding: 0;
   background: var(--bg);
   box-shadow: var(--shadow-sheet);
-  overflow: hidden;
+  /* Long forms must stay reachable on short screens: scroll vertically rather
+     than clipping (which previously hid the Add button below the fold). */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 dialog[open] {
