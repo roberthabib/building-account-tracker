@@ -1,4 +1,4 @@
-const CACHE_NAME = "building-account-tracker-v134";
+const CACHE_NAME = "building-account-tracker-v135";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -27,6 +27,10 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  // Only cache same-origin app-shell requests. Cross-origin calls (Supabase
+  // REST/Auth, Google Apps Script, Drive) must always hit the network so we
+  // never serve stale database reads or pollute the cache.
+  if (new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {

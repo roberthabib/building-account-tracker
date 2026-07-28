@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v134";
+const APP_VERSION = "v135";
 
 const els = {
   views: document.querySelectorAll(".view"),
@@ -113,6 +113,8 @@ const els = {
   defaultDueInput: document.querySelector("#defaultDueInput"),
   conversionRateInput: document.querySelector("#conversionRateInput"),
   invoiceUploadUrlInput: document.querySelector("#invoiceUploadUrlInput"),
+  supabaseUrlInput: document.querySelector("#supabaseUrlInput"),
+  supabaseAnonKeyInput: document.querySelector("#supabaseAnonKeyInput"),
   cloudSpreadsheetIdInput: document.querySelector("#cloudSpreadsheetIdInput"),
   invoiceUploadFolderIdInput: document.querySelector("#invoiceUploadFolderIdInput"),
   saveSettingsButton: document.querySelector("#saveSettingsButton"),
@@ -428,7 +430,11 @@ const I18N = {
     "set.monthlyBudget": "Total monthly building budget USD",
     "set.currency": "Currency & Conversion",
     "set.lbpRate": "LBP per USD conversion rate",
-    "set.google": "Google Integration",
+    "set.cloudDb": "Cloud database (Supabase)",
+    "set.supabaseUrl": "Supabase project URL",
+    "set.supabaseKey": "Supabase anon public key",
+    "set.supabaseNote": "Create a free project at supabase.com, run the setup SQL, then paste the Project URL and the anon public key here. Never paste the service_role key.",
+    "set.google": "Google Integration (legacy)",
     "set.appsScriptUrl": "Google Apps Script URL (Sheet sync)",
     "set.sheetId": "Google Sheet ID",
     "set.driveFolderId": "Google Drive invoice folder ID",
@@ -713,7 +719,11 @@ const I18N = {
     "set.monthlyBudget": "إجمالي ميزانية المبنى الشهرية بالدولار",
     "set.currency": "العملة والتحويل",
     "set.lbpRate": "سعر صرف الليرة مقابل الدولار",
-    "set.google": "تكامل Google",
+    "set.cloudDb": "قاعدة البيانات السحابية (Supabase)",
+    "set.supabaseUrl": "رابط مشروع Supabase",
+    "set.supabaseKey": "مفتاح Supabase العام (anon)",
+    "set.supabaseNote": "أنشئ مشروعاً مجانياً على supabase.com، ونفّذ سكربت الإعداد، ثم الصق رابط المشروع والمفتاح العام (anon) هنا. لا تلصق مفتاح service_role أبداً.",
+    "set.google": "تكامل Google (قديم)",
     "set.appsScriptUrl": "رابط Google Apps Script (مزامنة الجدول)",
     "set.sheetId": "معرّف Google Sheet",
     "set.driveFolderId": "معرّف مجلد الفواتير في Google Drive",
@@ -923,7 +933,10 @@ const DYN_AR = {
   "Backup restored on this device": "تمت استعادة النسخة الاحتياطية على هذا الجهاز",
   "Saved to Google Sheet": "تم الحفظ في Google Sheet",
   "Loaded from Google Sheet": "تم التحميل من Google Sheet",
+  "Saved to the cloud": "تم الحفظ في السحابة",
+  "Loaded from the cloud": "تم التحميل من السحابة",
   "Set the Google Apps Script URL first, then Save": "حدّد رابط Google Apps Script أولاً ثم احفظ",
+  "Set up the cloud database first, then Save": "أعدّ قاعدة البيانات السحابية أولاً ثم احفظ",
   "Access code copied — send it to your tenants": "تم نسخ رمز الوصول — أرسله لمستأجريك",
   "Paste the access code first": "الصق رمز الوصول أولاً",
   "That access code is not valid": "رمز الوصول غير صالح",
@@ -976,6 +989,8 @@ const DYN_AR = {
     "استعادة هذه النسخة ({summary})؟ ستستبدل بيانات هذا الجهاز. ستُنزَّل بياناتك الحالية أولاً كنسخة أمان.",
   "Reload from the Google Sheet? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost.":
     "إعادة التحميل من Google Sheet؟ ستستبدل بيانات هذا الجهاز بالنسخة السحابية. أي تغييرات لم تُزامَن بعد ستُفقد.",
+  "Reload from the cloud? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost.":
+    "إعادة التحميل من السحابة؟ ستستبدل بيانات هذا الجهاز بالنسخة السحابية. أي تغييرات لم تُزامَن بعد ستُفقد.",
   "Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone.":
     "مسح كل الدفعات والمصاريف؟ سيبقى المستأجرون. استخدمه لبدء فترة جديدة (مثلاً سنة جديدة). لا يمكن التراجع.",
   "Delete this ledger entry?\n\n{label}\n\nThis removes the record from the app and Google Sheet sync.":
@@ -1536,6 +1551,8 @@ function hydrateState(rawState) {
   hydrated.settings.cloudSpreadsheetId ||= "";
   hydrated.settings.invoiceUploadFolderId ||= "";
   hydrated.settings.syncSecret ||= "";
+  hydrated.settings.supabaseUrl ||= "";
+  hydrated.settings.supabaseAnonKey ||= "";
   hydrated.settings.collectionMode = hydrated.settings.collectionMode === "fixed" ? "fixed" : "actual";
   hydrated.settings.language = normalizeLang(hydrated.settings.language);
   hydrated.meta ||= {};
@@ -5574,6 +5591,8 @@ function renderSettings() {
   els.defaultDueInput.value = amountInputValue(state.settings.defaultDueUsd);
   els.conversionRateInput.value = Number(state.settings.lbpPerUsd || DEFAULT_LBP_PER_USD);
   els.invoiceUploadUrlInput.value = state.settings.invoiceUploadUrl || "";
+  els.supabaseUrlInput.value = state.settings.supabaseUrl || "";
+  els.supabaseAnonKeyInput.value = state.settings.supabaseAnonKey || "";
   els.cloudSpreadsheetIdInput.value = state.settings.cloudSpreadsheetId || "";
   els.invoiceUploadFolderIdInput.value = state.settings.invoiceUploadFolderId || "";
   els.syncSecretInput.value = state.settings.syncSecret || "";
@@ -6090,11 +6109,82 @@ function cloudConfig() {
   return {
     scriptUrl: String(state.settings.invoiceUploadUrl || "").trim(),
     spreadsheetId: String(state.settings.cloudSpreadsheetId || "").trim(),
+    supabaseUrl: String(state.settings.supabaseUrl || "").trim().replace(/\/+$/, ""),
+    supabaseKey: String(state.settings.supabaseAnonKey || "").trim(),
   };
 }
 
+// Which cloud backend is active. Supabase (a real database) takes precedence
+// over the legacy Google Sheet when both happen to be configured.
+function cloudProvider() {
+  const c = cloudConfig();
+  if (c.supabaseUrl && c.supabaseKey) return "supabase";
+  if (c.scriptUrl) return "sheet";
+  return null;
+}
+
 function hasCloudConfig() {
-  return Boolean(cloudConfig().scriptUrl);
+  return cloudProvider() !== null;
+}
+
+// The whole app state lives in one row keyed by this id (one Supabase project
+// per building). Multi-building support would make this per-building later.
+const SUPABASE_STATE_ROW_ID = "building";
+
+async function supabaseRequest(path, options = {}) {
+  const c = cloudConfig();
+  const res = await fetch(`${c.supabaseUrl}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      apikey: c.supabaseKey,
+      Authorization: `Bearer ${c.supabaseKey}`,
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  });
+  if (!res.ok) {
+    let msg = `Cloud database error (${res.status})`;
+    try { const j = await res.json(); msg = j.message || j.hint || j.error || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  return res;
+}
+
+// Provider-agnostic whole-state load. Returns the stored state object or null.
+async function cloudLoadState() {
+  if (cloudProvider() === "supabase") {
+    const res = await supabaseRequest(
+      `building_state?id=eq.${SUPABASE_STATE_ROW_ID}&select=state`,
+      { method: "GET" },
+    );
+    const rows = await res.json();
+    return Array.isArray(rows) && rows[0] ? rows[0].state : null;
+  }
+  const result = await postCloudAction("loadState");
+  return result?.state || null;
+}
+
+// Provider-agnostic whole-state save (upsert for Supabase).
+async function cloudSaveState(payload) {
+  if (cloudProvider() === "supabase") {
+    await supabaseRequest("building_state", {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify({
+        id: SUPABASE_STATE_ROW_ID,
+        state: payload,
+        rev: Number(payload?.meta?.rev || 0),
+        updated_at: new Date().toISOString(),
+      }),
+    });
+    return;
+  }
+  await postCloudAction("saveState", { state: payload });
+}
+
+// Short human label for the active backend, used in status messages.
+function cloudProviderLabel() {
+  return cloudProvider() === "supabase" ? "cloud database" : "Google Sheet";
 }
 
 function renderCloudStatus(message = "") {
@@ -6102,8 +6192,8 @@ function renderCloudStatus(message = "") {
   els.cloudSyncStatus.textContent =
     message ||
     (hasCloudConfig()
-      ? "Cloud sync is on. Data is saved locally and synced to the Google Sheet."
-      : "Cloud sync is off. Enter the Google Apps Script URL in Settings to enable.");
+      ? `Cloud sync is on. Data is saved on this device and synced to the ${cloudProviderLabel()}.`
+      : "Cloud sync is off. Add your Supabase project (or a Google Apps Script URL) in Settings to enable.");
 }
 
 const SYNC_CHIP_TEXT = { saving: "Saving…", saved: "Saved", error: "Sync error", offline: "Offline", local: "Local" };
@@ -6285,13 +6375,12 @@ async function saveCloudState({ silent = false } = {}) {
   cloudSaveInFlight = true;
   setSyncChip("saving");
   try {
-    if (!silent) renderCloudStatus("Saving to Google Sheet...");
+    if (!silent) renderCloudStatus(`Saving to the ${cloudProviderLabel()}…`);
     // Check whether another device wrote since this device last synced.
     const sync = loadSyncMeta();
     let remote = null;
     try {
-      const result = await postCloudAction("loadState");
-      remote = result?.state || null;
+      remote = await cloudLoadState();
     } catch {
       // Cloud unreachable for the pre-check; push anyway (best effort).
     }
@@ -6302,15 +6391,15 @@ async function saveCloudState({ silent = false } = {}) {
     }
     state.meta.token = randomToken();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    await postCloudAction("saveState", { state });
+    await cloudSaveState(state);
     saveSyncMeta({ lastSyncedToken: state.meta.token, lastPushedRev: Number(state.meta.rev || 0) });
     if (mergedForeignChanges) {
       populateTenantSelect();
       renderAll();
     }
-    renderCloudStatus(`Google Sheet saved at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+    renderCloudStatus(`Cloud saved at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
     setSyncChip("saved");
-    if (!silent) showToast("Saved to Google Sheet");
+    if (!silent) showToast("Saved to the cloud");
   } catch (error) {
     renderCloudStatus(error.message);
     setSyncChip(navigator.onLine === false ? "offline" : "error");
@@ -6321,20 +6410,20 @@ async function saveCloudState({ silent = false } = {}) {
 }
 
 async function loadCloudState() {
-  if (!window.confirm(tr("Reload from the Google Sheet? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost."))) return;
+  if (!window.confirm(tr("Reload from the cloud? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost."))) return;
   try {
-    renderCloudStatus("Loading from Google Sheet...");
-    const result = await postCloudAction("loadState");
-    if (!result.state) throw new Error("No app data found in Google Sheet");
-    state = hydrateState(result.state);
+    renderCloudStatus(`Loading from the ${cloudProviderLabel()}…`);
+    const remote = await cloudLoadState();
+    if (!remote) throw new Error("No app data found in the cloud database");
+    state = hydrateState(remote);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     saveSyncMeta({ lastSyncedToken: state.meta?.token || "", lastPushedRev: Number(state.meta?.rev || 0) });
     selectedMonth = null;
     populateTenantSelect();
     renderAll();
-    renderCloudStatus("Loaded from Google Sheet");
+    renderCloudStatus("Loaded from the cloud");
     setSyncChip("saved");
-    showToast("Loaded from Google Sheet");
+    showToast("Loaded from the cloud");
   } catch (error) {
     renderCloudStatus(error.message);
     setSyncChip(navigator.onLine === false ? "offline" : "error");
@@ -6358,11 +6447,13 @@ function buildSyncCode() {
     u: state.settings.invoiceUploadUrl || "",
     s: state.settings.cloudSpreadsheetId || "",
     k: state.settings.syncSecret || "",
+    su: state.settings.supabaseUrl || "",
+    sk: state.settings.supabaseAnonKey || "",
   });
 }
 
 async function shareSyncCode() {
-  if (!hasCloudConfig()) { showToast("Set the Google Apps Script URL first, then Save"); return; }
+  if (!hasCloudConfig()) { showToast("Set up the cloud database first, then Save"); return; }
   const code = buildSyncCode();
   const message =
     `${state.building.name || "Building"} – access code\n\n${code}\n\n` +
@@ -6393,23 +6484,27 @@ async function applySyncCode(rawCode) {
     showToast("That access code is not valid");
     return;
   }
-  if (!cfg || !cfg.u) { showToast("That access code is missing the sync address"); return; }
+  const hasSupabase = Boolean(cfg && cfg.su && cfg.sk);
+  if (!cfg || (!cfg.u && !hasSupabase)) { showToast("That access code is missing the sync address"); return; }
 
-  state.settings.invoiceUploadUrl = String(cfg.u || "").trim();
-  state.settings.cloudSpreadsheetId = String(cfg.s || "").trim();
-  state.settings.syncSecret = String(cfg.k || "").trim();
+  const applyCfg = () => {
+    state.settings.invoiceUploadUrl = String(cfg.u || "").trim();
+    state.settings.cloudSpreadsheetId = String(cfg.s || "").trim();
+    state.settings.syncSecret = String(cfg.k || "").trim();
+    state.settings.supabaseUrl = String(cfg.su || "").trim();
+    state.settings.supabaseAnonKey = String(cfg.sk || "").trim();
+  };
+  applyCfg();
   saveState({ sync: false });
 
   try {
     renderCloudStatus("Connecting…");
     setSyncChip("saving");
-    const result = await postCloudAction("loadState");
-    if (!result.state) throw new Error("No building data found at that address");
-    state = hydrateState(result.state);
+    const remote = await cloudLoadState();
+    if (!remote) throw new Error("No building data found at that address");
+    state = hydrateState(remote);
     // Preserve the cloud config we just entered, in case the pulled state lacks it.
-    state.settings.invoiceUploadUrl = String(cfg.u || "").trim();
-    state.settings.cloudSpreadsheetId = String(cfg.s || "").trim();
-    state.settings.syncSecret = String(cfg.k || "").trim();
+    applyCfg();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     saveSyncMeta({ lastSyncedToken: state.meta?.token || "", lastPushedRev: Number(state.meta?.rev || 0) });
     selectedMonth = null;
@@ -7694,6 +7789,8 @@ function attachEvents() {
     state.settings.defaultDueUsd = Number(els.defaultDueInput.value || 0);
     state.settings.lbpPerUsd = Math.max(1, Number(els.conversionRateInput.value || DEFAULT_LBP_PER_USD));
     state.settings.invoiceUploadUrl = els.invoiceUploadUrlInput.value.trim();
+    state.settings.supabaseUrl = els.supabaseUrlInput.value.trim().replace(/\/+$/, "");
+    state.settings.supabaseAnonKey = els.supabaseAnonKeyInput.value.trim();
     state.settings.cloudSpreadsheetId = els.cloudSpreadsheetIdInput.value.trim();
     state.settings.invoiceUploadFolderId = els.invoiceUploadFolderIdInput.value.trim();
     state.settings.syncSecret = els.syncSecretInput.value.trim();
@@ -7876,11 +7973,10 @@ async function syncFromSheet({ silent = false } = {}) {
   if (!hasCloudConfig()) return;
   if (document.querySelector("dialog[open]")) return;
   if (cloudSaveInFlight) return;
-  if (!silent) renderCloudStatus("Syncing from Google Sheet...");
+  if (!silent) renderCloudStatus(`Syncing from the ${cloudProviderLabel()}…`);
   try {
-    const result = await postCloudAction("loadState");
-    if (!result.success || !result.state) return;
-    const remote = result.state;
+    const remote = await cloudLoadState();
+    if (!remote) return;
     const sync = loadSyncMeta();
     const remoteToken = remote.meta?.token || "";
     const dirty = localHasUnsyncedChanges();
@@ -7908,7 +8004,7 @@ async function syncFromSheet({ silent = false } = {}) {
     renderCloudStatus(`Last synced at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
     setSyncChip("saved");
   } catch {
-    if (!silent) renderCloudStatus("Could not reach Google Sheet — showing cached data.");
+    if (!silent) renderCloudStatus(`Could not reach the ${cloudProviderLabel()} — showing cached data.`);
     setSyncChip(navigator.onLine === false ? "offline" : "error");
   }
 }
