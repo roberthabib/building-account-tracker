@@ -1018,25 +1018,46 @@ label select {
   text-decoration: underline;
 }
 
+/* "+ Add" sits in the Tenants header (per the design). It must NOT be
+   position:fixed: .view.active animates transform, which makes the section a
+   containing block for fixed children — the button then anchored to the card
+   list and covered tenant figures. */
 #addTenantButton {
-  position: fixed;
-  bottom: 80px;
-  right: 16px;
-  z-index: 50;
-  border-radius: 999px;
-  padding: 12px 20px;
-  background: var(--primary-dark);
-  color: #fff;
-  border-color: var(--primary-dark);
-  font-size: 0.9rem;
-  box-shadow: 0 4px 16px rgba(22, 56, 50, 0.35);
-  display: none;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
-#tenantsView.active #addTenantButton {
-  display: inline-flex;
+/* Full-width search row with a leading icon. */
+.search-field {
+  display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+  background: var(--surface);
+  margin-bottom: 14px;
+  color: #a2aaa5;
+}
+
+.search-field input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.search-field input:focus {
+  outline: none;
 }
 
 .ledger-item {
