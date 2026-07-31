@@ -1,4 +1,33 @@
-# Phase 2 — Tenant privacy (plan, not yet built)
+# Phase 2 — Tenant privacy
+
+> **Superseded in part — read this first.**
+>
+> This document's *goal*, *threat model* and *"what tenants should see"* table
+> still stand. Its **schema section does not**: we are **not** normalising the
+> JSON document into ~14 tables.
+>
+> **What we're building instead:** keep the single `building_state` document,
+> block tenants from reading it, and give them a `security definer` function
+> (`get_my_state()`) that returns a **server-redacted copy** containing only
+> their own data plus building-level expenses. Tenant writes go through one
+> narrow function (`declare_my_payment()`).
+>
+> Same guarantee — privacy enforced by the database, not the UI — because a
+> tenant cannot read the raw row at all. What it avoids:
+>
+> - the ~40 render/compute functions stay untouched (the state shape is
+>   identical), so the v128 balance work and the redesign aren't at risk
+> - **offline keeps working as it does today** — still one document in
+>   `localStorage`, no per-row write queue, no replacing the merge logic
+> - days instead of weeks
+>
+> Cost of the shortcut: redaction lives in one PL/pgSQL function that must be
+> updated whenever a new per-tenant field is added to the state — noted in the
+> function's own header comment. Normalising later remains possible.
+>
+> Live artefacts: [`phase2a-auth-foundation.sql`](phase2a-auth-foundation.sql)
+> (the SQL) and [`PHASE2-RUNBOOK.md`](PHASE2-RUNBOOK.md) (ordered steps).
+> Identity is **Option B** below, as recommended.
 
 ## The problem this solves
 
