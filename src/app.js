@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v138";
+const APP_VERSION = "v139";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2277,8 +2277,10 @@ function buildGeneratorReadingRows(month) {
       row.dataset.breakerAmps = String(tenant.breakerAmps || 0);
       row.innerHTML = `
         <div class="gen-reading-name"><strong></strong><span></span></div>
-        <label class="gen-reading-field"><span class="grf-label"></span><input class="gen-prev" type="number" min="0" step="1" /></label>
-        <label class="gen-reading-field"><span class="grf-label"></span><input class="gen-curr" type="number" min="0" step="1" /></label>
+        <div class="gen-reading-fields">
+          <label class="gen-reading-field"><span class="grf-label"></span><input class="gen-prev" type="number" inputmode="numeric" min="0" step="1" /></label>
+          <label class="gen-reading-field"><span class="grf-label"></span><input class="gen-curr" type="number" inputmode="numeric" min="0" step="1" /></label>
+        </div>
       `;
       const grfLabels = row.querySelectorAll(".grf-label");
       grfLabels[0].textContent = tr("Previous");

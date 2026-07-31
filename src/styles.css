@@ -3415,20 +3415,25 @@ body.rtl .entry-chooser-btn .ec-chevron {
   margin: 6px 0 10px;
 }
 
+/* Name on its own line, then the two meter fields side by side. Do NOT put all
+   three in one grid row: the fields need to be finger-width on a phone, which
+   starves the name column below its own text width and the unit/breaker line
+   then overflows underneath the "Previous" label. */
 .gen-reading-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  align-items: end;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-inner);
   background: var(--surface);
 }
 
 .gen-reading-name {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
   min-width: 0;
 }
 
@@ -3438,25 +3443,35 @@ body.rtl .entry-chooser-btn .ec-chevron {
 
 .gen-reading-name span {
   font-size: 0.78rem;
-  color: var(--muted);
+  color: var(--label-muted);
+}
+
+.gen-reading-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-width: 0;
 }
 
 .gen-reading-field {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   font-size: 0.72rem;
-  color: var(--muted);
-  gap: 2px;
+  color: var(--label-muted);
+  gap: 3px;
 }
 
 .gen-reading-field input {
-  width: 84px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 40px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   background: var(--bg);
   color: var(--ink);
-  padding: 0 8px;
+  padding: 0 10px;
   font: inherit;
 }
 
