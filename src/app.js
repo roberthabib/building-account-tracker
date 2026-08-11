@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v139";
+const APP_VERSION = "v140";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -1005,6 +1005,14 @@ const DYN_AR = {
     "إعادة التحميل من Google Sheet؟ ستستبدل بيانات هذا الجهاز بالنسخة السحابية. أي تغييرات لم تُزامَن بعد ستُفقد.",
   "Reload from the cloud? This replaces the data on this device with the cloud copy. Any changes here that haven't synced yet will be lost.":
     "إعادة التحميل من السحابة؟ ستستبدل بيانات هذا الجهاز بالنسخة السحابية. أي تغييرات لم تُزامَن بعد ستُفقد.",
+  "The cloud copy is EMPTY. This device has {summary}. Replacing means losing all of it. Download a backup first if you are unsure. Continue anyway?":
+    "النسخة السحابية فارغة. هذا الجهاز يحتوي على {summary}. الاستبدال يعني فقدانها بالكامل. نزّل نسخة احتياطية أولاً إذا لم تكن متأكداً. المتابعة على أي حال؟",
+  "The cloud copy is empty but this device has data. Nothing was replaced. Tap the sync chip to upload this device's data.":
+    "النسخة السحابية فارغة لكن هذا الجهاز يحتوي على بيانات. لم يُستبدل أي شيء. اضغط على شريحة المزامنة لرفع بيانات هذا الجهاز.",
+  "Cloud copy is empty — kept this device's data":
+    "النسخة السحابية فارغة — تم الإبقاء على بيانات هذا الجهاز",
+  "Reload cancelled — this device's data was kept":
+    "أُلغيت إعادة التحميل — تم الإبقاء على بيانات هذا الجهاز",
   "Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone.":
     "مسح كل الدفعات والمصاريف؟ سيبقى المستأجرون. استخدمه لبدء فترة جديدة (مثلاً سنة جديدة). لا يمكن التراجع.",
   "Delete this ledger entry?\n\n{label}\n\nThis removes the record from the app and Google Sheet sync.":
@@ -6488,6 +6496,17 @@ async function loadCloudState() {
     renderCloudStatus(`Loading from the ${cloudProviderLabel()}…`);
     const remote = await cloudLoadState();
     if (!remote) throw new Error("No app data found in the cloud database");
+    // Second confirmation only when the cloud copy would destroy data. The
+    // first prompt is generic; this one names the actual numbers, so "replace
+    // 244 transactions with 0" can't be waved through by habit.
+    if (remoteWouldWipeLocalData(remote)) {
+      const localSummary = `${state.tenants.length} tenants, ${state.transactions.length} transactions`;
+      if (!window.confirm(tr("The cloud copy is EMPTY. This device has {summary}. Replacing means losing all of it. Download a backup first if you are unsure. Continue anyway?", { summary: localSummary }))) {
+        renderCloudStatus("Reload cancelled — this device's data was kept");
+        setSyncChip("error");
+        return;
+      }
+    }
     state = hydrateState(remote);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     saveSyncMeta({ lastSyncedToken: state.meta?.token || "", lastPushedRev: Number(state.meta?.rev || 0) });
@@ -8043,6 +8062,16 @@ function attachEvents() {
   els.setupWizardDialog.addEventListener("cancel", (e) => e.preventDefault());
 }
 
+// Guard against one bad cloud write cascading into data loss on every device.
+// The auto-sync path adopts the cloud copy whenever this device has nothing
+// unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
+// Then adopting it silently deletes real data (and the now-empty device pushes
+// that emptiness back, so the loss spreads). Refuse it and let the owner decide.
+function remoteWouldWipeLocalData(remote) {
+  const size = (s) => (s?.tenants?.length || 0) + (s?.transactions?.length || 0);
+  return size(state) > 0 && size(remote) === 0;
+}
+
 async function syncFromSheet({ silent = false } = {}) {
   if (!hasCloudConfig()) return;
   if (document.querySelector("dialog[open]")) return;
@@ -8067,6 +8096,15 @@ async function syncFromSheet({ silent = false } = {}) {
       populateTenantSelect();
       renderAll();
       queueCloudSave();
+    } else if (remoteWouldWipeLocalData(remote)) {
+      // Cloud lost everything; this device still has data. Keep local, say so
+      // loudly, and push nothing automatically either way.
+      renderCloudStatus(
+        tr("The cloud copy is empty but this device has data. Nothing was replaced. Tap the sync chip to upload this device's data."),
+      );
+      setSyncChip("error");
+      if (!silent) showToast("Cloud copy is empty — kept this device's data");
+      return;
     } else {
       // No local changes: safe to adopt the cloud state.
       state = hydrateState(remote);
@@ -8096,7 +8134,9 @@ async function boot() {
   attachEvents();
   populateTenantSelect();
   renderAll();
-  setSyncChip(hasCloudConfig() ? "saved" : "local");
+  // Do NOT claim "Saved" here: nothing has been synced yet at boot. Showing
+  // in-progress means the chip can only say "Saved" after a real round trip.
+  setSyncChip(hasCloudConfig() ? "saving" : "local");
   showLoginScreen();
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
