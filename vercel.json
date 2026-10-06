@@ -1,5 +1,14 @@
 {
   "cleanUrls": true,
+  "functions": {
+    "api/keepalive.js": {
+      "includeFiles": "src/cloud-config.js"
+    }
+  },
+  "crons": [
+    { "path": "/api/keepalive?slot=morning", "schedule": "0 6 * * *" },
+    { "path": "/api/keepalive?slot=evening", "schedule": "0 18 * * *" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

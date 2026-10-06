@@ -70,6 +70,13 @@ publishable key stops granting access to everything.
 
 Do not run it early. Keep a fresh **Download Backup** from the app before you do.
 
+**Keep-alive dependency:** `api/keepalive.js` (Vercel Cron, twice daily) stops
+the free-plan project being paused by reading `building_state` with the anon
+key. Step 7 revokes that read. Before or alongside step 7, give the keep-alive
+something it may still call — e.g. a `public.keepalive()` function returning
+`now()`, granted to `anon` — and point `api/keepalive.js` at
+`/rest/v1/rpc/keepalive`. Otherwise the project starts getting paused again.
+
 ---
 
 ## If you get locked out
