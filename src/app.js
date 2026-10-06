@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v140";
+const APP_VERSION = "v141";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -161,6 +161,14 @@ const els = {
   loginSubmitBtn: document.querySelector("#loginSubmitBtn"),
   loginError: document.querySelector("#loginError"),
   loginHint: document.querySelector("#loginHint"),
+  loginEmailInput: document.querySelector("#loginEmailInput"),
+  loginOwnerAccount: document.querySelector("#loginOwnerAccount"),
+  loginSwitchAccountBtn: document.querySelector("#loginSwitchAccountBtn"),
+  loginDeviceFallbackBtn: document.querySelector("#loginDeviceFallbackBtn"),
+  loginBackToAccountBtn: document.querySelector("#loginBackToAccountBtn"),
+  ownerAccountAction: document.querySelector("#ownerAccountAction"),
+  ownerAccountText: document.querySelector("#ownerAccountText"),
+  ownerSignOutButton: document.querySelector("#ownerSignOutButton"),
   logoutButton: document.querySelector("#logoutButton"),
   tenantCoefficientInput: document.querySelector("#tenantCoefficientInput"),
   tenantPinDialogInput: document.querySelector("#tenantPinDialogInput"),
@@ -339,6 +347,10 @@ const I18N = {
     "login.error": "Incorrect password or PIN",
     "login.enter": "Enter",
     "login.connect": "Connect to a building (new device)",
+    "login.emailPh": "Email",
+    "login.switchAccount": "Use a different account",
+    "login.deviceFallback": "Can't sign in? Use this device's password",
+    "login.backToAccount": "Sign in with your account instead",
     // Connect dialog
     "connect.title": "Connect to a building",
     "connect.note": "Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.",
@@ -443,6 +455,8 @@ const I18N = {
     "set.currency": "Currency & Conversion",
     "set.lbpRate": "LBP per USD conversion rate",
     "set.cloudDb": "Cloud database",
+    "set.ownerAccount": "Owner account",
+    "set.signOut": "Sign out",
     "set.cloudDbBuiltIn": "Connected to the building's cloud database. Data and invoice photos sync automatically — nothing to set up on this device.",
     "set.supabaseUrl": "Supabase project URL",
     "set.supabaseKey": "Supabase anon public key",
@@ -629,6 +643,10 @@ const I18N = {
     "login.error": "كلمة السر أو الرمز غير صحيح",
     "login.enter": "دخول",
     "login.connect": "الاتصال بمبنى (جهاز جديد)",
+    "login.emailPh": "البريد الإلكتروني",
+    "login.switchAccount": "استخدام حساب آخر",
+    "login.deviceFallback": "تعذّر تسجيل الدخول؟ استخدم كلمة سر هذا الجهاز",
+    "login.backToAccount": "تسجيل الدخول بحسابك بدلاً من ذلك",
     // Connect dialog
     "connect.title": "الاتصال بمبنى",
     "connect.note": "الصق رمز الوصول الذي شاركه معك مالك المبنى، ثم اضغط اتصال. يربط هذا الجهاز بالمبنى ويحمّل بياناته.",
@@ -733,6 +751,8 @@ const I18N = {
     "set.currency": "العملة والتحويل",
     "set.lbpRate": "سعر صرف الليرة مقابل الدولار",
     "set.cloudDb": "قاعدة البيانات السحابية",
+    "set.ownerAccount": "حساب المالك",
+    "set.signOut": "تسجيل الخروج",
     "set.cloudDbBuiltIn": "متصل بقاعدة بيانات المبنى السحابية. تُزامَن البيانات وصور الفواتير تلقائياً — لا حاجة لأي إعداد على هذا الجهاز.",
     "set.supabaseUrl": "رابط مشروع Supabase",
     "set.supabaseKey": "مفتاح Supabase العام (anon)",
@@ -915,6 +935,17 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Signed in as {email}": "تم تسجيل الدخول باسم {email}",
+  "Wrong email or password": "البريد الإلكتروني أو كلمة السر غير صحيحة",
+  "This account is not the building owner": "هذا الحساب ليس حساب مالك المبنى",
+  "Can't reach the cloud. Check your connection.": "تعذّر الوصول إلى السحابة. تحقّق من الاتصال.",
+  "Enter your email and password": "أدخل بريدك الإلكتروني وكلمة السر",
+  "Your owner sign-in expired. Sign in again from the login screen.": "انتهت صلاحية تسجيل دخول المالك. سجّل الدخول مجدداً من شاشة الدخول.",
+  "Enter this device's owner password": "أدخل كلمة سر المالك على هذا الجهاز",
+  "No password set — press Enter to access as owner": "لا توجد كلمة سر — اضغط دخول للوصول كمالك",
+  "Incorrect password": "كلمة السر غير صحيحة",
+  "Incorrect PIN": "الرمز غير صحيح",
+  "Signed out": "تم تسجيل الخروج",
   // Toasts
   "Enter a project name": "أدخل اسم المشروع",
   "Enter the total budget": "أدخل إجمالي الميزانية",
@@ -2999,14 +3030,58 @@ function showLoginScreen() {
       return opt;
     }),
   );
-  const hasPassword = Boolean(state.settings.ownerPasswordHash);
   const hasTenants = tenantsWithPin.length > 0;
-  els.loginHint.textContent = hasPassword ? "" : "No password set — press Enter to access as owner";
-  els.loginHint.classList.toggle("hidden", hasPassword);
   els.loginTenantTab.classList.toggle("hidden", !hasTenants);
+  renderOwnerLoginForm();
   els.loginScreen.classList.remove("hidden");
   document.querySelector(".app-shell").classList.add("hidden");
-  els.loginPasswordInput.focus();
+  focusOwnerLoginField();
+}
+
+// Temporary (Phase 2): lets the owner fall back to the old per-device password
+// if account sign-in fails, so nobody is locked out before step 7 removes it.
+let ownerDevicePasswordMode = false;
+
+// Three owner states: already signed in on this device (just press Enter),
+// account sign-in (email + password), or the device password (legacy/fallback).
+function renderOwnerLoginForm() {
+  const accounts = usesOwnerAccounts() && !ownerDevicePasswordMode;
+  const signedIn = accounts && Boolean(authSession);
+  els.loginOwnerAccount.classList.toggle("hidden", !signedIn);
+  if (signedIn) els.loginOwnerAccount.textContent = tr("Signed in as {email}", { email: authSession.email });
+  els.loginEmailInput.classList.toggle("hidden", !accounts || signedIn);
+  els.loginPasswordInput.classList.toggle("hidden", signedIn);
+  els.loginSwitchAccountBtn.classList.toggle("hidden", !signedIn);
+  els.loginDeviceFallbackBtn.classList.toggle("hidden", !accounts || signedIn);
+  els.loginBackToAccountBtn.classList.toggle("hidden", !(usesOwnerAccounts() && ownerDevicePasswordMode));
+  const hasPassword = Boolean(state.settings.ownerPasswordHash);
+  const hint = accounts ? "" : hasPassword
+    ? (usesOwnerAccounts() ? tr("Enter this device's owner password") : "")
+    : tr("No password set — press Enter to access as owner");
+  els.loginHint.textContent = hint;
+  els.loginHint.classList.toggle("hidden", !hint);
+}
+
+function focusOwnerLoginField() {
+  if (!els.loginEmailInput.classList.contains("hidden") && !els.loginEmailInput.value) els.loginEmailInput.focus();
+  else if (!els.loginPasswordInput.classList.contains("hidden")) els.loginPasswordInput.focus();
+  else els.loginSubmitBtn.focus();
+}
+
+function showLoginError(message) {
+  els.loginError.textContent = tr(message);
+  els.loginError.classList.remove("hidden");
+}
+
+function enterAsOwner() {
+  sessionMode = "owner";
+  sessionTenantId = null;
+  ownerDevicePasswordMode = false;
+  applySessionMode();
+  hideLoginScreen();
+  els.loginPasswordInput.value = "";
+  renderAll();
+  checkSetupWizard();
 }
 
 function hideLoginScreen() {
@@ -3024,24 +3099,52 @@ function applySessionMode() {
   }
 }
 
-function attemptLogin() {
+let ownerSignInBusy = false;
+
+async function attemptLogin() {
   const isOwnerTab = !els.loginOwnerForm.classList.contains("hidden");
   els.loginError.classList.add("hidden");
+
+  if (isOwnerTab && usesOwnerAccounts() && !ownerDevicePasswordMode) {
+    if (authSession) {
+      enterAsOwner();
+      // Boot synced before the owner was known; pull again as the owner.
+      syncFromSheet({ silent: true });
+      return;
+    }
+    if (ownerSignInBusy) return;
+    const email = els.loginEmailInput.value.trim();
+    const password = els.loginPasswordInput.value;
+    if (!email || !password) {
+      showLoginError("Enter your email and password");
+      return;
+    }
+    ownerSignInBusy = true;
+    els.loginSubmitBtn.disabled = true;
+    try {
+      await signInOwner(email, password);
+      enterAsOwner();
+      syncFromSheet({ silent: true });
+    } catch (error) {
+      // fetch() rejects with a TypeError when the network is unreachable, and
+      // with a TimeoutError when AbortSignal.timeout fires.
+      const unreachable = error instanceof TypeError || error?.name === "TimeoutError" || error?.name === "AbortError";
+      showLoginError(unreachable ? "Can't reach the cloud. Check your connection." : error.message);
+    } finally {
+      ownerSignInBusy = false;
+      els.loginSubmitBtn.disabled = false;
+      els.loginPasswordInput.value = "";
+    }
+    return;
+  }
 
   if (isOwnerTab) {
     const entered = els.loginPasswordInput.value;
     const stored = state.settings.ownerPasswordHash;
     if (!stored || hashSecret(entered, state.security.salt) === stored) {
-      sessionMode = "owner";
-      sessionTenantId = null;
-      applySessionMode();
-      hideLoginScreen();
-      els.loginPasswordInput.value = "";
-      renderAll();
-      checkSetupWizard();
+      enterAsOwner();
     } else {
-      els.loginError.textContent = "Incorrect password";
-      els.loginError.classList.remove("hidden");
+      showLoginError("Incorrect password");
     }
   } else {
     const tenantId = els.loginTenantSelect.value;
@@ -3057,8 +3160,7 @@ function attemptLogin() {
       checkDueBanner();
       els.loginPinInput.value = "";
     } else {
-      els.loginError.textContent = "Incorrect PIN";
-      els.loginError.classList.remove("hidden");
+      showLoginError("Incorrect PIN");
     }
   }
 }
@@ -3066,6 +3168,7 @@ function attemptLogin() {
 function logout() {
   sessionMode = null;
   sessionTenantId = null;
+  ownerDevicePasswordMode = false;
   document.body.classList.remove("tenant-mode");
   els.logoutButton.classList.add("hidden");
   els.loginPasswordInput.value = "";
@@ -5631,6 +5734,7 @@ function renderSettings() {
     ? t("set.ownerPasswordSetPh")
     : t("set.ownerPasswordPh");
   els.removeOwnerPasswordButton.classList.toggle("hidden", !state.settings.ownerPasswordHash);
+  renderOwnerAccount();
   const coeffSum = state.tenants.reduce((sum, t) => sum + (t.coefficient || 0), 0);
   const tenantsWithCoeff = state.tenants.filter((t) => t.coefficient > 0).length;
   if (tenantsWithCoeff > 0) {
@@ -6093,13 +6197,14 @@ function base64ToBytes(base64) {
 async function uploadInvoiceToSupabase(transaction, prepared) {
   const c = cloudConfig();
   const path = `${(transaction.date || localDateInput()).slice(0, 4)}/${randomToken()}-${prepared.fileName}`;
+  await ensureFreshSession();
   const res = await fetch(
     `${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`,
     {
       method: "POST",
       headers: {
         apikey: c.supabaseKey,
-        Authorization: `Bearer ${c.supabaseKey}`,
+        Authorization: `Bearer ${authBearer()}`,
         "Content-Type": prepared.mimeType,
         "x-upsert": "false",
       },
@@ -6212,17 +6317,163 @@ function hasCloudConfig() {
 // per building). Multi-building support would make this per-building later.
 const SUPABASE_STATE_ROW_ID = "building";
 
-async function supabaseRequest(path, options = {}) {
+// ── Owner sign-in (Supabase Auth, Phase 2 step 5) ───────────────────────────
+// The owner signs in once per device with their Supabase account. The session
+// (access + refresh token) is kept in its own localStorage key, so later
+// launches just press Enter. While it exists, every Supabase request carries it
+// instead of the shared publishable key, so the database sees the owner rather
+// than "anyone holding the key". Tokens never go into `state`, which is synced
+// to the cloud and downloaded as backups.
+const AUTH_KEY = "building-account-tracker:auth";
+let authSession = loadAuthSession();
+let refreshInFlight = null;
+// Sign-in calls give up after this long, so a flaky connection shows an error
+// instead of leaving the Enter button greyed out indefinitely.
+const AUTH_TIMEOUT_MS = 15000;
+
+function loadAuthSession() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
+    return saved?.refresh_token ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveAuthSession(session) {
+  authSession = session;
+  try {
+    if (session) localStorage.setItem(AUTH_KEY, JSON.stringify(session));
+    else localStorage.removeItem(AUTH_KEY);
+  } catch { /* private mode: the session just won't survive a reload */ }
+}
+
+// Supabase accounts replace the device password whenever the cloud database is
+// Supabase. Without it (fresh clone, local-only) the device password remains.
+function usesOwnerAccounts() {
+  return cloudProvider() === "supabase";
+}
+
+function sessionFromAuthResponse(body) {
+  return {
+    access_token: body.access_token,
+    refresh_token: body.refresh_token,
+    // expires_at is in seconds; fall back to expires_in when it's absent
+    expires_at: Number(body.expires_at) || Math.floor(Date.now() / 1000) + Number(body.expires_in || 3600),
+    email: body.user?.email || authSession?.email || "",
+    user_id: body.user?.id || authSession?.user_id || "",
+  };
+}
+
+async function authRequest(path, body, token) {
   const c = cloudConfig();
+  const res = await fetch(`${c.supabaseUrl}/auth/v1/${path}`, {
+    method: "POST",
+    headers: {
+      apikey: c.supabaseKey,
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body || {}),
+    signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
+  });
+  let json = null;
+  try { json = await res.json(); } catch { /* empty body (logout) */ }
+  return { ok: res.ok, status: res.status, body: json };
+}
+
+// Makes sure the access token has at least a minute left. A refresh token the
+// server rejects means the sign-in is over: drop it and fall back to the shared
+// key (still accepted until step 7). A network failure keeps the session for
+// offline use; the caller's own request then fails the normal way.
+async function ensureFreshSession({ force = false } = {}) {
+  if (!authSession) return;
+  const secondsLeft = authSession.expires_at - Math.floor(Date.now() / 1000);
+  if (!force && secondsLeft > 60) return;
+  refreshInFlight ||= (async () => {
+    try {
+      const r = await authRequest("token?grant_type=refresh_token", { refresh_token: authSession.refresh_token });
+      if (r.ok && r.body?.access_token) {
+        saveAuthSession(sessionFromAuthResponse(r.body));
+      } else if (r.status >= 400 && r.status < 500) {
+        saveAuthSession(null);
+        renderOwnerAccount();
+        // The login screen may already be showing "Signed in as …" (boot draws
+        // it before syncing); swap it back to the email + password form.
+        renderOwnerLoginForm();
+        showToast("Your owner sign-in expired. Sign in again from the login screen.");
+      }
+    } catch {
+      // offline — keep the session
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  await refreshInFlight;
+}
+
+function authBearer() {
+  return authSession?.access_token || cloudConfig().supabaseKey;
+}
+
+// Signing in proves who you are, not that you own the building, so the account
+// must also pass is_owner() before the session is kept.
+async function signInOwner(email, password) {
+  const r = await authRequest("token?grant_type=password", { email, password });
+  if (!r.ok || !r.body?.access_token) {
+    throw new Error(r.body?.error_code === "invalid_credentials"
+      ? "Wrong email or password"
+      : r.body?.msg || r.body?.error_description || `Sign-in failed (${r.status})`);
+  }
+  const session = sessionFromAuthResponse(r.body);
+  const c = cloudConfig();
+  const check = await fetch(`${c.supabaseUrl}/rest/v1/rpc/is_owner`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+    body: "{}",
+    signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
+  });
+  const isOwner = check.ok && (await check.json()) === true;
+  if (!isOwner) {
+    authRequest("logout", {}, session.access_token).catch(() => {});
+    throw new Error("This account is not the building owner");
+  }
+  saveAuthSession(session);
+}
+
+function signOutOwner() {
+  const token = authSession?.access_token;
+  saveAuthSession(null);
+  if (token) authRequest("logout", {}, token).catch(() => {});
+  showToast("Signed out");
+  logout();
+}
+
+function renderOwnerAccount() {
+  if (!els.ownerAccountAction) return;
+  const show = usesOwnerAccounts() && Boolean(authSession) && sessionMode === "owner";
+  els.ownerAccountAction.classList.toggle("hidden", !show);
+  if (show) els.ownerAccountText.textContent = tr("Signed in as {email}", { email: authSession.email });
+}
+
+async function supabaseRequest(path, options = {}, retried = false) {
+  const c = cloudConfig();
+  await ensureFreshSession();
   const res = await fetch(`${c.supabaseUrl}/rest/v1/${path}`, {
     ...options,
     headers: {
       apikey: c.supabaseKey,
-      Authorization: `Bearer ${c.supabaseKey}`,
+      Authorization: `Bearer ${authBearer()}`,
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
   });
+  // The token can expire between the freshness check and the server (clock
+  // skew, a sleeping phone). Refresh once and retry.
+  if (res.status === 401 && authSession && !retried) {
+    await ensureFreshSession({ force: true });
+    return supabaseRequest(path, options, true);
+  }
   if (!res.ok) {
     let msg = `Cloud database error (${res.status})`;
     try { const j = await res.json(); msg = j.message || j.hint || j.error || msg; } catch (_) {}
@@ -8023,7 +8274,7 @@ function attachEvents() {
     els.loginOwnerForm.classList.remove("hidden");
     els.loginTenantForm.classList.add("hidden");
     els.loginError.classList.add("hidden");
-    els.loginPasswordInput.focus();
+    focusOwnerLoginField();
   });
   els.loginTenantTab.addEventListener("click", () => {
     els.loginTenantTab.classList.add("active");
@@ -8035,6 +8286,29 @@ function attachEvents() {
   });
   els.loginSubmitBtn.addEventListener("click", attemptLogin);
   els.loginPasswordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
+  els.loginEmailInput.addEventListener("keydown", (e) => { if (e.key === "Enter") els.loginPasswordInput.focus(); });
+  els.loginSwitchAccountBtn.addEventListener("click", () => {
+    // Forget this device's sign-in and show the email + password form.
+    const token = authSession?.access_token;
+    saveAuthSession(null);
+    if (token) authRequest("logout", {}, token).catch(() => {});
+    els.loginError.classList.add("hidden");
+    renderOwnerLoginForm();
+    focusOwnerLoginField();
+  });
+  els.loginDeviceFallbackBtn.addEventListener("click", () => {
+    ownerDevicePasswordMode = true;
+    els.loginError.classList.add("hidden");
+    renderOwnerLoginForm();
+    focusOwnerLoginField();
+  });
+  els.loginBackToAccountBtn.addEventListener("click", () => {
+    ownerDevicePasswordMode = false;
+    els.loginError.classList.add("hidden");
+    renderOwnerLoginForm();
+    focusOwnerLoginField();
+  });
+  els.ownerSignOutButton.addEventListener("click", signOutOwner);
   els.loginPinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
   els.logoutButton.addEventListener("click", logout);
   els.runWizardButton.addEventListener("click", openSetupWizard);
@@ -8085,8 +8359,10 @@ async function syncFromSheet({ silent = false } = {}) {
     const dirty = localHasUnsyncedChanges();
 
     if (remoteToken && remoteToken === sync.lastSyncedToken) {
-      // Cloud unchanged since this device last synced.
+      // Cloud unchanged since this device last synced. When clean, this is the
+      // round trip that earns "Saved" (boot shows "Saving…" until one happens).
       if (dirty) queueCloudSave();
+      else setSyncChip("saved");
       return;
     }
     if (dirty) {

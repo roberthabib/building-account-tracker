@@ -28,6 +28,8 @@
           <button class="login-tab" id="loginTenantTab" type="button" data-i18n="login.tenant">Tenant</button>
         </div>
         <div id="loginOwnerForm">
+          <p class="login-account hidden" id="loginOwnerAccount"></p>
+          <input class="login-input hidden" id="loginEmailInput" type="email" inputmode="email" placeholder="Email" data-i18n-ph="login.emailPh" autocomplete="username" />
           <input class="login-input" id="loginPasswordInput" type="password" placeholder="Password" data-i18n-ph="login.passwordPh" autocomplete="current-password" />
         </div>
         <div id="loginTenantForm" class="hidden">
@@ -37,6 +39,11 @@
         <p class="login-error hidden" id="loginError" data-i18n="login.error">Incorrect password or PIN</p>
         <button class="login-submit-btn" id="loginSubmitBtn" type="button" data-i18n="login.enter">Enter</button>
         <p class="login-hint hidden" id="loginHint"></p>
+        <button class="login-link-btn hidden" id="loginSwitchAccountBtn" type="button" data-i18n="login.switchAccount">Use a different account</button>
+        <!-- Temporary (Phase 2): the old per-device owner password, so a failed
+             sign-in can't lock the owner out before step 7. Removed at step 7. -->
+        <button class="login-link-btn hidden" id="loginDeviceFallbackBtn" type="button" data-i18n="login.deviceFallback">Can't sign in? Use this device's password</button>
+        <button class="login-link-btn hidden" id="loginBackToAccountBtn" type="button" data-i18n="login.backToAccount">Sign in with your account instead</button>
         <button class="login-link-btn" id="connectBuildingButton" type="button" data-i18n="login.connect">Connect to a building (new device)</button>
       </div>
     </div>
@@ -375,6 +382,10 @@
             <p class="settings-note" id="cloudDbNote" data-i18n="set.cloudDbBuiltIn">Connected to the building's cloud database. Data and invoice photos sync automatically — nothing to set up on this device.</p>
             <div class="button-row">
               <button class="primary-button" id="saveSettingsButton" type="button" data-i18n="common.save">Save</button>
+            </div>
+            <div class="settings-action hidden" id="ownerAccountAction">
+              <div class="settings-action-text"><strong data-i18n="set.ownerAccount">Owner account</strong><span id="ownerAccountText"></span></div>
+              <button class="secondary-button" id="ownerSignOutButton" type="button" data-i18n="set.signOut">Sign out</button>
             </div>
             <div class="settings-action" id="shareAccessAction">
               <div class="settings-action-text"><strong data-i18n="set.shareAccessTitle">Share access with tenants</strong><span data-i18n="set.shareAccessDesc">Copy a code that lets a tenant's phone connect to this building. They paste it on their login screen.</span></div>

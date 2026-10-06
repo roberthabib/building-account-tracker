@@ -2385,6 +2385,16 @@ body.rtl .entry-chooser-btn .ec-chevron {
   margin: 0;
 }
 
+/* "Signed in as …" on the owner tab once this device has an account session. */
+.login-account {
+  margin: 4px 0 2px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
 .login-link-btn {
   display: block;
   width: 100%;

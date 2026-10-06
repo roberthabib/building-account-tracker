@@ -53,7 +53,13 @@ select p.role, p.tenant_id, u.email
   from public.profiles p join auth.users u on u.id = p.auth_user_id;
 ```
 
-## 5. App: owner sign-in  ⏳ not built yet
+## 5. App: owner sign-in  ✅ done (v141, 2026-10-06)
+
+SQL: [`phase2b-owner-access.sql`](phase2b-owner-access.sql), run and verified by
+impersonation — owner reads 1 / updates 1 / sees the invoice photos; a claimed
+tenant device gets 0 / 0 / 0. App flow tested end to end against a local mock
+(sign-in, wrong password, non-owner account, stay-signed-in, token refresh,
+revoked session, sign-out, device-password fallback, offline, Arabic).
 
 Adds an owner email + password sign-in, and keeps the Supabase session alive
 across reloads (refresh tokens in `localStorage`).
