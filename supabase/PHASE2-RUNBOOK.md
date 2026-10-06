@@ -58,7 +58,32 @@ select p.role, p.tenant_id, u.email
 Adds an owner email + password sign-in, and keeps the Supabase session alive
 across reloads (refresh tokens in `localStorage`).
 
+**Verified 2026-10-06 — signed-in users have NO access to `building_state`.**
+A signed-in session (owner or tenant, including anonymous sign-ins) runs as the
+`authenticated` role. `schema.sql` granted and wrote policies for `anon` only,
+so a claimed tenant device reading the row directly gets 403. Good for privacy
+(tenants already can't bypass `get_my_state()`), but it means **the owner's
+signed-in session can't read or write the document either**. Step 5 must add:
+
+```sql
+grant select, insert, update on public.building_state to authenticated;
+create policy "owner reads"   on public.building_state for select to authenticated using (public.is_owner());
+create policy "owner inserts" on public.building_state for insert to authenticated with check (public.is_owner());
+create policy "owner updates" on public.building_state for update to authenticated
+  using (public.is_owner()) with check (public.is_owner());
+```
+
+Step 7 then only has to remove the `anon` grants/policies.
+
 ## 6. App: tenant claim + redacted read  ⏳ not built yet
+
+**Server side verified 2026-10-06 against real data (16/16 checks):** claim
+code minted by the owner, redeemed once by an anonymous device, reuse refused,
+tenant can't mint codes; `get_my_state()` returns only the caller's tenant row,
+the other tenant's id and phone appear nowhere in the response, the building
+expense stays visible with its `shares` map cut to the caller's own entry
+(amount intact), credentials stripped, and `declare_my_payment()` rejects a bad
+month or amount without writing.
 
 Tenant devices sign in anonymously, redeem a claim code once, then load their
 data via `get_my_state()` instead of reading the row directly.
