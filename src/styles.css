@@ -2385,6 +2385,41 @@ body.rtl .entry-chooser-btn .ec-chevron {
   margin: 0;
 }
 
+/* "Continue with Google" — Google's standard light button (white, grey border,
+   multicolour G), so it reads as the familiar Google sign-in at a glance. */
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  margin: 4px 0 2px;
+  padding: 0 16px;
+  border: 1px solid #dadce0;
+  border-radius: var(--radius-control);
+  background: #fff;
+  color: #1f1f1f;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.google-btn:hover {
+  background: #f8faff;
+  border-color: #c6dafc;
+}
+
+.google-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.google-btn svg {
+  flex: 0 0 auto;
+}
+
 /* "Signed in as …" on the owner tab once this device has an account session. */
 .login-account {
   margin: 4px 0 2px;

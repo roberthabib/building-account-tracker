@@ -81,6 +81,16 @@ create policy "owner updates" on public.building_state for update to authenticat
 
 Step 7 then only has to remove the `anon` grants/policies.
 
+### 5b. Owner signs in with Google (v142)
+
+App side built and tested against a local mock (round trip, wrong account,
+cancel at Google, intercepted-code replay rejected by PKCE, stray code, email
+mode, tabs, Arabic). Needs, once: a Google OAuth client (redirect URI
+`https://<project>.supabase.co/auth/v1/callback`), the Google provider enabled
+in Supabase with that client, Site URL + redirect allow-list set to the app's
+URL, and the Gmail account marked owner (`insert into public.profiles …
+role 'owner'`) after its first sign-in attempt.
+
 ## 6. App: tenant claim + redacted read  ⏳ not built yet
 
 **Server side verified 2026-10-06 against real data (16/16 checks):** claim

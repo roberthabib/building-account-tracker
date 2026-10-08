@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v141";
+const APP_VERSION = "v142";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -162,6 +162,8 @@ const els = {
   loginError: document.querySelector("#loginError"),
   loginHint: document.querySelector("#loginHint"),
   loginEmailInput: document.querySelector("#loginEmailInput"),
+  googleSignInBtn: document.querySelector("#googleSignInBtn"),
+  loginEmailModeBtn: document.querySelector("#loginEmailModeBtn"),
   loginOwnerAccount: document.querySelector("#loginOwnerAccount"),
   loginSwitchAccountBtn: document.querySelector("#loginSwitchAccountBtn"),
   loginDeviceFallbackBtn: document.querySelector("#loginDeviceFallbackBtn"),
@@ -350,7 +352,9 @@ const I18N = {
     "login.emailPh": "Email",
     "login.switchAccount": "Use a different account",
     "login.deviceFallback": "Can't sign in? Use this device's password",
-    "login.backToAccount": "Sign in with your account instead",
+    "login.backToAccount": "Back to Google sign-in",
+    "login.google": "Continue with Google",
+    "login.emailMode": "Use email and password instead",
     // Connect dialog
     "connect.title": "Connect to a building",
     "connect.note": "Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.",
@@ -646,7 +650,9 @@ const I18N = {
     "login.emailPh": "البريد الإلكتروني",
     "login.switchAccount": "استخدام حساب آخر",
     "login.deviceFallback": "تعذّر تسجيل الدخول؟ استخدم كلمة سر هذا الجهاز",
-    "login.backToAccount": "تسجيل الدخول بحسابك بدلاً من ذلك",
+    "login.backToAccount": "العودة إلى تسجيل الدخول عبر Google",
+    "login.google": "المتابعة باستخدام Google",
+    "login.emailMode": "استخدام البريد الإلكتروني وكلمة السر بدلاً من ذلك",
     // Connect dialog
     "connect.title": "الاتصال بمبنى",
     "connect.note": "الصق رمز الوصول الذي شاركه معك مالك المبنى، ثم اضغط اتصال. يربط هذا الجهاز بالمبنى ويحمّل بياناته.",
@@ -946,6 +952,9 @@ const DYN_AR = {
   "Incorrect password": "كلمة السر غير صحيحة",
   "Incorrect PIN": "الرمز غير صحيح",
   "Signed out": "تم تسجيل الخروج",
+  "{email} is not the building owner's account": "{email} ليس حساب مالك المبنى",
+  "Google sign-in didn't finish on this device. Please try again.": "لم يكتمل تسجيل الدخول عبر Google على هذا الجهاز. حاول مجدداً.",
+  "Google sign-in was cancelled or failed: {reason}": "أُلغي تسجيل الدخول عبر Google أو فشل: {reason}",
   // Toasts
   "Enter a project name": "أدخل اسم المشروع",
   "Enter the total budget": "أدخل إجمالي الميزانية",
@@ -3038,25 +3047,34 @@ function showLoginScreen() {
   focusOwnerLoginField();
 }
 
-// Temporary (Phase 2): lets the owner fall back to the old per-device password
-// if account sign-in fails, so nobody is locked out before step 7 removes it.
-let ownerDevicePasswordMode = false;
+// How the owner tab signs in when Supabase accounts are on:
+//   "google" — Continue with Google (the default)
+//   "email"  — email + password for the same kind of account
+//   "device" — temporary (Phase 2): the old per-device password, so a failed
+//              account sign-in can't lock the owner out before step 7 removes it
+let ownerLoginMode = "google";
 
-// Three owner states: already signed in on this device (just press Enter),
-// account sign-in (email + password), or the device password (legacy/fallback).
+// Owner states: already signed in on this device (just press Enter), one of
+// the three modes above, or — without Supabase — the device password alone.
 function renderOwnerLoginForm() {
-  const accounts = usesOwnerAccounts() && !ownerDevicePasswordMode;
-  const signedIn = accounts && Boolean(authSession);
-  els.loginOwnerAccount.classList.toggle("hidden", !signedIn);
-  if (signedIn) els.loginOwnerAccount.textContent = tr("Signed in as {email}", { email: authSession.email });
-  els.loginEmailInput.classList.toggle("hidden", !accounts || signedIn);
-  els.loginPasswordInput.classList.toggle("hidden", signedIn);
-  els.loginSwitchAccountBtn.classList.toggle("hidden", !signedIn);
-  els.loginDeviceFallbackBtn.classList.toggle("hidden", !accounts || signedIn);
-  els.loginBackToAccountBtn.classList.toggle("hidden", !(usesOwnerAccounts() && ownerDevicePasswordMode));
+  const accounts = usesOwnerAccounts();
+  const signedIn = accounts && ownerLoginMode !== "device" && Boolean(authSession);
+  const mode = !accounts ? "device" : signedIn ? "signedIn" : ownerLoginMode;
+  const show = (el, on) => el.classList.toggle("hidden", !on);
+  show(els.loginOwnerAccount, mode === "signedIn");
+  if (mode === "signedIn") els.loginOwnerAccount.textContent = tr("Signed in as {email}", { email: authSession.email });
+  show(els.googleSignInBtn, mode === "google");
+  show(els.loginEmailInput, mode === "email");
+  show(els.loginPasswordInput, mode === "email" || mode === "device");
+  // Google sign-in has its own button; Enter would do nothing there.
+  if (!els.loginOwnerForm.classList.contains("hidden")) show(els.loginSubmitBtn, mode !== "google");
+  show(els.loginSwitchAccountBtn, mode === "signedIn");
+  show(els.loginEmailModeBtn, mode === "google");
+  show(els.loginDeviceFallbackBtn, accounts && (mode === "google" || mode === "email"));
+  show(els.loginBackToAccountBtn, accounts && (mode === "email" || mode === "device"));
   const hasPassword = Boolean(state.settings.ownerPasswordHash);
-  const hint = accounts ? "" : hasPassword
-    ? (usesOwnerAccounts() ? tr("Enter this device's owner password") : "")
+  const hint = mode !== "device" ? "" : hasPassword
+    ? (accounts ? tr("Enter this device's owner password") : "")
     : tr("No password set — press Enter to access as owner");
   els.loginHint.textContent = hint;
   els.loginHint.classList.toggle("hidden", !hint);
@@ -3076,7 +3094,7 @@ function showLoginError(message) {
 function enterAsOwner() {
   sessionMode = "owner";
   sessionTenantId = null;
-  ownerDevicePasswordMode = false;
+  ownerLoginMode = "google";
   applySessionMode();
   hideLoginScreen();
   els.loginPasswordInput.value = "";
@@ -3105,11 +3123,15 @@ async function attemptLogin() {
   const isOwnerTab = !els.loginOwnerForm.classList.contains("hidden");
   els.loginError.classList.add("hidden");
 
-  if (isOwnerTab && usesOwnerAccounts() && !ownerDevicePasswordMode) {
+  if (isOwnerTab && usesOwnerAccounts() && ownerLoginMode !== "device") {
     if (authSession) {
       enterAsOwner();
       // Boot synced before the owner was known; pull again as the owner.
       syncFromSheet({ silent: true });
+      return;
+    }
+    if (ownerLoginMode === "google") {
+      startGoogleSignIn();
       return;
     }
     if (ownerSignInBusy) return;
@@ -3168,7 +3190,7 @@ async function attemptLogin() {
 function logout() {
   sessionMode = null;
   sessionTenantId = null;
-  ownerDevicePasswordMode = false;
+  ownerLoginMode = "google";
   document.body.classList.remove("tenant-mode");
   els.logoutButton.classList.add("hidden");
   els.loginPasswordInput.value = "";
@@ -6416,8 +6438,6 @@ function authBearer() {
   return authSession?.access_token || cloudConfig().supabaseKey;
 }
 
-// Signing in proves who you are, not that you own the building, so the account
-// must also pass is_owner() before the session is kept.
 async function signInOwner(email, password) {
   const r = await authRequest("token?grant_type=password", { email, password });
   if (!r.ok || !r.body?.access_token) {
@@ -6425,7 +6445,74 @@ async function signInOwner(email, password) {
       ? "Wrong email or password"
       : r.body?.msg || r.body?.error_description || `Sign-in failed (${r.status})`);
   }
-  const session = sessionFromAuthResponse(r.body);
+  await adoptOwnerSession(sessionFromAuthResponse(r.body));
+}
+
+// ── Continue with Google (PKCE) ─────────────────────────────────────────────
+// The browser goes app -> Supabase -> Google -> Supabase -> back to the app
+// with a one-time ?code=. That code is useless on its own: it only becomes a
+// session together with the secret "verifier" this device generated before
+// leaving, so an intercepted code can't be replayed elsewhere. The verifier is
+// kept in localStorage (not sessionStorage) because an installed phone app may
+// come back from Google in a different window of the same browser.
+const OAUTH_VERIFIER_KEY = "building-account-tracker:oauth-verifier";
+
+function base64Url(bytes) {
+  let binary = "";
+  bytes.forEach((b) => { binary += String.fromCharCode(b); });
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function startGoogleSignIn() {
+  const verifier = base64Url(crypto.getRandomValues(new Uint8Array(32)));
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+  localStorage.setItem(OAUTH_VERIFIER_KEY, verifier);
+  const params = new URLSearchParams({
+    provider: "google",
+    redirect_to: `${location.origin}${location.pathname}`,
+    code_challenge: base64Url(new Uint8Array(digest)),
+    code_challenge_method: "s256",
+  });
+  location.assign(`${cloudConfig().supabaseUrl}/auth/v1/authorize?${params}`);
+}
+
+// Runs at boot. Does nothing unless this page load is the return from Google.
+async function completeGoogleSignIn() {
+  const query = new URLSearchParams(location.search);
+  const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const code = query.get("code");
+  const failure = query.get("error_description") || query.get("error") || hash.get("error_description") || hash.get("error");
+  if (!code && !failure) return;
+  // Clear ?code= from the address bar and history straight away: it's single
+  // use, and a reload must not try to spend it twice.
+  history.replaceState(null, "", location.pathname);
+  const verifier = localStorage.getItem(OAUTH_VERIFIER_KEY);
+  localStorage.removeItem(OAUTH_VERIFIER_KEY);
+  if (failure) {
+    showLoginError(tr("Google sign-in was cancelled or failed: {reason}", { reason: failure }));
+    return;
+  }
+  if (!verifier) {
+    showLoginError("Google sign-in didn't finish on this device. Please try again.");
+    return;
+  }
+  try {
+    const r = await authRequest("token?grant_type=pkce", { auth_code: code, code_verifier: verifier });
+    if (!r.ok || !r.body?.access_token) {
+      throw new Error(r.body?.msg || r.body?.error_description || `Sign-in failed (${r.status})`);
+    }
+    await adoptOwnerSession(sessionFromAuthResponse(r.body));
+    enterAsOwner();
+  } catch (error) {
+    const unreachable = error instanceof TypeError || error?.name === "TimeoutError" || error?.name === "AbortError";
+    showLoginError(unreachable ? "Can't reach the cloud. Check your connection." : error.message);
+  }
+}
+
+// Signing in proves who you are, not that you own the building, so every
+// account must also pass is_owner() before its session is kept. Shared by the
+// password and Google paths so they can never disagree.
+async function adoptOwnerSession(session) {
   const c = cloudConfig();
   const check = await fetch(`${c.supabaseUrl}/rest/v1/rpc/is_owner`, {
     method: "POST",
@@ -6436,7 +6523,10 @@ async function signInOwner(email, password) {
   const isOwner = check.ok && (await check.json()) === true;
   if (!isOwner) {
     authRequest("logout", {}, session.access_token).catch(() => {});
-    throw new Error("This account is not the building owner");
+    // Name the account: with Google it's easy to have picked the wrong one.
+    throw new Error(session.email
+      ? tr("{email} is not the building owner's account", { email: session.email })
+      : "This account is not the building owner");
   }
   saveAuthSession(session);
 }
@@ -8274,6 +8364,7 @@ function attachEvents() {
     els.loginOwnerForm.classList.remove("hidden");
     els.loginTenantForm.classList.add("hidden");
     els.loginError.classList.add("hidden");
+    renderOwnerLoginForm();
     focusOwnerLoginField();
   });
   els.loginTenantTab.addEventListener("click", () => {
@@ -8282,6 +8373,7 @@ function attachEvents() {
     els.loginTenantForm.classList.remove("hidden");
     els.loginOwnerForm.classList.add("hidden");
     els.loginError.classList.add("hidden");
+    els.loginSubmitBtn.classList.remove("hidden");
     els.loginPinInput.focus();
   });
   els.loginSubmitBtn.addEventListener("click", attemptLogin);
@@ -8297,17 +8389,24 @@ function attachEvents() {
     focusOwnerLoginField();
   });
   els.loginDeviceFallbackBtn.addEventListener("click", () => {
-    ownerDevicePasswordMode = true;
+    ownerLoginMode = "device";
     els.loginError.classList.add("hidden");
     renderOwnerLoginForm();
     focusOwnerLoginField();
   });
   els.loginBackToAccountBtn.addEventListener("click", () => {
-    ownerDevicePasswordMode = false;
+    ownerLoginMode = "google";
     els.loginError.classList.add("hidden");
     renderOwnerLoginForm();
     focusOwnerLoginField();
   });
+  els.loginEmailModeBtn.addEventListener("click", () => {
+    ownerLoginMode = "email";
+    els.loginError.classList.add("hidden");
+    renderOwnerLoginForm();
+    focusOwnerLoginField();
+  });
+  els.googleSignInBtn.addEventListener("click", startGoogleSignIn);
   els.ownerSignOutButton.addEventListener("click", signOutOwner);
   els.loginPinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
   els.logoutButton.addEventListener("click", logout);
@@ -8416,6 +8515,10 @@ async function boot() {
   showLoginScreen();
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // Returning from Google? Finish signing in before the first sync, so that
+  // sync already runs as the owner.
+  if (usesOwnerAccounts()) await completeGoogleSignIn();
 
   await syncFromSheet();
 
