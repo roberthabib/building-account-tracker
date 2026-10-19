@@ -5,11 +5,15 @@ const APP_VERSION = "v142";
 // committed, so the live app is preconfigured while the public repo stays free
 // of keys. Absent in a fresh clone — the app then falls back to Settings.
 let EMBEDDED_CLOUD = { supabaseUrl: "", supabaseAnonKey: "" };
-try {
-  const mod = await import("./cloud-config.js");
-  if (mod?.CLOUD_CONFIG) EMBEDDED_CLOUD = { ...EMBEDDED_CLOUD, ...mod.CLOUD_CONFIG };
-} catch (_) {
-  // No built-in config bundled; Settings values (if any) are used instead.
+// The node test harness (tests/) sets this so a test run can never pick up the
+// real credentials and talk to the live database.
+if (!globalThis.__BAT_TEST__) {
+  try {
+    const mod = await import("./cloud-config.js");
+    if (mod?.CLOUD_CONFIG) EMBEDDED_CLOUD = { ...EMBEDDED_CLOUD, ...mod.CLOUD_CONFIG };
+  } catch (_) {
+    // No built-in config bundled; Settings values (if any) are used instead.
+  }
 }
 
 const els = {
@@ -8528,3 +8532,22 @@ async function boot() {
 boot().catch((error) => {
   document.body.innerHTML = `<main class="app-shell"><section class="panel"><h1>BUILDING ACCOUNT TRACKER ${APP_VERSION}</h1><p>${error.message}</p></section></main>`;
 });
+
+// Test hook for the node tests in tests/ (browsers ignore module exports).
+// Pure calculation functions plus a way to load a state; nothing here touches
+// the network.
+export const __test = {
+  setState(raw) { state = hydrateState(raw); },
+  getState() { return state; },
+  getTenantBalance,
+  getTenantExpenseShare,
+  getTenantServicesDue,
+  getTenantPaymentsTotal,
+  getTenantOpeningNet,
+  getTenantFixedDueTotal,
+  computeServiceDistribution,
+  allocateByWeight,
+  mergeStates,
+  remoteWouldWipeLocalData,
+  toUsd,
+};

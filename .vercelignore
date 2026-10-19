@@ -11,6 +11,7 @@ Naccache 1727 rev3.xlsx
 cloud-state-backup-*.json
 live-sheet-backup-*.json
 tools/
+tests/
 
 # Local scratch and dev-only files
 _tmp_*.pdf
