@@ -37,6 +37,7 @@
           <input class="login-input" id="loginPasswordInput" type="password" placeholder="Password" data-i18n-ph="login.passwordPh" autocomplete="current-password" />
         </div>
         <div id="loginTenantForm" class="hidden">
+          <p class="login-account hidden" id="loginTenantLinked"></p>
           <select class="login-input" id="loginTenantSelect"></select>
           <input class="login-input" id="loginPinInput" type="password" placeholder="PIN" data-i18n-ph="login.pinPh" autocomplete="current-password" />
         </div>
@@ -49,7 +50,8 @@
              sign-in can't lock the owner out before step 7. Removed at step 7. -->
         <button class="login-link-btn hidden" id="loginDeviceFallbackBtn" type="button" data-i18n="login.deviceFallback">Can't sign in? Use this device's password</button>
         <button class="login-link-btn hidden" id="loginBackToAccountBtn" type="button" data-i18n="login.backToAccount">Back to Google sign-in</button>
-        <button class="login-link-btn" id="connectBuildingButton" type="button" data-i18n="login.connect">Connect to a building (new device)</button>
+        <button class="login-link-btn hidden" id="loginUnlinkBtn" type="button" data-i18n="login.unlink">Unlink this phone</button>
+        <button class="login-link-btn" id="connectBuildingButton" type="button" data-i18n="login.connect">I'm a tenant with an invite code</button>
       </div>
     </div>
 
@@ -114,7 +116,7 @@
             <div id="tenantDuesList"></div>
           </section>
 
-          <section class="panel">
+          <section class="panel building-wide">
             <div class="panel-header">
               <h3 data-i18n="financial.title">Building Financial Position</h3>
             </div>
@@ -141,7 +143,7 @@
             <div id="declarationsList"></div>
           </section>
 
-          <section class="panel">
+          <section class="panel building-wide">
             <div class="panel-header">
               <h3 data-i18n="tenantBalances.title">Tenant Balances</h3>
               <span id="collectionRate"></span>
@@ -163,7 +165,7 @@
             <div id="sharedExpensesList"></div>
           </section>
 
-          <section class="panel">
+          <section class="panel building-wide">
             <div class="panel-header">
               <h3 data-i18n="monthlyActivity.title">Monthly Activity</h3>
               <span id="categorySummaryPeriod"></span>
@@ -393,11 +395,15 @@
               <button class="secondary-button" id="ownerSignOutButton" type="button" data-i18n="set.signOut">Sign out</button>
             </div>
             <div class="settings-action" id="shareAccessAction">
-              <div class="settings-action-text"><strong data-i18n="set.shareAccessTitle">Share access with tenants</strong><span data-i18n="set.shareAccessDesc">Copy a code that lets a tenant's phone connect to this building. They paste it on their login screen.</span></div>
-              <button class="secondary-button" id="shareSyncCodeButton" type="button" data-i18n="common.share">Share</button>
+              <div class="settings-action-text"><strong data-i18n="set.shareAccessTitle">Invite a tenant</strong><span data-i18n="set.shareAccessDesc">Create a one-time code that links a tenant's phone to their own account. They only ever see their own figures.</span></div>
+              <button class="secondary-button" id="shareSyncCodeButton" type="button" data-i18n="common.invite">Invite</button>
             </div>
 
             <p class="settings-section-header" data-i18n="set.backup">Backup &amp; Restore</p>
+            <div class="settings-action owner-only">
+              <div class="settings-action-text"><strong data-i18n="set.cloudBackupsTitle">Restore a daily cloud backup</strong><span data-i18n="set.cloudBackupsDesc">The cloud keeps a copy of your data every night for 60 days. Pick a day to go back to.</span></div>
+              <button class="secondary-button" id="cloudBackupsButton" type="button" data-i18n="common.choose">Choose…</button>
+            </div>
             <div class="settings-action owner-only">
               <div class="settings-action-text"><strong data-i18n="set.fullExportTitle">Export everything to Excel</strong><span data-i18n="set.fullExportDesc">One workbook with every tenant, transaction, month, reading, project and poll — formatted and ready to print or share.</span></div>
               <button class="secondary-button" id="fullExportButton" type="button" data-i18n="common.export">Export</button>
@@ -696,6 +702,32 @@
       </div>
       <p class="settings-note" id="whatsappDialogNote"></p>
       <div id="whatsappReminderList"></div>
+    </dialog>
+
+    <dialog id="inviteDialog">
+      <div class="dialog-header">
+        <h2 data-i18n="invite.title">Invite a tenant</h2>
+        <button class="icon-button small" id="closeInviteDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
+      </div>
+      <p class="settings-note" data-i18n="invite.note">Each code links one phone to one tenant, once, within 30 days. That phone then shows only that tenant's figures and the building expenses.</p>
+      <label><span data-i18n="invite.tenant">Tenant</span><select id="inviteTenantSelect"></select></label>
+      <div class="invite-result hidden" id="inviteResult">
+        <p class="invite-code" id="inviteCodeText"></p>
+        <p class="settings-note" id="inviteHowTo"></p>
+      </div>
+      <div class="button-row">
+        <button class="primary-button" id="inviteCreateButton" type="button" data-i18n="invite.create">Create invite code</button>
+        <button class="secondary-button hidden" id="inviteShareButton" type="button" data-i18n="common.share">Share</button>
+      </div>
+    </dialog>
+
+    <dialog id="backupsDialog">
+      <div class="dialog-header">
+        <h2 data-i18n="backups.title">Daily cloud backups</h2>
+        <button class="icon-button small" id="closeBackupsDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
+      </div>
+      <p class="settings-note" data-i18n="backups.note">Restoring replaces the data on every device with that day's copy. A safety copy of today's data is downloaded first.</p>
+      <div class="backups-list" id="backupsList"></div>
     </dialog>
 
     <dialog id="monthDialog">

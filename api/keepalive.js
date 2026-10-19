@@ -53,12 +53,17 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 500, { ok: false, error: error.message });
   }
 
+  const headers = { apikey: config.key, Authorization: `Bearer ${config.key}`, "Content-Type": "application/json" };
   const statuses = [];
   for (let i = 0; i < READS_PER_RUN; i += 1) {
     try {
-      const response = await fetch(`${config.url}/rest/v1/building_state?id=eq.building&select=rev`, {
-        headers: { apikey: config.key, Authorization: `Bearer ${config.key}` },
-      });
+      // public.keepalive() is a real query that returns only a count, so it
+      // keeps working after step 7 removes the shared key's access to the
+      // data. Until that function exists (404), fall back to the old read.
+      let response = await fetch(`${config.url}/rest/v1/rpc/keepalive`, { method: "POST", headers, body: "{}" });
+      if (response.status === 404) {
+        response = await fetch(`${config.url}/rest/v1/building_state?id=eq.building&select=rev`, { headers });
+      }
       statuses.push(response.status);
     } catch (error) {
       // DNS failure / connection refused: the project is paused (or gone).
@@ -72,8 +77,8 @@ module.exports = async function handler(req, res) {
   }
 
   // Any answer below 500 came back through Postgres, which is the activity that
-  // counts. (A 401/403 would also mean the anon read was revoked — see the
-  // keep-alive note in supabase/PHASE2-RUNBOOK.md step 7.)
+  // counts. (A 401/403 from the fallback read means rpc/keepalive is missing
+  // and the shared key has lost its read access: run phase2c SQL.)
   const ok = statuses.every((status) => status < 500);
   return sendJson(res, ok ? 200 : 502, { ok, statuses, at: new Date().toISOString() });
 };

@@ -3562,3 +3562,65 @@ body.rtl .entry-chooser-btn .ec-chevron {
   color: var(--red);
 }
 
+
+/* Invite code: large, spaced, easy to read aloud or copy by hand. */
+.invite-result {
+  margin: 12px 0 4px;
+  padding: 14px;
+  border-radius: var(--radius-inner);
+  background: var(--surface-soft);
+  text-align: center;
+}
+
+.invite-code {
+  margin: 0 0 6px;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--primary-dark);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  user-select: all;
+}
+
+/* Daily backups: one tappable row per day. */
+.backups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.backup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.backup-row span {
+  color: var(--label-muted);
+  font-size: 0.85rem;
+}
+
+.backup-row:hover,
+.backup-row:focus-visible {
+  border-color: var(--primary);
+}
+
+/* Linked tenant phones only receive their own tenant's money, so panels that
+   total the whole building would show wrong figures there. */
+body.tenant-phone .building-wide {
+  display: none;
+}

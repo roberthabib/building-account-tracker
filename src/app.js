@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v143";
+const APP_VERSION = "v144";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -167,6 +167,20 @@ const els = {
   loginError: document.querySelector("#loginError"),
   loginHint: document.querySelector("#loginHint"),
   loginEmailInput: document.querySelector("#loginEmailInput"),
+  loginTenantLinked: document.querySelector("#loginTenantLinked"),
+  loginUnlinkBtn: document.querySelector("#loginUnlinkBtn"),
+  inviteDialog: document.querySelector("#inviteDialog"),
+  closeInviteDialog: document.querySelector("#closeInviteDialog"),
+  inviteTenantSelect: document.querySelector("#inviteTenantSelect"),
+  inviteResult: document.querySelector("#inviteResult"),
+  inviteCodeText: document.querySelector("#inviteCodeText"),
+  inviteHowTo: document.querySelector("#inviteHowTo"),
+  inviteCreateButton: document.querySelector("#inviteCreateButton"),
+  inviteShareButton: document.querySelector("#inviteShareButton"),
+  backupsDialog: document.querySelector("#backupsDialog"),
+  closeBackupsDialog: document.querySelector("#closeBackupsDialog"),
+  backupsList: document.querySelector("#backupsList"),
+  cloudBackupsButton: document.querySelector("#cloudBackupsButton"),
   googleSignInBtn: document.querySelector("#googleSignInBtn"),
   loginEmailModeBtn: document.querySelector("#loginEmailModeBtn"),
   loginOwnerAccount: document.querySelector("#loginOwnerAccount"),
@@ -356,7 +370,7 @@ const I18N = {
     "login.pinPh": "PIN",
     "login.error": "Incorrect password or PIN",
     "login.enter": "Enter",
-    "login.connect": "Connect to a building (new device)",
+    "login.connect": "I'm a tenant with an invite code",
     "login.emailPh": "Email",
     "login.switchAccount": "Use a different account",
     "login.deviceFallback": "Can't sign in? Use this device's password",
@@ -364,10 +378,21 @@ const I18N = {
     "login.google": "Continue with Google",
     "login.emailMode": "Use email and password instead",
     // Connect dialog
-    "connect.title": "Connect to a building",
-    "connect.note": "Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.",
-    "connect.placeholder": "Paste access code here",
-    "connect.submit": "Connect",
+    "connect.title": "Link your phone",
+    "connect.note": "Enter the invite code the building owner sent you. It links this phone to your own account: you'll see your balance, payments and the building expenses — never other tenants.",
+    "connect.placeholder": "Invite code, e.g. 7KQ2M9XB",
+    "connect.submit": "Link this phone",
+    "login.unlink": "Unlink this phone",
+    "common.invite": "Invite",
+    "common.choose": "Choose…",
+    "set.cloudBackupsTitle": "Restore a daily cloud backup",
+    "set.cloudBackupsDesc": "The cloud keeps a copy of your data every night for 60 days. Pick a day to go back to.",
+    "invite.title": "Invite a tenant",
+    "invite.note": "Each code links one phone to one tenant, once, within 30 days. That phone then shows only that tenant's figures and the building expenses.",
+    "invite.tenant": "Tenant",
+    "invite.create": "Create invite code",
+    "backups.title": "Daily cloud backups",
+    "backups.note": "Restoring replaces the data on every device with that day's copy. A safety copy of today's data is downloaded first.",
     // Topbar / sync
     "topbar.eyebrow": "Building Account",
     "topbar.appName": "Building Account Tracker",
@@ -479,8 +504,8 @@ const I18N = {
     "set.driveFolderId": "Google Drive invoice folder ID",
     "set.syncSecret": "Sync secret (optional)",
     "set.syncSecretPh": "Match the SYNC_SECRET set in Apps Script",
-    "set.shareAccessTitle": "Share access with tenants",
-    "set.shareAccessDesc": "Copy a code that lets a tenant's phone connect to this building. They paste it on their login screen.",
+    "set.shareAccessTitle": "Invite a tenant",
+    "set.shareAccessDesc": "Create a one-time code that links a tenant's phone to their own account. They only ever see their own figures.",
     "set.backup": "Backup & Restore",
     "set.downloadBackupTitle": "Download backup",
     "set.downloadBackupDesc": "Save all your data to a file on this device. Keep it somewhere safe.",
@@ -657,7 +682,7 @@ const I18N = {
     "login.pinPh": "الرمز",
     "login.error": "كلمة السر أو الرمز غير صحيح",
     "login.enter": "دخول",
-    "login.connect": "الاتصال بمبنى (جهاز جديد)",
+    "login.connect": "أنا مستأجر ولديّ رمز دعوة",
     "login.emailPh": "البريد الإلكتروني",
     "login.switchAccount": "استخدام حساب آخر",
     "login.deviceFallback": "تعذّر تسجيل الدخول؟ استخدم كلمة سر هذا الجهاز",
@@ -665,10 +690,21 @@ const I18N = {
     "login.google": "المتابعة باستخدام Google",
     "login.emailMode": "استخدام البريد الإلكتروني وكلمة السر بدلاً من ذلك",
     // Connect dialog
-    "connect.title": "الاتصال بمبنى",
-    "connect.note": "الصق رمز الوصول الذي شاركه معك مالك المبنى، ثم اضغط اتصال. يربط هذا الجهاز بالمبنى ويحمّل بياناته.",
-    "connect.placeholder": "الصق رمز الوصول هنا",
-    "connect.submit": "اتصال",
+    "connect.title": "ربط هاتفك",
+    "connect.note": "أدخل رمز الدعوة الذي أرسله لك مالك المبنى. يربط هذا الهاتف بحسابك فقط: سترى رصيدك ودفعاتك ومصاريف المبنى — ولن ترى المستأجرين الآخرين أبداً.",
+    "connect.placeholder": "رمز الدعوة، مثل 7KQ2M9XB",
+    "connect.submit": "ربط هذا الهاتف",
+    "login.unlink": "إلغاء ربط هذا الهاتف",
+    "common.invite": "دعوة",
+    "common.choose": "اختر…",
+    "set.cloudBackupsTitle": "استعادة نسخة احتياطية يومية من السحابة",
+    "set.cloudBackupsDesc": "تحتفظ السحابة بنسخة من بياناتك كل ليلة لمدة 60 يوماً. اختر يوماً للعودة إليه.",
+    "invite.title": "دعوة مستأجر",
+    "invite.note": "كل رمز يربط هاتفاً واحداً بمستأجر واحد، مرة واحدة، خلال 30 يوماً. بعدها يعرض ذلك الهاتف أرقام ذلك المستأجر ومصاريف المبنى فقط.",
+    "invite.tenant": "المستأجر",
+    "invite.create": "إنشاء رمز دعوة",
+    "backups.title": "النسخ الاحتياطية اليومية",
+    "backups.note": "الاستعادة تستبدل البيانات على كل الأجهزة بنسخة ذلك اليوم. تُنزَّل أولاً نسخة أمان من بيانات اليوم.",
     // Topbar / sync
     "topbar.eyebrow": "حساب المبنى",
     "topbar.appName": "متتبّع حساب المبنى",
@@ -780,8 +816,8 @@ const I18N = {
     "set.driveFolderId": "معرّف مجلد الفواتير في Google Drive",
     "set.syncSecret": "كلمة سر المزامنة (اختياري)",
     "set.syncSecretPh": "يطابق SYNC_SECRET المحدّد في Apps Script",
-    "set.shareAccessTitle": "مشاركة الوصول مع المستأجرين",
-    "set.shareAccessDesc": "انسخ رمزاً يتيح لهاتف المستأجر الاتصال بهذا المبنى. يلصقونه في شاشة الدخول.",
+    "set.shareAccessTitle": "دعوة مستأجر",
+    "set.shareAccessDesc": "أنشئ رمزاً لمرة واحدة يربط هاتف المستأجر بحسابه فقط. لن يرى سوى أرقامه.",
     "set.backup": "النسخ الاحتياطي والاستعادة",
     "set.downloadBackupTitle": "تنزيل نسخة احتياطية",
     "set.downloadBackupDesc": "احفظ كل بياناتك في ملف على هذا الجهاز. احتفظ به في مكان آمن.",
@@ -952,6 +988,32 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Linked as {name} — Unit {unit}": "مرتبط باسم {name} — الوحدة {unit}",
+  "This phone is linked to a tenant": "هذا الهاتف مرتبط بمستأجر",
+  "Enter the invite code first": "أدخل رمز الدعوة أولاً",
+  "This app isn't connected to the cloud database": "هذا التطبيق غير متصل بقاعدة البيانات السحابية",
+  "This phone is signed in as the building owner. Link it to a tenant instead? The owner will be signed out here.": "هذا الهاتف مسجّل الدخول كمالك المبنى. هل تريد ربطه بمستأجر بدلاً من ذلك؟ سيتم تسجيل خروج المالك من هذا الهاتف.",
+  "Could not create this phone's account": "تعذّر إنشاء حساب لهذا الهاتف",
+  "That code is not valid": "هذا الرمز غير صالح",
+  "That code has already been used": "هذا الرمز مستخدم مسبقاً",
+  "That code has expired": "انتهت صلاحية هذا الرمز",
+  "Phone linked. You'll only see your own account.": "تم ربط الهاتف. سترى حسابك فقط.",
+  "Unlink this phone? Its copy of your account is removed. You'll need a new invite code from the owner to link it again.": "إلغاء ربط هذا الهاتف؟ ستُحذف نسخة حسابك منه، وستحتاج إلى رمز دعوة جديد من المالك لربطه مجدداً.",
+  "Sign in with Google first: only the signed-in owner can create invite codes": "سجّل الدخول عبر Google أولاً: فقط المالك المسجّل يمكنه إنشاء رموز الدعوة",
+  "Send this to {name}. On their phone: open {url}, tap \"I'm a tenant with an invite code\" and enter the code. It works once, within 30 days.": "أرسل هذا إلى {name}. على هاتفه: افتح {url}، واضغط \"أنا مستأجر ولديّ رمز دعوة\" وأدخل الرمز. يعمل مرة واحدة خلال 30 يوماً.",
+  "Your invite code for {building}": "رمز الدعوة الخاص بك لـ {building}",
+  "Invite copied — paste it in WhatsApp or a message": "تم نسخ الدعوة — الصقها في واتساب أو رسالة",
+  "Copy this invite:": "انسخ هذه الدعوة:",
+  "Sign in with Google first: only the signed-in owner can restore backups": "سجّل الدخول عبر Google أولاً: فقط المالك المسجّل يمكنه استعادة النسخ الاحتياطية",
+  "Loading…": "جارٍ التحميل…",
+  "No backups yet. The first one is taken tonight.": "لا توجد نسخ احتياطية بعد. تُؤخذ الأولى الليلة.",
+  "{tenants} tenants · {transactions} transactions": "{tenants} مستأجرين · {transactions} قيود",
+  "Restore the backup from {day}? It replaces the data on every device. Today's data is downloaded first as a safety copy.": "استعادة نسخة {day}؟ ستستبدل البيانات على كل الأجهزة. تُنزَّل بيانات اليوم أولاً كنسخة أمان.",
+  "That backup is empty": "هذه النسخة الاحتياطية فارغة",
+  "Restored the backup from {day}": "تمت استعادة نسخة {day}",
+  "In app": "في التطبيق",
+  "Only the building owner can create claim codes": "فقط مالك المبنى يمكنه إنشاء رموز الدعوة",
+  "This poll is closed": "هذا الاستطلاع مغلق",
   "Full database export · {date}": "تصدير كامل لقاعدة البيانات · {date}",
   "Only the building owner can export the full database": "فقط مالك المبنى يمكنه تصدير قاعدة البيانات كاملة",
   "Full Excel export downloaded": "تم تنزيل ملف Excel الكامل",
@@ -1841,6 +1903,16 @@ function getTenantExpenseShareForTransaction(tenantId, transaction) {
   if (!activeTenants.length) return 0;
   const totalUsd = toUsd(Number(transaction.debitUsd || 0), Number(transaction.debitLbp || 0));
   if (!totalUsd) return 0;
+  // A tenant's phone only holds its own tenant row; the server sends the
+  // building-wide totals so the split matches what the owner sees.
+  const red = state.redaction;
+  if (red && Number(red.activeTenantCount) > 0) {
+    const me = activeTenants.find((t) => t.id === tenantId);
+    if (!me) return 0;
+    const total = Number(red.activeCoefficientTotal || 0);
+    if (total > 0) return roundUsd(totalUsd * ((me.coefficient || 0) / total));
+    return roundUsd(totalUsd / Number(red.activeTenantCount));
+  }
   const coeffSum = activeTenants.reduce((s, t) => s + (t.coefficient || 0), 0);
   const tenant = activeTenants.find((t) => t.id === tenantId);
   if (!tenant) return 0;
@@ -3140,7 +3212,9 @@ function showLoginScreen() {
     }),
   );
   const hasTenants = tenantsWithPin.length > 0;
-  els.loginTenantTab.classList.toggle("hidden", !hasTenants);
+  els.loginTenantTab.classList.toggle("hidden", !hasTenants && !isTenantSession());
+  renderTenantLoginForm();
+  if (isTenantSession() && !els.loginTenantTab.classList.contains("active")) els.loginTenantTab.click();
   renderOwnerLoginForm();
   els.loginScreen.classList.remove("hidden");
   document.querySelector(".app-shell").classList.add("hidden");
@@ -3158,7 +3232,7 @@ let ownerLoginMode = "google";
 // the three modes above, or — without Supabase — the device password alone.
 function renderOwnerLoginForm() {
   const accounts = usesOwnerAccounts();
-  const signedIn = accounts && ownerLoginMode !== "device" && Boolean(authSession);
+  const signedIn = accounts && ownerLoginMode !== "device" && isOwnerSession();
   const mode = !accounts ? "device" : signedIn ? "signedIn" : ownerLoginMode;
   const show = (el, on) => el.classList.toggle("hidden", !on);
   show(els.loginOwnerAccount, mode === "signedIn");
@@ -3208,6 +3282,9 @@ function hideLoginScreen() {
 }
 
 function applySessionMode() {
+  // A linked tenant phone holds only its own tenant's money, so building-wide
+  // totals (cash, everyone's balances, all payments) can't be computed there.
+  document.body.classList.toggle("tenant-phone", sessionMode === "tenant" && isTenantSession());
   if (sessionMode === "tenant") {
     document.body.classList.add("tenant-mode");
     els.logoutButton.classList.remove("hidden");
@@ -3224,7 +3301,7 @@ async function attemptLogin() {
   els.loginError.classList.add("hidden");
 
   if (isOwnerTab && usesOwnerAccounts() && ownerLoginMode !== "device") {
-    if (authSession) {
+    if (isOwnerSession()) {
       enterAsOwner();
       // Boot synced before the owner was known; pull again as the owner.
       syncFromSheet({ silent: true });
@@ -3260,11 +3337,17 @@ async function attemptLogin() {
     return;
   }
 
+  if (!isOwnerTab && isTenantSession()) {
+    enterAsLinkedTenant();
+    return;
+  }
+
   if (isOwnerTab) {
     const entered = els.loginPasswordInput.value;
     const stored = state.settings.ownerPasswordHash;
     if (!stored || hashSecret(entered, state.security.salt) === stored) {
       enterAsOwner();
+      syncFromSheet({ silent: true });
     } else {
       showLoginError("Incorrect password");
     }
@@ -3291,7 +3374,7 @@ function logout() {
   sessionMode = null;
   sessionTenantId = null;
   ownerLoginMode = "google";
-  document.body.classList.remove("tenant-mode");
+  document.body.classList.remove("tenant-mode", "tenant-phone");
   els.logoutButton.classList.add("hidden");
   els.loginPasswordInput.value = "";
   els.loginPinInput.value = "";
@@ -3839,6 +3922,12 @@ function declarePayment(tenantId, month, amount) {
     declaredAt: new Date().toISOString(),
     status: "pending",
   };
+  if (isTenantSession()) {
+    supabaseRequest("rpc/declare_my_payment", { method: "POST", body: JSON.stringify({ p_month: month, p_amount: Number(amount) }) })
+      .then(() => { showToast("Owner notified of your payment"); return syncFromSheet({ silent: true }); })
+      .catch((error) => showToast(describeSyncProblem(error), 6000));
+    return;
+  }
   (state.paymentDeclarations ||= []).push(decl);
   saveState();
   renderPayments();
@@ -5434,12 +5523,11 @@ function renderLedger() {
       btn.textContent = tr("Edit");
       actionGroup.append(btn);
     }
-    if (attachmentUrl(transaction.invoiceAttachment)) {
-      const link = document.createElement("a");
+    if (hasInvoicePhoto(transaction.invoiceAttachment)) {
+      const link = document.createElement("button");
       link.className = "ledger-action-btn attachment-button";
-      link.href = attachmentUrl(transaction.invoiceAttachment);
-      link.target = "_blank";
-      link.rel = "noopener";
+      link.type = "button";
+      link.addEventListener("click", (e) => { e.stopPropagation(); openInvoicePhoto(transaction.invoiceAttachment); });
       link.textContent = tr("Invoice");
       actionGroup.append(link);
     }
@@ -5648,9 +5736,10 @@ function buildPollCard(poll) {
   const activeTenants = state.tenants.filter((t) => t.active !== false);
   const allVoterIds = ["owner", ...activeTenants.map((t) => t.id)];
   const votes = poll.votes || {};
-  const yesCount = Object.values(votes).filter((v) => v === "yes").length;
-  const noCount = Object.values(votes).filter((v) => v === "no").length;
-  const abstainCount = Object.values(votes).filter((v) => v === "abstain").length;
+  const counts = poll.voteCounts; // present on a tenant phone (server-side tally)
+  const yesCount = counts ? Number(counts.yes || 0) : Object.values(votes).filter((v) => v === "yes").length;
+  const noCount = counts ? Number(counts.no || 0) : Object.values(votes).filter((v) => v === "no").length;
+  const abstainCount = counts ? Number(counts.abstain || 0) : Object.values(votes).filter((v) => v === "abstain").length;
   const totalVoters = allVoterIds.length;
   const pending = allVoterIds.filter((id) => !votes[id]);
 
@@ -5799,6 +5888,15 @@ function castVote(pollId, vote) {
   if (!poll || poll.status !== "open") return;
   const myId = sessionMode === "owner" ? "owner" : sessionTenantId;
   if (!myId) return;
+  if (isTenantSession()) {
+    poll.votes[myId] = vote; // show it straight away; the server copy follows
+    renderPolls();
+    supabaseRequest("rpc/cast_my_vote", { method: "POST", body: JSON.stringify({ p_poll_id: pollId, p_vote: vote }) })
+      .then(() => syncFromSheet({ silent: true }))
+      .catch((error) => showToast(describeSyncProblem(error), 6000));
+    showToast(tr("Voted {vote}", { vote: vote.toUpperCase() }));
+    return;
+  }
   poll.votes[myId] = vote;
   saveState();
   renderPolls();
@@ -6304,6 +6402,12 @@ function attachmentUrl(attachment) {
   return attachment?.url || attachment?.driveUrl || "";
 }
 
+// True for both kinds of photo: private Supabase files (storagePath) and old
+// Google Drive links.
+function hasInvoicePhoto(attachment) {
+  return Boolean(attachment?.storagePath || attachmentUrl(attachment));
+}
+
 const SUPABASE_INVOICE_BUCKET = "invoices";
 
 function base64ToBytes(base64) {
@@ -6484,7 +6588,19 @@ function sessionFromAuthResponse(body) {
     expires_at: Number(body.expires_at) || Math.floor(Date.now() / 1000) + Number(body.expires_in || 3600),
     email: body.user?.email || authSession?.email || "",
     user_id: body.user?.id || authSession?.user_id || "",
+    // Carried across token refreshes; set explicitly on sign-in / linking.
+    role: authSession?.role || "owner",
+    tenantId: authSession?.tenantId || null,
   };
+}
+
+// Sessions saved before roles existed are owner sessions.
+function isOwnerSession() {
+  return Boolean(authSession) && authSession.role !== "tenant";
+}
+
+function isTenantSession() {
+  return Boolean(authSession) && authSession.role === "tenant" && Boolean(authSession.tenantId);
 }
 
 async function authRequest(path, body, token) {
@@ -6628,7 +6744,7 @@ async function adoptOwnerSession(session) {
       ? tr("{email} is not the building owner's account", { email: session.email })
       : "This account is not the building owner");
   }
-  saveAuthSession(session);
+  saveAuthSession({ ...session, role: "owner", tenantId: null });
 }
 
 function signOutOwner() {
@@ -6641,7 +6757,7 @@ function signOutOwner() {
 
 function renderOwnerAccount() {
   if (!els.ownerAccountAction) return;
-  const show = usesOwnerAccounts() && Boolean(authSession) && sessionMode === "owner";
+  const show = usesOwnerAccounts() && isOwnerSession() && sessionMode === "owner";
   els.ownerAccountAction.classList.toggle("hidden", !show);
   if (show) els.ownerAccountText.textContent = tr("Signed in as {email}", { email: authSession.email });
 }
@@ -6677,6 +6793,12 @@ async function supabaseRequest(path, options = {}, retried = false) {
 // Provider-agnostic whole-state load. Returns the stored state object or null.
 async function cloudLoadState() {
   if (cloudProvider() === "supabase") {
+    // Tenants never read the raw document: the server returns a copy with
+    // everything belonging to other tenants removed.
+    if (isTenantSession()) {
+      const res = await supabaseRequest("rpc/get_my_state", { method: "POST", body: "{}" });
+      return await res.json();
+    }
     const res = await supabaseRequest(
       `building_state?id=eq.${SUPABASE_STATE_ROW_ID}&select=state`,
       { method: "GET" },
@@ -6918,8 +7040,20 @@ function localHasUnsyncedChanges() {
   return Number(state.meta?.rev || 0) > Number(loadSyncMeta().lastPushedRev || 0);
 }
 
+// Only the owner's signed-in session writes the whole document. Tenants write
+// through narrow server functions; a phone with no session has no identity
+// to write with (the shared key loses write access at step 7).
+function canPushDocument() {
+  if (!usesOwnerAccounts() || isOwnerSession()) return true;
+  // Owner who entered with the device password: still tried with the shared
+  // key, so nothing stops before step 7; after it, the server refuses and the
+  // chip says to sign in with Google.
+  return !authSession && sessionMode === "owner";
+}
+
 function queueCloudSave() {
   if (!hasCloudConfig()) return;
+  if (!canPushDocument()) return;
   setSyncChip("saving");
   window.clearTimeout(cloudSaveTimer);
   cloudSaveTimer = window.setTimeout(() => saveCloudState({ silent: true }), 900);
@@ -6927,6 +7061,11 @@ function queueCloudSave() {
 
 async function saveCloudState({ silent = false } = {}) {
   if (cloudSaveInFlight) return;
+  if (!canPushDocument()) {
+    reportSyncProblem(Object.assign(new Error("not signed in"), { status: 401 }));
+    if (!silent) showToast(lastSyncProblem, 6000);
+    return;
+  }
   window.clearTimeout(cloudSaveTimer);
   cloudSaveInFlight = true;
   setSyncChip("saving");
@@ -6995,6 +7134,254 @@ async function loadCloudState() {
     reportSyncProblem(error);
     renderCloudStatus(lastSyncProblem);
     showToast(lastSyncProblem, 6000);
+  }
+}
+
+// ── Invoice photos (private bucket) ─────────────────────────────────────────
+// The bucket is private, so a stored photo opens through a link that is
+// signed on demand and expires after 10 minutes. Photos uploaded to Google
+// Drive before the migration have no storagePath and keep their old link.
+async function invoicePhotoLink(attachment) {
+  if (!attachment?.storagePath || cloudProvider() !== "supabase") return attachmentUrl(attachment);
+  const c = cloudConfig();
+  await ensureFreshSession();
+  const res = await fetch(`${c.supabaseUrl}/storage/v1/object/sign/${SUPABASE_INVOICE_BUCKET}/${encodeURI(attachment.storagePath)}`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ expiresIn: 600 }),
+  });
+  if (!res.ok) throw Object.assign(new Error(`Photo link failed (${res.status})`), { status: res.status });
+  const body = await res.json();
+  const signed = body.signedURL || body.signedUrl || "";
+  return signed.startsWith("http") ? signed : `${c.supabaseUrl}/storage/v1${signed}`;
+}
+
+async function openInvoicePhoto(attachment) {
+  // Open the window first (inside the tap) so phones don't block it as a popup.
+  const win = window.open("", "_blank");
+  try {
+    const url = await invoicePhotoLink(attachment);
+    if (win) win.location.href = url; else window.location.assign(url);
+  } catch (error) {
+    if (win) win.close();
+    showToast(describeSyncProblem(error), 6000);
+  }
+}
+
+function deleteInvoicePhoto(attachment) {
+  if (!attachment?.storagePath || cloudProvider() !== "supabase" || !isOwnerSession()) return;
+  const c = cloudConfig();
+  ensureFreshSession()
+    .then(() => fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(attachment.storagePath)}`, {
+      method: "DELETE",
+      headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}` },
+    }))
+    .catch(() => { /* best effort: the entry is already gone */ });
+}
+
+// ── Tenant phones: linked by a one-time invite code ─────────────────────────
+// The phone gets its own anonymous account, and the server binds that account
+// to one tenant when the code is redeemed. From then on the database itself
+// decides what the phone may see (get_my_state) and write (declare / vote).
+function renderTenantLoginForm() {
+  const linked = isTenantSession();
+  const me = linked ? state.tenants.find((t) => t.id === authSession.tenantId) : null;
+  els.loginTenantLinked.classList.toggle("hidden", !linked);
+  if (linked) {
+    els.loginTenantLinked.textContent = me
+      ? tr("Linked as {name} — Unit {unit}", { name: me.name, unit: me.unit || "" })
+      : tr("This phone is linked to a tenant");
+  }
+  els.loginTenantSelect.classList.toggle("hidden", linked);
+  els.loginPinInput.classList.toggle("hidden", linked);
+  els.loginUnlinkBtn.classList.toggle("hidden", !linked || els.loginTenantForm.classList.contains("hidden"));
+}
+
+function enterAsLinkedTenant() {
+  sessionMode = "tenant";
+  sessionTenantId = authSession.tenantId;
+  applySessionMode();
+  hideLoginScreen();
+  setView("dashboardView");
+  renderAll();
+  checkDueBanner();
+  syncFromSheet({ silent: true });
+}
+
+async function joinWithInviteCode(rawCode) {
+  const code = String(rawCode || "").trim().toUpperCase();
+  if (!code) { showToast("Enter the invite code first"); return; }
+  if (cloudProvider() !== "supabase") { showToast("This app isn't connected to the cloud database"); return; }
+  if (isOwnerSession() && !window.confirm(tr("This phone is signed in as the building owner. Link it to a tenant instead? The owner will be signed out here."))) return;
+  const c = cloudConfig();
+  els.connectSubmitButton.disabled = true;
+  try {
+    // 1. a fresh anonymous identity for this phone
+    const signup = await authRequest("signup", {});
+    if (!signup.ok || !signup.body?.access_token) throw new Error(signup.body?.msg || "Could not create this phone's account");
+    const session = sessionFromAuthResponse(signup.body);
+    // 2. redeem the code: the server links this identity to one tenant
+    const claim = await fetch(`${c.supabaseUrl}/rest/v1/rpc/claim_tenant`, {
+      method: "POST",
+      headers: { apikey: c.supabaseKey, Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_code: code }),
+      signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
+    });
+    const claimBody = await claim.json().catch(() => null);
+    if (!claim.ok) {
+      authRequest("logout", {}, session.access_token).catch(() => {});
+      throw new Error(claimBody?.message || "That code is not valid");
+    }
+    saveAuthSession({ ...session, email: "", role: "tenant", tenantId: String(claimBody) });
+    // 3. this phone's copy of the data = the server's filtered copy, nothing else
+    const res = await supabaseRequest("rpc/get_my_state", { method: "POST", body: "{}" });
+    state = hydrateState(await res.json());
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    applyLanguage(state.settings.language);
+    closeDialog(els.connectDialog);
+    els.connectCodeInput.value = "";
+    populateTenantSelect();
+    enterAsLinkedTenant();
+    showToast("Phone linked. You'll only see your own account.");
+  } catch (error) {
+    const unreachable = error instanceof TypeError || error?.name === "TimeoutError";
+    showToast(unreachable ? "Can't reach the cloud. Check your connection." : tr(error.message), 6000);
+  } finally {
+    els.connectSubmitButton.disabled = false;
+  }
+}
+
+function unlinkTenantPhone() {
+  if (!window.confirm(tr("Unlink this phone? Its copy of your account is removed. You'll need a new invite code from the owner to link it again."))) return;
+  const token = authSession?.access_token;
+  saveAuthSession(null);
+  if (token) authRequest("logout", {}, token).catch(() => {});
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(SYNC_META_KEY);
+  location.reload();
+}
+
+// Owner side: mint a code for one tenant and hand it over.
+function openInviteDialog() {
+  if (!isOwnerSession()) {
+    showToast("Sign in with Google first: only the signed-in owner can create invite codes", 6000);
+    return;
+  }
+  const active = state.tenants.filter((t) => t.active !== false);
+  els.inviteTenantSelect.replaceChildren(...active.map((t) => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = `${t.name} — ${tr("Unit")} ${t.unit || ""}`;
+    return opt;
+  }));
+  resetInviteResult();
+  openDialog(els.inviteDialog);
+}
+
+function resetInviteResult() {
+  els.inviteResult.classList.add("hidden");
+  els.inviteShareButton.classList.add("hidden");
+  els.inviteCreateButton.classList.remove("hidden");
+  els.inviteCodeText.textContent = "";
+}
+
+async function createInviteCode() {
+  const tenantId = els.inviteTenantSelect.value;
+  if (!tenantId) return;
+  els.inviteCreateButton.disabled = true;
+  try {
+    const res = await supabaseRequest("rpc/create_claim_code", { method: "POST", body: JSON.stringify({ p_tenant_id: tenantId }) });
+    const code = String(await res.json());
+    const tenant = state.tenants.find((t) => t.id === tenantId);
+    els.inviteCodeText.textContent = code;
+    els.inviteHowTo.textContent = tr("Send this to {name}. On their phone: open {url}, tap \"I'm a tenant with an invite code\" and enter the code. It works once, within 30 days.", { name: tenant?.name || "", url: inviteAppUrl() });
+    els.inviteResult.classList.remove("hidden");
+    els.inviteShareButton.classList.remove("hidden");
+    els.inviteCreateButton.classList.add("hidden");
+  } catch (error) {
+    showToast(describeSyncProblem(error), 6000);
+  } finally {
+    els.inviteCreateButton.disabled = false;
+  }
+}
+
+function inviteAppUrl() {
+  return `${location.origin}${location.pathname}`;
+}
+
+async function shareInviteCode() {
+  const code = els.inviteCodeText.textContent;
+  if (!code) return;
+  const message = `${tr("Your invite code for {building}", { building: state.building?.name || "" })}: ${code}\n${inviteAppUrl()}`;
+  try {
+    if (typeof navigator.share === "function") { await navigator.share({ text: message }); return; }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  try {
+    await navigator.clipboard.writeText(message);
+    showToast("Invite copied — paste it in WhatsApp or a message");
+  } catch {
+    window.prompt(tr("Copy this invite:"), message);
+  }
+}
+
+// ── Daily cloud backups (owner) ─────────────────────────────────────────────
+async function openBackupsDialog() {
+  if (!isOwnerSession()) {
+    showToast("Sign in with Google first: only the signed-in owner can restore backups", 6000);
+    return;
+  }
+  els.backupsList.replaceChildren();
+  const loading = document.createElement("p");
+  loading.className = "settings-note";
+  loading.textContent = tr("Loading…");
+  els.backupsList.append(loading);
+  openDialog(els.backupsDialog);
+  try {
+    const res = await supabaseRequest("rpc/list_backups", { method: "POST", body: "{}" });
+    const rows = await res.json();
+    if (!rows.length) {
+      loading.textContent = tr("No backups yet. The first one is taken tonight.");
+      return;
+    }
+    els.backupsList.replaceChildren(...rows.map((row) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "backup-row";
+      const day = document.createElement("strong");
+      day.textContent = formatDateLabel(row.day);
+      const meta = document.createElement("span");
+      meta.textContent = tr("{tenants} tenants · {transactions} transactions", { tenants: row.tenants, transactions: row.transactions });
+      btn.append(day, meta);
+      btn.addEventListener("click", () => restoreCloudBackup(row.day));
+      return btn;
+    }));
+  } catch (error) {
+    loading.textContent = describeSyncProblem(error);
+  }
+}
+
+async function restoreCloudBackup(day) {
+  if (!window.confirm(tr("Restore the backup from {day}? It replaces the data on every device. Today's data is downloaded first as a safety copy.", { day: formatDateLabel(day) }))) return;
+  try {
+    const res = await supabaseRequest("rpc/get_backup", { method: "POST", body: JSON.stringify({ p_day: day }) });
+    const backup = await res.json();
+    if (!backup || !Array.isArray(backup.tenants)) throw new Error("That backup is empty");
+    downloadBackup(); // safety copy of what's here now
+    const restored = hydrateState(backup);
+    // A higher epoch makes every other device take this copy wholesale
+    // instead of merging their newer rows back in.
+    restored.meta = { ...(restored.meta || {}), epoch: Math.max(Number(state.meta?.epoch || 0), Number(backup.meta?.epoch || 0)) + 1 };
+    state = restored;
+    saveState({ sync: false });
+    closeDialog(els.backupsDialog);
+    populateTenantSelect();
+    renderAll();
+    await saveCloudState();
+    showToast(tr("Restored the backup from {day}", { day: formatDateLabel(day) }));
+  } catch (error) {
+    showToast(describeSyncProblem(error), 6000);
   }
 }
 
@@ -7210,7 +7597,7 @@ function openExpenseEditDialog(transactionId) {
   els.transactionExpenseCategory.value = transaction.expenseCategory || "";
   els.transactionProject.value = transaction.project || "";
   clearInvoiceFileSelection();
-  els.invoiceAttachmentStatus.textContent = attachmentUrl(transaction.invoiceAttachment)
+  els.invoiceAttachmentStatus.textContent = hasInvoicePhoto(transaction.invoiceAttachment)
     ? "Existing invoice photo will be kept unless you choose a new picture."
     : "No invoice photo is attached. Choose a picture to add one.";
   syncTransactionFormMode();
@@ -7246,6 +7633,7 @@ function deleteLedgerTransaction(transactionId) {
   state.transactions = state.transactions.filter((entry) => entry.id !== transactionId);
   state.sharedExpenses = (state.sharedExpenses || []).filter((se) => se.expenseTransactionId !== transactionId);
   recordDeletedId("transactions", transactionId);
+  deleteInvoicePhoto(transaction.invoiceAttachment); // otherwise the file is orphaned in storage
   saveState();
   renderAll();
   showToast("Ledger entry deleted");
@@ -7286,7 +7674,8 @@ function ledgerExcelRows() {
     creditLbp: Number(transaction.creditLbp || 0),
     netUsd: transactionNetUsd(transaction),
     receiptRef: transaction.receiptRef || "",
-    invoicePhoto: attachmentUrl(transaction.invoiceAttachment),
+    // Only old Google Drive photos have a permanent link; private ones open in the app.
+    invoicePhoto: transaction.invoiceAttachment?.storagePath ? "" : attachmentUrl(transaction.invoiceAttachment),
     expenseCategory: transaction.expenseCategory || "",
   }));
 }
@@ -8103,7 +8492,9 @@ function handleLedgerPdfExport() {
     appendCell(row, formatUsd(Number(transaction.debitUsd || 0)), "numeric");
     appendCell(row, formatUsd(Number(transaction.creditUsd || 0)), "numeric");
     appendCell(row, formatUsd(transactionNetUsd(transaction)), "numeric");
-    appendOptionalLinkCell(row, attachmentUrl(transaction.invoiceAttachment) ? "Open" : "", attachmentUrl(transaction.invoiceAttachment));
+    // Private (Supabase) photos have no permanent link to print; say one exists.
+    const photo = transaction.invoiceAttachment;
+    appendOptionalLinkCell(row, photo ? (photo.storagePath ? tr("In app") : "Open") : "", photo && !photo.storagePath ? attachmentUrl(photo) : "");
     tbody.append(row);
   });
 
@@ -8645,7 +9036,9 @@ function attachEvents() {
       if ((transaction.category === "Expenses" || transaction.category === "Services Expenses") && invoiceFile) {
         showToast(existingTransaction ? "Uploading replacement invoice" : "Uploading invoice picture");
         try {
+          const previous = existingTransaction?.invoiceAttachment;
           transaction.invoiceAttachment = await uploadExpenseInvoice(transaction, invoiceFile);
+          if (previous?.storagePath && previous.storagePath !== transaction.invoiceAttachment?.storagePath) deleteInvoicePhoto(previous);
         } catch (error) {
           invoiceUploadError = error;
         }
@@ -8670,7 +9063,7 @@ function attachEvents() {
         showToast("Payment added. Receipt saved");
       } else if (invoiceUploadError) {
         showToast(tr("Expense saved. Invoice upload failed: {msg}", { msg: invoiceUploadError.message }));
-      } else if (attachmentUrl(transaction.invoiceAttachment)) {
+      } else if (hasInvoicePhoto(transaction.invoiceAttachment)) {
         showToast("Expense added. Invoice uploaded");
       } else {
         showToast("Transaction added");
@@ -8742,7 +9135,7 @@ function attachEvents() {
     showToast("Settings saved");
   });
   els.loadCloudButton.addEventListener("click", loadCloudState);
-  els.shareSyncCodeButton.addEventListener("click", shareSyncCode);
+  els.shareSyncCodeButton.addEventListener("click", openInviteDialog);
   els.connectBuildingButton.addEventListener("click", () => {
     els.connectCodeInput.value = "";
     openDialog(els.connectDialog);
@@ -8750,7 +9143,19 @@ function attachEvents() {
   });
   els.closeConnectDialog.addEventListener("click", () => closeDialog(els.connectDialog));
   els.cancelConnectButton.addEventListener("click", () => closeDialog(els.connectDialog));
-  els.connectSubmitButton.addEventListener("click", () => applySyncCode(els.connectCodeInput.value));
+  els.connectSubmitButton.addEventListener("click", () => {
+    const code = els.connectCodeInput.value.trim();
+    // Invite codes are short; anything long is a legacy access code.
+    if (/^[A-Za-z0-9]{6,12}$/.test(code)) joinWithInviteCode(code);
+    else applySyncCode(code);
+  });
+  els.loginUnlinkBtn.addEventListener("click", unlinkTenantPhone);
+  els.closeInviteDialog.addEventListener("click", () => closeDialog(els.inviteDialog));
+  els.inviteCreateButton.addEventListener("click", createInviteCode);
+  els.inviteShareButton.addEventListener("click", shareInviteCode);
+  els.inviteTenantSelect.addEventListener("change", resetInviteResult);
+  els.cloudBackupsButton.addEventListener("click", openBackupsDialog);
+  els.closeBackupsDialog.addEventListener("click", () => closeDialog(els.backupsDialog));
   els.downloadBackupButton.addEventListener("click", downloadBackup);
   els.fullExportButton.addEventListener("click", handleFullExcelExport);
   els.restoreBackupButton.addEventListener("click", () => els.restoreBackupInput.click());
@@ -8880,7 +9285,8 @@ function attachEvents() {
     els.loginOwnerForm.classList.add("hidden");
     els.loginError.classList.add("hidden");
     els.loginSubmitBtn.classList.remove("hidden");
-    els.loginPinInput.focus();
+    renderTenantLoginForm();
+    if (!isTenantSession()) els.loginPinInput.focus();
   });
   els.loginSubmitBtn.addEventListener("click", attemptLogin);
   els.loginPasswordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
@@ -8955,6 +9361,24 @@ async function syncFromSheet({ silent = false } = {}) {
   if (!hasCloudConfig()) return;
   if (document.querySelector("dialog[open]")) return;
   if (cloudSaveInFlight) return;
+  // A phone with no identity that is not in owner mode (fresh phone, login
+  // screen, PIN tenant): fetch nothing, so an unlinked phone never downloads
+  // the building.
+  if (usesOwnerAccounts() && !authSession && sessionMode !== "owner") return;
+  if (isTenantSession()) {
+    // A tenant phone never has local edits: just take the server's copy.
+    try {
+      const remote = await cloudLoadState();
+      if (!remote) return;
+      state = hydrateState(remote);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (sessionMode === "tenant") renderAll();
+      setSyncChip("saved");
+    } catch (error) {
+      reportSyncProblem(error);
+    }
+    return;
+  }
   if (!silent) renderCloudStatus(`Syncing from the ${cloudProviderLabel()}…`);
   try {
     const remote = await cloudLoadState();

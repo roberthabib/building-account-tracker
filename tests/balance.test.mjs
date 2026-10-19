@@ -154,3 +154,25 @@ test("an empty cloud copy is never allowed to silently replace real data", () =>
   app.setState(baseState());
   assert.equal(app.remoteWouldWipeLocalData(baseState()), false, "nothing local to lose");
 });
+
+test("tenant phone: only its own tenant row, but the split still uses building-wide coefficients", () => {
+  const phone = baseState({
+    tenants: [TENANTS[0]], // the server sends just this tenant
+    transactions: [{ id: "e1", category: "Expenses", tenantId: null, date: "2026-09-02", debitUsd: 100 }],
+    redaction: { tenantId: "t1", activeCoefficientTotal: 1000, activeTenantCount: 2 },
+  });
+  app.setState(phone);
+  assert.equal(app.getTenantExpenseShare("t1"), 60, "600 / 1000, not 600 / 600");
+  delete phone.redaction;
+  app.setState(phone);
+  assert.equal(app.getTenantExpenseShare("t1"), 100, "without the totals a lone tenant would be billed everything");
+});
+
+test("tenant phone with equal split (no coefficients) divides by the building's tenant count", () => {
+  app.setState(baseState({
+    tenants: [{ id: "t1", name: "One", active: true, coefficient: 0 }],
+    transactions: [{ id: "e1", category: "Expenses", tenantId: null, date: "2026-09-02", debitUsd: 90 }],
+    redaction: { tenantId: "t1", activeCoefficientTotal: 0, activeTenantCount: 3 },
+  }));
+  assert.equal(app.getTenantExpenseShare("t1"), 30);
+});
