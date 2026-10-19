@@ -126,3 +126,19 @@ The app's `Download Backup` JSON is always a complete copy of your data, and
 the `building_state` row is never deleted by any of this. Recovery: revert the
 step-7 policies in the SQL Editor (dashboard access does not depend on the
 app's auth), then reload.
+
+---
+
+## Status 2026-10-19 — Phase 2 complete
+
+| Step | State |
+|---|---|
+| 1–4 foundation, owner account | ✅ |
+| 5 owner sign-in (Google, v142) | ✅ owner session in daily use |
+| 6 tenant phones (v144 + `phase2c-tenants-backups-photos.sql`) | ✅ 16/16 live checks: own row only, other tenant's id/name/phone absent, shares cut to own, building totals for the split, anonymous poll counts, credentials stripped, bad writes refused, no backup access, raw document unreadable |
+| 7 lockdown (`phase2d-lockdown.sql`) | ✅ shared key refused for read / write / photo upload; owner reads, writes, sees photos and backups; keep-alive on `rpc/keepalive` |
+| Daily backups | ✅ pg_cron `daily-building-backup` 00:30 UTC, 60 days, first snapshot taken |
+| Private invoice photos | ✅ bucket private, 10-minute signed links, deleted with their expense |
+| Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
+
+Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.

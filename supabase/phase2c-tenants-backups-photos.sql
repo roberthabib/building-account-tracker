@@ -11,7 +11,7 @@
 -- updatedAt) or an owner's next save would silently overwrite the change.
 create or replace function public.touch_state_meta(p_state jsonb)
 returns jsonb
-language sql stable set search_path = public, extensions
+language sql volatile set search_path = public, extensions
 as $$
   select jsonb_set(
            jsonb_set(
