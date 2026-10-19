@@ -46,7 +46,7 @@ Two translation mechanisms, both near the top of `app.js`:
 - **Static HTML** → the `I18N` dictionary (semantic keys like `nav.dashboard`) + `t(key, params)`. Markup carries `data-i18n` / `data-i18n-ph` (placeholder) / `data-i18n-aria` / `data-i18n-title`; `applyStaticI18n()` walks them on every render. **Never** put `data-i18n` on a `<label>` that wraps an input — wrap the caption in a `<span>` instead (setting `textContent` would delete the input).
 - **Dynamic JS strings** → the `DYN_AR` reverse map (English source string → Arabic) + `tr(en, params)`. `showToast()` runs its message through `tr()` automatically, so fixed toast strings need no call-site change; only parameterized ones do. Params use `{name}` placeholders.
 
-When adding UI text: static markup gets a `data-i18n*` attribute + an `I18N` entry; JS-built text gets wrapped in `tr("English", {params})` + a `DYN_AR` entry. Category/status values that double as **stored data** (e.g. `"Payments"`, `"Expenses"`) are only ever translated at display time — never change the stored value. Generated **PDF statements/receipts stay English** (the hand-rolled PDF engine has no Arabic shaping/bidi).
+When adding UI text: static markup gets a `data-i18n*` attribute + an `I18N` entry; JS-built text gets wrapped in `tr("English", {params})` + a `DYN_AR` entry. Category/status values that double as **stored data** (e.g. `"Payments"`, `"Expenses"`) are only ever translated at display time — never change the stored value. Generated **PDFs follow the app language** (v145+): `pdfTextCommand` translates exact labels via `tr()`, and any non-ASCII text (Arabic labels, Arabic names/descriptions) is drawn by the browser on a canvas and embedded as a JPEG XObject (`pdfTextImageCommand`, ASCIIHex so the file stays ASCII; images are drawn first so table lines stay on top). English output is unchanged pure text. Table column order stays left-to-right.
 
 ---
 
@@ -210,7 +210,7 @@ Amounts are stored as `debitUsd`/`debitLbp`/`creditUsd`/`creditLbp`. The entry f
 ## Statements, receipts, exports
 
 - Tenant statement PDF (`buildTenantStatementPdf`) is **multi-page** (`buildMultiPagePdf`), skips empty months, and shows a non-zero-only summary.
-- Receipts (`buildReceiptLayoutPdf`), ledger PDF, and ledger XLSX (`buildLedgerXlsx`) are all hand-built. `pdfSafeText` strips non-ASCII (no Arabic glyphs in the base PDF fonts yet).
+- Receipts (`buildReceiptLayoutPdf`), ledger PDF, and ledger XLSX (`buildLedgerXlsx`) are all hand-built. `pdfSafeText` keeps non-Latin text (rendered as images) and folds accented Latin to plain letters.
 
 ---
 

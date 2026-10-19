@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v144";
+const APP_VERSION = "v145";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -988,6 +988,39 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Outstanding USD": "المتبقي $",
+  "Payment Receipt": "إيصال دفع",
+  "Tenant Account Statement": "كشف حساب المستأجر",
+  "{name} | Unit {unit}": "{name} | الوحدة {unit}",
+  "{name} | Unit {unit} - statement (continued)": "{name} | الوحدة {unit} - كشف الحساب (تابع)",
+  "Receipt: {no}": "رقم الإيصال: {no}",
+  "Date: {date}": "التاريخ: {date}",
+  "Project Payment Details": "تفاصيل دفعة المشروع",
+  "Monthly Allocation": "التوزيع الشهري",
+  "Applied USD": "المبلغ المخصّص $",
+  "Due USD": "المستحق $",
+  "Paid USD": "المدفوع $",
+  "Monthly Dues": "المستحقات الشهرية",
+  "No dues or payments recorded yet.": "لا توجد مستحقات أو دفعات مسجّلة بعد.",
+  "Amount USD": "المبلغ $",
+  "Received From": "مستلم من",
+  "Payment For": "الدفع مقابل",
+  "Project Payment": "دفعة مشروع",
+  "Amount Received": "المبلغ المستلم",
+  "Months Covered": "الأشهر المغطّاة",
+  "Advance Credit": "رصيد مسبق",
+  "Payment Type": "نوع الدفعة",
+  "Payment Date": "تاريخ الدفع",
+  "Amount": "المبلغ",
+  "Monthly Fee Impact": "الأثر على الرسوم الشهرية",
+  "Not attributed to monthly dues": "لا تُحتسب ضمن المستحقات الشهرية",
+  "Project payments are separate from monthly building fees.": "دفعات المشاريع منفصلة عن رسوم المبنى الشهرية.",
+  "Payments are applied to the tenant's building dues for the month.": "تُطبَّق الدفعات على مستحقات المبنى الشهرية للمستأجر.",
+  "Monthly dues and project payments are separated. Project payments are not applied to monthly fees.": "المستحقات الشهرية ودفعات المشاريع منفصلة. لا تُطبَّق دفعات المشاريع على الرسوم الشهرية.",
+  "Advance Balance": "رصيد مسبق الدفع",
+  "Expense Share": "حصة المصاريف",
+  "Total Monthly Dues": "إجمالي المستحقات الشهرية",
+  "No share": "لا حصة",
   "Linked as {name} — Unit {unit}": "مرتبط باسم {name} — الوحدة {unit}",
   "This phone is linked to a tenant": "هذا الهاتف مرتبط بمستأجر",
   "Enter the invite code first": "أدخل رمز الدعوة أولاً",
@@ -4868,11 +4901,93 @@ function printPaymentReceipt(transactionId) {
 const PDF_MIME = "application/pdf";
 
 function pdfSafeText(value) {
-  return String(value ?? "")
-    .normalize("NFKD")
-    .replace(/[^\x20-\x7E]/g, "")
+  const text = String(value ?? "")
+    .replace(/[\u2013\u2014\u2212]/g, "-")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/\u00B7/g, "-")
+    .replace(/[\u0000-\u001F\u007F\u00A0]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+  // Accented Latin (é, à…) becomes plain letters Helvetica can draw. Any other
+  // script (Arabic names, descriptions, labels) is kept and drawn as an image
+  // by pdfTextCommand.
+  const latin = text.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+  return /^[\x20-\x7E]*$/.test(latin) ? latin : text;
+}
+
+// ── Non-English text in PDFs ─────────────────────────────────────────────────
+// The PDF engine only has the built-in Helvetica font, which has no Arabic
+// glyphs. Text that isn't plain ASCII is drawn by the browser instead (which
+// joins Arabic letters and orders right-to-left text correctly) onto a canvas,
+// and embedded as a JPEG. English stays real, selectable PDF text.
+const PDF_TEXT_SCALE = 4; // canvas pixels per PDF point: sharp when printed
+let pdfTextImages = [];   // filled while drawing, consumed by the PDF builders
+let pdfTextImageCache = new Map();
+
+function pdfNeedsImage(text) {
+  return /[^\x20-\x7E]/.test(text);
+}
+
+function pdfTextImageCommand(text, x, y, size, bold) {
+  const key = `${bold ? 1 : 0}|${size}|${text}`;
+  let img = pdfTextImageCache.get(key);
+  if (!img) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const px = size * PDF_TEXT_SCALE;
+    const font = `${bold ? 700 : 400} ${px}px Tahoma, "Segoe UI", "Noto Sans Arabic", "Noto Naskh Arabic", Arial, sans-serif`;
+    const rtl = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.test(text);
+    ctx.font = font;
+    // Arabic sits lower and reaches deeper than Latin; leave room for both.
+    const ascent = Math.ceil(px * 0.95);
+    const descent = Math.ceil(px * 0.45);
+    const width = Math.max(1, Math.ceil(ctx.measureText(text).width) + 2);
+    const height = ascent + descent;
+    canvas.width = width;
+    canvas.height = height;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.font = font;
+    ctx.fillStyle = "#111111";
+    ctx.textBaseline = "alphabetic";
+    ctx.direction = rtl ? "rtl" : "ltr";
+    ctx.textAlign = rtl ? "right" : "left";
+    ctx.fillText(text, rtl ? width - 1 : 1, ascent);
+    const binary = atob(canvas.toDataURL("image/jpeg", 0.92).split(",")[1] || "");
+    let hex = "";
+    for (let i = 0; i < binary.length; i += 1) hex += binary.charCodeAt(i).toString(16).padStart(2, "0");
+    img = { name: `Tx${pdfTextImages.length + 1}`, width, height, ascent, hex };
+    pdfTextImages.push(img);
+    pdfTextImageCache.set(key, img);
+  }
+  const w = (img.width / PDF_TEXT_SCALE).toFixed(2);
+  const h = (img.height / PDF_TEXT_SCALE).toFixed(2);
+  const bottom = (y - (img.height - img.ascent) / PDF_TEXT_SCALE).toFixed(2);
+  return `q ${w} 0 0 ${h} ${x} ${bottom} cm /${img.name} Do Q`;
+}
+
+// Hands the images drawn so far to a PDF builder and starts afresh.
+function takePdfTextImages() {
+  const images = pdfTextImages;
+  pdfTextImages = [];
+  pdfTextImageCache = new Map();
+  return images;
+}
+
+// Text images have a white background, so draw them first: the table lines
+// and boxes drawn afterwards then stay visible on top of them.
+function pdfImagesFirst(content) {
+  const lines = content.split("\n");
+  const isImage = (line) => /^q .* \/Tx\d+ Do Q$/.test(line);
+  return [...lines.filter(isImage), ...lines.filter((line) => !isImage(line))].join("\n");
+}
+
+function pdfImageObject(img) {
+  // ASCIIHex keeps the whole file ASCII, so string lengths stay byte offsets.
+  const data = `${img.hex}>`;
+  return `<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter [/ASCIIHexDecode /DCTDecode] /Length ${data.length} >>\nstream\n${data}\nendstream`;
 }
 
 function pdfEscape(value) {
@@ -4922,21 +5037,26 @@ function buildSimplePdf(lines) {
   lines.forEach((line) => {
     const size = line.size || 11;
     const font = line.bold ? "F2" : "F1";
-    lineCommands.push(`BT /${font} ${size} Tf 50 ${y} Td (${pdfEscape(line.text)}) Tj ET`);
+    lineCommands.push(pdfTextCommand(line.text, 50, y, size, line.bold));
     y -= size + 6;
   });
   const content = `${lineCommands.join("\n")}\n`;
   return buildPdfDocument(content);
 }
 
-function buildPdfDocument(content) {
+function buildPdfDocument(rawContent) {
+  const images = takePdfTextImages();
+  const content = pdfImagesFirst(rawContent);
+  // Image objects follow the six fixed objects: 7, 8, …
+  const xobjects = images.length ? ` /XObject << ${images.map((img, i) => `/${img.name} ${7 + i} 0 R`).join(" ")} >>` : "";
   const objects = [
     "<< /Type /Catalog /Pages 2 0 R >>",
     "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>",
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >>${xobjects} >> /Contents 6 0 R >>`,
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
+    ...images.map(pdfImageObject),
   ];
   let pdf = "%PDF-1.4\n";
   const offsets = [0];
@@ -4962,12 +5082,18 @@ function buildMultiPagePdf(pageContents) {
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
   ];
   const kids = [];
-  pageContents.forEach((content) => {
+  // Text images are shared by every page (a label like "Paid" is drawn once).
+  const images = takePdfTextImages();
+  const firstImageObj = objects.length + 1; // 5, 6, …
+  images.forEach((img) => objects.push(pdfImageObject(img)));
+  const xobjects = images.length ? ` /XObject << ${images.map((img, i) => `/${img.name} ${firstImageObj + i} 0 R`).join(" ")} >>` : "";
+  pageContents.forEach((rawContent) => {
+    const content = pdfImagesFirst(rawContent);
     const contentObjNum = objects.length + 1;
     objects.push(`<< /Length ${content.length} >>\nstream\n${content}endstream`);
     const pageObjNum = objects.length + 1;
     objects.push(
-      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjNum} 0 R >>`,
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>${xobjects} >> /Contents ${contentObjNum} 0 R >>`,
     );
     kids.push(`${pageObjNum} 0 R`);
   });
@@ -4989,7 +5115,12 @@ function buildMultiPagePdf(pageContents) {
 }
 
 function pdfTextCommand(text, x, y, size = 10, bold = false) {
-  return `BT /${bold ? "F2" : "F1"} ${size} Tf ${x} ${y} Td (${pdfEscape(text)}) Tj ET`;
+  // Labels are written in English in the builders; in Arabic, exact labels
+  // ("Monthly Dues", "Paid", …) translate here. Data (names, amounts) has no
+  // dictionary entry and passes through unchanged.
+  const shown = pdfSafeText(currentLang === "ar" ? tr(String(text ?? "")) : text);
+  if (pdfNeedsImage(shown)) return pdfTextImageCommand(shown, x, y, size, bold);
+  return `BT /${bold ? "F2" : "F1"} ${size} Tf ${x} ${y} Td (${pdfEscape(shown)}) Tj ET`;
 }
 
 function pdfRectCommand(x, y, width, height) {
@@ -5008,9 +5139,9 @@ function buildReceiptLayoutPdf(data) {
 
   commands.push(pdfTextCommand(state.building.name, left, y, 11));
   commands.push(pdfTextCommand("Payment Receipt", left, y - 28, 20, true));
-  commands.push(pdfTextCommand(`${data.tenant.name} | Unit ${data.tenant.unit}`, left, y - 48, 11));
-  commands.push(pdfTextCommand(`Receipt: ${data.receiptNo}`, 380, y, 10));
-  commands.push(pdfTextCommand(`Date: ${data.transaction.date || localDateInput()}`, 380, y - 16, 10));
+  commands.push(pdfTextCommand(tr("{name} | Unit {unit}", { name: data.tenant.name, unit: data.tenant.unit }), left, y - 48, 11));
+  commands.push(pdfTextCommand(tr("Receipt: {no}", { no: data.receiptNo }), 380, y, 10));
+  commands.push(pdfTextCommand(tr("Date: {date}", { date: data.transaction.date || localDateInput() }), 380, y - 16, 10));
   commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 32, 9));
   commands.push(pdfLineCommand(left, y - 64, right, y - 64));
 
@@ -5124,13 +5255,13 @@ function buildTenantStatementPdf(tenantId) {
     if (kind === "full") {
       commands.push(pdfTextCommand(state.building.name, left, y, 11));
       commands.push(pdfTextCommand("Tenant Account Statement", left, y - 28, 18, true));
-      commands.push(pdfTextCommand(`${tenant.name} | Unit ${tenant.unit}`, left, y - 48, 11));
-      commands.push(pdfTextCommand(`Date: ${localDateInput()}`, 380, y, 10));
+      commands.push(pdfTextCommand(tr("{name} | Unit {unit}", { name: tenant.name, unit: tenant.unit }), left, y - 48, 11));
+      commands.push(pdfTextCommand(tr("Date: {date}", { date: localDateInput() }), 380, y, 10));
       commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 16, 9));
       commands.push(pdfLineCommand(left, y - 64, right, y - 64));
       y = TOP - 92;
     } else {
-      commands.push(pdfTextCommand(`${tenant.name} | Unit ${tenant.unit} — statement (continued)`, left, y, 10, true));
+      commands.push(pdfTextCommand(tr("{name} | Unit {unit} - statement (continued)", { name: tenant.name, unit: tenant.unit }), left, y, 10, true));
       commands.push(pdfLineCommand(left, y - 10, right, y - 10));
       y = TOP - 34;
     }
@@ -5190,7 +5321,7 @@ function buildTenantStatementPdf(tenantId) {
     { heading: "Month", width: 80 },
     { heading: "Due USD", width: 80 },
     { heading: "Paid USD", width: 80 },
-    { heading: "Outstanding", width: 80 },
+    { heading: "Outstanding USD", width: 80 },
     { heading: "Status", width: 60 },
     { heading: "Receipts", width: 115 },
   ];
