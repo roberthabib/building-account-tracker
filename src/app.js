@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v142";
+const APP_VERSION = "v143";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -136,6 +136,7 @@ const els = {
   saveSettingsButton: document.querySelector("#saveSettingsButton"),
   loadCloudButton: document.querySelector("#loadCloudButton"),
   downloadBackupButton: document.querySelector("#downloadBackupButton"),
+  fullExportButton: document.querySelector("#fullExportButton"),
   restoreBackupButton: document.querySelector("#restoreBackupButton"),
   restoreBackupInput: document.querySelector("#restoreBackupInput"),
   cloudSyncStatus: document.querySelector("#cloudSyncStatus"),
@@ -336,6 +337,9 @@ const I18N = {
     "common.close": "Close",
     "common.share": "Share",
     "common.download": "Download",
+    "common.export": "Export",
+    "set.fullExportTitle": "Export everything to Excel",
+    "set.fullExportDesc": "One workbook with every tenant, transaction, month, reading, project and poll — formatted and ready to print or share.",
     "common.restore": "Restore",
     "common.reload": "Reload",
     "common.clear": "Clear",
@@ -634,6 +638,9 @@ const I18N = {
     "common.close": "إغلاق",
     "common.share": "مشاركة",
     "common.download": "تنزيل",
+    "common.export": "تصدير",
+    "set.fullExportTitle": "تصدير كل البيانات إلى Excel",
+    "set.fullExportDesc": "ملف واحد يضم كل المستأجرين والقيود والأشهر والقراءات والمشاريع والاستطلاعات — منسّق وجاهز للطباعة أو المشاركة.",
     "common.restore": "استعادة",
     "common.reload": "إعادة تحميل",
     "common.clear": "مسح",
@@ -945,6 +952,89 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Full database export · {date}": "تصدير كامل لقاعدة البيانات · {date}",
+  "Only the building owner can export the full database": "فقط مالك المبنى يمكنه تصدير قاعدة البيانات كاملة",
+  "Full Excel export downloaded": "تم تنزيل ملف Excel الكامل",
+  "{building} · exported {date}": "{building} · صُدّر في {date}",
+  "Total": "المجموع",
+  "Yes": "نعم",
+  "No": "لا",
+  "(removed tenant)": "(مستأجر محذوف)",
+  "Summary": "ملخص",
+  "Tenant balances": "أرصدة المستأجرين",
+  "Transactions": "القيود",
+  "Monthly activity": "النشاط الشهري",
+  "Generator readings": "قراءات المولّد",
+  "Monthly budget": "الميزانية الشهرية",
+  "Polls": "الاستطلاعات",
+  "Payment declarations": "إشعارات الدفع",
+  "Tenant": "المستأجر",
+  "Unit": "الوحدة",
+  "Coefficient": "المعامل",
+  "Breaker (A)": "القاطع (أمبير)",
+  "Phone": "الهاتف",
+  "Active": "نشط",
+  "Monthly dues to date": "المستحقات الشهرية حتى الآن",
+  "Expense share": "حصة المصاريف",
+  "Generator & water": "المولّد والمياه",
+  "Payments": "الدفعات",
+  "Opening credit (+) / debt (−)": "رصيد افتتاحي دائن (+) / مدين (−)",
+  "Balance (owes +)": "الرصيد (مستحق +)",
+  "Projects outstanding": "مستحقات المشاريع",
+  "Total due": "إجمالي المستحق",
+  "Date": "التاريخ",
+  "Category": "الفئة",
+  "Description": "الوصف",
+  "For month": "عن شهر",
+  "Expense category": "فئة المصروف",
+  "Supplier": "المورّد",
+  "Project": "المشروع",
+  "Service": "الخدمة",
+  "Debit USD": "مدين $",
+  "Debit LBP": "مدين ل.ل",
+  "Credit USD": "دائن $",
+  "Credit LBP": "دائن ل.ل",
+  "Net USD": "الصافي $",
+  "Invoice photo": "صورة الفاتورة",
+  "Opening balance": "الرصيد الافتتاحي",
+  "Monthly payments": "الدفعات الشهرية",
+  "Project payments": "دفعات المشاريع",
+  "Other": "أخرى",
+  "Net cash flow": "صافي التدفق النقدي",
+  "Cash at month end": "النقد في نهاية الشهر",
+  "Previous reading": "القراءة السابقة",
+  "Current reading": "القراءة الحالية",
+  "kWh used": "الاستهلاك (كيلوواط ساعة)",
+  "Fuel share": "حصة الوقود",
+  "Maintenance share": "حصة الصيانة",
+  "Budget": "الميزانية",
+  "Due date": "تاريخ الاستحقاق",
+  "Distribution": "طريقة التوزيع",
+  "Share": "الحصة",
+  "Expected (USD)": "المتوقع ($)",
+  "Poll": "الاستطلاع",
+  "Created": "تاريخ الإنشاء",
+  "Amount (USD)": "المبلغ ($)",
+  "Declared on": "تاريخ الإشعار",
+  "Building": "المبنى",
+  "Exported on": "تاريخ التصدير",
+  "App version": "إصدار التطبيق",
+  "Collection mode": "طريقة التحصيل",
+  "Fixed monthly amount": "مبلغ شهري ثابت",
+  "Actual expenses": "المصاريف الفعلية",
+  "LBP per USD": "ل.ل لكل دولار",
+  "Position": "الوضع المالي",
+  "Cash / reserve": "النقد / الاحتياطي",
+  "Owed by tenants": "مستحق على المستأجرين",
+  "Tenant credit (prepaid)": "رصيد دائن للمستأجرين (مدفوع مسبقاً)",
+  "Net position": "صافي الوضع",
+  "Total expenses (incl. generator & water)": "إجمالي المصاريف (مع المولّد والمياه)",
+  "Total payments received": "إجمالي الدفعات المستلمة",
+  "Contents": "المحتويات",
+  "Tenants": "المستأجرون",
+  "Months with activity": "أشهر فيها نشاط",
+  "Generator fuel": "وقود المولّد",
+  "Generator maintenance": "صيانة المولّد",
   "This device is offline. Your changes are kept here and sync when you're back online.": "هذا الجهاز غير متصل. تُحفظ تغييراتك هنا وتُزامَن عند عودة الاتصال.",
   "The cloud refused access. Sign out from Settings and sign in again with Google.": "رفضت السحابة الوصول. سجّل الخروج من الإعدادات ثم سجّل الدخول مجدداً عبر Google.",
   "Not signed in to the cloud. Open the login screen and sign in with Google to sync.": "لم تسجّل الدخول إلى السحابة. افتح شاشة الدخول وسجّل الدخول عبر Google للمزامنة.",
@@ -7514,6 +7604,376 @@ function buildLedgerXlsx(rows) {
   return new Blob([buildZip(files)], { type: XLSX_MIME });
 }
 
+// ── Full database export (owner only) ───────────────────────────────────────
+// One workbook with every part of the building's data on its own styled sheet:
+// dark header band, zebra rows, $ / LBP / date formats, frozen headers,
+// filters and a bold totals row. Figures come from the same functions the
+// screens use, so the workbook always agrees with the app.
+
+// Column types -> number format. Text and Yes/No stay as text.
+const WB_FORMATS = { usd: 164, lbp: 165, date: 166, month: 167, int: 168 };
+// Cell styles, built once: [type][zebra][totals] -> cellXfs index.
+const WB_XF = (() => {
+  const list = [
+    `<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>`, // 0 default
+    `<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>`, // 1 header
+    `<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>`, // 2 title
+    `<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1"/>`, // 3 subtitle
+    `<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1"/>`, // 4 bold label
+    `<xf numFmtId="164" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyNumberFormat="1"/>`, // 5 bold $
+  ];
+  const map = {};
+  ["text", "usd", "lbp", "date", "month", "int"].forEach((type) => {
+    map[type] = {};
+    [false, true].forEach((zebra) => {
+      map[type][zebra] = {};
+      [false, true].forEach((totals) => {
+        const fmt = WB_FORMATS[type] || 0;
+        const fill = totals ? 4 : zebra ? 3 : 0;
+        const font = totals ? 4 : 0;
+        const border = totals ? 2 : 0;
+        map[type][zebra][totals] = list.length;
+        list.push(`<xf numFmtId="${fmt}" fontId="${font}" fillId="${fill}" borderId="${border}" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>`);
+      });
+    });
+  });
+  return { list, map };
+})();
+
+const WB_STYLES_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="5"><numFmt numFmtId="164" formatCode="$#,##0.00;[Red]-$#,##0.00"/><numFmt numFmtId="165" formatCode="#,##0 &quot;LBP&quot;;[Red]-#,##0 &quot;LBP&quot;"/><numFmt numFmtId="166" formatCode="dd mmm yyyy"/><numFmt numFmtId="167" formatCode="mmm yyyy"/><numFmt numFmtId="168" formatCode="#,##0"/></numFmts>
+  <fonts count="5"><font><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FF163832"/><sz val="16"/><name val="Calibri"/></font><font><i/><color rgb="FF5F7A71"/><sz val="10"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>
+  <fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF163832"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF3F7F5"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE1ECE7"/><bgColor indexed="64"/></patternFill></fill></fills>
+  <borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left/><right/><top/><bottom style="thin"><color rgb="FFB6C9C1"/></bottom><diagonal/></border><border><left/><right/><top style="medium"><color rgb="FF163832"/></top><bottom/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="${WB_XF.list.length}">${WB_XF.list.join("")}</cellXfs>
+  <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>`;
+
+// "2026-09-05" -> Excel day number, so dates sort and filter as real dates.
+function excelDateSerial(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ""));
+  if (!m) return null;
+  return (Date.UTC(+m[1], +m[2] - 1, +m[3]) - Date.UTC(1899, 11, 30)) / 86400000;
+}
+
+function wbCell(rowNumber, col, value, type, zebra, totals) {
+  const style = WB_XF.map[type || "text"][Boolean(zebra)][Boolean(totals)];
+  if (value === null || value === undefined || value === "") {
+    return `<c r="${excelCellRef(rowNumber, col)}" s="${style}"/>`;
+  }
+  if (type === "date" || type === "month") {
+    const serial = excelDateSerial(value);
+    if (serial !== null) return xlsxNumberCell(rowNumber, col, serial, style);
+    return xlsxTextCell(rowNumber, col, value, style);
+  }
+  if (type && type !== "text") return xlsxNumberCell(rowNumber, col, value, style);
+  return xlsxTextCell(rowNumber, col, value, style);
+}
+
+// sheet: { name, title, columns: [{ header, width, type, total }], rows: [[...]] }
+function buildTableSheetXml(sheet, subtitle, rtl) {
+  const cols = sheet.columns;
+  const headerRowNo = 4;
+  const rowsXml = [
+    `<row r="1" ht="24" customHeight="1">${xlsxTextCell(1, 0, sheet.title, 2)}</row>`,
+    `<row r="2">${xlsxTextCell(2, 0, subtitle, 3)}</row>`,
+    `<row r="${headerRowNo}" ht="30" customHeight="1">${cols.map((c, i) => xlsxTextCell(headerRowNo, i, c.header, 1)).join("")}</row>`,
+  ];
+  sheet.rows.forEach((row, index) => {
+    const r = headerRowNo + 1 + index;
+    const zebra = index % 2 === 1;
+    rowsXml.push(`<row r="${r}">${cols.map((c, i) => wbCell(r, i, row[i], c.type, zebra, false)).join("")}</row>`);
+  });
+  const lastData = headerRowNo + sheet.rows.length;
+  const hasTotals = sheet.rows.length > 0 && cols.some((c) => c.total);
+  if (hasTotals) {
+    const r = lastData + 1;
+    const cells = cols.map((c, i) => {
+      if (i === 0) return wbCell(r, 0, tr("Total"), "text", false, true);
+      if (!c.total) return wbCell(r, i, "", c.type, false, true);
+      const sum = sheet.rows.reduce((s, row) => s + Number(row[i] || 0), 0);
+      return wbCell(r, i, c.type === "usd" ? roundUsd(sum) : sum, c.type, false, true);
+    });
+    rowsXml.push(`<row r="${r}">${cells.join("")}</row>`);
+  }
+  const lastRow = hasTotals ? lastData + 1 : Math.max(lastData, headerRowNo);
+  const lastCol = excelColumnName(cols.length - 1);
+  const filter = sheet.rows.length ? `<autoFilter ref="A${headerRowNo}:${lastCol}${lastData}"/>` : "";
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>
+  <dimension ref="A1:${lastCol}${lastRow}"/>
+  <sheetViews><sheetView workbookViewId="0"${rtl ? ` rightToLeft="1"` : ""} showGridLines="0"><pane ySplit="${headerRowNo}" topLeftCell="A${headerRowNo + 1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
+  <cols>${cols.map((c, i) => `<col min="${i + 1}" max="${i + 1}" width="${c.width || 14}" customWidth="1"/>`).join("")}</cols>
+  <sheetData>${rowsXml.join("")}</sheetData>
+  ${filter}
+  <pageMargins left="0.5" right="0.5" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>
+  <pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>
+</worksheet>`;
+}
+
+// Summary: label / value pairs grouped under section headings.
+function buildSummarySheetXml(title, subtitle, sections, rtl) {
+  const rows = [
+    `<row r="1" ht="24" customHeight="1">${xlsxTextCell(1, 0, title, 2)}</row>`,
+    `<row r="2">${xlsxTextCell(2, 0, subtitle, 3)}</row>`,
+  ];
+  let r = 4;
+  sections.forEach((section) => {
+    rows.push(`<row r="${r}" ht="22" customHeight="1">${xlsxTextCell(r, 0, section.heading, 1)}${xlsxTextCell(r, 1, "", 1)}</row>`);
+    r += 1;
+    section.items.forEach(([label, value, type], i) => {
+      const zebra = i % 2 === 1;
+      rows.push(`<row r="${r}">${wbCell(r, 0, label, "text", zebra, false)}${wbCell(r, 1, value, type || "text", zebra, false)}</row>`);
+      r += 1;
+    });
+    r += 1;
+  });
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <dimension ref="A1:B${r}"/>
+  <sheetViews><sheetView workbookViewId="0"${rtl ? ` rightToLeft="1"` : ""} showGridLines="0"/></sheetViews>
+  <cols><col min="1" max="1" width="38" customWidth="1"/><col min="2" max="2" width="30" customWidth="1"/></cols>
+  <sheetData>${rows.join("")}</sheetData>
+  <pageMargins left="0.5" right="0.5" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>
+</worksheet>`;
+}
+
+// Excel sheet names: max 31 chars, none of []:*?/\
+function safeSheetName(name, used) {
+  let base = String(name).replace(/[[\]:*?/\\]/g, " ").trim().slice(0, 31) || "Sheet";
+  let candidate = base;
+  let n = 2;
+  while (used.has(candidate.toLowerCase())) candidate = `${base.slice(0, 28)} ${n++}`;
+  used.add(candidate.toLowerCase());
+  return candidate;
+}
+
+// Gathers every table from the live state. Exposed to tests.
+function collectFullExportData() {
+  const yesNo = (v) => (v ? tr("Yes") : tr("No"));
+  const name = (id) => tenantName(id) || (id ? tr("(removed tenant)") : "");
+  const sortByDate = (a, b) => String(transactionDateValue(a)).localeCompare(String(transactionDateValue(b)));
+
+  // Tenants
+  const tenantRows = state.tenants.map((t) => {
+    const totals = getTenantTotals(t.id);
+    return [
+      t.name, t.unit || "", Number(t.coefficient || 0), Number(t.breakerAmps || 0), t.phone || "", yesNo(t.active !== false),
+      getTenantDueBasisTotal(t.id), getTenantServicesDue(t.id), getTenantPaymentsTotal(t.id), getTenantOpeningNet(t.id),
+      getTenantBalance(t.id), getTenantProjectOutstanding(t.id), totals.dueUsd,
+    ];
+  });
+
+  // Transactions
+  const serviceLabel = (t) => {
+    if (t.serviceType === "generator") return t.servicePart === "maintenance" ? tr("Generator maintenance") : tr("Generator fuel");
+    if (t.serviceType === "water") return tr("Water");
+    return "";
+  };
+  const txRows = [...state.transactions].sort(sortByDate).map((t) => [
+    t.date || "", t.category || "", name(t.tenantId), t.description || "", t.forMonth || "",
+    t.expenseCategory || "", t.supplier || "", t.invoice || "", t.project || "", serviceLabel(t),
+    Number(t.debitUsd || 0), Number(t.debitLbp || 0), Number(t.creditUsd || 0), Number(t.creditLbp || 0),
+    roundUsd(transactionNetUsd(t)), t.receiptRef || "", t.invoiceAttachment ? tr("Yes") : "",
+  ]);
+
+  // Monthly cash activity (by transaction date). Running cash ends at the
+  // dashboard's Cash figure, because both skip tenant-tied opening balances.
+  const byMonth = new Map();
+  state.transactions.forEach((t) => {
+    if (t.category === "Opening Balance" && t.tenantId) return;
+    const m = monthIso(monthKey(t.date || t.forMonth || ""));
+    if (!m) return;
+    const row = byMonth.get(m) || { opening: 0, expenses: 0, services: 0, payments: 0, projects: 0, other: 0, net: 0 };
+    const net = transactionNetUsd(t);
+    if (t.category === "Expenses") row.expenses += toUsd(t.debitUsd, t.debitLbp);
+    else if (t.category === "Services Expenses") row.services += toUsd(t.debitUsd, t.debitLbp);
+    else if (t.category === "Payments" && t.project) row.projects += net;
+    else if (t.category === "Payments") row.payments += net;
+    else if (t.category === "Opening Balance") row.opening += net;
+    else row.other += net;
+    row.net += net;
+    byMonth.set(m, row);
+  });
+  let running = 0;
+  const monthRows = [...byMonth.keys()].sort().map((m) => {
+    const r = byMonth.get(m);
+    running = roundUsd(running + r.net);
+    return [m, roundUsd(r.opening), roundUsd(r.payments), roundUsd(r.projects), roundUsd(r.other), roundUsd(r.expenses), roundUsd(r.services), roundUsd(r.net), running];
+  });
+
+  // Generator readings with their computed split
+  const readingRows = [];
+  (state.serviceReadings || [])
+    .filter((r) => r.serviceType === "generator")
+    .sort((a, b) => String(a.forMonth).localeCompare(String(b.forMonth)))
+    .forEach((rec) => {
+      const dist = computeServiceDistribution("generator", rec.forMonth);
+      Object.keys(rec.lines || {}).forEach((id) => {
+        const l = dist.lines[id] || {};
+        readingRows.push([rec.forMonth, name(id), l.previousReading || 0, l.currentReading || 0, l.kwh || 0, l.breakerAmps || 0, l.consumptionUsd || 0, l.maintenanceUsd || 0, l.totalUsd || 0]);
+      });
+    });
+
+  // Projects: one row per tenant share
+  const projectRows = [];
+  (state.buildingProjects || []).forEach((p) => {
+    const ids = Object.keys(p.shares || {});
+    const base = [p.name || "", p.status || "", Number(p.totalBudget || 0), p.dueDate || "", p.distribution || ""];
+    if (!ids.length) { projectRows.push([...base, "", 0, 0, 0]); return; }
+    ids.forEach((id) => {
+      const st = getProjectTenantStatus(p, id);
+      projectRows.push([...base, name(id), st.share, st.paid, roundUsd(Math.max(0, st.share - st.paid))]);
+    });
+  });
+
+  const budgetRows = (state.monthlyExpected || [])
+    .slice()
+    .sort((a, b) => String(a.month).localeCompare(String(b.month)))
+    .map((e) => [e.month, Number(e.expectedUsd || 0)]);
+
+  const pollRows = (state.polls || []).map((p) => {
+    const votes = Object.values(p.votes || {});
+    const count = (v) => votes.filter((x) => x === v).length;
+    return [p.title || "", p.status || "", (p.createdAt || "").slice(0, 10), count("yes"), count("no"), count("abstain")];
+  });
+
+  const declarationRows = (state.paymentDeclarations || []).map((d) => [
+    name(d.tenantId), d.month || "", Number(d.amount || 0), d.status || "", (d.declaredAt || "").slice(0, 10),
+  ]);
+
+  const position = getPositionTotals();
+  const account = getAccountTotals();
+  return { tenantRows, txRows, monthRows, readingRows, projectRows, budgetRows, pollRows, declarationRows, position, account };
+}
+
+// Returns the workbook's parts before zipping (tests check each one is valid XML).
+function buildFullWorkbookFiles() {
+  const d = collectFullExportData();
+  const rtl = currentLang === "ar";
+  const buildingTitle = (state.building && state.building.name) || "Building";
+  const subtitle = tr("{building} · exported {date}", { building: buildingTitle, date: formatDateLabel(localDateInput()) });
+  const C = (header, width, type = "text", total = false) => ({ header: tr(header), width, type, total });
+
+  const tables = [
+    { name: tr("Tenant balances"), rows: d.tenantRows, columns: [
+      C("Tenant", 26), C("Unit", 9), C("Coefficient", 12, "int", true), C("Breaker (A)", 11, "int"), C("Phone", 16), C("Active", 9),
+      C(isFixedMode() ? "Monthly dues to date" : "Expense share", 15, "usd", true), C("Generator & water", 15, "usd", true),
+      C("Payments", 14, "usd", true), C("Opening credit (+) / debt (−)", 17, "usd", true), C("Balance (owes +)", 15, "usd", true),
+      C("Projects outstanding", 15, "usd", true), C("Total due", 14, "usd", true)] },
+    { name: tr("Transactions"), rows: d.txRows, columns: [
+      C("Date", 13, "date"), C("Category", 17), C("Tenant", 22), C("Description", 34), C("For month", 12, "month"),
+      C("Expense category", 17), C("Supplier", 18), C("Invoice", 11), C("Project", 16), C("Service", 18),
+      C("Debit USD", 13, "usd", true), C("Debit LBP", 15, "lbp", true), C("Credit USD", 13, "usd", true), C("Credit LBP", 15, "lbp", true),
+      C("Net USD", 13, "usd", true), C("Receipt", 18), C("Invoice photo", 12)] },
+    { name: tr("Monthly activity"), rows: d.monthRows, columns: [
+      C("Month", 12, "month"), C("Opening balance", 15, "usd", true), C("Monthly payments", 16, "usd", true), C("Project payments", 16, "usd", true),
+      C("Other", 12, "usd", true), C("Expenses", 14, "usd", true), C("Generator & water", 16, "usd", true), C("Net cash flow", 15, "usd", true),
+      C("Cash at month end", 17, "usd")] },
+    { name: tr("Generator readings"), rows: d.readingRows, columns: [
+      C("Month", 12, "month"), C("Tenant", 24), C("Previous reading", 15, "int"), C("Current reading", 15, "int"), C("kWh used", 12, "int", true),
+      C("Breaker (A)", 11, "int"), C("Fuel share", 13, "usd", true), C("Maintenance share", 16, "usd", true), C("Total", 13, "usd", true)] },
+    { name: tr("Projects"), rows: d.projectRows, columns: [
+      C("Project", 24), C("Status", 12), C("Budget", 14, "usd"), C("Due date", 13, "date"), C("Distribution", 14),
+      C("Tenant", 24), C("Share", 13, "usd", true), C("Paid", 13, "usd", true), C("Outstanding", 14, "usd", true)] },
+    { name: tr("Monthly budget"), rows: d.budgetRows, columns: [C("Month", 14, "month"), C("Expected (USD)", 16, "usd", true)] },
+    { name: tr("Polls"), rows: d.pollRows, columns: [
+      C("Poll", 40), C("Status", 12), C("Created", 13, "date"), C("Yes", 8, "int", true), C("No", 8, "int", true), C("Abstain", 10, "int", true)] },
+    { name: tr("Payment declarations"), rows: d.declarationRows, columns: [
+      C("Tenant", 24), C("Month", 12, "month"), C("Amount (USD)", 14, "usd", true), C("Status", 12), C("Declared on", 14, "date")] },
+  ];
+
+  const summarySections = [
+    { heading: tr("Building"), items: [
+      [tr("Building"), buildingTitle], [tr("Exported on"), localDateInput(), "date"], [tr("App version"), APP_VERSION],
+      [tr("Collection mode"), isFixedMode() ? tr("Fixed monthly amount") : tr("Actual expenses")],
+      [tr("LBP per USD"), getConversionRate(), "int"]] },
+    { heading: tr("Position"), items: [
+      [tr("Cash / reserve"), roundUsd(d.position.cashUsd), "usd"], [tr("Owed by tenants"), d.position.receivableUsd, "usd"],
+      [tr("Tenant credit (prepaid)"), d.position.advanceLiabilityUsd, "usd"], [tr("Net position"), d.position.netPositionUsd, "usd"],
+      [tr("Total expenses (incl. generator & water)"), roundUsd(d.account.expenseUsd), "usd"],
+      [tr("Total payments received"), roundUsd(d.account.paymentsUsd), "usd"]] },
+    { heading: tr("Contents"), items: [
+      [tr("Tenants"), state.tenants.length, "int"], [tr("Transactions"), state.transactions.length, "int"],
+      [tr("Months with activity"), d.monthRows.length, "int"], [tr("Projects"), (state.buildingProjects || []).length, "int"],
+      [tr("Polls"), (state.polls || []).length, "int"]] },
+  ];
+
+  const used = new Set();
+  const sheets = [
+    { name: safeSheetName(tr("Summary"), used), xml: buildSummarySheetXml(buildingTitle, tr("Full database export · {date}", { date: formatDateLabel(localDateInput()) }), summarySections, rtl) },
+    ...tables.map((t) => ({
+      name: safeSheetName(t.name, used),
+      xml: buildTableSheetXml({ ...t, title: t.name }, subtitle, rtl),
+    })),
+  ];
+
+  const createdAt = new Date().toISOString();
+  const files = [
+    { name: "[Content_Types].xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  ${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("\n  ")}
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>` },
+    { name: "_rels/.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>` },
+    { name: "docProps/app.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>Building Account Tracker</Application>
+  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>${sheets.length}</vt:i4></vt:variant></vt:vector></HeadingPairs>
+  <TitlesOfParts><vt:vector size="${sheets.length}" baseType="lpstr">${sheets.map((s) => `<vt:lpstr>${escapeXml(s.name)}</vt:lpstr>`).join("")}</vt:vector></TitlesOfParts>
+</Properties>` },
+    { name: "docProps/core.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>${escapeXml(buildingTitle)} — full export</dc:title>
+  <dc:creator>Building Account Tracker</dc:creator>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${createdAt}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${createdAt}</dcterms:modified>
+</cp:coreProperties>` },
+    { name: "xl/workbook.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <bookViews><workbookView activeTab="0"/></bookViews>
+  <sheets>${sheets.map((s, i) => `<sheet name="${escapeXml(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets>
+</workbook>` },
+    { name: "xl/_rels/workbook.xml.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  ${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("\n  ")}
+  <Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>` },
+    { name: "xl/styles.xml", content: WB_STYLES_XML },
+    ...sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, content: s.xml })),
+  ];
+  return files;
+}
+
+function buildFullWorkbookXlsx() {
+  return new Blob([buildZip(buildFullWorkbookFiles())], { type: XLSX_MIME });
+}
+
+function handleFullExcelExport() {
+  // Owner only: the button is hidden for tenants, and this guard stops it
+  // being triggered any other way.
+  if (sessionMode !== "owner") {
+    showToast("Only the building owner can export the full database");
+    return;
+  }
+  const slug = String((state.building && state.building.name) || "building").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "building";
+  downloadBlob(buildFullWorkbookXlsx(), XLSX_MIME, `${slug}-full-export-${localDateInput()}.xlsx`);
+  showToast("Full Excel export downloaded");
+}
+
 function handleLedgerExcelExport() {
   const rows = ledgerExcelRows();
   if (!rows.length) {
@@ -8292,6 +8752,7 @@ function attachEvents() {
   els.cancelConnectButton.addEventListener("click", () => closeDialog(els.connectDialog));
   els.connectSubmitButton.addEventListener("click", () => applySyncCode(els.connectCodeInput.value));
   els.downloadBackupButton.addEventListener("click", downloadBackup);
+  els.fullExportButton.addEventListener("click", handleFullExcelExport);
   els.restoreBackupButton.addEventListener("click", () => els.restoreBackupInput.click());
   els.restoreBackupInput.addEventListener("change", () => {
     const file = els.restoreBackupInput.files[0];
@@ -8578,7 +9039,7 @@ boot().catch((error) => {
 // Pure calculation functions plus a way to load a state; nothing here touches
 // the network.
 export const __test = {
-  setState(raw) { state = hydrateState(raw); },
+  setState(raw) { state = hydrateState(raw); currentLang = normalizeLang(state.settings.language); },
   getState() { return state; },
   getTenantBalance,
   getTenantExpenseShare,
@@ -8591,5 +9052,10 @@ export const __test = {
   mergeStates,
   remoteWouldWipeLocalData,
   describeSyncProblem,
+  collectFullExportData,
+  buildFullWorkbookXlsx,
+  buildFullWorkbookFiles,
+  getAccountTotals,
+  getPositionTotals,
   toUsd,
 };
