@@ -945,6 +945,12 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "This device is offline. Your changes are kept here and sync when you're back online.": "هذا الجهاز غير متصل. تُحفظ تغييراتك هنا وتُزامَن عند عودة الاتصال.",
+  "The cloud refused access. Sign out from Settings and sign in again with Google.": "رفضت السحابة الوصول. سجّل الخروج من الإعدادات ثم سجّل الدخول مجدداً عبر Google.",
+  "Not signed in to the cloud. Open the login screen and sign in with Google to sync.": "لم تسجّل الدخول إلى السحابة. افتح شاشة الدخول وسجّل الدخول عبر Google للمزامنة.",
+  "The cloud database had an error. Tap the chip to try again in a minute.": "حدث خطأ في قاعدة البيانات السحابية. اضغط على الشريحة للمحاولة بعد دقيقة.",
+  "Can't reach the cloud database. If this lasts, it may be paused: resume it in the Supabase dashboard.": "تعذّر الوصول إلى قاعدة البيانات السحابية. إذا استمر ذلك فقد تكون متوقفة مؤقتاً: استأنفها من لوحة Supabase.",
+  "Sync failed.": "فشلت المزامنة.",
   "Signed in as {email}": "تم تسجيل الدخول باسم {email}",
   "Wrong email or password": "البريد الإلكتروني أو كلمة السر غير صحيحة",
   "This account is not the building owner": "هذا الحساب ليس حساب مالك المبنى",
@@ -1592,11 +1598,11 @@ function transactionNetUsd(transaction) {
   return toUsd(net.usd, net.lbp);
 }
 
-function showToast(message) {
+function showToast(message, durationMs = 2200) {
   els.toast.textContent = tr(message);
   els.toast.classList.add("visible");
   window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => els.toast.classList.remove("visible"), 2200);
+  showToast.timer = window.setTimeout(() => els.toast.classList.remove("visible"), durationMs);
 }
 
 function saveState(options = {}) {
@@ -6571,7 +6577,9 @@ async function supabaseRequest(path, options = {}, retried = false) {
   if (!res.ok) {
     let msg = `Cloud database error (${res.status})`;
     try { const j = await res.json(); msg = j.message || j.hint || j.error || msg; } catch (_) {}
-    throw new Error(msg);
+    const error = new Error(msg);
+    error.status = res.status;
+    throw error;
   }
   return res;
 }
@@ -6624,6 +6632,36 @@ function renderCloudStatus(message = "") {
 
 const SYNC_CHIP_TEXT = { saving: "Saving…", saved: "Saved", error: "Sync error", offline: "Offline", local: "Local" };
 
+// Why the last sync failed, in words the owner can act on. "Sync error" alone
+// gave no clue whether to wait, sign in, or resume the database. Shown when the
+// chip is tapped; cleared by the next successful sync.
+let lastSyncProblem = "";
+
+function describeSyncProblem(error) {
+  if (navigator.onLine === false) {
+    return "This device is offline. Your changes are kept here and sync when you're back online.";
+  }
+  if (error?.code === "empty-cloud") return error.message;
+  const status = Number(error?.status || 0);
+  if (status === 401 || status === 403) {
+    return authSession
+      ? "The cloud refused access. Sign out from Settings and sign in again with Google."
+      : "Not signed in to the cloud. Open the login screen and sign in with Google to sync.";
+  }
+  if (status >= 500) return "The cloud database had an error. Tap the chip to try again in a minute.";
+  // fetch() rejects with a TypeError when the host can't be reached at all — the
+  // signature of a paused free-plan Supabase project (its address stops resolving).
+  if (error instanceof TypeError || error?.name === "TimeoutError") {
+    return "Can't reach the cloud database. If this lasts, it may be paused: resume it in the Supabase dashboard.";
+  }
+  return error?.message || "Sync failed.";
+}
+
+function reportSyncProblem(error) {
+  lastSyncProblem = tr(describeSyncProblem(error));
+  setSyncChip(navigator.onLine === false ? "offline" : "error");
+}
+
 // Header status chip reflecting cloud-sync state. "local" (no cloud configured)
 // stays hidden via CSS so single-device users aren't shown a meaningless badge.
 function setSyncChip(kind) {
@@ -6632,6 +6670,8 @@ function setSyncChip(kind) {
   els.syncChip.classList.remove("is-saving", "is-saved", "is-error", "is-offline", "is-local");
   els.syncChip.classList.add(`is-${state_}`);
   els.syncChipText.textContent = SYNC_CHIP_TEXT[state_] || "";
+  if (state_ === "saved") lastSyncProblem = "";
+  els.syncChip.title = lastSyncProblem;
 }
 
 function downloadBackup() {
@@ -6827,9 +6867,9 @@ async function saveCloudState({ silent = false } = {}) {
     setSyncChip("saved");
     if (!silent) showToast("Saved to the cloud");
   } catch (error) {
-    renderCloudStatus(error.message);
-    setSyncChip(navigator.onLine === false ? "offline" : "error");
-    if (!silent) showToast(error.message);
+    reportSyncProblem(error);
+    renderCloudStatus(lastSyncProblem);
+    if (!silent) showToast(lastSyncProblem, 6000);
   } finally {
     cloudSaveInFlight = false;
   }
@@ -6862,9 +6902,9 @@ async function loadCloudState() {
     setSyncChip("saved");
     showToast("Loaded from the cloud");
   } catch (error) {
-    renderCloudStatus(error.message);
-    setSyncChip(navigator.onLine === false ? "offline" : "error");
-    showToast(error.message);
+    reportSyncProblem(error);
+    renderCloudStatus(lastSyncProblem);
+    showToast(lastSyncProblem, 6000);
   }
 }
 
@@ -8259,7 +8299,8 @@ function attachEvents() {
     restoreFromBackupFile(file);
   });
   els.syncChip.addEventListener("click", () => {
-    if (hasCloudConfig() && !cloudSaveInFlight) saveCloudState();
+    if (lastSyncProblem) showToast(lastSyncProblem, 6000);
+    if (hasCloudConfig() && !cloudSaveInFlight) saveCloudState({ silent: Boolean(lastSyncProblem) });
   });
   window.addEventListener("online", () => { if (hasCloudConfig()) saveCloudState({ silent: true }); });
   window.addEventListener("offline", () => setSyncChip("offline"));
@@ -8481,7 +8522,7 @@ async function syncFromSheet({ silent = false } = {}) {
       renderCloudStatus(
         tr("The cloud copy is empty but this device has data. Nothing was replaced. Tap the sync chip to upload this device's data."),
       );
-      setSyncChip("error");
+      reportSyncProblem(Object.assign(new Error("The cloud copy is empty but this device has data. Nothing was replaced. Tap the sync chip to upload this device's data."), { code: "empty-cloud" }));
       if (!silent) showToast("Cloud copy is empty — kept this device's data");
       return;
     } else {
@@ -8494,9 +8535,9 @@ async function syncFromSheet({ silent = false } = {}) {
     }
     renderCloudStatus(`Last synced at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
     setSyncChip("saved");
-  } catch {
-    if (!silent) renderCloudStatus(`Could not reach the ${cloudProviderLabel()} — showing cached data.`);
-    setSyncChip(navigator.onLine === false ? "offline" : "error");
+  } catch (error) {
+    reportSyncProblem(error);
+    if (!silent) renderCloudStatus(lastSyncProblem);
   }
 }
 
@@ -8549,5 +8590,6 @@ export const __test = {
   allocateByWeight,
   mergeStates,
   remoteWouldWipeLocalData,
+  describeSyncProblem,
   toUsd,
 };
