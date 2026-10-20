@@ -4018,3 +4018,17 @@ body.tenant-phone #createPollButton {
   background: var(--surface);
   font-size: 0.86rem;
 }
+
+/* Maintenance: quick-add buttons for common jobs. */
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.preset-row .settings-note {
+  flex-basis: 100%;
+  margin: 0;
+}

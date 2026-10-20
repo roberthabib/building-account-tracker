@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v154";
+const APP_VERSION = "v155";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,9 @@ const I18N = {
     "common.export": "Export",
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
+    "nav.maintenance": "Maintenance",
+    "more.maintenanceSub": "Inspections, cleanings, renewals",
+    "maint.new": "+ Add",
     "more.noticesSub": "News for the residents",
     "nav.issues": "Problems",
     "more.issuesSub": "Report and follow repairs",
@@ -725,6 +728,9 @@ const I18N = {
     "common.export": "تصدير",
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
+    "nav.maintenance": "الصيانة",
+    "more.maintenanceSub": "الفحوصات والتنظيف والتجديدات",
+    "maint.new": "+ إضافة",
     "more.noticesSub": "أخبار للسكان",
     "nav.issues": "المشاكل",
     "more.issuesSub": "الإبلاغ عن الأعطال ومتابعتها",
@@ -1085,6 +1091,56 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Edit Payment": "تعديل الدفعة",
+  "Payment updated. Same receipt number": "تم تعديل الدفعة. رقم الإيصال نفسه",
+  "That entry was not found": "لم يُعثر على هذا القيد",
+  "Lift inspection": "فحص المصعد",
+  "Water tank cleaning": "تنظيف خزان المياه",
+  "Fire extinguisher refill": "تعبئة طفايات الحريق",
+  "Building insurance renewal": "تجديد تأمين المبنى",
+  "Pest control": "مكافحة الحشرات",
+  "Roof and drains check": "فحص السطح والمجاري",
+  "Every month": "كل شهر",
+  "Every 2 months": "كل شهرين",
+  "Every 3 months": "كل 3 أشهر",
+  "Every 6 months": "كل 6 أشهر",
+  "Every year": "كل سنة",
+  "Every 2 years": "كل سنتين",
+  "Every {n} months": "كل {n} أشهر",
+  "Company, phone, contract number…": "الشركة، الهاتف، رقم العقد…",
+  "Give the job a name": "أعطِ العمل اسماً",
+  "Choose when it is next due": "اختر موعد الاستحقاق التالي",
+  "Job updated": "تم تحديث العمل",
+  "Job added to the calendar": "أُضيف العمل إلى الجدول",
+  "Remove \"{name}\" from the calendar? Its history is removed too.": "إزالة \"{name}\" من الجدول؟ يُحذف سجلّه أيضاً.",
+  "Edit job": "تعديل العمل",
+  "New maintenance job": "عمل صيانة جديد",
+  "Job": "العمل",
+  "How often": "كم مرة",
+  "Next due": "الموعد التالي",
+  "Notes": "ملاحظات",
+  "Also record the cost as a building expense": "تسجيل الكلفة أيضاً كمصروف للمبنى",
+  "Next due: {date}": "الموعد التالي: {date}",
+  "Done. Next due {date}": "تم. الموعد التالي {date}",
+  "Mark done — {name}": "تسجيل الإنجاز — {name}",
+  "Done on": "أُنجز بتاريخ",
+  "Cost (USD, optional)": "الكلفة (دولار، اختياري)",
+  "Mark done": "تم الإنجاز",
+  "Add a common job:": "أضف عملاً شائعاً:",
+  "Start with a common job:": "ابدأ بعمل شائع:",
+  "Overdue": "متأخر",
+  "Due soon": "قريب الاستحقاق",
+  "Scheduled": "مجدول",
+  "No date": "بلا تاريخ",
+  "Next due {date} · {every}": "الموعد التالي {date} · {every}",
+  "Last done {date}{cost}": "آخر إنجاز {date}{cost}",
+  "No jobs yet. Add the inspections, cleanings and renewals the building needs, and the app reminds you before each is due.": "لا أعمال بعد. أضف الفحوصات والتنظيف والتجديدات التي يحتاجها المبنى، ويذكّرك التطبيق قبل موعد كل منها.",
+  "{name} is overdue (was due {date})": "{name} متأخر (كان مستحقاً في {date})",
+  "{name} is due {date}": "{name} مستحق في {date}",
+  "{n} maintenance jobs are due": "{n} أعمال صيانة مستحقة",
+  "Download a backup with photos — last one {date}": "نزّل نسخة احتياطية مع الصور — آخر نسخة {date}",
+  "Download your first backup with photos": "نزّل أول نسخة احتياطية مع الصور",
+  "Maintenance job": "عمل صيانة",
   "Sign in with Google as the owner to include the photos": "سجّل الدخول عبر Google كمالك لتضمين الصور",
   "{done} of {total}…": "{done} من {total}…",
   "Backup downloaded — {n} photos could not be included (listed in README.txt)": "تم تنزيل النسخة — تعذّر تضمين {n} صور (مذكورة في README.txt)",
@@ -2266,6 +2322,7 @@ function hydrateState(rawState) {
   hydrated.deleted.announcements ||= [];
   hydrated.deleted.issues ||= [];
   hydrated.deleted.cashChecks ||= [];
+  hydrated.deleted.maintenanceTasks ||= [];
   hydrated.security ||= {};
   hydrated.security.salt ||= randomToken();
   hydrated.transactions ||= [];
@@ -2300,6 +2357,7 @@ function hydrateState(rawState) {
   hydrated.announcements ||= [];
   hydrated.issues ||= [];
   hydrated.generatorServices ||= [];
+  hydrated.maintenanceTasks ||= [];
   hydrated.settings.sharedExpensesEnabled = false; // v108: merged into unified Expenses model
   if (hydrated.setupComplete === undefined) {
     hydrated.setupComplete = Boolean(
@@ -2327,7 +2385,7 @@ function hydrateState(rawState) {
   hydrated.tenants = hydrated.tenants.filter((t) => !deletedTenants.has(t.id));
   hydrated.polls = hydrated.polls.filter((p) => !deletedPolls.has(p.id));
   hydrated.buildingProjects = hydrated.buildingProjects.filter((p) => !deletedProjects.has(p.id));
-  ["announcements", "issues", "cashChecks"].forEach((kind) => {
+  ["announcements", "issues", "cashChecks", "maintenanceTasks"].forEach((kind) => {
     const gone = new Set(hydrated.deleted[kind]);
     hydrated[kind] = hydrated[kind].filter((item) => !gone.has(item.id));
   });
@@ -6213,7 +6271,7 @@ function renderLedger() {
       btn.textContent = tr("Receipt");
       actionGroup.append(btn);
     }
-    if (transaction.category === "Expenses" && !transaction.serviceType && sessionMode === "owner") {
+    if (((transaction.category === "Expenses" && !transaction.serviceType) || transaction.category === "Payments") && sessionMode === "owner") {
       const btn = document.createElement("button");
       btn.className = "ledger-action-btn edit-expense-button";
       btn.type = "button";
@@ -6700,10 +6758,10 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView"];
 
 function setView(viewId) {
-  if (sessionMode === "tenant" && (viewId === "settingsView" || viewId === "reportsView")) viewId = "moreView";
+  if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView"].includes(viewId)) viewId = "moreView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
   // Re-run the enter animation each time a view is shown.
   const active = document.getElementById(viewId);
@@ -7749,7 +7807,7 @@ function mergeDeclarations(olderArr, newerArr) {
 }
 
 function mergeDeletedLists(local, remote) {
-  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks"];
+  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks", "maintenanceTasks"];
   const merged = {};
   kinds.forEach((kind) => {
     merged[kind] = [...new Set([...(local?.[kind] || []), ...(remote?.[kind] || [])])].slice(-1000);
@@ -7786,6 +7844,7 @@ function mergeStates(local, remote) {
   merged.announcements = mergeById(older.announcements, newer.announcements, merged.deleted.announcements);
   merged.issues = mergeByStamp(older.issues, newer.issues, merged.deleted.issues, "updatedAt");
   merged.generatorServices = mergeById(older.generatorServices, newer.generatorServices);
+  merged.maintenanceTasks = mergeByStamp(older.maintenanceTasks, newer.maintenanceTasks, merged.deleted.maintenanceTasks, "updatedAt");
   merged.meta = {
     rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
     epoch: localEpoch,
@@ -8833,6 +8892,7 @@ function expenseDebitLbp(transaction) {
 function openExpenseEditDialog(transactionId) {
   if (sessionMode !== "owner") return;
   const transaction = state.transactions.find((entry) => entry.id === transactionId);
+  if (transaction?.category === "Payments") { openPaymentEditDialog(transactionId); return; }
   if (transaction?.serviceType === "generator") {
     showToast("Edit generator bills from the Services tab");
     return;
@@ -10153,10 +10213,10 @@ function attachEvents() {
   els.transactionCategory.addEventListener("change", applyTransactionCategoryDefaults);
   els.transactionService.addEventListener("change", syncTransactionFormMode);
   els.transactionTenant.addEventListener("change", () => {
-    if (els.transactionCategory.value === "Payments") applyTransactionCategoryDefaults();
+    if (els.transactionCategory.value === "Payments" && !editingExpenseId) applyTransactionCategoryDefaults();
     else if (els.transactionCategory.value === "Opening Balance") updateTransactionDirectionLabels();
   });
-  els.transactionMonth.addEventListener("change", () => { if (els.transactionCategory.value === "Payments") applyTransactionCategoryDefaults(); });
+  els.transactionMonth.addEventListener("change", () => { if (els.transactionCategory.value === "Payments" && !editingExpenseId) applyTransactionCategoryDefaults(); });
   els.transactionProject.addEventListener("input", () => {
     setProjectDropdownOpen(true);
     syncTransactionFormMode();
@@ -10212,11 +10272,11 @@ function attachEvents() {
       const transactions = createTransactionsFromForm();
       const transaction = transactions[0];
       const editingIndex = editingExpenseId
-        ? state.transactions.findIndex((entry) => entry.id === editingExpenseId && entry.category === "Expenses")
+        ? state.transactions.findIndex((entry) => entry.id === editingExpenseId)
         : -1;
       const existingTransaction = editingIndex >= 0 ? state.transactions[editingIndex] : null;
       let invoiceUploadError = null;
-      if (editingExpenseId && !existingTransaction) throw new Error("Expense entry was not found");
+      if (editingExpenseId && !existingTransaction) throw new Error("That entry was not found");
       assertTransactionsOpen(transactions, existingTransaction);
       if (!existingTransaction) {
         const duplicate = findDuplicatePayment(transactions);
@@ -10224,7 +10284,14 @@ function attachEvents() {
           name: tenantName(duplicate.match.tenantId), amount: formatUsd(transactionNetUsd(duplicate.match)), date: formatDateLabel(duplicate.match.date),
         }))) return;
       }
-      if (existingTransaction) {
+      if (existingTransaction?.category === "Payments") {
+        // Editing a payment keeps its id, receipt number and proof photo.
+        transaction.id = existingTransaction.id;
+        transaction.receiptRef = existingTransaction.receiptRef || transaction.receiptRef;
+        transaction.paymentGroupId = existingTransaction.paymentGroupId || transaction.paymentGroupId;
+        transaction.sourceRow = existingTransaction.sourceRow || null;
+        transaction.invoiceAttachment = existingTransaction.invoiceAttachment || null;
+      } else if (existingTransaction) {
         transaction.id = existingTransaction.id;
         transaction.category = "Expenses";
         transaction.tenantId = null;
@@ -10265,7 +10332,9 @@ function attachEvents() {
       }
       selectedMonth = transactions.find((entry) => entry.forMonth)?.forMonth || selectedMonth;
       renderAll();
-      if (existingTransaction) {
+      if (existingTransaction?.category === "Payments") {
+        showToast("Payment updated. Same receipt number");
+      } else if (existingTransaction) {
         showToast(
           invoiceUploadError
             ? tr("Expense updated. Invoice upload failed: {msg}", { msg: invoiceUploadError.message })
@@ -10606,6 +10675,8 @@ Object.assign(els, {
   pollWeightingInput: document.querySelector("#pollWeightingInput"),
   pollClosesInput: document.querySelector("#pollClosesInput"),
   pollQuorumInput: document.querySelector("#pollQuorumInput"),
+  maintenanceList: document.querySelector("#maintenanceList"),
+  newMaintenanceButton: document.querySelector("#newMaintenanceButton"),
 });
 
 // ── Small DOM + dialog helpers ──────────────────────────────────────────────
@@ -10713,6 +10784,7 @@ const TRACKED_COLLECTIONS = [
   ["announcements", "notice"],
   ["issues", "issue"],
   ["generatorServices", "genService"],
+  ["maintenanceTasks", "maintenance"],
   ["monthLocks", "monthLock"],
   ["polls", "poll"],
 ];
@@ -10882,7 +10954,7 @@ function monthToClose() {
 const AUDIT_KIND_LABELS = {
   transaction: "Entry", tenant: "Tenant", project: "Project", reading: "Meter readings", recurring: "Monthly expense",
   cashCheck: "Cash count", notice: "Notice", issue: "Problem", genService: "Generator service",
-  monthLock: "Month lock", poll: "Poll", budget: "Monthly budget", settings: "Settings", many: "Many records",
+  monthLock: "Month lock", maintenance: "Maintenance job", poll: "Poll", budget: "Monthly budget", settings: "Settings", many: "Many records",
 };
 
 function describeRecord(kind, record) {
@@ -10903,6 +10975,7 @@ function describeRecord(kind, record) {
     case "genService": return `${formatDateLabel(record.date)} · ${record.work || ""}`;
     case "monthLock": return `${formatMonth(monthIso(record.id))} · ${record.closed ? tr("Closed") : tr("Open")}`;
     case "poll": return record.title || "";
+    case "maintenance": return `${record.title || ""} · ${record.nextDue ? formatDateLabel(record.nextDue) : ""}`;
     case "budget": return `${formatMonth(record.month)} · ${formatUsd(record.expectedUsd)}`;
     case "settings": return tr("Building settings");
     default: return "";
@@ -12072,6 +12145,7 @@ function extraAttentionItems() {
   if (openIssues.length) items.push({ kind: "warn", text: tr(openIssues.length === 1 ? "{n} problem reported" : "{n} problems reported", { n: openIssues.length }), view: "issuesView" });
   const health = dataHealthIssues();
   if (health.length) items.push({ kind: "warn", text: tr(health.length === 1 ? "{n} thing to check in your data" : "{n} things to check in your data", { n: health.length }), view: "reportsView" });
+  items.push(...v155AttentionItems());
   if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView" });
   return items;
 }
@@ -12090,6 +12164,7 @@ function renderV148() {
   renderIssues();
   renderReports();
   renderGeneratorExtras();
+  renderMaintenance();
   renderPushStatus();
   document.body.classList.toggle("view-only", isViewerSession() && sessionMode === "owner");
 }
@@ -12098,6 +12173,7 @@ function attachV148Events() {
   els.closeToolDialog?.addEventListener("click", closeToolDialog);
   els.newNoticeButton?.addEventListener("click", openNoticeDialog);
   els.newIssueButton?.addEventListener("click", openIssueDialog);
+  els.newMaintenanceButton?.addEventListener("click", () => openMaintenanceTaskDialog());
   els.adminsButton?.addEventListener("click", openAdminsDialog);
   els.pushToggleButton?.addEventListener("click", () => (pushIsOn() ? disablePushNotifications() : enablePushNotifications()));
   els.transactionServicePart?.addEventListener("change", syncTransactionFormMode);
@@ -12537,6 +12613,9 @@ async function downloadBackupWithPhotos() {
       ...(external.length ? ["", "Older photos kept on Google Drive (not in this file):", ...external.map((e) => `- ${e.label}: ${e.external}`)] : []),
     ].join("\r\n");
     files.splice(1, 0, { name: "README.txt", content: readme });
+    state.settings.lastPhotoBackupAt = localDateInput();
+    saveState();
+    renderAttention();
     const slug = safeFilePart(state.building?.name || "building", "building").toLowerCase();
     downloadBlob(new Blob([buildZip(files)], { type: "application/zip" }), "application/zip", `${slug}-backup-with-photos-${localDateInput()}.zip`);
     showToast(failed.length
@@ -12551,6 +12630,204 @@ async function downloadBackupWithPhotos() {
       button.textContent = t("common.download");
     }
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// v155 — edit a payment, maintenance calendar, backup reminder
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Edit a payment ──────────────────────────────────────────────────────────
+// Same form as recording one; the receipt number, proof photo and id stay.
+function openPaymentEditDialog(transactionId) {
+  if (sessionMode !== "owner") return;
+  const transaction = state.transactions.find((entry) => entry.id === transactionId);
+  if (!transaction || transaction.category !== "Payments") return;
+  const closed = recordMonths("transaction", transaction).find(isMonthClosed);
+  if (closed) { showToast(closedMonthError(closed).message, 5000); return; }
+  resetTransactionForm();
+  editingExpenseId = transaction.id;
+  els.transactionDialogTitle.textContent = tr("Edit Payment");
+  els.transactionSubmitButton.textContent = tr("Save");
+  els.transactionCategory.value = "Payments";
+  els.transactionCategory.disabled = true;
+  syncTransactionFormMode();
+  els.transactionTenant.value = transaction.tenantId || "";
+  els.transactionDate.value = transaction.date || localDateInput();
+  els.transactionMonth.value = monthKey(transaction.forMonth || transaction.date || localDateInput());
+  els.transactionProject.value = transaction.project || "";
+  const lbp = Number(transaction.creditLbp || 0);
+  const usd = Number(transaction.creditUsd || 0);
+  if (lbp > 0 && usd === 0) {
+    els.transactionCurrency.value = "LBP";
+    els.transactionAmount.value = amountInputValue(lbp);
+  } else {
+    els.transactionCurrency.value = "USD";
+    els.transactionAmount.value = amountInputValue(usd);
+  }
+  syncTransactionFormMode();
+  openDialog(els.transactionDialog);
+}
+
+// ── Maintenance calendar ────────────────────────────────────────────────────
+const MAINTENANCE_PRESETS = [
+  ["Lift inspection", 12],
+  ["Water tank cleaning", 6],
+  ["Fire extinguisher refill", 12],
+  ["Building insurance renewal", 12],
+  ["Pest control", 3],
+  ["Roof and drains check", 12],
+];
+
+function addMonthsToDate(iso, months) {
+  const [y, m, d] = String(iso).split("-").map(Number);
+  const target = new Date(y, m - 1 + Number(months || 0), 1);
+  const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+  return localDateInputFrom(new Date(target.getFullYear(), target.getMonth(), Math.min(d, lastDay)));
+}
+
+function maintenanceStatus(task, today = localDateInput()) {
+  if (!task.nextDue) return "none";
+  if (task.nextDue < today) return "overdue";
+  return task.nextDue <= addDays(today, 14) ? "soon" : "ok";
+}
+
+function maintenanceDue() {
+  return (state.maintenanceTasks || []).filter((task) => ["overdue", "soon"].includes(maintenanceStatus(task)));
+}
+
+function openMaintenanceTaskDialog(taskId = null, preset = null) {
+  if (sessionMode !== "owner") return;
+  const task = taskId ? (state.maintenanceTasks || []).find((t) => t.id === taskId) : null;
+  const title = textInput(task?.title || preset?.[0] || "", { placeholder: tr("Lift inspection"), maxlength: "120" });
+  const every = selectInput([[1, tr("Every month")], [2, tr("Every 2 months")], [3, tr("Every 3 months")], [6, tr("Every 6 months")], [12, tr("Every year")], [24, tr("Every 2 years")]], String(task?.everyMonths || preset?.[1] || 12));
+  const nextDue = mk("input", { type: "date", value: task?.nextDue || addMonthsToDate(localDateInput(), 1) });
+  const memo = mk("textarea", { rows: "2", placeholder: tr("Company, phone, contract number…"), maxlength: "500" });
+  memo.value = task?.notes || "";
+  const save = () => {
+    if (!title.value.trim()) { showToast("Give the job a name"); return; }
+    if (!nextDue.value) { showToast("Choose when it is next due"); return; }
+    const fields = { title: title.value.trim(), everyMonths: Number(every.value), nextDue: nextDue.value, notes: memo.value.trim(), updatedAt: new Date().toISOString() };
+    if (task) Object.assign(task, fields);
+    else (state.maintenanceTasks ||= []).push({ id: newId("mnt"), history: [], ...fields });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast(task ? "Job updated" : "Job added to the calendar");
+  };
+  const remove = () => {
+    if (!window.confirm(tr("Remove \"{name}\" from the calendar? Its history is removed too.", { name: task.title }))) return;
+    state.maintenanceTasks = (state.maintenanceTasks || []).filter((t) => t.id !== task.id);
+    recordDeletedId("maintenanceTasks", task.id);
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(task ? tr("Edit job") : tr("New maintenance job"),
+    field(tr("Job"), title),
+    field(tr("How often"), every),
+    field(tr("Next due"), nextDue),
+    field(tr("Notes"), memo),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), save),
+      task ? mk("button", { type: "button", className: "danger-button", text: tr("Delete"), onclick: remove }) : secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openMaintenanceDoneDialog(taskId) {
+  const task = (state.maintenanceTasks || []).find((t) => t.id === taskId);
+  if (!task || sessionMode !== "owner") return;
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const cost = numberInput("");
+  const memo = textInput("", { placeholder: tr("Optional") });
+  const asExpense = checkboxRow(tr("Also record the cost as a building expense"), true);
+  const nextPreview = note("");
+  const update = () => { nextPreview.textContent = tr("Next due: {date}", { date: formatDateLabel(addMonthsToDate(date.value || localDateInput(), task.everyMonths)) }); };
+  date.addEventListener("input", update);
+  update();
+  const save = () => {
+    const doneOn = date.value || localDateInput();
+    const amount = Number(cost.value || 0);
+    if (amount > 0 && asExpense.input.checked) {
+      if (isMonthClosed(doneOn)) { showToast(closedMonthError(doneOn).message, 5000); return; }
+      const shares = computeSharedExpenseShares(amount, "coefficient", doneOn);
+      state.transactions.push({
+        id: newId("tx"), category: "Expenses", description: task.title, tenantId: null, forMonth: null, project: "", date: doneOn,
+        supplier: "", invoice: "", expenseCategory: tr("Maintenance"), serviceType: "", servicePart: "",
+        debitUsd: amount, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -amount, balanceLbp: 0,
+        invoiceAttachment: null, sourceRow: null, shares: Object.keys(shares).length ? shares : null, maintenanceTaskId: task.id,
+      });
+    }
+    task.history = [...(task.history || []), { date: doneOn, costUsd: amount, note: memo.value.trim() }].slice(-30);
+    task.lastDone = doneOn;
+    task.nextDue = addMonthsToDate(doneOn, task.everyMonths);
+    task.updatedAt = new Date().toISOString();
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast(tr("Done. Next due {date}", { date: formatDateLabel(task.nextDue) }));
+  };
+  openToolDialog(tr("Mark done — {name}", { name: task.title }),
+    field(tr("Done on"), date),
+    field(tr("Cost (USD, optional)"), cost),
+    asExpense.row,
+    field(tr("Note"), memo),
+    nextPreview,
+    mk("div", { className: "button-row" }, primaryButton(tr("Mark done"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function renderMaintenance() {
+  if (!els.maintenanceList) return;
+  if (sessionMode !== "owner") { els.maintenanceList.replaceChildren(); return; }
+  const tasks = (state.maintenanceTasks || []).slice().sort((a, b) => String(a.nextDue || "9999").localeCompare(String(b.nextDue || "9999")));
+  const presets = MAINTENANCE_PRESETS.filter(([name]) => !tasks.some((t) => t.title.toLowerCase() === tr(name).toLowerCase()));
+  const presetRow = presets.length
+    ? mk("div", { className: "preset-row" },
+      mk("span", { className: "settings-note", text: tasks.length ? tr("Add a common job:") : tr("Start with a common job:") }),
+      presets.map((preset) => miniButton(`+ ${tr(preset[0])}`, () => openMaintenanceTaskDialog(null, [tr(preset[0]), preset[1]]))))
+    : null;
+  const LABEL = { overdue: "Overdue", soon: "Due soon", ok: "Scheduled", none: "No date" };
+  const PILL = { overdue: "status-due", soon: "status-partial", ok: "status-paid", none: "status-none" };
+  const cards = tasks.map((task) => {
+    const status = maintenanceStatus(task);
+    const last = (task.history || []).slice(-1)[0];
+    const everyText = Number(task.everyMonths) === 12 ? tr("Every year") : Number(task.everyMonths) === 1 ? tr("Every month") : tr("Every {n} months", { n: task.everyMonths });
+    return mk("article", { className: "notice-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: task.title }), mk("span", { className: `status-pill ${PILL[status]}`, text: tr(LABEL[status]) })),
+      mk("p", { className: "notice-body", text: tr("Next due {date} · {every}", { date: task.nextDue ? formatDateLabel(task.nextDue) : "—", every: everyText }) }),
+      last ? mk("p", { className: "notice-until", text: tr("Last done {date}{cost}", { date: formatDateLabel(last.date), cost: last.costUsd ? ` · ${formatUsd(last.costUsd)}` : "" }) }) : null,
+      task.notes ? mk("p", { className: "notice-until", text: task.notes }) : null,
+      mk("div", { className: "notice-actions" },
+        miniButton(tr("Mark done"), () => openMaintenanceDoneDialog(task.id)),
+        miniButton(tr("Edit"), () => openMaintenanceTaskDialog(task.id))));
+  });
+  els.maintenanceList.replaceChildren(
+    ...(cards.length ? cards : [mk("div", { className: "empty-state", text: tr("No jobs yet. Add the inspections, cleanings and renewals the building needs, and the app reminds you before each is due.") })]),
+    ...(presetRow ? [presetRow] : []),
+  );
+}
+
+// ── Backup reminder ─────────────────────────────────────────────────────────
+function photoBackupDue() {
+  if (sessionMode !== "owner" || isViewerSession() || cloudProvider() !== "supabase" || !state.transactions.length) return null;
+  const last = state.settings.lastPhotoBackupAt || "";
+  if (!last) return { last: null };
+  const days = (Date.parse(localDateInput()) - Date.parse(last)) / 86400000;
+  return days > 31 ? { last } : null;
+}
+
+function v155AttentionItems() {
+  const items = [];
+  const due = maintenanceDue();
+  if (due.length === 1) {
+    const task = due[0];
+    items.push({ kind: maintenanceStatus(task) === "overdue" ? "danger" : "warn", text: maintenanceStatus(task) === "overdue" ? tr("{name} is overdue (was due {date})", { name: task.title, date: formatDateLabel(task.nextDue) }) : tr("{name} is due {date}", { name: task.title, date: formatDateLabel(task.nextDue) }), view: "maintenanceView" });
+  } else if (due.length > 1) {
+    items.push({ kind: due.some((t) => maintenanceStatus(t) === "overdue") ? "danger" : "warn", text: tr("{n} maintenance jobs are due", { n: due.length }), view: "maintenanceView" });
+  }
+  const backup = photoBackupDue();
+  if (backup) {
+    items.push({ kind: "warn", text: backup.last ? tr("Download a backup with photos — last one {date}", { date: formatDateLabel(backup.last) }) : tr("Download your first backup with photos"), view: "settingsView", action: "photoBackup" });
+  }
+  return items;
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.
@@ -12710,6 +12987,11 @@ export const __test = {
   groupBalancesData,
   txUsd,
   backupPhotoList,
+  maintenanceStatus,
+  maintenanceDue,
+  addMonthsToDate,
+  photoBackupDue,
+  v155AttentionItems,
   stampLbpRates,
   dataHealthIssues,
   findDuplicatePayment,

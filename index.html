@@ -305,6 +305,9 @@
             <button class="more-menu-item" type="button" data-view="issuesView" data-nav-icon="wrench">
               <span class="mm-text"><strong data-i18n="nav.issues">Problems</strong><span data-i18n="more.issuesSub">Report and follow repairs</span></span>
             </button>
+            <button class="more-menu-item owner-only" type="button" data-view="maintenanceView" data-nav-icon="calendar">
+              <span class="mm-text"><strong data-i18n="nav.maintenance">Maintenance</strong><span data-i18n="more.maintenanceSub">Inspections, cleanings, renewals</span></span>
+            </button>
             <button class="more-menu-item owner-only" type="button" data-view="reportsView" data-nav-icon="barChart">
               <span class="mm-text"><strong data-i18n="nav.reports">Reports</strong><span data-i18n="more.reportsSub">Annual report, cash count, history</span></span>
             </button>
@@ -381,6 +384,18 @@
             <button class="primary-button hidden" id="newIssueButton" type="button" data-i18n="issues.new">+ Report</button>
           </div>
           <div class="notice-list" id="issuesList"></div>
+        </section>
+
+        <section class="view sub-view" id="maintenanceView" aria-labelledby="maintenanceTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="maintenanceTitle" data-i18n="nav.maintenance">Maintenance</h2>
+            </div>
+            <button class="primary-button" id="newMaintenanceButton" type="button" data-i18n="maint.new">+ Add</button>
+          </div>
+          <div class="notice-list" id="maintenanceList"></div>
         </section>
 
         <section class="view sub-view" id="reportsView" aria-labelledby="reportsTitle">
