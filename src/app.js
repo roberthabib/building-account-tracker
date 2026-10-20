@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v160";
+const APP_VERSION = "v161";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -116,7 +116,6 @@ const els = {
   transactionExpenseCategory: document.querySelector("#transactionExpenseCategory"),
   expenseCategoryDropdownButton: document.querySelector("#expenseCategoryDropdownButton"),
   expenseCategoryDropdown: document.querySelector("#expenseCategoryDropdown"),
-  lastReceiptButton: document.querySelector("#lastReceiptButton"),
   addMonthButton: document.querySelector("#addMonthButton"),
   monthDialog: document.querySelector("#monthDialog"),
   monthForm: document.querySelector("#monthForm"),
@@ -513,7 +512,6 @@ const I18N = {
     // Payments view
     "pay.eyebrow": "Collections",
     "pay.title": "Monthly Payments",
-    "pay.lastReceipt": "Last Receipt",
     "pay.dueOnly": "Due Only",
     "pay.messageDue": "Message Due",
     "pay.addMonth": "Add Month",
@@ -886,7 +884,6 @@ const I18N = {
     // Payments view
     "pay.eyebrow": "التحصيل",
     "pay.title": "الدفعات الشهرية",
-    "pay.lastReceipt": "آخر إيصال",
     "pay.dueOnly": "المتأخرون فقط",
     "pay.messageDue": "تذكير المتأخرين",
     "pay.addMonth": "إضافة شهر",
@@ -5575,32 +5572,11 @@ function ensureAllReceiptReferences() {
   return changed;
 }
 
-function getLastReceiptablePayment() {
-  return state.transactions
-    .filter(isReceiptablePayment)
-    .slice()
-    .sort(
-      (a, b) =>
-        transactionDateValue(b).localeCompare(transactionDateValue(a)) ||
-        Number(b.sourceRow || 0) - Number(a.sourceRow || 0) ||
-        String(b.id).localeCompare(String(a.id)),
-    )[0];
-}
-
 function formatCoveredMonths(entries) {
   const months = entries.map((entry) => entry.forMonth).filter(Boolean).sort();
   if (!months.length) return "";
   if (months.length === 1) return formatMonth(months[0]);
   return `${formatMonth(months[0])} - ${formatMonth(months.at(-1))}`;
-}
-
-function printLastReceipt() {
-  const transaction = getLastReceiptablePayment();
-  if (!transaction) {
-    showToast("No tenant payment receipt found");
-    return;
-  }
-  void sharePaymentReceiptPdf(transaction.id);
 }
 
 function getPaymentReceiptData(transactionId) {
@@ -10413,7 +10389,6 @@ function attachEvents() {
     renderDashboard();
     renderPayments();
   });
-  els.lastReceiptButton.addEventListener("click", printLastReceipt);
   els.tenantSearch.addEventListener("input", renderTenants);
   els.addTenantButton.addEventListener("click", openAddTenantDialog);
   els.tenantForm.addEventListener("submit", handleTenantFormSubmit);
