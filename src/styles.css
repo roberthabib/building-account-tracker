@@ -3812,10 +3812,6 @@ body.tenant-phone .building-wide {
   margin-top: 10px;
 }
 
-.plan-card {
-  border-color: var(--primary);
-}
-
 .issue-open {
   color: var(--red-tint-text);
   background: var(--red-tint-bg);
@@ -3831,7 +3827,7 @@ body.tenant-phone .building-wide {
   background: var(--green-tint-bg);
 }
 
-.tenant-plan-line {
+.tenant-moved-line {
   display: block;
   margin-top: 2px;
   color: var(--amber);

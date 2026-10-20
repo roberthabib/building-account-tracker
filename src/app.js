@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v150";
+const APP_VERSION = "v151";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -1101,7 +1101,6 @@ const DYN_AR = {
   "Entry": "قيد",
   "Meter readings": "قراءات العدّادات",
   "Monthly expense": "مصروف شهري",
-  "Payment plan": "خطة دفع",
   "Cash count": "جرد الصندوق",
   "Notice": "إعلان",
   "Problem": "مشكلة",
@@ -1114,7 +1113,6 @@ const DYN_AR = {
   "Name": "الاسم",
   "Title": "العنوان",
   "Litres": "ليترات",
-  "Per month": "شهرياً",
   "Put back the earlier version of this record?\n\n{label}": "استعادة النسخة السابقة من هذا السجل؟\n\n{label}",
   "That record no longer exists": "هذا السجل لم يعد موجوداً",
   "Earlier version restored": "تمت استعادة النسخة السابقة",
@@ -1180,7 +1178,6 @@ const DYN_AR = {
   "Post to WhatsApp group": "نشر في مجموعة واتساب",
   "No notices yet. Post one when there's news for the residents — a water cut, maintenance work, a meeting.": "لا إعلانات بعد. انشر إعلاناً عند وجود أخبار للسكان — انقطاع مياه، أعمال صيانة، اجتماع.",
   "No notices from the building.": "لا إعلانات من إدارة المبنى.",
-  "Your payment plan": "خطة الدفع الخاصة بك",
   "Water cut on Tuesday": "انقطاع المياه يوم الثلاثاء",
   "Details for the residents": "تفاصيل للسكان",
   "Also send a phone notification to tenants": "إرسال إشعار إلى هواتف المستأجرين أيضاً",
@@ -1219,31 +1216,7 @@ const DYN_AR = {
   "No problems reported.": "لا مشاكل مُبلّغ عنها.",
   "Photo": "صورة",
   "Update": "تحديث",
-  "{amount} per month from {month}": "{amount} شهرياً ابتداءً من {month}",
-  "fully paid ✓": "مسدّدة بالكامل ✓",
-  "first instalment due by the end of {month}": "القسط الأول مستحق بنهاية {month}",
-  "behind by {amount}": "متأخر بمبلغ {amount}",
-  "on track": "ضمن الجدول",
-  "about {n} months left": "تبقّى نحو {n} أشهر",
-  "Mark this plan as finished?": "اعتبار هذه الخطة منتهية؟",
-  "Cancel this payment plan? The full balance is due again.": "إلغاء خطة الدفع هذه؟ يصبح الرصيد كاملاً مستحقاً من جديد.",
-  "Payment plan — {name}": "خطة دفع — {name}",
-  "Agreed amount": "المبلغ المتفق عليه",
-  "Balance now": "الرصيد الحالي",
-  "Should be at most (last statement)": "يجب ألا يتجاوز (آخر كشف)",
-  "Mark as finished": "اعتبارها منتهية",
-  "Cancel plan": "إلغاء الخطة",
   "Close": "إغلاق",
-  "{n} monthly instalments, on top of the normal monthly charges.": "{n} أقساط شهرية، إضافة إلى الرسوم الشهرية العادية.",
-  "Enter the amount and the monthly instalment": "أدخل المبلغ والقسط الشهري",
-  "The instalment can't be more than the total": "لا يمكن أن يتجاوز القسط المبلغ الإجمالي",
-  "Payment plan saved": "تم حفظ خطة الدفع",
-  "Agree how a tenant who is behind catches up: a fixed amount each month until the arrears are cleared, while they keep paying the normal monthly charges.": "اتفق مع المستأجر المتأخر على طريقة السداد: مبلغ ثابت كل شهر حتى تسديد المتأخرات، مع استمراره بدفع الرسوم الشهرية العادية.",
-  "Amount to pay off (USD)": "المبلغ المطلوب تسديده (دولار)",
-  "Current balance: {amount}": "الرصيد الحالي: {amount}",
-  "Per month (USD)": "شهرياً (دولار)",
-  "Starting": "ابتداءً من",
-  "Save plan": "حفظ الخطة",
   "New occupant's name": "اسم الشاغل الجديد",
   "The leaving tenant settles it": "يسدّده المستأجر المغادر",
   "Transfer it to the new occupant": "ينتقل إلى الشاغل الجديد",
@@ -1347,17 +1320,12 @@ const DYN_AR = {
   "Generator service is due soon": "صيانة المولد مستحقة قريباً",
   "{n} problem reported": "{n} مشكلة مُبلّغ عنها",
   "{n} problems reported": "{n} مشاكل مُبلّغ عنها",
-  "{n} payment plan is behind": "{n} خطة دفع متأخرة",
-  "{n} payment plans are behind": "{n} خطط دفع متأخرة",
   "The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.": "لم يعمل منبّه إبقاء قاعدة البيانات نشطة منذ {date}. تتوقف قاعدة البيانات المجانية بعد أسبوع دون نشاط.",
   "Close {month}? Its figures can't change until you reopen it.": "إقفال شهر {month}؟ لا يمكن تغيير أرقامه حتى تعيد فتحه.",
   "Payment received": "تم استلام الدفعة",
   "{amount} recorded — thank you.": "تم تسجيل {amount} — شكراً لك.",
-  "Plan": "الخطة",
   "Move out": "مغادرة",
   "Moved out {date}": "غادر بتاريخ {date}",
-  "Your payment plan: {text}": "خطة الدفع الخاصة بك: {text}",
-  "payment plan": "خطة دفع",
   "view only": "اطلاع فقط",
   "You've been invited to help manage this building. Continue with Google to accept.": "تمت دعوتك للمساعدة في إدارة هذا المبنى. تابع عبر Google للقبول.",
   "That invite could not be used": "تعذّر استخدام هذه الدعوة",
@@ -2274,7 +2242,6 @@ function hydrateState(rawState) {
   hydrated.cashChecks ||= [];
   hydrated.announcements ||= [];
   hydrated.issues ||= [];
-  hydrated.paymentPlans ||= [];
   hydrated.generatorServices ||= [];
   hydrated.settings.sharedExpensesEnabled = false; // v108: merged into unified Expenses model
   if (hydrated.setupComplete === undefined) {
@@ -4920,7 +4887,6 @@ function renderTenants() {
           <button class="text-link-btn edit-tenant-button" type="button"></button>
           <button class="text-link-btn print-statement-button" type="button"></button>
           <button class="text-link-btn invite-tenant-button owner-only" type="button"></button>
-          <button class="text-link-btn plan-tenant-button owner-only" type="button"></button>
           <button class="text-link-btn moveout-tenant-button owner-only" type="button"></button>
         </div>
       `;
@@ -4936,11 +4902,6 @@ function renderTenants() {
       card.querySelector(".print-statement-button").textContent = tr("Statement");
       card.querySelector(".invite-tenant-button").textContent = tr("Invite");
       card.querySelector(".invite-tenant-button").dataset.tenantId = tenant.id;
-      const plan = activePlanFor(tenant.id);
-      const planBtn = card.querySelector(".plan-tenant-button");
-      planBtn.textContent = plan ? tr("Plan") : tr("Payment plan");
-      planBtn.dataset.tenantId = tenant.id;
-      planBtn.classList.toggle("hidden", tenant.active === false || (!plan && totals.dueUsd <= 0.005));
       const moveBtn = card.querySelector(".moveout-tenant-button");
       moveBtn.textContent = tr("Move out");
       moveBtn.dataset.tenantId = tenant.id;
@@ -4951,8 +4912,7 @@ function renderTenants() {
       const coeffLabel = tenant.coefficient > 0 ? ` · ${tenant.coefficient}/1000` : "";
       const breakerLabel = tenant.breakerAmps > 0 ? ` · ${tenant.breakerAmps}A` : "";
       unitSpan.textContent = `${tr("Unit {unit}", { unit: tenant.unit })}${coeffLabel}${breakerLabel}${tenant.phone ? "" : ` · ${tr("no phone")}`}`;
-      if (tenant.movedOutOn) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-plan-line", text: tr("Moved out {date}", { date: formatDateLabel(tenant.movedOutOn) }) }));
-      else if (plan) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-plan-line", text: `${tr("Payment plan")}: ${planStatusText(plan)}` }));
+      if (tenant.movedOutOn) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-moved-line", text: tr("Moved out {date}", { date: formatDateLabel(tenant.movedOutOn) }) }));
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
@@ -7756,7 +7716,6 @@ function mergeStates(local, remote) {
   merged.cashChecks = mergeById(older.cashChecks, newer.cashChecks, merged.deleted.cashChecks);
   merged.announcements = mergeById(older.announcements, newer.announcements, merged.deleted.announcements);
   merged.issues = mergeByStamp(older.issues, newer.issues, merged.deleted.issues, "updatedAt");
-  merged.paymentPlans = mergeById(older.paymentPlans, newer.paymentPlans);
   merged.generatorServices = mergeById(older.generatorServices, newer.generatorServices);
   merged.meta = {
     rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
@@ -7927,8 +7886,7 @@ function buildGroupBalancesMessage() {
       : advanceUsd > 0.005
         ? tr("paid up ✓ (credit {amount})", { amount: formatUsd(advanceUsd) })
         : tr("paid up ✓");
-    const planNote = activePlanFor(t.id) && dueUsd > 0.005 ? ` (${tr("payment plan")})` : "";
-    lines.push(`• ${tr("Unit {unit}", { unit: t.unit || "" })} – ${t.name}: ${status}${planNote}`);
+    lines.push(`• ${tr("Unit {unit}", { unit: t.unit || "" })} – ${t.name}: ${status}`);
   });
   lines.push("", tr("Total outstanding: {amount}", { amount: formatUsd(roundUsd(totalDue)) }));
   return lines.join("\n");
@@ -7938,7 +7896,6 @@ function reminderMessage(tenant, amount, month) {
   return [
     tr("{building} – Payment Reminder", { building: state.building?.name || "" }),
     tr("Hi {name}, your outstanding balance{monthLine} is {amount}.", { name: tenant.name, monthLine: month ? tr(" as of the {month} statement", { month: formatMonth(month) }) : "", amount: formatUsd(amount) }),
-    ...(activePlanFor(tenant.id) ? [tr("Your payment plan: {text}", { text: planStatusText(activePlanFor(tenant.id)) })] : []),
     tr("Please settle at your earliest convenience. Thank you."),
   ].join("\n");
 }
@@ -8006,7 +7963,7 @@ function buildGroupBalancesPdf() {
   const C = {
     green: "#163832", primary: "#1f6b5a", tint: "#eef4ef", zebra: "#f6f9f7", white: "#ffffff", ink: "#14211f",
     muted: "#61706b", soft: "#cfe3db", red: "#a23b3b", redBg: "#f6dede", okText: "#0f513f", okBg: "#dcefe8",
-    blue: "#315f9d", blueBg: "#e3ecf7", amber: "#6e4410", amberBg: "#f7e6c7",
+    blue: "#315f9d", blueBg: "#e3ecf7",
   };
   const W = 595;
   const left = 40;
@@ -8018,7 +7975,7 @@ function buildGroupBalancesPdf() {
     .sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || ""), undefined, { numeric: true }))
     .map((t) => {
       const { dueUsd, advanceUsd } = getTenantTotals(t.id);
-      const status = dueUsd > 0.005 ? (activePlanFor(t.id) ? "plan" : "due") : advanceUsd > 0.005 ? "credit" : "paid";
+      const status = dueUsd > 0.005 ? "due" : advanceUsd > 0.005 ? "credit" : "paid";
       return { tenant: t, dueUsd, advanceUsd, status };
     });
   const totalDue = roundUsd(rows.reduce((s, r) => s + r.dueUsd, 0));
@@ -8027,7 +7984,6 @@ function buildGroupBalancesPdf() {
   const dateLabel = formatDateLabel(localDateInput());
   const PILL = {
     due: ["Due", C.redBg, C.red],
-    plan: ["Payment plan", C.amberBg, C.amber],
     credit: ["In credit", C.blueBg, C.blue],
     paid: ["Paid up", C.okBg, C.okText],
   };
@@ -10014,8 +9970,6 @@ function attachEvents() {
     showToast("Tenant PIN removed");
   });
   els.tenantList.addEventListener("click", (event) => {
-    const planBtn = event.target.closest(".plan-tenant-button[data-tenant-id]");
-    if (planBtn) { openPlanDialog(planBtn.dataset.tenantId); return; }
     const moveBtn = event.target.closest(".moveout-tenant-button[data-tenant-id]");
     if (moveBtn) { openMoveOutDialog(moveBtn.dataset.tenantId); return; }
     const inviteBtn = event.target.closest(".invite-tenant-button[data-tenant-id]");
@@ -10506,7 +10460,7 @@ function attachEvents() {
 // v148 — running the building long-term
 //   Month locks and the change history both come from one before/after diff
 //   taken in saveState. Then: cash counts, generator fuel efficiency and
-//   service reminders, notices, problem reports, payment plans, move-outs,
+//   service reminders, notices, problem reports, move-outs,
 //   extra administrators, reports (spending trends, annual report),
 //   share-weighted polls, phone notifications and a keep-alive watch.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -10636,7 +10590,6 @@ const TRACKED_COLLECTIONS = [
   ["buildingProjects", "project"],
   ["serviceReadings", "reading"],
   ["recurringExpenses", "recurring"],
-  ["paymentPlans", "plan"],
   ["cashChecks", "cashCheck"],
   ["announcements", "notice"],
   ["issues", "issue"],
@@ -10809,7 +10762,7 @@ function monthToClose() {
 // ── Change history ──────────────────────────────────────────────────────────
 const AUDIT_KIND_LABELS = {
   transaction: "Entry", tenant: "Tenant", project: "Project", reading: "Meter readings", recurring: "Monthly expense",
-  plan: "Payment plan", cashCheck: "Cash count", notice: "Notice", issue: "Problem", genService: "Generator service",
+  cashCheck: "Cash count", notice: "Notice", issue: "Problem", genService: "Generator service",
   monthLock: "Month lock", poll: "Poll", budget: "Monthly budget", settings: "Settings", many: "Many records",
 };
 
@@ -10825,7 +10778,6 @@ function describeRecord(kind, record) {
     case "project": return record.name || "";
     case "reading": return formatMonth(record.forMonth);
     case "recurring": return record.description || "";
-    case "plan": return `${tenantName(record.tenantId)} · ${formatUsd(record.totalUsd)}`;
     case "cashCheck": return `${formatDateLabel(record.date)} · ${formatUsd(record.countedUsd)}`;
     case "notice": return record.title || "";
     case "issue": return record.title || "";
@@ -10843,7 +10795,7 @@ const AUDIT_FIELD_LABELS = {
   date: "Date", forMonth: "Month", tenantId: "Tenant", supplier: "Supplier", invoice: "Invoice", expenseCategory: "Expense category",
   name: "Name", unit: "Unit", coefficient: "Coefficient", breakerAmps: "Breaker (A)", phone: "Phone", active: "Active",
   status: "Status", title: "Title", expectedUsd: "Expected (USD)", collectionMode: "Collection mode", defaultDueUsd: "Monthly budget",
-  lbpPerUsd: "LBP per USD", litres: "Litres", totalUsd: "Total", instalmentUsd: "Per month", closed: "Closed", amount: "Amount",
+  lbpPerUsd: "LBP per USD", litres: "Litres", totalUsd: "Total", closed: "Closed", amount: "Amount",
 };
 const AUDIT_SKIP_FIELDS = new Set(["balanceUsd", "balanceLbp", "shares", "sourceRow", "invoiceAttachment", "pinHash", "updatedAt", "lines", "votes", "voteCounts", "at", "by"]);
 
@@ -11221,13 +11173,9 @@ function renderTenantDashboardExtras() {
   if (!els.tenantNoticesPanel) return;
   const isTenant = sessionMode === "tenant" && sessionTenantId;
   const notices = isTenant ? activeNotices().slice(0, 3) : [];
-  const plan = isTenant ? activePlanFor(sessionTenantId) : null;
   const myIssues = isTenant ? (state.issues || []).filter((i) => i.tenantId === sessionTenantId && i.status !== "fixed") : [];
   const blocks = [
     ...notices.map((n) => buildNoticeCard(n, { compact: true })),
-    plan ? mk("article", { className: "notice-card plan-card" },
-      mk("div", { className: "notice-head" }, mk("strong", { text: tr("Your payment plan") })),
-      mk("p", { className: "notice-body", text: planStatusText(plan) })) : null,
     ...myIssues.map((issue) => mk("article", { className: "notice-card" },
       mk("div", { className: "notice-head" }, mk("strong", { text: issue.title }), issueStatusPill(issue.status)),
       issue.ownerNote ? mk("p", { className: "notice-body", text: issue.ownerNote }) : null)),
@@ -11392,106 +11340,6 @@ function renderIssues() {
     if (actions.childNodes.length) card.append(actions);
     return card;
   }));
-}
-
-// ── Payment plans ───────────────────────────────────────────────────────────
-function activePlanFor(tenantId) {
-  return (state.paymentPlans || []).find((p) => p.tenantId === tenantId && p.status === "active") || null;
-}
-
-function monthsBetween(fromMonth, toMonth) {
-  const [fy, fm] = monthKey(fromMonth).split("-").map(Number);
-  const [ty, tm] = monthKey(toMonth).split("-").map(Number);
-  return (ty - fy) * 12 + (tm - fm);
-}
-
-// The plan schedules the balance down by one instalment per completed month.
-// Measured at the last statement (month end), so charges added this month do
-// not make a tenant look behind before they are due.
-function planProgress(plan) {
-  const statementMonth = getLastCompletedMonth();
-  const completed = Math.max(0, monthsBetween(plan.startMonth, statementMonth) + 1);
-  const scheduled = roundUsd(Math.max(0, Number(plan.totalUsd || 0) - completed * Number(plan.instalmentUsd || 0)));
-  const statementBalance = completed > 0 ? getTenantMonthEndBalance(plan.tenantId, statementMonth) : Number(plan.totalUsd || 0);
-  const currentBalance = getTenantBalance(plan.tenantId);
-  const behindBy = roundUsd(Math.max(0, statementBalance - scheduled));
-  const monthsLeft = Number(plan.instalmentUsd || 0) > 0 ? Math.ceil(Math.max(0, currentBalance) / Number(plan.instalmentUsd)) : 0;
-  return { completed, scheduled, statementBalance, currentBalance, behindBy, monthsLeft, done: currentBalance <= 0.005, started: completed > 0 };
-}
-
-function planStatusText(plan) {
-  const p = planProgress(plan);
-  const base = tr("{amount} per month from {month}", { amount: formatUsd(plan.instalmentUsd), month: formatMonth(plan.startMonth) });
-  if (p.done) return `${base} · ${tr("fully paid ✓")}`;
-  if (!p.started) return `${base} · ${tr("first instalment due by the end of {month}", { month: formatMonth(plan.startMonth) })}`;
-  return p.behindBy > 0.5
-    ? `${base} · ${tr("behind by {amount}", { amount: formatUsd(p.behindBy) })}`
-    : `${base} · ${tr("on track")} · ${tr("about {n} months left", { n: p.monthsLeft })}`;
-}
-
-function plansBehind() {
-  return (state.paymentPlans || []).filter((p) => p.status === "active" && state.tenants.some((t) => t.id === p.tenantId))
-    .filter((p) => { const pr = planProgress(p); return pr.started && !pr.done && pr.behindBy > 0.5; });
-}
-
-function openPlanDialog(tenantId) {
-  const tenant = state.tenants.find((t) => t.id === tenantId);
-  if (!tenant || sessionMode !== "owner") return;
-  const plan = activePlanFor(tenantId);
-  if (plan) {
-    const p = planProgress(plan);
-    const end = (status) => {
-      if (!window.confirm(status === "done" ? tr("Mark this plan as finished?") : tr("Cancel this payment plan? The full balance is due again."))) return;
-      plan.status = status;
-      plan.endedAt = new Date().toISOString();
-      if (!saveState()) return;
-      closeToolDialog();
-      renderAll();
-    };
-    openToolDialog(tr("Payment plan — {name}", { name: tenant.name }),
-      note(planStatusText(plan)),
-      mk("div", { className: "cash-result" },
-        mk("div", {}, mk("span", { text: tr("Agreed amount") }), mk("b", { className: "tnum", text: formatUsd(plan.totalUsd) })),
-        mk("div", {}, mk("span", { text: tr("Balance now") }), mk("b", { className: "tnum", text: formatUsd(p.currentBalance) })),
-        p.started ? mk("div", {}, mk("span", { text: tr("Should be at most (last statement)") }), mk("b", { className: "tnum", text: formatUsd(p.scheduled) })) : null),
-      plan.note ? note(plan.note) : null,
-      mk("div", { className: "button-row" },
-        p.done ? primaryButton(tr("Mark as finished"), () => end("done")) : null,
-        mk("button", { type: "button", className: "danger-button", text: tr("Cancel plan"), onclick: () => end("cancelled") }),
-        secondaryButton(tr("Close"), closeToolDialog)));
-    return;
-  }
-  const balance = Math.max(0, getTenantBalance(tenantId));
-  const total = numberInput(balance ? balance.toFixed(2) : "");
-  const instalment = numberInput("");
-  const start = mk("input", { type: "month", value: monthKey(currentMonthValue()) });
-  const memo = textInput("", { placeholder: tr("Optional") });
-  const preview = note("");
-  const update = () => {
-    const t = Number(total.value || 0);
-    const i = Number(instalment.value || 0);
-    preview.textContent = t > 0 && i > 0 ? tr("{n} monthly instalments, on top of the normal monthly charges.", { n: Math.ceil(t / i) }) : "";
-  };
-  [total, instalment].forEach((input) => input.addEventListener("input", update));
-  const save = () => {
-    const t = Number(total.value || 0);
-    const i = Number(instalment.value || 0);
-    if (!(t > 0) || !(i > 0)) { showToast("Enter the amount and the monthly instalment"); return; }
-    if (i > t) { showToast("The instalment can't be more than the total"); return; }
-    (state.paymentPlans ||= []).push({ id: newId("plan"), tenantId, totalUsd: roundUsd(t), instalmentUsd: roundUsd(i), startMonth: monthIso(start.value) || currentMonthValue(), note: memo.value.trim(), status: "active", createdAt: new Date().toISOString() });
-    if (!saveState()) return;
-    closeToolDialog();
-    renderAll();
-    showToast("Payment plan saved");
-  };
-  openToolDialog(tr("Payment plan — {name}", { name: tenant.name }),
-    note(tr("Agree how a tenant who is behind catches up: a fixed amount each month until the arrears are cleared, while they keep paying the normal monthly charges.")),
-    field(tr("Amount to pay off (USD)"), total, tr("Current balance: {amount}", { amount: formatUsd(balance) })),
-    field(tr("Per month (USD)"), instalment),
-    field(tr("Starting"), start),
-    field(tr("Note"), memo),
-    preview,
-    mk("div", { className: "button-row" }, primaryButton(tr("Save plan"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
 }
 
 // ── Moving in and out ───────────────────────────────────────────────────────
@@ -12091,8 +11939,6 @@ function extraAttentionItems() {
   if (service) items.push({ kind: service.overdue ? "danger" : "warn", text: service.overdue ? tr("Generator service is overdue") : tr("Generator service is due soon"), view: "servicesView" });
   const openIssues = (state.issues || []).filter((i) => i.status === "open");
   if (openIssues.length) items.push({ kind: "warn", text: tr(openIssues.length === 1 ? "{n} problem reported" : "{n} problems reported", { n: openIssues.length }), view: "issuesView" });
-  const behind = plansBehind();
-  if (behind.length) items.push({ kind: "due", text: tr(behind.length === 1 ? "{n} payment plan is behind" : "{n} payment plans are behind", { n: behind.length }), view: "tenantsView" });
   if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView" });
   return items;
 }
@@ -12247,8 +12093,6 @@ export const __test = {
   diffStates,
   recordMonths,
   isMonthClosed,
-  planProgress,
-  planStatusText,
   generatorEfficiencyRows,
   generatorEfficiencyWarning,
   spendingByYear,

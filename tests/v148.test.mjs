@@ -69,26 +69,6 @@ test("diff ignores poll votes but sees settings changes", () => {
   assert.deepEqual(changes.map((c) => c.kind), ["settings"]);
 });
 
-test("payment plan: on track when the balance follows the schedule, behind otherwise", () => {
-  // Plan of $300 at $100/month starting two months before the last statement.
-  const lastStatement = (() => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 1); return d; })();
-  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
-  const start = new Date(lastStatement); start.setMonth(start.getMonth() - 1);
-  const plan = { id: "plan1", tenantId: "a", totalUsd: 300, instalmentUsd: 100, startMonth: iso(start), status: "active" };
-  // Opening debt of 300 before the plan, nothing paid: two instalments missed.
-  const debt = { id: "ob", category: "Opening Balance", tenantId: "a", date: "2020-01-01", debitUsd: 300, creditUsd: 0, debitLbp: 0, creditLbp: 0, balanceUsd: -300, balanceLbp: 0 };
-  app.setState(baseState({ tenants: [T("a", 1000)], transactions: [debt], paymentPlans: [plan] }));
-  let p = app.planProgress(plan);
-  assert.equal(p.completed, 2);
-  assert.equal(p.scheduled, 100);
-  assert.equal(p.behindBy, 200);
-  // Paying the two instalments by the last statement puts it on track.
-  app.setState(baseState({ tenants: [T("a", 1000)], transactions: [debt, payment("p1", "a", iso(start).replace(/01$/, "15"), 100), payment("p2", "a", iso(lastStatement).replace(/01$/, "15"), 100)], paymentPlans: [plan] }));
-  p = app.planProgress(plan);
-  assert.equal(p.behindBy, 0);
-  assert.match(app.planStatusText(plan), /on track/);
-});
-
 test("move-out: fixed dues follow the occupant month by month", () => {
   app.setState(baseState({
     settings: { collectionMode: "fixed", defaultDueUsd: 1000, lbpPerUsd: 100000, language: "en" },
