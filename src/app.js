@@ -4063,7 +4063,7 @@ async function declarePayment(tenantId, month, amount, proof = null) {
     ...(proof ? { proof } : {}),
   };
   if (isTenantSession()) {
-    await supabaseRequest("rpc/declare_my_payment", { method: "POST", body: JSON.stringify({ p_month: month, p_amount: Number(amount), p_proof_path: proof?.storagePath || null }) });
+    await supabaseRequest("rpc/declare_my_payment", { method: "POST", body: JSON.stringify({ p_month: month, p_amount: Number(amount), ...(proof?.storagePath ? { p_proof_path: proof.storagePath } : {}) }) });
     showToast("Owner notified of your payment");
     syncFromSheet({ silent: true });
     return;
