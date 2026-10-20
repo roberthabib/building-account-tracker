@@ -1,4 +1,4 @@
-const CACHE_NAME = "building-account-tracker-v147";
+const CACHE_NAME = "building-account-tracker-v148";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -39,5 +39,31 @@ self.addEventListener("fetch", (event) => {
         return response;
       })
       .catch(() => caches.match(event.request)),
+  );
+});
+
+// Phone notifications (see api/push.js). Payload: { title, body, url }.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data ? event.data.text() : "" }; }
+  event.waitUntil(
+    self.registration.showNotification(data.title || "Building Account Tracker", {
+      body: data.body || "",
+      icon: "./assets/icon-192.png",
+      badge: "./assets/icon-192.png",
+      data: { url: data.url || "./" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "./", self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      const open = windows.find((w) => w.url.startsWith(self.location.origin));
+      if (open) return open.focus();
+      return self.clients.openWindow(target);
+    }),
   );
 });

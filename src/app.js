@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v147";
+const APP_VERSION = "v148";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -371,6 +371,26 @@ const I18N = {
     "common.share": "Share",
     "common.download": "Download",
     "common.export": "Export",
+    "tenantNotices.title": "From the building",
+    "nav.notices": "Notices",
+    "more.noticesSub": "News for the residents",
+    "nav.issues": "Problems",
+    "more.issuesSub": "Report and follow repairs",
+    "nav.reports": "Reports",
+    "more.reportsSub": "Annual report, cash count, history",
+    "push.title": "Phone notifications",
+    "push.turnOn": "Turn on",
+    "notices.new": "+ New",
+    "issues.new": "+ Report",
+    "set.adminsTitle": "Administrators",
+    "set.adminsDesc": "Give a family member or the building committee their own sign-in — full access or view only.",
+    "tx.litres": "Litres of diesel (optional)",
+    "gen.engineHours": "Generator hour meter (optional)",
+    "poll.weighting": "How votes count",
+    "poll.byUnit": "One vote per unit",
+    "poll.byShare": "By ownership share (coefficient)",
+    "poll.closes": "Voting closes on (optional)",
+    "poll.quorum": "Minimum turnout % (optional)",
     "wa.groupButton": "Post all balances to the building group",
     "invite.whatsapp": "Send on WhatsApp",
     "tx.repeatMonthly": "Repeat every month (salary, cleaning, internet…)",
@@ -697,6 +717,26 @@ const I18N = {
     "common.share": "مشاركة",
     "common.download": "تنزيل",
     "common.export": "تصدير",
+    "tenantNotices.title": "من إدارة المبنى",
+    "nav.notices": "الإعلانات",
+    "more.noticesSub": "أخبار للسكان",
+    "nav.issues": "المشاكل",
+    "more.issuesSub": "الإبلاغ عن الأعطال ومتابعتها",
+    "nav.reports": "التقارير",
+    "more.reportsSub": "التقرير السنوي، جرد الصندوق، السجل",
+    "push.title": "إشعارات الهاتف",
+    "push.turnOn": "تفعيل",
+    "notices.new": "+ جديد",
+    "issues.new": "+ إبلاغ",
+    "set.adminsTitle": "المسؤولون",
+    "set.adminsDesc": "امنح أحد أفراد العائلة أو لجنة المبنى دخولاً خاصاً — صلاحية كاملة أو اطلاع فقط.",
+    "tx.litres": "ليترات المازوت (اختياري)",
+    "gen.engineHours": "عدّاد ساعات المولد (اختياري)",
+    "poll.weighting": "كيف تُحتسب الأصوات",
+    "poll.byUnit": "صوت واحد لكل وحدة",
+    "poll.byShare": "حسب حصة الملكية (المعامل)",
+    "poll.closes": "يُغلق التصويت في (اختياري)",
+    "poll.quorum": "الحد الأدنى للمشاركة % (اختياري)",
     "wa.groupButton": "نشر كل الأرصدة في مجموعة المبنى",
     "invite.whatsapp": "إرسال عبر واتساب",
     "tx.repeatMonthly": "تكرار كل شهر (راتب، تنظيف، إنترنت…)",
@@ -1035,6 +1075,278 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "You have view-only access. Changes aren't saved.": "لديك صلاحية الاطلاع فقط. لا تُحفظ التغييرات.",
+  "{month} is closed. Reopen it in Reports before changing it.": "شهر {month} مُقفل. أعد فتحه من التقارير قبل تعديله.",
+  "Reopen {month}? Its figures can then be changed again.": "إعادة فتح شهر {month}؟ يمكن بعدها تعديل أرقامه من جديد.",
+  "{month} closed": "تم إقفال شهر {month}",
+  "{month} reopened": "أُعيد فتح شهر {month}",
+  "Entry": "قيد",
+  "Meter readings": "قراءات العدّادات",
+  "Monthly expense": "مصروف شهري",
+  "Payment plan": "خطة دفع",
+  "Cash count": "جرد الصندوق",
+  "Notice": "إعلان",
+  "Problem": "مشكلة",
+  "Generator service": "صيانة المولد",
+  "Month lock": "إقفال شهر",
+  "Settings": "الإعدادات",
+  "Many records": "سجلات عديدة",
+  "Building settings": "إعدادات المبنى",
+  "Amount LBP": "المبلغ بالليرة",
+  "Name": "الاسم",
+  "Title": "العنوان",
+  "Litres": "ليترات",
+  "Per month": "شهرياً",
+  "Put back the earlier version of this record?\n\n{label}": "استعادة النسخة السابقة من هذا السجل؟\n\n{label}",
+  "That record no longer exists": "هذا السجل لم يعد موجوداً",
+  "Earlier version restored": "تمت استعادة النسخة السابقة",
+  "Change history": "سجل التغييرات",
+  "Nothing recorded yet. From now on every addition, change and deletion is listed here with the date and who made it.": "لا شيء مسجّل بعد. من الآن، تظهر هنا كل إضافة وتعديل وحذف مع التاريخ ومن قام به.",
+  "Added": "إضافة",
+  "Changed": "تعديل",
+  "Deleted": "حذف",
+  "Replaced": "استبدال",
+  "{n} records at once (restore, import or clear)": "{n} سجل دفعة واحدة (استعادة أو استيراد أو مسح)",
+  "by {who}": "بواسطة {who}",
+  "Undo": "تراجع",
+  "Undone": "تم التراجع",
+  "Show more": "عرض المزيد",
+  "Every addition, change and deletion, newest first.": "كل إضافة وتعديل وحذف، الأحدث أولاً.",
+  "Optional": "اختياري",
+  "You counted": "ما عددته",
+  "The books say": "ما تقوله الدفاتر",
+  "Matches": "مطابق",
+  "More than expected": "أكثر من المتوقع",
+  "Missing": "نقص",
+  "Enter what you counted": "أدخل ما عددته",
+  "Cash count saved — it matches the books": "تم حفظ الجرد — مطابق للدفاتر",
+  "Cash count saved — difference {amount}": "تم حفظ الجرد — الفرق {amount}",
+  "Count the cash": "جرد الصندوق",
+  "Count the cash box and check the bank balance. The app compares the total with what the books say you should have.": "عُدّ ما في الصندوق وتحقق من رصيد المصرف. يقارن التطبيق المجموع بما يجب أن يكون لديك حسب الدفاتر.",
+  "Cash in USD": "نقداً بالدولار",
+  "Cash in LBP": "نقداً بالليرة",
+  "Converted at {rate} LBP/USD": "محوّل على سعر {rate} ل.ل/دولار",
+  "Bank balance (USD)": "رصيد المصرف (دولار)",
+  "Note": "ملاحظة",
+  "Save count": "حفظ الجرد",
+  "Cancel": "إلغاء",
+  "Delete this cash count?": "حذف هذا الجرد؟",
+  "Generator: {month} gave {value} kWh per litre, {pct}% below usual ({base}). Check for leaks, theft or an engine problem.": "المولد: أعطى في {month} ‏{value} ك.و.س لكل ليتر، أقل بـ {pct}% من المعتاد ({base}). تحقق من تسرّب أو سرقة أو عطل في المحرك.",
+  "Generator: fuel cost per kWh in {month} is {pct}% above usual. Diesel price, or a leak or theft?": "المولد: كلفة المازوت لكل ك.و.س في {month} أعلى بـ {pct}% من المعتاد. سعر المازوت، أم تسرّب أو سرقة؟",
+  "Fuel efficiency": "كفاءة الوقود",
+  "Last {n} months": "آخر {n} أشهر",
+  "kWh / litre": "ك.و.س / ليتر",
+  "$ / kWh": "$ / ك.و.س",
+  "Tip: type the litres when you record a diesel purchase to see kWh per litre — the clearest sign of leaks or theft.": "نصيحة: أدخل عدد الليترات عند تسجيل شراء المازوت لترى الكيلوواط لكل ليتر — أوضح مؤشر على التسرّب أو السرقة.",
+  "Oil and filter change": "تغيير الزيت والفلتر",
+  "Say what was done": "اذكر ما تم إنجازه",
+  "Generator service saved": "تم حفظ صيانة المولد",
+  "Record each service. The app reminds you when the next one is due, by running hours or by date — whichever comes first.": "سجّل كل صيانة. يذكّرك التطبيق بموعد الصيانة التالية حسب ساعات التشغيل أو التاريخ — أيهما يأتي أولاً.",
+  "Hour meter reading": "قراءة عدّاد الساعات",
+  "Last known: {hours} h": "آخر قراءة: {hours} ساعة",
+  "Work done": "العمل المنجز",
+  "Cost (USD, optional — record the expense separately)": "الكلفة (دولار، اختياري — سجّل المصروف بشكل منفصل)",
+  "Next service at (hours)": "الصيانة التالية عند (ساعات)",
+  "or by date": "أو بحلول تاريخ",
+  "Save service": "حفظ الصيانة",
+  "{hours} h": "{hours} ساعة",
+  "Last: {date} · {work}": "آخر صيانة: {date} · {work}",
+  "No service recorded yet": "لا صيانة مسجّلة بعد",
+  "Record service": "تسجيل صيانة",
+  "Hour meter: {hours} h": "عدّاد الساعات: {hours} ساعة",
+  "Next at {hours} h": "التالية عند {hours} ساعة",
+  "or by {date}": "أو بحلول {date}",
+  "Service is overdue.": "الصيانة متأخرة.",
+  "Service is due soon.": "الصيانة مستحقة قريباً.",
+  "Until {date}": "حتى {date}",
+  "Post to WhatsApp group": "نشر في مجموعة واتساب",
+  "No notices yet. Post one when there's news for the residents — a water cut, maintenance work, a meeting.": "لا إعلانات بعد. انشر إعلاناً عند وجود أخبار للسكان — انقطاع مياه، أعمال صيانة، اجتماع.",
+  "No notices from the building.": "لا إعلانات من إدارة المبنى.",
+  "Your payment plan": "خطة الدفع الخاصة بك",
+  "Water cut on Tuesday": "انقطاع المياه يوم الثلاثاء",
+  "Details for the residents": "تفاصيل للسكان",
+  "Also send a phone notification to tenants": "إرسال إشعار إلى هواتف المستأجرين أيضاً",
+  "Give the notice a title": "أعطِ الإعلان عنواناً",
+  "Notice posted": "تم نشر الإعلان",
+  "Tenants see it on their phones. Post it to the building's WhatsApp group too?": "يراه المستأجرون على هواتفهم. هل تنشره أيضاً في مجموعة واتساب المبنى؟",
+  "Done": "تم",
+  "New notice": "إعلان جديد",
+  "Message": "الرسالة",
+  "Show until (optional)": "يُعرض حتى (اختياري)",
+  "Without a date it shows for 60 days.": "بدون تاريخ يُعرض لمدة 60 يوماً.",
+  "Post notice": "نشر الإعلان",
+  "Delete this notice?": "حذف هذا الإعلان؟",
+  "In progress": "قيد المعالجة",
+  "Fixed": "تم الإصلاح",
+  "Photo upload failed ({status})": "فشل رفع الصورة ({status})",
+  "Link this phone with an invite code to report problems": "اربط هذا الهاتف برمز دعوة للإبلاغ عن المشاكل",
+  "Leak under the stairs": "تسرّب تحت الدرج",
+  "Where, since when, how bad": "أين، منذ متى، ومدى خطورته",
+  "Describe the problem in a few words": "صف المشكلة ببضع كلمات",
+  "Sent to the building owner": "أُرسل إلى مالك المبنى",
+  "Problem recorded": "تم تسجيل المشكلة",
+  "Report a problem": "الإبلاغ عن مشكلة",
+  "The owner gets your report and you can follow its status here.": "يصل بلاغك إلى المالك ويمكنك متابعة حالته هنا.",
+  "A building problem everyone can see, like a broken lift.": "مشكلة في المبنى يراها الجميع، كتعطّل المصعد.",
+  "What's wrong?": "ما المشكلة؟",
+  "Details": "التفاصيل",
+  "Photo (optional)": "صورة (اختياري)",
+  "e.g. The plumber comes on Thursday": "مثلاً: يأتي السمكري يوم الخميس",
+  "Problem update: {title}": "تحديث المشكلة: {title}",
+  "Problem updated": "تم تحديث المشكلة",
+  "Delete this problem report?": "حذف بلاغ المشكلة هذا؟",
+  "Reported by {name} on {date}": "أبلغ عنها {name} بتاريخ {date}",
+  "Building problem": "مشكلة في المبنى",
+  "Note for the resident": "ملاحظة للساكن",
+  "No problems reported.": "لا مشاكل مُبلّغ عنها.",
+  "Photo": "صورة",
+  "Update": "تحديث",
+  "{amount} per month from {month}": "{amount} شهرياً ابتداءً من {month}",
+  "fully paid ✓": "مسدّدة بالكامل ✓",
+  "first instalment due by the end of {month}": "القسط الأول مستحق بنهاية {month}",
+  "behind by {amount}": "متأخر بمبلغ {amount}",
+  "on track": "ضمن الجدول",
+  "about {n} months left": "تبقّى نحو {n} أشهر",
+  "Mark this plan as finished?": "اعتبار هذه الخطة منتهية؟",
+  "Cancel this payment plan? The full balance is due again.": "إلغاء خطة الدفع هذه؟ يصبح الرصيد كاملاً مستحقاً من جديد.",
+  "Payment plan — {name}": "خطة دفع — {name}",
+  "Agreed amount": "المبلغ المتفق عليه",
+  "Balance now": "الرصيد الحالي",
+  "Should be at most (last statement)": "يجب ألا يتجاوز (آخر كشف)",
+  "Mark as finished": "اعتبارها منتهية",
+  "Cancel plan": "إلغاء الخطة",
+  "Close": "إغلاق",
+  "{n} monthly instalments, on top of the normal monthly charges.": "{n} أقساط شهرية، إضافة إلى الرسوم الشهرية العادية.",
+  "Enter the amount and the monthly instalment": "أدخل المبلغ والقسط الشهري",
+  "The instalment can't be more than the total": "لا يمكن أن يتجاوز القسط المبلغ الإجمالي",
+  "Payment plan saved": "تم حفظ خطة الدفع",
+  "Agree how a tenant who is behind catches up: a fixed amount each month until the arrears are cleared, while they keep paying the normal monthly charges.": "اتفق مع المستأجر المتأخر على طريقة السداد: مبلغ ثابت كل شهر حتى تسديد المتأخرات، مع استمراره بدفع الرسوم الشهرية العادية.",
+  "Amount to pay off (USD)": "المبلغ المطلوب تسديده (دولار)",
+  "Current balance: {amount}": "الرصيد الحالي: {amount}",
+  "Per month (USD)": "شهرياً (دولار)",
+  "Starting": "ابتداءً من",
+  "Save plan": "حفظ الخطة",
+  "New occupant's name": "اسم الشاغل الجديد",
+  "The leaving tenant settles it": "يسدّده المستأجر المغادر",
+  "Transfer it to the new occupant": "ينتقل إلى الشاغل الجديد",
+  "{name} is settled in full.": "حساب {name} مسدّد بالكامل.",
+  "{name} owes {amount}.": "على {name} مبلغ {amount}.",
+  "{name} has a credit of {amount}.": "لـ {name} رصيد دائن بقيمة {amount}.",
+  "Choose the handover date": "اختر تاريخ التسليم",
+  "Enter the new occupant's name": "أدخل اسم الشاغل الجديد",
+  "Balance transferred to {name}": "رصيد محوّل إلى {name}",
+  "Balance taken over from {name}": "رصيد منقول من {name}",
+  "Handover recorded": "تم تسجيل التسليم",
+  "{old} has moved out and {new} is now the occupant of unit {unit}. From {month}, {new} pays the monthly charges.": "غادر {old} وأصبح {new} شاغل الوحدة {unit}. ابتداءً من {month} يدفع {new} الرسوم الشهرية.",
+  "Final statement for {name}": "الكشف النهائي لـ {name}",
+  "Invite {name}": "دعوة {name}",
+  "Move out — {name}": "مغادرة — {name}",
+  "Records a change of occupant for unit {unit}. The old account is kept (inactive) with its full history.": "يسجّل تغيير شاغل الوحدة {unit}. يُحتفظ بالحساب القديم (غير نشط) مع كامل سجلّه.",
+  "Handover date": "تاريخ التسليم",
+  "The leaving tenant pays up to the month before; the new occupant from this month.": "يدفع المستأجر المغادر حتى الشهر السابق، والشاغل الجديد ابتداءً من هذا الشهر.",
+  "New occupant": "الشاغل الجديد",
+  "Phone (optional)": "الهاتف (اختياري)",
+  "Generator meter at handover (optional)": "عدّاد المولد عند التسليم (اختياري)",
+  "The balance": "الرصيد",
+  "Record handover": "تسجيل التسليم",
+  "Sign in with Google as the owner to manage administrators": "سجّل الدخول عبر Google كمالك لإدارة المسؤولين",
+  "View only — sees everything, changes nothing": "اطلاع فقط — يرى كل شيء ولا يغيّر شيئاً",
+  "Full access — can change everything": "صلاحية كاملة — يمكنه تغيير كل شيء",
+  "Create invite link": "إنشاء رابط دعوة",
+  "You're invited to help manage {building} in the Building Account Tracker. Open this link on your phone and sign in with your Google account (valid 7 days, one use):\n{link}": "أنت مدعو للمساعدة في إدارة {building} على تطبيق حسابات المبنى. افتح هذا الرابط على هاتفك وسجّل الدخول بحساب Google الخاص بك (صالح 7 أيام، لمرة واحدة):\n{link}",
+  "Send on WhatsApp": "إرسال عبر واتساب",
+  "Copy link": "نسخ الرابط",
+  "Link copied": "تم نسخ الرابط",
+  "Administrators": "المسؤولون",
+  "Give a family member or the building committee their own sign-in. They use their own Google account; you can remove them at any time.": "امنح أحد أفراد العائلة أو لجنة المبنى دخولاً خاصاً بهم. يستخدمون حساب Google الخاص بهم، ويمكنك إزالتهم في أي وقت.",
+  "Invite someone": "دعوة شخص",
+  "Google only lets accounts sign in that are allowed in the app's Google settings. If they get an \"access blocked\" message, the account needs adding there first.": "لا يسمح Google بالدخول إلا للحسابات المسموح بها في إعدادات Google للتطبيق. إذا ظهرت رسالة \"تم حظر الوصول\" فيجب إضافة الحساب هناك أولاً.",
+  "View only": "اطلاع فقط",
+  "Full access": "صلاحية كاملة",
+  "You": "أنت",
+  "Remove": "إزالة",
+  "Remove {email}'s access to the building?": "إزالة وصول {email} إلى المبنى؟",
+  "Access removed": "تمت إزالة الوصول",
+  "The database update for administrators hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بالمسؤولين.",
+  "This phone or browser can't receive notifications. On an iPhone, add the app to the Home Screen first.": "لا يمكن لهذا الهاتف أو المتصفح استقبال الإشعارات. على iPhone أضف التطبيق إلى الشاشة الرئيسية أولاً.",
+  "Sign in first (Google for the owner, an invite code for tenants)": "سجّل الدخول أولاً (Google للمالك، رمز دعوة للمستأجرين)",
+  "Notifications are blocked for this site in the phone's settings": "الإشعارات محظورة لهذا الموقع في إعدادات الهاتف",
+  "Notifications aren't set up on the server yet": "الإشعارات غير مفعّلة على الخادم بعد",
+  "Notifications are on for this phone": "الإشعارات مفعّلة على هذا الهاتف",
+  "Notifications are off for this phone": "الإشعارات متوقفة على هذا الهاتف",
+  "Not available in this browser. On an iPhone, add the app to the Home Screen first.": "غير متاحة في هذا المتصفح. على iPhone أضف التطبيق إلى الشاشة الرئيسية أولاً.",
+  "On for this phone.": "مفعّلة على هذا الهاتف.",
+  "Get a notification when the owner posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المالك إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
+  "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
+  "Turn off": "إيقاف",
+  "Turn on": "تفعيل",
+  "General": "عام",
+  "No expenses recorded yet.": "لا مصاريف مسجّلة بعد.",
+  "Change": "التغيّر",
+  "{year} is the year so far.": "أرقام {year} حتى تاريخه.",
+  "Annual report {year}": "التقرير السنوي {year}",
+  "For the owners' meeting": "لاجتماع المالكين",
+  "Cash on 1 January": "النقد في 1 كانون الثاني",
+  "Money in": "المداخيل",
+  "Money out": "المصاريف",
+  "Cash on 31 December": "النقد في 31 كانون الأول",
+  "Still owed by tenants": "المستحق على المستأجرين",
+  "Month by month": "شهراً بشهر",
+  "Net": "الصافي",
+  "Where the money went": "أين صُرفت الأموال",
+  "Paid in the year": "المدفوع خلال السنة",
+  "Balances are as of the end of {month}.": "الأرصدة كما في نهاية {month}.",
+  "{building} · annual report {year}": "{building} · التقرير السنوي {year}",
+  "Annual report downloaded": "تم تنزيل التقرير السنوي",
+  "Reopen": "إعادة فتح",
+  "No months with activity yet.": "لا أشهر فيها حركة بعد.",
+  "Counted {counted} · books {expected}": "المعدود {counted} · الدفاتر {expected}",
+  "Annual report": "التقرير السنوي",
+  "Everything for the yearly owners' meeting: money in and out, where it went, the reserve, and who still owes.": "كل ما يلزم لاجتماع المالكين السنوي: المداخيل والمصاريف، أين صُرفت، الاحتياطي، ومن لا يزال مديناً.",
+  "Year": "السنة",
+  "PDF": "PDF",
+  "Excel": "Excel",
+  "Spending by year": "المصاريف حسب السنة",
+  "Cash check": "جرد الصندوق",
+  "Once a month, type what's actually in the cash box and the bank. Missing or unrecorded money shows up straight away.": "مرة في الشهر، أدخل ما هو موجود فعلاً في الصندوق والمصرف. يظهر أي نقص أو مبلغ غير مسجّل فوراً.",
+  "Close the month": "إقفال الشهر",
+  "Once you've sent a month's balances, close it. Its figures can't change by accident; to edit them you reopen the month first.": "بعد إرسال أرصدة الشهر، أقفله. لا تتغيّر أرقامه عن طريق الخطأ؛ ولتعديلها تعيد فتح الشهر أولاً.",
+  "{n} changes recorded. Every addition, change and deletion, with the date and who made it — and an Undo for mistakes.": "{n} تغيير مسجّل. كل إضافة وتعديل وحذف مع التاريخ ومن قام به — مع إمكانية التراجع عن الأخطاء.",
+  "Open the history": "فتح السجل",
+  "Counted by ownership share: YES {yes} · NO {no} · ABSTAIN {abstain} of {total}": "حسب حصة الملكية: نعم {yes} · لا {no} · امتناع {abstain} من {total}",
+  "Turnout {pct}% — quorum of {q}% reached": "المشاركة {pct}% — تم بلوغ النصاب {q}%",
+  "Turnout {pct}% — needs {q}%": "المشاركة {pct}% — المطلوب {q}%",
+  "Voting closes {date}": "يُغلق التصويت في {date}",
+  "Voting closed {date}": "أُغلق التصويت في {date}",
+  "Result: no decision (quorum not reached)": "النتيجة: لا قرار (لم يكتمل النصاب)",
+  "Result: YES": "النتيجة: نعم",
+  "Result: NO": "النتيجة: لا",
+  "Result: tie": "النتيجة: تعادل",
+  "Close {month} now that its balances are out": "أقفل شهر {month} بعد إرسال أرصدته",
+  "Count the cash — last count {date}": "جرد الصندوق — آخر جرد {date}",
+  "Count the cash once to check the books": "قم بجرد الصندوق مرة للتحقق من الدفاتر",
+  "Generator service is overdue": "صيانة المولد متأخرة",
+  "Generator service is due soon": "صيانة المولد مستحقة قريباً",
+  "{n} problem reported": "{n} مشكلة مُبلّغ عنها",
+  "{n} problems reported": "{n} مشاكل مُبلّغ عنها",
+  "{n} payment plan is behind": "{n} خطة دفع متأخرة",
+  "{n} payment plans are behind": "{n} خطط دفع متأخرة",
+  "The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.": "لم يعمل منبّه إبقاء قاعدة البيانات نشطة منذ {date}. تتوقف قاعدة البيانات المجانية بعد أسبوع دون نشاط.",
+  "Close {month}? Its figures can't change until you reopen it.": "إقفال شهر {month}؟ لا يمكن تغيير أرقامه حتى تعيد فتحه.",
+  "Payment received": "تم استلام الدفعة",
+  "{amount} recorded — thank you.": "تم تسجيل {amount} — شكراً لك.",
+  "Plan": "الخطة",
+  "Move out": "مغادرة",
+  "Moved out {date}": "غادر بتاريخ {date}",
+  "Your payment plan: {text}": "خطة الدفع الخاصة بك: {text}",
+  "payment plan": "خطة دفع",
+  "view only": "اطلاع فقط",
+  "You've been invited to help manage this building. Continue with Google to accept.": "تمت دعوتك للمساعدة في إدارة هذا المبنى. تابع عبر Google للقبول.",
+  "That invite could not be used": "تعذّر استخدام هذه الدعوة",
+  "Sign in with Google to accept an administrator invite": "سجّل الدخول عبر Google لقبول دعوة المسؤول",
+  "That invite is not valid": "هذه الدعوة غير صالحة",
+  "That invite has already been used": "تم استخدام هذه الدعوة مسبقاً",
+  "That invite has expired": "انتهت صلاحية هذه الدعوة",
   "The other tenants already use all 1000/1000. Lower someone else's coefficient first.": "المستأجرون الآخرون يستخدمون كامل الـ 1000/1000. خفّض معامل مستأجر آخر أولاً.",
   "Only {room}/1000 is left for this tenant: the total can't go over 1000/1000.": "تبقّى {room}/1000 فقط لهذا المستأجر: لا يمكن أن يتجاوز المجموع 1000/1000.",
   "Available: {room} of 1000": "المتاح: {room} من 1000",
@@ -1624,6 +1936,10 @@ const LUCIDE_ICONS = {
   plus: [["path", { d: "M5 12h14" }], ["path", { d: "M12 5v14" }]],
   camera: [["path", { d: "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" }], ["circle", { cx: 12, cy: 13, r: 3 }]],
   calendar: [["path", { d: "M8 2v4" }], ["path", { d: "M16 2v4" }], ["rect", { width: 18, height: 18, x: 3, y: 4, rx: 2 }], ["path", { d: "M3 10h18" }]],
+  megaphone: [["path", { d: "m3 11 18-5v12L3 14v-3z" }], ["path", { d: "M11.6 16.8a3 3 0 1 1-5.8-1.6" }]],
+  wrench: [["path", { d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" }]],
+  barChart: [["path", { d: "M3 3v18h18" }], ["path", { d: "M18 17V9" }], ["path", { d: "M13 17V5" }], ["path", { d: "M8 17v-3" }]],
+  bell: [["path", { d: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" }], ["path", { d: "M10.3 21a1.94 1.94 0 0 0 3.4 0" }]],
 };
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -1861,19 +2177,24 @@ function transactionNetUsd(transaction) {
 }
 
 function showToast(message, durationMs = 2200) {
+  if (Date.now() < (showToast.heldUntil || 0)) return;
   els.toast.textContent = tr(message);
   els.toast.classList.add("visible");
   window.clearTimeout(showToast.timer);
   showToast.timer = window.setTimeout(() => els.toast.classList.remove("visible"), durationMs);
 }
 
+// Returns false when the change was refused (closed month, view-only access);
+// the previous copy is then back in `state` and the caller's render shows it.
 function saveState(options = {}) {
+  if (options.sync !== false && !guardAndAuditSave()) return false;
   state.monthlyExpected = normalizedMonthlyExpected(state.monthlyExpected);
   state.meta = state.meta || {};
   state.meta.rev = Number(state.meta.rev || 0) + 1;
   state.meta.updatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   if (options.sync !== false) queueCloudSave();
+  return true;
 }
 
 function hydrateState(rawState) {
@@ -1899,6 +2220,9 @@ function hydrateState(rawState) {
   hydrated.deleted.tenants ||= [];
   hydrated.deleted.polls ||= [];
   hydrated.deleted.projects ||= [];
+  hydrated.deleted.announcements ||= [];
+  hydrated.deleted.issues ||= [];
+  hydrated.deleted.cashChecks ||= [];
   hydrated.security ||= {};
   hydrated.security.salt ||= randomToken();
   hydrated.transactions ||= [];
@@ -1927,6 +2251,13 @@ function hydrateState(rawState) {
   hydrated.sharedExpenses ||= [];
   hydrated.buildingProjects ||= [];
   hydrated.serviceReadings ||= [];
+  hydrated.auditLog ||= [];
+  hydrated.monthLocks ||= [];
+  hydrated.cashChecks ||= [];
+  hydrated.announcements ||= [];
+  hydrated.issues ||= [];
+  hydrated.paymentPlans ||= [];
+  hydrated.generatorServices ||= [];
   hydrated.settings.sharedExpensesEnabled = false; // v108: merged into unified Expenses model
   if (hydrated.setupComplete === undefined) {
     hydrated.setupComplete = Boolean(
@@ -1954,6 +2285,10 @@ function hydrateState(rawState) {
   hydrated.tenants = hydrated.tenants.filter((t) => !deletedTenants.has(t.id));
   hydrated.polls = hydrated.polls.filter((p) => !deletedPolls.has(p.id));
   hydrated.buildingProjects = hydrated.buildingProjects.filter((p) => !deletedProjects.has(p.id));
+  ["announcements", "issues", "cashChecks"].forEach((kind) => {
+    const gone = new Set(hydrated.deleted[kind]);
+    hydrated[kind] = hydrated[kind].filter((item) => !gone.has(item.id));
+  });
   hydrated.transactions.forEach((transaction) => {
     if (transaction.category === "Payments" && transaction.project) transaction.forMonth = null;
   });
@@ -2010,7 +2345,9 @@ function getTenantExpenseShareForTransaction(tenantId, transaction) {
   // Prefer the share split snapshotted when the expense was recorded, so later
   // tenant/coefficient changes do not retroactively shift historical balances.
   if (transaction.shares) return roundUsd(Number(transaction.shares[tenantId] || 0));
-  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  // Without a saved split: the people living there on the expense date, so a
+  // later move-out or move-in does not reshuffle old balances.
+  const activeTenants = occupantsOn(transaction.date || null);
   if (!activeTenants.length) return 0;
   const totalUsd = toUsd(Number(transaction.debitUsd || 0), Number(transaction.debitLbp || 0));
   if (!totalUsd) return 0;
@@ -2223,6 +2560,7 @@ function getExpectedForTenant(tenantId, month) {
   const total = getExpectedMonthlyUsd(month);
   if (!total) return 0;
   const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (tenant && !tenantOccupiesMonth(tenant, month)) return 0;
   if (tenant && tenant.coefficient > 0) return roundUsd(total * (tenant.coefficient / 1000));
   return total;
 }
@@ -2596,7 +2934,12 @@ function readGeneratorFormReadings() {
 }
 
 function buildGeneratorReadingRows(month) {
-  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  // Active tenants, plus one who moved out during this month (their last
+  // reading), minus one who only moves in after it.
+  const monthStart = monthIso(monthKey(month));
+  const monthEnd = getMonthEndDate(monthStart);
+  const activeTenants = state.tenants.filter((t) =>
+    (t.active !== false || (t.movedOutOn && t.movedOutOn > monthStart)) && !(t.movedInOn && t.movedInOn > monthEnd));
   const existing = getServiceReadingRecord("generator", month);
   els.generatorReadingRows.replaceChildren(
     ...activeTenants.map((tenant) => {
@@ -2623,6 +2966,7 @@ function buildGeneratorReadingRows(month) {
           : tr("Unit {unit} · no breaker", { unit: tenant.unit });
       row.querySelector(".gen-prev").value = prev || "";
       if (saved && saved.currentReading) row.querySelector(".gen-curr").value = saved.currentReading;
+      else if (tenant.active === false && tenant.meterEnd !== undefined) row.querySelector(".gen-curr").value = tenant.meterEnd;
       return row;
     }),
   );
@@ -2677,6 +3021,7 @@ function openGeneratorReadingsDialog(month) {
   const m = month ? monthKey(month) : (selectedMonth ? monthKey(selectedMonth) : monthKey(localDateInput()));
   els.generatorBillMonth.value = m;
   buildGeneratorReadingRows(monthIso(m));
+  if (els.generatorEngineHours) els.generatorEngineHours.value = getServiceReadingRecord("generator", monthIso(m))?.engineHours || "";
   updateGeneratorReadingsPreview();
   updateGeneratorDeleteVisibility();
   openDialog(els.generatorBillDialog);
@@ -2684,6 +3029,7 @@ function openGeneratorReadingsDialog(month) {
 
 function refreshGeneratorReadingRowsForMonth() {
   buildGeneratorReadingRows(monthIso(els.generatorBillMonth.value));
+  if (els.generatorEngineHours) els.generatorEngineHours.value = getServiceReadingRecord("generator", monthIso(els.generatorBillMonth.value))?.engineHours || "";
   updateGeneratorReadingsPreview();
   updateGeneratorDeleteVisibility();
 }
@@ -2701,7 +3047,9 @@ function submitGeneratorReadings(event) {
   if (sessionMode !== "owner") return;
   const month = monthIso(els.generatorBillMonth.value);
   if (!month) { showToast("Select a month"); return; }
+  if (isMonthClosed(month)) { showToast(closedMonthError(month).message, 5000); return; }
   const readings = readGeneratorFormReadings();
+  const engineHours = Number(els.generatorEngineHours?.value || 0);
   const lines = {};
   Object.keys(readings).forEach((id) => {
     lines[id] = {
@@ -2714,10 +3062,12 @@ function submitGeneratorReadings(event) {
   const existing = getServiceReadingRecord("generator", month);
   if (existing) {
     existing.lines = lines;
+    if (engineHours > 0) existing.engineHours = engineHours;
+    else delete existing.engineHours;
   } else {
-    state.serviceReadings.push({ id: `rdg-${Date.now()}`, serviceType: "generator", forMonth: month, lines });
+    state.serviceReadings.push({ id: `rdg-${Date.now()}`, serviceType: "generator", forMonth: month, lines, ...(engineHours > 0 ? { engineHours } : {}) });
   }
-  saveState();
+  if (!saveState()) return;
   closeDialog(els.generatorBillDialog);
   selectedMonth = month;
   renderAll();
@@ -2726,6 +3076,7 @@ function submitGeneratorReadings(event) {
 
 function deleteServiceReadings(serviceType, month) {
   if (sessionMode !== "owner") return false;
+  if (isMonthClosed(month)) { showToast(closedMonthError(month).message, 5000); return false; }
   if (!window.confirm(tr("Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.", { month: formatMonth(month) }))) return false;
   state.serviceReadings = (state.serviceReadings || []).filter(
     (r) => !(r.serviceType === serviceType && monthKey(r.forMonth) === monthKey(month)),
@@ -2885,8 +3236,15 @@ function renderServices() {
   els.generatorBillList.replaceChildren(...cards);
 }
 
-function computeSharedExpenseShares(totalUsd, distribution) {
-  const activeTenants = state.tenants.filter((t) => t.active !== false);
+// Who shares a cost dated `date`: the occupants on that day, so a unit that
+// changed hands splits by who lived there (without a date: active tenants).
+function occupantsOn(date) {
+  if (!date) return state.tenants.filter((t) => t.active !== false);
+  return state.tenants.filter((t) => (t.active !== false || (t.movedOutOn && t.movedOutOn > date)) && !(t.movedInOn && t.movedInOn > date));
+}
+
+function computeSharedExpenseShares(totalUsd, distribution, date = null) {
+  const activeTenants = occupantsOn(date);
   if (!activeTenants.length) return {};
   const shares = {};
   if (distribution === "coefficient") {
@@ -2967,7 +3325,8 @@ function getPreviousMeterReading(tenantId, beforeMonth) {
       return Number(line.currentReading) || 0;
     }
   }
-  return 0;
+  // A new occupant's first month starts from the meter at handover.
+  return Number(state.tenants.find((t) => t.id === tenantId)?.meterStart || 0);
 }
 
 function buildSharedExpensesForMonth(month) {
@@ -3343,7 +3702,7 @@ let ownerLoginMode = "google";
 // the three modes above, or — without Supabase — the device password alone.
 function renderOwnerLoginForm() {
   const accounts = usesOwnerAccounts();
-  const signedIn = accounts && ownerLoginMode !== "device" && isOwnerSession();
+  const signedIn = accounts && ownerLoginMode !== "device" && isAdminSession();
   const mode = !accounts ? "device" : signedIn ? "signedIn" : ownerLoginMode;
   const show = (el, on) => el.classList.toggle("hidden", !on);
   show(els.loginOwnerAccount, mode === "signedIn");
@@ -3358,9 +3717,11 @@ function renderOwnerLoginForm() {
   show(els.loginDeviceFallbackBtn, accounts && (mode === "google" || mode === "email"));
   show(els.loginBackToAccountBtn, accounts && (mode === "email" || mode === "device"));
   const hasPassword = Boolean(state.settings.ownerPasswordHash);
-  const hint = mode !== "device" ? "" : hasPassword
-    ? (accounts ? tr("Enter this device's owner password") : "")
-    : tr("No password set — press Enter to access as owner");
+  const hint = mode === "google" && pendingAdminInvite()
+    ? tr("You've been invited to help manage this building. Continue with Google to accept.")
+    : mode !== "device" ? "" : hasPassword
+      ? (accounts ? tr("Enter this device's owner password") : "")
+      : tr("No password set — press Enter to access as owner");
   els.loginHint.textContent = hint;
   els.loginHint.classList.toggle("hidden", !hint);
 }
@@ -3385,6 +3746,7 @@ function enterAsOwner() {
   els.loginPasswordInput.value = "";
   renderAll();
   checkSetupWizard();
+  refreshKeepaliveStatus();
 }
 
 function hideLoginScreen() {
@@ -3412,7 +3774,7 @@ async function attemptLogin() {
   els.loginError.classList.add("hidden");
 
   if (isOwnerTab && usesOwnerAccounts() && ownerLoginMode !== "device") {
-    if (isOwnerSession()) {
+    if (isAdminSession()) {
       enterAsOwner();
       // Boot synced before the owner was known; pull again as the owner.
       syncFromSheet({ silent: true });
@@ -3572,6 +3934,8 @@ function renderAttention() {
     items.push({ kind: "warn", text: tr(recurringDue.length === 1 ? "{n} monthly expense to confirm for {month}" : "{n} monthly expenses to confirm for {month}", { n: recurringDue.length, month: formatMonth(thisMonth) }), view: "ledgerView", action: "recurring" });
   }
 
+  items.push(...extraAttentionItems());
+
   if (!items.length) {
     els.attentionPanel.classList.add("hidden");
     return;
@@ -3591,6 +3955,7 @@ function renderAttention() {
       row.className = "attention-row";
       row.dataset.view = item.view;
       if (item.action) row.dataset.action = item.action;
+      if (item.arg) row.dataset.arg = item.arg;
       const chip = document.createElement("span");
       chip.className = "attention-icon";
       chip.style.background = tone.tint;
@@ -4537,6 +4902,8 @@ function renderTenants() {
           <button class="text-link-btn edit-tenant-button" type="button"></button>
           <button class="text-link-btn print-statement-button" type="button"></button>
           <button class="text-link-btn invite-tenant-button owner-only" type="button"></button>
+          <button class="text-link-btn plan-tenant-button owner-only" type="button"></button>
+          <button class="text-link-btn moveout-tenant-button owner-only" type="button"></button>
         </div>
       `;
       card.querySelector(".tenant-id").insertBefore(avatarChip(tenant.name, 38), card.querySelector(".tenant-id-text"));
@@ -4551,11 +4918,23 @@ function renderTenants() {
       card.querySelector(".print-statement-button").textContent = tr("Statement");
       card.querySelector(".invite-tenant-button").textContent = tr("Invite");
       card.querySelector(".invite-tenant-button").dataset.tenantId = tenant.id;
+      const plan = activePlanFor(tenant.id);
+      const planBtn = card.querySelector(".plan-tenant-button");
+      planBtn.textContent = plan ? tr("Plan") : tr("Payment plan");
+      planBtn.dataset.tenantId = tenant.id;
+      planBtn.classList.toggle("hidden", tenant.active === false || (!plan && totals.dueUsd <= 0.005));
+      const moveBtn = card.querySelector(".moveout-tenant-button");
+      moveBtn.textContent = tr("Move out");
+      moveBtn.dataset.tenantId = tenant.id;
+      moveBtn.classList.toggle("hidden", tenant.active === false);
+      card.querySelector(".invite-tenant-button").classList.toggle("hidden", tenant.active === false);
       card.querySelector("strong").textContent = tenant.name;
       const unitSpan = card.querySelector(".tenant-unit-line");
       const coeffLabel = tenant.coefficient > 0 ? ` · ${tenant.coefficient}/1000` : "";
       const breakerLabel = tenant.breakerAmps > 0 ? ` · ${tenant.breakerAmps}A` : "";
       unitSpan.textContent = `${tr("Unit {unit}", { unit: tenant.unit })}${coeffLabel}${breakerLabel}${tenant.phone ? "" : ` · ${tr("no phone")}`}`;
+      if (tenant.movedOutOn) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-plan-line", text: tr("Moved out {date}", { date: formatDateLabel(tenant.movedOutOn) }) }));
+      else if (plan) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-plan-line", text: `${tr("Payment plan")}: ${planStatusText(plan)}` }));
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
@@ -5981,16 +6360,18 @@ function buildPollCard(poll) {
   const activeTenants = state.tenants.filter((t) => t.active !== false);
   const allVoterIds = ["owner", ...activeTenants.map((t) => t.id)];
   const votes = poll.votes || {};
-  const counts = poll.voteCounts; // present on a tenant phone (server-side tally)
-  const yesCount = counts ? Number(counts.yes || 0) : Object.values(votes).filter((v) => v === "yes").length;
-  const noCount = counts ? Number(counts.no || 0) : Object.values(votes).filter((v) => v === "no").length;
-  const abstainCount = counts ? Number(counts.abstain || 0) : Object.values(votes).filter((v) => v === "abstain").length;
-  const totalVoters = allVoterIds.length;
-  const pending = allVoterIds.filter((id) => !votes[id]);
+  const tally = pollTally(poll);
+  const shareMode = tally.mode === "share";
+  const yesCount = tally.yes;
+  const noCount = tally.no;
+  const abstainCount = tally.abstain;
+  const totalVoters = tally.total;
+  const voterIds = shareMode ? activeTenants.map((t) => t.id) : allVoterIds;
+  const pending = voterIds.filter((id) => !votes[id]);
 
   const myId = sessionMode === "owner" ? "owner" : sessionTenantId;
   const myVote = votes[myId];
-  const isOpen = poll.status === "open";
+  const isOpen = pollIsOpen(poll);
   const isOwner = sessionMode === "owner";
   const creatorName = poll.createdBy === "owner" ? tr("Owner") : tenantName(poll.createdBy);
 
@@ -6003,8 +6384,8 @@ function buildPollCard(poll) {
   titleEl.className = "poll-card-title";
   titleEl.textContent = poll.title;
   const badge = document.createElement("span");
-  badge.className = `poll-status-badge ${poll.status}`;
-  badge.textContent = poll.status === "open" ? tr("Open") : tr("Closed");
+  badge.className = `poll-status-badge ${isOpen ? "open" : "closed"}`;
+  badge.textContent = isOpen ? tr("Open") : tr("Closed");
   header.append(titleEl, badge);
   card.append(header);
 
@@ -6020,8 +6401,8 @@ function buildPollCard(poll) {
     card.append(desc);
   }
 
-  const tally = document.createElement("div");
-  tally.className = "poll-tally";
+  const tallyEl = document.createElement("div");
+  tallyEl.className = "poll-tally";
   const yesPct = totalVoters > 0 ? Math.round((yesCount / totalVoters) * 100) : 0;
   const abstainPct = totalVoters > 0 ? Math.round((abstainCount / totalVoters) * 100) : 0;
   const noPct = totalVoters > 0 ? Math.round((noCount / totalVoters) * 100) : 0;
@@ -6041,25 +6422,33 @@ function buildPollCard(poll) {
   labels.className = "poll-tally-labels";
   const yesLbl = document.createElement("span");
   yesLbl.className = "ptl-yes";
-  yesLbl.textContent = tr("YES {n}", { n: yesCount });
+  const shown = (n) => (shareMode ? `${n}/${totalVoters}` : n);
+  yesLbl.textContent = tr("YES {n}", { n: shown(yesCount) });
   const abstainLbl = document.createElement("span");
   abstainLbl.className = "ptl-abstain";
-  abstainLbl.textContent = tr("ABSTAIN {n}", { n: abstainCount });
+  abstainLbl.textContent = tr("ABSTAIN {n}", { n: shown(abstainCount) });
   const noLbl = document.createElement("span");
   noLbl.className = "ptl-no";
-  noLbl.textContent = tr("NO {n}", { n: noCount });
+  noLbl.textContent = tr("NO {n}", { n: shown(noCount) });
   const pendingLbl = document.createElement("span");
   pendingLbl.className = "ptl-pending";
   pendingLbl.textContent = tr("{n} pending", { n: pending.length });
   labels.append(yesLbl, abstainLbl, noLbl, pendingLbl);
-  tally.append(labels, track);
-  card.append(tally);
+  tallyEl.append(labels, track);
+  card.append(tallyEl);
+  pollSummaryLines(poll).forEach((line) => {
+    const p = document.createElement("p");
+    p.className = "poll-meta";
+    p.textContent = line;
+    card.append(p);
+  });
 
   const resultList = document.createElement("ul");
   resultList.className = "poll-result-list";
-  allVoterIds.forEach((voterId) => {
+  voterIds.forEach((voterId) => {
     const voterVote = votes[voterId];
-    const voterName = voterId === "owner" ? tr("Owner") : tenantName(voterId);
+    const coefficient = activeTenants.find((t) => t.id === voterId)?.coefficient || 0;
+    const voterName = voterId === "owner" ? tr("Owner") : `${tenantName(voterId)}${shareMode ? ` (${coefficient}/1000)` : ""}`;
     const li = document.createElement("li");
     li.className = "poll-result-row";
     const nameEl = document.createElement("span");
@@ -6073,7 +6462,7 @@ function buildPollCard(poll) {
   });
   card.append(resultList);
 
-  if (isOpen) {
+  if (isOpen && !(shareMode && myId === "owner")) {
     const voteRow = document.createElement("div");
     voteRow.className = "poll-vote-row";
     const yesBtn = document.createElement("button");
@@ -6124,13 +6513,16 @@ function buildPollCard(poll) {
 function openCreatePollDialog() {
   els.pollTitleInput.value = "";
   els.pollDescInput.value = "";
+  if (els.pollWeightingInput) els.pollWeightingInput.value = "unit";
+  if (els.pollClosesInput) els.pollClosesInput.value = "";
+  if (els.pollQuorumInput) els.pollQuorumInput.value = "";
   openDialog(els.pollDialog);
   setTimeout(() => els.pollTitleInput.focus(), 50);
 }
 
 function castVote(pollId, vote) {
   const poll = (state.polls || []).find((p) => p.id === pollId);
-  if (!poll || poll.status !== "open") return;
+  if (!poll || !pollIsOpen(poll)) return;
   const myId = sessionMode === "owner" ? "owner" : sessionTenantId;
   if (!myId) return;
   if (isTenantSession()) {
@@ -6231,12 +6623,13 @@ function renderAll() {
   renderPolls();
   renderDatalists();
   renderSettings();
+  renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView"];
 
 function setView(viewId) {
-  if (sessionMode === "tenant" && viewId === "settingsView") viewId = "moreView";
+  if (sessionMode === "tenant" && (viewId === "settingsView" || viewId === "reportsView")) viewId = "moreView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
   // Re-run the enter animation each time a view is shown.
   const active = document.getElementById(viewId);
@@ -6366,6 +6759,7 @@ function syncTransactionFormMode() {
   const waterMode = serviceMode && els.transactionService.value === "water";
   document.querySelector(".service-part-wrap").classList.toggle("hidden", !serviceMode || waterMode);
   document.querySelector(".service-split-wrap").classList.toggle("hidden", !waterMode);
+  els.litresWrap?.classList.toggle("hidden", !serviceMode || waterMode || els.transactionServicePart.value === "maintenance");
   document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
@@ -6521,6 +6915,8 @@ function createTransactionsFromForm() {
         : expenseCategory,
     serviceType,
     servicePart,
+    ...(isServiceExpense && !isWater && servicePart !== "maintenance" && Number(els.transactionLitres?.value || 0) > 0
+      ? { litres: Number(els.transactionLitres.value) } : {}),
     debitUsd: isDebit ? amountUsd : 0,
     debitLbp: isDebit ? amountLbp : 0,
     creditUsd: isDebit ? 0 : amountUsd,
@@ -6535,11 +6931,11 @@ function createTransactionsFromForm() {
   // an equal or by-coefficient split chosen at entry and bill immediately. Generator
   // service expenses carry no shares — they bill via the monthly meter readings.
   if (isExpense) {
-    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), "coefficient");
+    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), "coefficient", els.transactionDate.value || null);
     baseTransaction.shares = Object.keys(shares).length ? shares : null;
   } else if (isWater) {
     baseTransaction.waterSplit = waterSplit;
-    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), waterSplit);
+    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), waterSplit, els.transactionDate.value || null);
     baseTransaction.shares = Object.keys(shares).length ? shares : null;
   }
 
@@ -6842,7 +7238,7 @@ function sessionFromAuthResponse(body) {
 
 // Sessions saved before roles existed are owner sessions.
 function isOwnerSession() {
-  return Boolean(authSession) && authSession.role !== "tenant";
+  return Boolean(authSession) && authSession.role !== "tenant" && authSession.role !== "viewer";
 }
 
 function isTenantSession() {
@@ -6976,21 +7372,41 @@ async function completeGoogleSignIn() {
 // password and Google paths so they can never disagree.
 async function adoptOwnerSession(session) {
   const c = cloudConfig();
-  const check = await fetch(`${c.supabaseUrl}/rest/v1/rpc/is_owner`, {
+  const call = (fn, body = {}) => fetch(`${c.supabaseUrl}/rest/v1/rpc/${fn}`, {
     method: "POST",
     headers: { apikey: c.supabaseKey, Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
-    body: "{}",
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
   });
-  const isOwner = check.ok && (await check.json()) === true;
-  if (!isOwner) {
+  // Arriving through an administrator invite link: accept it first.
+  const invite = pendingAdminInvite();
+  if (invite) {
+    try { localStorage.removeItem(ADMIN_INVITE_KEY); } catch { /* ignore */ }
+    const claim = await call("claim_admin_invite", { p_code: invite });
+    if (!claim.ok) {
+      let msg = "That invite could not be used";
+      try { const j = await claim.json(); msg = j.message || msg; } catch { /* keep default */ }
+      authRequest("logout", {}, session.access_token).catch(() => {});
+      throw new Error(tr(msg));
+    }
+  }
+  // owner (full) or viewer (sees everything, changes nothing). Before the
+  // phase2f SQL, my_admin_role doesn't exist yet: fall back to is_owner.
+  let role = null;
+  const roleRes = await call("my_admin_role");
+  if (roleRes.ok) role = await roleRes.json();
+  else if (roleRes.status === 404) {
+    const check = await call("is_owner");
+    role = check.ok && (await check.json()) === true ? "owner" : null;
+  }
+  if (role !== "owner" && role !== "viewer") {
     authRequest("logout", {}, session.access_token).catch(() => {});
     // Name the account: with Google it's easy to have picked the wrong one.
     throw new Error(session.email
       ? tr("{email} is not the building owner's account", { email: session.email })
       : "This account is not the building owner");
   }
-  saveAuthSession({ ...session, role: "owner", tenantId: null });
+  saveAuthSession({ ...session, role, tenantId: null });
 }
 
 function signOutOwner() {
@@ -7003,9 +7419,12 @@ function signOutOwner() {
 
 function renderOwnerAccount() {
   if (!els.ownerAccountAction) return;
-  const show = usesOwnerAccounts() && isOwnerSession() && sessionMode === "owner";
+  const show = usesOwnerAccounts() && isAdminSession() && sessionMode === "owner";
   els.ownerAccountAction.classList.toggle("hidden", !show);
-  if (show) els.ownerAccountText.textContent = tr("Signed in as {email}", { email: authSession.email });
+  if (show) {
+    els.ownerAccountText.textContent = tr("Signed in as {email}", { email: authSession.email })
+      + (isViewerSession() ? ` · ${tr("view only")}` : "");
+  }
 }
 
 async function supabaseRequest(path, options = {}, retried = false) {
@@ -7204,6 +7623,19 @@ function mergeById(olderArr, newerArr, deletedIds = []) {
   return [...map.values()];
 }
 
+// Per record, the later edit wins (a tenant's new problem report and the
+// owner's status change on another one both survive).
+function mergeByStamp(olderArr, newerArr, deletedIds = [], stampKey = "updatedAt") {
+  const map = new Map();
+  [...(olderArr || []), ...(newerArr || [])].forEach((item) => {
+    if (!item?.id) return;
+    const prev = map.get(item.id);
+    if (!prev || String(item[stampKey] || "") >= String(prev[stampKey] || "")) map.set(item.id, item);
+  });
+  deletedIds.forEach((id) => map.delete(id));
+  return [...map.values()];
+}
+
 function mergeByMonth(olderArr, newerArr) {
   const map = new Map();
   (olderArr || []).forEach((entry) => entry?.month && map.set(entry.month, entry));
@@ -7243,7 +7675,7 @@ function mergeDeclarations(olderArr, newerArr) {
 }
 
 function mergeDeletedLists(local, remote) {
-  const kinds = ["transactions", "tenants", "polls", "projects"];
+  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks"];
   const merged = {};
   kinds.forEach((kind) => {
     merged[kind] = [...new Set([...(local?.[kind] || []), ...(remote?.[kind] || [])])].slice(-1000);
@@ -7274,6 +7706,13 @@ function mergeStates(local, remote) {
   merged.serviceReadings = mergeById(older.serviceReadings, newer.serviceReadings);
   merged.monthlyExpected = mergeByMonth(older.monthlyExpected, newer.monthlyExpected);
   merged.recurringExpenses = mergeById(older.recurringExpenses, newer.recurringExpenses);
+  merged.auditLog = mergeById(older.auditLog, newer.auditLog).sort((a, b) => String(a.at).localeCompare(String(b.at))).slice(-AUDIT_LIMIT);
+  merged.monthLocks = mergeByStamp(older.monthLocks, newer.monthLocks, [], "at");
+  merged.cashChecks = mergeById(older.cashChecks, newer.cashChecks, merged.deleted.cashChecks);
+  merged.announcements = mergeById(older.announcements, newer.announcements, merged.deleted.announcements);
+  merged.issues = mergeByStamp(older.issues, newer.issues, merged.deleted.issues, "updatedAt");
+  merged.paymentPlans = mergeById(older.paymentPlans, newer.paymentPlans);
+  merged.generatorServices = mergeById(older.generatorServices, newer.generatorServices);
   merged.meta = {
     rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
     epoch: localEpoch,
@@ -7443,7 +7882,8 @@ function buildGroupBalancesMessage() {
       : advanceUsd > 0.005
         ? tr("paid up ✓ (credit {amount})", { amount: formatUsd(advanceUsd) })
         : tr("paid up ✓");
-    lines.push(`• ${tr("Unit {unit}", { unit: t.unit || "" })} – ${t.name}: ${status}`);
+    const planNote = activePlanFor(t.id) && dueUsd > 0.005 ? ` (${tr("payment plan")})` : "";
+    lines.push(`• ${tr("Unit {unit}", { unit: t.unit || "" })} – ${t.name}: ${status}${planNote}`);
   });
   lines.push("", tr("Total outstanding: {amount}", { amount: formatUsd(roundUsd(totalDue)) }));
   return lines.join("\n");
@@ -7453,6 +7893,7 @@ function reminderMessage(tenant, amount, month) {
   return [
     tr("{building} – Payment Reminder", { building: state.building?.name || "" }),
     tr("Hi {name}, your outstanding balance{monthLine} is {amount}.", { name: tenant.name, monthLine: month ? tr(" as of the {month} statement", { month: formatMonth(month) }) : "", amount: formatUsd(amount) }),
+    ...(activePlanFor(tenant.id) ? [tr("Your payment plan: {text}", { text: planStatusText(activePlanFor(tenant.id)) })] : []),
     tr("Please settle at your earliest convenience. Thank you."),
   ].join("\n");
 }
@@ -8201,6 +8642,8 @@ function deleteLedgerTransaction(transactionId) {
     return;
   }
 
+  const closed = recordMonths("transaction", transaction).find(isMonthClosed);
+  if (closed) { showToast(closedMonthError(closed).message, 5000); return; }
   const label = [transaction.category, transaction.description || tenantName(transaction.tenantId), transaction.date]
     .filter(Boolean)
     .join(" | ");
@@ -8211,8 +8654,8 @@ function deleteLedgerTransaction(transactionId) {
   state.transactions = state.transactions.filter((entry) => entry.id !== transactionId);
   state.sharedExpenses = (state.sharedExpenses || []).filter((se) => se.expenseTransactionId !== transactionId);
   recordDeletedId("transactions", transactionId);
+  if (!saveState()) return;
   deleteInvoicePhoto(transaction.invoiceAttachment); // otherwise the file is orphaned in storage
-  saveState();
   renderAll();
   showToast("Ledger entry deleted");
 }
@@ -8878,51 +9321,7 @@ function buildFullWorkbookFiles() {
     })),
   ];
 
-  const createdAt = new Date().toISOString();
-  const files = [
-    { name: "[Content_Types].xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-  ${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("\n  ")}
-  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-</Types>` },
-    { name: "_rels/.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
-  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
-</Relationships>` },
-    { name: "docProps/app.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-  <Application>Building Account Tracker</Application>
-  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>${sheets.length}</vt:i4></vt:variant></vt:vector></HeadingPairs>
-  <TitlesOfParts><vt:vector size="${sheets.length}" baseType="lpstr">${sheets.map((s) => `<vt:lpstr>${escapeXml(s.name)}</vt:lpstr>`).join("")}</vt:vector></TitlesOfParts>
-</Properties>` },
-    { name: "docProps/core.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <dc:title>${escapeXml(buildingTitle)} — full export</dc:title>
-  <dc:creator>Building Account Tracker</dc:creator>
-  <dcterms:created xsi:type="dcterms:W3CDTF">${createdAt}</dcterms:created>
-  <dcterms:modified xsi:type="dcterms:W3CDTF">${createdAt}</dcterms:modified>
-</cp:coreProperties>` },
-    { name: "xl/workbook.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <bookViews><workbookView activeTab="0"/></bookViews>
-  <sheets>${sheets.map((s, i) => `<sheet name="${escapeXml(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets>
-</workbook>` },
-    { name: "xl/_rels/workbook.xml.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  ${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("\n  ")}
-  <Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>` },
-    { name: "xl/styles.xml", content: WB_STYLES_XML },
-    ...sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, content: s.xml })),
-  ];
-  return files;
+  return workbookPackageFiles(sheets, `${buildingTitle} — full export`);
 }
 
 function buildFullWorkbookXlsx() {
@@ -9359,6 +9758,7 @@ function navigateMonth(direction) {
 
 function attachEvents() {
   renderNavIcons();
+  attachV148Events();
   els.navButtons.forEach((button) => {
     button.addEventListener("click", () => setView(button.dataset.view));
   });
@@ -9403,7 +9803,7 @@ function attachEvents() {
     if (!row) return;
     if (row.dataset.action === "reminders") openWhatsAppReminderDialog();
     else if (row.dataset.action === "recurring") openRecurringDialog();
-    else setView(row.dataset.view);
+    else if (!handleExtraAttentionAction(row)) setView(row.dataset.view);
   });
   els.declarationsList.addEventListener("click", (event) => {
     const recordBtn = event.target.closest(".declaration-record-btn[data-decl-id]");
@@ -9434,6 +9834,10 @@ function attachEvents() {
     showToast("Tenant PIN removed");
   });
   els.tenantList.addEventListener("click", (event) => {
+    const planBtn = event.target.closest(".plan-tenant-button[data-tenant-id]");
+    if (planBtn) { openPlanDialog(planBtn.dataset.tenantId); return; }
+    const moveBtn = event.target.closest(".moveout-tenant-button[data-tenant-id]");
+    if (moveBtn) { openMoveOutDialog(moveBtn.dataset.tenantId); return; }
     const inviteBtn = event.target.closest(".invite-tenant-button[data-tenant-id]");
     if (inviteBtn) { openInviteDialog(inviteBtn.dataset.tenantId); return; }
     const statBtn = event.target.closest(".print-statement-button[data-tenant-id]");
@@ -9567,6 +9971,7 @@ function attachEvents() {
       const existingTransaction = editingIndex >= 0 ? state.transactions[editingIndex] : null;
       let invoiceUploadError = null;
       if (editingExpenseId && !existingTransaction) throw new Error("Expense entry was not found");
+      assertTransactionsOpen(transactions, existingTransaction);
       if (existingTransaction) {
         transaction.id = existingTransaction.id;
         transaction.category = "Expenses";
@@ -9600,8 +10005,12 @@ function attachEvents() {
       else {
         state.transactions.push(...transactions);
       }
-      saveState();
+      if (!saveState()) return;
       closeDialog(els.transactionDialog);
+      if (!existingTransaction) {
+        transactions.filter(isReceiptablePayment).forEach((payment) => notifyTenants(payment.tenantId,
+          tr("Payment received"), tr("{amount} recorded — thank you.", { amount: formatUsd(transactionNetUsd(payment)) })));
+      }
       selectedMonth = transactions.find((entry) => entry.forMonth)?.forMonth || selectedMonth;
       renderAll();
       if (existingTransaction) {
@@ -9772,6 +10181,9 @@ function attachEvents() {
       createdAt: new Date().toISOString(),
       status: "open",
       votes: {},
+      weighting: els.pollWeightingInput?.value === "share" ? "share" : "unit",
+      ...(els.pollClosesInput?.value ? { closesOn: els.pollClosesInput.value } : {}),
+      ...(Number(els.pollQuorumInput?.value || 0) > 0 ? { quorumPct: Math.min(100, Number(els.pollQuorumInput.value)) } : {}),
     };
     (state.polls ||= []).push(poll);
     saveState();
@@ -9909,6 +10321,1628 @@ function attachEvents() {
   els.setupWizardDialog.addEventListener("cancel", (e) => e.preventDefault());
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v148 — running the building long-term
+//   Month locks and the change history both come from one before/after diff
+//   taken in saveState. Then: cash counts, generator fuel efficiency and
+//   service reminders, notices, problem reports, payment plans, move-outs,
+//   extra administrators, reports (spending trends, annual report),
+//   share-weighted polls, phone notifications and a keep-alive watch.
+// ═══════════════════════════════════════════════════════════════════════════
+
+Object.assign(els, {
+  toolDialog: document.querySelector("#toolDialog"),
+  toolDialogTitle: document.querySelector("#toolDialogTitle"),
+  toolDialogBody: document.querySelector("#toolDialogBody"),
+  closeToolDialog: document.querySelector("#closeToolDialog"),
+  noticesList: document.querySelector("#noticesList"),
+  newNoticeButton: document.querySelector("#newNoticeButton"),
+  issuesList: document.querySelector("#issuesList"),
+  newIssueButton: document.querySelector("#newIssueButton"),
+  reportsBody: document.querySelector("#reportsBody"),
+  tenantNoticesPanel: document.querySelector("#tenantNoticesPanel"),
+  tenantNoticesList: document.querySelector("#tenantNoticesList"),
+  pushStatusText: document.querySelector("#pushStatusText"),
+  pushToggleButton: document.querySelector("#pushToggleButton"),
+  adminsButton: document.querySelector("#adminsButton"),
+  transactionLitres: document.querySelector("#transactionLitres"),
+  litresWrap: document.querySelector(".litres-wrap"),
+  generatorEngineHours: document.querySelector("#generatorEngineHours"),
+  generatorExtras: document.querySelector("#generatorExtras"),
+  pollWeightingInput: document.querySelector("#pollWeightingInput"),
+  pollClosesInput: document.querySelector("#pollClosesInput"),
+  pollQuorumInput: document.querySelector("#pollQuorumInput"),
+});
+
+// ── Small DOM + dialog helpers ──────────────────────────────────────────────
+function mk(tag, props = {}, ...children) {
+  const node = document.createElement(tag);
+  Object.entries(props || {}).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === false) return;
+    if (key === "className") node.className = value;
+    else if (key === "text") node.textContent = value;
+    else if (key === "dataset") Object.assign(node.dataset, value);
+    else if (key === "value") node.value = value;
+    else if (key === "checked") node.checked = Boolean(value);
+    else if (key.startsWith("on") && typeof value === "function") node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value === true ? "" : String(value));
+  });
+  children.flat(Infinity).forEach((child) => {
+    if (child === null || child === undefined || child === false) return;
+    node.append(child instanceof Node ? child : String(child));
+  });
+  return node;
+}
+
+function newId(prefix) {
+  return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function field(label, input, note) {
+  return mk("label", {}, mk("span", { text: label }), input, note ? mk("small", { className: "field-hint", text: note }) : null);
+}
+
+function textInput(value = "", attrs = {}) {
+  return mk("input", { type: "text", value, ...attrs });
+}
+
+function numberInput(value = "", attrs = {}) {
+  return mk("input", { type: "number", inputmode: "decimal", step: "0.01", min: "0", value: value === 0 ? "0" : value || "", ...attrs });
+}
+
+function selectInput(options, value) {
+  const select = mk("select", {}, options.map(([v, label]) => mk("option", { value: v, text: label })));
+  if (value !== undefined && value !== null) select.value = value;
+  return select;
+}
+
+function checkboxRow(label, checked = false) {
+  const input = mk("input", { type: "checkbox", checked });
+  return { row: mk("label", { className: "checkbox-row" }, input, mk("span", { text: label })), input };
+}
+
+function primaryButton(text, onclick) {
+  return mk("button", { type: "button", className: "primary-button", text, onclick });
+}
+
+function secondaryButton(text, onclick) {
+  return mk("button", { type: "button", className: "secondary-button", text, onclick });
+}
+
+function miniButton(text, onclick, extra = "") {
+  return mk("button", { type: "button", className: `mini-button ${extra}`.trim(), text, onclick });
+}
+
+function note(text, extra = "") {
+  return mk("p", { className: `settings-note ${extra}`.trim(), text });
+}
+
+function openToolDialog(title, ...nodes) {
+  els.toolDialogTitle.textContent = title;
+  els.toolDialogBody.replaceChildren(...nodes.flat().filter(Boolean));
+  if (!els.toolDialog.open) openDialog(els.toolDialog);
+}
+
+function closeToolDialog() {
+  closeDialog(els.toolDialog);
+}
+
+// Toasts raised by a refused save win over the caller's own "Saved" toast.
+function showPriorityToast(message, durationMs = 5000) {
+  showToast(message, durationMs);
+  showToast.heldUntil = Date.now() + durationMs;
+}
+
+function isAdminView() {
+  return sessionMode === "owner";
+}
+
+// ── Roles: owner, view-only administrator, tenant ───────────────────────────
+function isViewerSession() {
+  return Boolean(authSession) && authSession.role === "viewer";
+}
+
+function isAdminSession() {
+  return Boolean(authSession) && authSession.role !== "tenant";
+}
+
+// ── The before/after diff behind month locks and the change history ────────
+const AUDIT_LIMIT = 800;
+const AUDIT_BULK = 40;
+const TRACKED_COLLECTIONS = [
+  ["transactions", "transaction"],
+  ["tenants", "tenant"],
+  ["buildingProjects", "project"],
+  ["serviceReadings", "reading"],
+  ["recurringExpenses", "recurring"],
+  ["paymentPlans", "plan"],
+  ["cashChecks", "cashCheck"],
+  ["announcements", "notice"],
+  ["issues", "issue"],
+  ["generatorServices", "genService"],
+  ["monthLocks", "monthLock"],
+  ["polls", "poll"],
+];
+
+function comparableRecord(kind, record) {
+  if (kind === "poll") {
+    const { votes, voteCounts, ...rest } = record;
+    return JSON.stringify(rest);
+  }
+  return JSON.stringify(record);
+}
+
+function settingsSnapshot(s) {
+  return {
+    name: s?.building?.name || "",
+    collectionMode: s?.settings?.collectionMode || "actual",
+    defaultDueUsd: Number(s?.settings?.defaultDueUsd || 0),
+    lbpPerUsd: Number(s?.settings?.lbpPerUsd || 0),
+  };
+}
+
+// Every record added, changed or removed between two states.
+function diffStates(prev, next) {
+  const changes = [];
+  TRACKED_COLLECTIONS.forEach(([key, kind]) => {
+    const before = new Map((prev?.[key] || []).filter((r) => r?.id).map((r) => [r.id, r]));
+    const after = new Map((next?.[key] || []).filter((r) => r?.id).map((r) => [r.id, r]));
+    after.forEach((record, id) => {
+      const old = before.get(id);
+      if (!old) changes.push({ kind, id, before: null, after: record });
+      else if (comparableRecord(kind, old) !== comparableRecord(kind, record)) changes.push({ kind, id, before: old, after: record });
+    });
+    before.forEach((record, id) => {
+      if (!after.has(id)) changes.push({ kind, id, before: record, after: null });
+    });
+  });
+  const budgetBefore = new Map((prev?.monthlyExpected || []).map((e) => [e.month, e]));
+  const budgetAfter = new Map((next?.monthlyExpected || []).map((e) => [e.month, e]));
+  new Set([...budgetBefore.keys(), ...budgetAfter.keys()]).forEach((month) => {
+    const a = budgetBefore.get(month) || null;
+    const b = budgetAfter.get(month) || null;
+    if (JSON.stringify(a) !== JSON.stringify(b)) changes.push({ kind: "budget", id: month, before: a, after: b });
+  });
+  const sa = settingsSnapshot(prev);
+  const sb = settingsSnapshot(next);
+  if (JSON.stringify(sa) !== JSON.stringify(sb)) changes.push({ kind: "settings", id: "settings", before: sa, after: sb });
+  return changes;
+}
+
+// The accounting months a record belongs to. Payments and expenses count by
+// their date; generator/water costs also by the month they are billed in.
+function recordMonths(kind, record) {
+  if (!record) return [];
+  if (kind === "transaction") {
+    const months = [monthKey(record.date || record.forMonth || "")];
+    if (record.serviceType && record.forMonth) months.push(monthKey(record.forMonth));
+    return months.filter(Boolean);
+  }
+  if (kind === "reading") return [monthKey(record.forMonth || "")].filter(Boolean);
+  if (kind === "budget") return [monthKey(record.month || "")].filter(Boolean);
+  return [];
+}
+
+function lockedMonthIn(changes) {
+  for (const change of changes) {
+    for (const month of [...recordMonths(change.kind, change.before), ...recordMonths(change.kind, change.after)]) {
+      if (isMonthClosed(month)) return month;
+    }
+  }
+  return null;
+}
+
+function auditActor() {
+  if (authSession?.email) return authSession.email;
+  return sessionMode === "owner" ? "owner" : "";
+}
+
+function appendAudit(changes) {
+  const at = new Date().toISOString();
+  const by = auditActor();
+  state.auditLog ||= [];
+  if (changes.length > AUDIT_BULK) {
+    state.auditLog.push({ id: newId("log"), at, by, action: "bulk", kind: "many", count: changes.length });
+  } else {
+    changes.forEach((change) => {
+      state.auditLog.push({
+        id: newId("log"),
+        at,
+        by,
+        action: change.before ? (change.after ? "changed" : "deleted") : "added",
+        kind: change.kind,
+        recordId: change.id,
+        before: change.before,
+        after: change.after,
+      });
+    });
+  }
+  state.auditLog = state.auditLog.slice(-AUDIT_LIMIT);
+}
+
+// Called by saveState before anything is written. Compares with what this
+// device last stored. Returns false (and puts the stored copy back) when the
+// change is not allowed: a view-only administrator, or a closed month.
+function guardAndAuditSave() {
+  if (sessionMode !== "owner") return true;
+  let stored = null;
+  try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); } catch { stored = null; }
+  if (!stored) return true;
+  const previous = hydrateState(stored);
+  if (isViewerSession()) {
+    state = previous;
+    showPriorityToast("You have view-only access. Changes aren't saved.");
+    return false;
+  }
+  const changes = diffStates(previous, state);
+  if (!changes.length) return true;
+  const closed = lockedMonthIn(changes);
+  if (closed) {
+    state = previous;
+    showPriorityToast(tr("{month} is closed. Reopen it in Reports before changing it.", { month: formatMonth(monthIso(closed)) }));
+    return false;
+  }
+  appendAudit(changes);
+  return true;
+}
+
+// ── Month locks ─────────────────────────────────────────────────────────────
+function isMonthClosed(month) {
+  const key = monthKey(month || "");
+  return Boolean(key) && (state.monthLocks || []).some((lock) => lock.id === key && lock.closed);
+}
+
+function closedMonthError(month) {
+  return new Error(tr("{month} is closed. Reopen it in Reports before changing it.", { month: formatMonth(monthIso(monthKey(month))) }));
+}
+
+// Throws before a form is saved, so the dialog stays open with its message.
+function assertTransactionsOpen(...transactions) {
+  transactions.flat().filter(Boolean).forEach((t) => {
+    recordMonths("transaction", t).forEach((m) => { if (isMonthClosed(m)) throw closedMonthError(m); });
+  });
+}
+
+function setMonthClosed(month, closed) {
+  const key = monthKey(month);
+  if (!closed && !window.confirm(tr("Reopen {month}? Its figures can then be changed again.", { month: formatMonth(monthIso(key)) }))) return;
+  state.monthLocks ||= [];
+  const lock = state.monthLocks.find((l) => l.id === key);
+  const stamp = { closed, at: new Date().toISOString(), by: auditActor() };
+  if (lock) Object.assign(lock, stamp);
+  else state.monthLocks.push({ id: key, ...stamp });
+  if (!saveState()) return;
+  renderAll();
+  showToast(closed ? tr("{month} closed", { month: formatMonth(monthIso(key)) }) : tr("{month} reopened", { month: formatMonth(monthIso(key)) }));
+}
+
+// The month to suggest closing: last month, once a few days have passed.
+function monthToClose() {
+  const last = getLastCompletedMonth();
+  if (new Date().getDate() < 5) return null;
+  if (isMonthClosed(last)) return null;
+  const hasActivity = state.transactions.some((t) => monthKey(transactionDateValue(t)) === monthKey(last));
+  return hasActivity ? last : null;
+}
+
+// ── Change history ──────────────────────────────────────────────────────────
+const AUDIT_KIND_LABELS = {
+  transaction: "Entry", tenant: "Tenant", project: "Project", reading: "Meter readings", recurring: "Monthly expense",
+  plan: "Payment plan", cashCheck: "Cash count", notice: "Notice", issue: "Problem", genService: "Generator service",
+  monthLock: "Month lock", poll: "Poll", budget: "Monthly budget", settings: "Settings", many: "Many records",
+};
+
+function describeRecord(kind, record) {
+  if (!record) return "";
+  switch (kind) {
+    case "transaction": {
+      const who = record.tenantId ? tenantName(record.tenantId) || tr("(removed tenant)") : "";
+      const amount = formatUsd(Math.abs(transactionNetUsd(record)));
+      return [tr(record.category || ""), who || record.description || "", amount, record.date ? formatDateLabel(record.date) : ""].filter(Boolean).join(" · ");
+    }
+    case "tenant": return `${record.name || ""} · ${tr("Unit {unit}", { unit: record.unit || "" })}`;
+    case "project": return record.name || "";
+    case "reading": return formatMonth(record.forMonth);
+    case "recurring": return record.description || "";
+    case "plan": return `${tenantName(record.tenantId)} · ${formatUsd(record.totalUsd)}`;
+    case "cashCheck": return `${formatDateLabel(record.date)} · ${formatUsd(record.countedUsd)}`;
+    case "notice": return record.title || "";
+    case "issue": return record.title || "";
+    case "genService": return `${formatDateLabel(record.date)} · ${record.work || ""}`;
+    case "monthLock": return `${formatMonth(monthIso(record.id))} · ${record.closed ? tr("Closed") : tr("Open")}`;
+    case "poll": return record.title || "";
+    case "budget": return `${formatMonth(record.month)} · ${formatUsd(record.expectedUsd)}`;
+    case "settings": return tr("Building settings");
+    default: return "";
+  }
+}
+
+const AUDIT_FIELD_LABELS = {
+  debitUsd: "Amount USD", creditUsd: "Amount USD", debitLbp: "Amount LBP", creditLbp: "Amount LBP", description: "Description",
+  date: "Date", forMonth: "Month", tenantId: "Tenant", supplier: "Supplier", invoice: "Invoice", expenseCategory: "Expense category",
+  name: "Name", unit: "Unit", coefficient: "Coefficient", breakerAmps: "Breaker (A)", phone: "Phone", active: "Active",
+  status: "Status", title: "Title", expectedUsd: "Expected (USD)", collectionMode: "Collection mode", defaultDueUsd: "Monthly budget",
+  lbpPerUsd: "LBP per USD", litres: "Litres", totalUsd: "Total", instalmentUsd: "Per month", closed: "Closed", amount: "Amount",
+};
+const AUDIT_SKIP_FIELDS = new Set(["balanceUsd", "balanceLbp", "shares", "sourceRow", "invoiceAttachment", "pinHash", "updatedAt", "lines", "votes", "voteCounts", "at", "by"]);
+
+function auditValue(key, value) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (key === "tenantId") return tenantName(value) || String(value);
+  if (/Usd$/.test(key)) return formatUsd(value);
+  if (/Lbp$/.test(key)) return formatLbp(value);
+  if (typeof value === "boolean") return value ? tr("Yes") : tr("No");
+  if (typeof value === "object") return "…";
+  return String(value);
+}
+
+function auditFieldChanges(before, after) {
+  if (!before || !after) return [];
+  const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
+  const lines = [];
+  keys.forEach((key) => {
+    if (AUDIT_SKIP_FIELDS.has(key)) return;
+    if (JSON.stringify(before[key] ?? null) === JSON.stringify(after[key] ?? null)) return;
+    lines.push(`${tr(AUDIT_FIELD_LABELS[key] || key)}: ${auditValue(key, before[key])} → ${auditValue(key, after[key])}`);
+  });
+  return lines.slice(0, 6);
+}
+
+function canUndoAudit(entry) {
+  if (!entry || entry.undone) return false;
+  if (entry.kind === "transaction") return entry.action === "changed" || entry.action === "deleted";
+  if (entry.kind === "tenant") return entry.action === "changed";
+  return false;
+}
+
+// Undo puts the old version back. A deleted entry comes back under a new id,
+// because the old id is remembered as deleted on every device.
+function undoAudit(entryId) {
+  const entry = (state.auditLog || []).find((e) => e.id === entryId);
+  if (!canUndoAudit(entry)) return;
+  if (!window.confirm(tr("Put back the earlier version of this record?\n\n{label}", { label: describeRecord(entry.kind, entry.before) }))) return;
+  if (entry.kind === "transaction") {
+    if (entry.action === "deleted") {
+      state.transactions.push({ ...entry.before, id: `${entry.before.id}-r${Date.now().toString(36)}`, invoiceAttachment: null });
+    } else {
+      const index = state.transactions.findIndex((t) => t.id === entry.recordId);
+      if (index < 0) { showToast("That record no longer exists"); return; }
+      state.transactions[index] = { ...entry.before };
+    }
+  } else if (entry.kind === "tenant") {
+    const index = state.tenants.findIndex((t) => t.id === entry.recordId);
+    if (index < 0) { showToast("That record no longer exists"); return; }
+    state.tenants[index] = { ...entry.before, pinHash: state.tenants[index].pinHash || "" };
+  }
+  entry.undone = true;
+  if (!saveState()) { entry.undone = false; return; }
+  populateTenantSelect();
+  renderAll();
+  openHistoryDialog();
+  showToast("Earlier version restored");
+}
+
+let historyShown = 40;
+function openHistoryDialog() {
+  const entries = (state.auditLog || []).slice().reverse();
+  if (!entries.length) {
+    openToolDialog(tr("Change history"), note(tr("Nothing recorded yet. From now on every addition, change and deletion is listed here with the date and who made it.")));
+    return;
+  }
+  const list = mk("div", { className: "history-list" }, entries.slice(0, historyShown).map((entry) => {
+    const when = new Date(entry.at);
+    const stamp = `${formatDateLabel(localDateInputFrom(when))} ${when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    const actionText = { added: tr("Added"), changed: tr("Changed"), deleted: tr("Deleted"), bulk: tr("Replaced") }[entry.action] || entry.action;
+    const label = entry.action === "bulk"
+      ? tr("{n} records at once (restore, import or clear)", { n: entry.count })
+      : describeRecord(entry.kind, entry.after || entry.before);
+    const row = mk("div", { className: `history-row history-${entry.action}` },
+      mk("div", { className: "history-head" },
+        mk("strong", { text: `${actionText} · ${tr(AUDIT_KIND_LABELS[entry.kind] || entry.kind)}` }),
+        mk("span", { text: stamp })),
+      mk("div", { className: "history-label", text: label }),
+      auditFieldChanges(entry.before, entry.after).map((line) => mk("div", { className: "history-change", text: line })),
+      entry.by ? mk("div", { className: "history-by", text: tr("by {who}", { who: entry.by }) }) : null,
+      canUndoAudit(entry) && !isViewerSession() ? miniButton(tr("Undo"), () => undoAudit(entry.id)) : null,
+      entry.undone ? mk("div", { className: "history-by", text: tr("Undone") }) : null);
+    return row;
+  }));
+  const more = entries.length > historyShown
+    ? secondaryButton(tr("Show more"), () => { historyShown += 60; openHistoryDialog(); })
+    : null;
+  openToolDialog(tr("Change history"), note(tr("Every addition, change and deletion, newest first.")), list, more);
+}
+
+function localDateInputFrom(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+// ── Cash counts ─────────────────────────────────────────────────────────────
+// What the books say the building should hold on a date: every cash movement
+// up to that day (tenant-tied opening balances are not cash).
+function expectedCashOn(date) {
+  return roundUsd(state.transactions
+    .filter((t) => !(t.category === "Opening Balance" && t.tenantId))
+    .filter((t) => String(transactionDateValue(t)) <= date)
+    .reduce((sum, t) => sum + transactionNetUsd(t), 0));
+}
+
+function lastCashCheck() {
+  return (state.cashChecks || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)))[0] || null;
+}
+
+function cashCheckDue() {
+  if (!state.transactions.length) return null;
+  const last = lastCashCheck();
+  if (!last) return { last: null };
+  const days = (Date.parse(localDateInput()) - Date.parse(last.date)) / 86400000;
+  return days > 35 ? { last } : null;
+}
+
+function openCashCheckDialog() {
+  const rate = getConversionRate();
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const cashUsd = numberInput("");
+  const cashLbp = numberInput("", { step: "1000" });
+  const bankUsd = numberInput("");
+  const memo = textInput("", { placeholder: tr("Optional") });
+  const result = mk("div", { className: "cash-result" });
+  const update = () => {
+    const counted = roundUsd(Number(cashUsd.value || 0) + Number(bankUsd.value || 0) + Number(cashLbp.value || 0) / rate);
+    const expected = expectedCashOn(date.value || localDateInput());
+    const diff = roundUsd(counted - expected);
+    result.replaceChildren(
+      mk("div", {}, mk("span", { text: tr("You counted") }), mk("b", { className: "tnum", text: formatUsd(counted) })),
+      mk("div", {}, mk("span", { text: tr("The books say") }), mk("b", { className: "tnum", text: formatUsd(expected) })),
+      mk("div", { className: Math.abs(diff) < 1 ? "cash-ok" : "cash-gap" },
+        mk("span", { text: Math.abs(diff) < 1 ? tr("Matches") : diff > 0 ? tr("More than expected") : tr("Missing") }),
+        mk("b", { className: "tnum", text: formatUsd(diff) })),
+    );
+    return { counted, expected, diff };
+  };
+  [date, cashUsd, cashLbp, bankUsd].forEach((input) => input.addEventListener("input", update));
+  update();
+  const save = () => {
+    const { counted, expected, diff } = update();
+    if (!(Number(cashUsd.value || 0) || Number(cashLbp.value || 0) || Number(bankUsd.value || 0))) { showToast("Enter what you counted"); return; }
+    (state.cashChecks ||= []).push({
+      id: newId("cash"), date: date.value || localDateInput(), cashUsd: Number(cashUsd.value || 0), cashLbp: Number(cashLbp.value || 0),
+      bankUsd: Number(bankUsd.value || 0), rate, countedUsd: counted, expectedUsd: expected, differenceUsd: diff, note: memo.value.trim(), by: auditActor(),
+    });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast(Math.abs(diff) < 1 ? "Cash count saved — it matches the books" : tr("Cash count saved — difference {amount}", { amount: formatUsd(diff) }));
+  };
+  openToolDialog(tr("Count the cash"),
+    note(tr("Count the cash box and check the bank balance. The app compares the total with what the books say you should have.")),
+    field(tr("Date"), date),
+    field(tr("Cash in USD"), cashUsd),
+    field(tr("Cash in LBP"), cashLbp, tr("Converted at {rate} LBP/USD", { rate: numberFormat.format(rate) })),
+    field(tr("Bank balance (USD)"), bankUsd),
+    field(tr("Note"), memo),
+    result,
+    mk("div", { className: "button-row" }, primaryButton(tr("Save count"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function deleteCashCheck(id) {
+  if (!window.confirm(tr("Delete this cash count?"))) return;
+  state.cashChecks = (state.cashChecks || []).filter((c) => c.id !== id);
+  recordDeletedId("cashChecks", id);
+  if (!saveState()) return;
+  renderAll();
+}
+
+// ── Generator: fuel efficiency ──────────────────────────────────────────────
+function generatorEfficiencyRows() {
+  return getServiceMonths("generator").map((month) => {
+    const dist = computeServiceDistribution("generator", month);
+    const litres = state.transactions
+      .filter((t) => t.category === "Services Expenses" && t.serviceType === "generator" && t.servicePart !== "maintenance")
+      .filter((t) => monthKey(t.forMonth || t.date || "") === monthKey(month))
+      .reduce((sum, t) => sum + Number(t.litres || 0), 0);
+    const kwh = dist.distributed ? dist.totalKwh : 0;
+    const fuelUsd = dist.pools.fuelUsd;
+    return {
+      month,
+      litres,
+      kwh,
+      fuelUsd,
+      kwhPerLitre: litres > 0 && kwh > 0 ? kwh / litres : null,
+      usdPerKwh: kwh > 0 && fuelUsd > 0 ? fuelUsd / kwh : null,
+      usdPerLitre: litres > 0 && fuelUsd > 0 ? fuelUsd / litres : null,
+    };
+  });
+}
+
+// Compares the latest month with the average of up to three months before it.
+// Litres give the real signal (kWh per litre falls with leaks, theft or a
+// worn engine); without litres, a jump in cost per kWh is a softer hint.
+function generatorEfficiencyWarning(rows = generatorEfficiencyRows()) {
+  const withLitres = rows.filter((r) => r.kwhPerLitre);
+  if (withLitres.length >= 2) {
+    const latest = withLitres[withLitres.length - 1];
+    const prior = withLitres.slice(-4, -1);
+    const baseline = prior.reduce((s, r) => s + r.kwhPerLitre, 0) / prior.length;
+    if (latest.kwhPerLitre < baseline * 0.8) {
+      return { kind: "litres", month: latest.month, value: latest.kwhPerLitre, baseline, pct: Math.round((1 - latest.kwhPerLitre / baseline) * 100) };
+    }
+    return null;
+  }
+  const withCost = rows.filter((r) => r.usdPerKwh);
+  if (withCost.length >= 3) {
+    const latest = withCost[withCost.length - 1];
+    const prior = withCost.slice(-4, -1);
+    const baseline = prior.reduce((s, r) => s + r.usdPerKwh, 0) / prior.length;
+    if (latest.usdPerKwh > baseline * 1.35) {
+      return { kind: "cost", month: latest.month, value: latest.usdPerKwh, baseline, pct: Math.round((latest.usdPerKwh / baseline - 1) * 100) };
+    }
+  }
+  return null;
+}
+
+function generatorWarningText(warning) {
+  return warning.kind === "litres"
+    ? tr("Generator: {month} gave {value} kWh per litre, {pct}% below usual ({base}). Check for leaks, theft or an engine problem.", { month: formatMonth(warning.month), value: warning.value.toFixed(2), pct: warning.pct, base: warning.baseline.toFixed(2) })
+    : tr("Generator: fuel cost per kWh in {month} is {pct}% above usual. Diesel price, or a leak or theft?", { month: formatMonth(warning.month), pct: warning.pct });
+}
+
+function buildEfficiencyCard() {
+  const rows = generatorEfficiencyRows().slice(-6).reverse();
+  if (!rows.length) return null;
+  const { card } = buildServiceCardShell(`⛽ ${tr("Fuel efficiency")}`, tr("Last {n} months", { n: rows.length }));
+  const table = mk("table", { className: "report-table" },
+    mk("thead", {}, mk("tr", {}, [tr("Month"), tr("Litres"), tr("kWh"), tr("kWh / litre"), tr("$ / kWh")].map((h, i) => mk("th", { className: i ? "num" : "", text: h })))),
+    mk("tbody", {}, rows.map((r) => mk("tr", {},
+      mk("td", { text: formatMonth(r.month) }),
+      mk("td", { className: "num", text: r.litres ? numberFormat.format(r.litres) : "—" }),
+      mk("td", { className: "num", text: r.kwh ? numberFormat.format(r.kwh) : "—" }),
+      mk("td", { className: "num", text: r.kwhPerLitre ? r.kwhPerLitre.toFixed(2) : "—" }),
+      mk("td", { className: "num", text: r.usdPerKwh ? `$${r.usdPerKwh.toFixed(3)}` : "—" })))));
+  card.append(mk("div", { className: "report-table-wrap" }, table));
+  const warning = generatorEfficiencyWarning();
+  if (warning) card.append(note(generatorWarningText(warning), "is-warning"));
+  if (!rows.some((r) => r.litres)) card.append(note(tr("Tip: type the litres when you record a diesel purchase to see kWh per litre — the clearest sign of leaks or theft.")));
+  return card;
+}
+
+// ── Generator: service reminders ────────────────────────────────────────────
+function latestEngineHours() {
+  const fromReadings = (state.serviceReadings || []).map((r) => Number(r.engineHours || 0));
+  const fromServices = (state.generatorServices || []).map((s) => Number(s.hours || 0));
+  return Math.max(0, ...fromReadings, ...fromServices);
+}
+
+function lastGeneratorService() {
+  return (state.generatorServices || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)))[0] || null;
+}
+
+function generatorServiceDue() {
+  const last = lastGeneratorService();
+  if (!last) return null;
+  const hours = latestEngineHours();
+  const byHours = Number(last.nextHours || 0) > 0 && hours >= Number(last.nextHours) - 25;
+  const byDate = last.nextDate && Date.parse(last.nextDate) - Date.parse(localDateInput()) <= 7 * 86400000;
+  if (!byHours && !byDate) return null;
+  const overdue = (Number(last.nextHours || 0) > 0 && hours >= Number(last.nextHours)) || (last.nextDate && last.nextDate < localDateInput());
+  return { last, hours, overdue };
+}
+
+function openGeneratorServiceDialog() {
+  const hoursNow = latestEngineHours();
+  const intervalHours = Number(state.settings.genServiceHours || 250);
+  const intervalDays = Number(state.settings.genServiceDays || 90);
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const hours = numberInput(hoursNow || "", { step: "0.1" });
+  const work = textInput("", { placeholder: tr("Oil and filter change") });
+  const cost = numberInput("");
+  const nextHours = numberInput(hoursNow ? Math.round(hoursNow + intervalHours) : "", { step: "1" });
+  const nextDate = mk("input", { type: "date", value: addDays(localDateInput(), intervalDays) });
+  hours.addEventListener("input", () => { if (Number(hours.value) > 0) nextHours.value = Math.round(Number(hours.value) + intervalHours); });
+  date.addEventListener("input", () => { if (date.value) nextDate.value = addDays(date.value, intervalDays); });
+  const save = () => {
+    if (!work.value.trim()) { showToast("Say what was done"); return; }
+    const record = {
+      id: newId("gsv"), date: date.value || localDateInput(), hours: Number(hours.value || 0), work: work.value.trim(),
+      costUsd: Number(cost.value || 0), nextHours: Number(nextHours.value || 0), nextDate: nextDate.value || "",
+    };
+    (state.generatorServices ||= []).push(record);
+    if (Number(hours.value) > 0 && Number(nextHours.value) > Number(hours.value)) state.settings.genServiceHours = Number(nextHours.value) - Number(hours.value);
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast("Generator service saved");
+  };
+  const history = (state.generatorServices || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 8);
+  openToolDialog(tr("Generator service"),
+    note(tr("Record each service. The app reminds you when the next one is due, by running hours or by date — whichever comes first.")),
+    field(tr("Date"), date),
+    field(tr("Hour meter reading"), hours, hoursNow ? tr("Last known: {hours} h", { hours: numberFormat.format(hoursNow) }) : null),
+    field(tr("Work done"), work),
+    field(tr("Cost (USD, optional — record the expense separately)"), cost),
+    mk("div", { className: "two-col" }, field(tr("Next service at (hours)"), nextHours), field(tr("or by date"), nextDate)),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save service"), save), secondaryButton(tr("Cancel"), closeToolDialog)),
+    history.length ? mk("div", { className: "history-list compact" }, history.map((s) => mk("div", { className: "history-row" },
+      mk("div", { className: "history-head" }, mk("strong", { text: s.work }), mk("span", { text: formatDateLabel(s.date) })),
+      mk("div", { className: "history-change", text: [s.hours ? tr("{hours} h", { hours: numberFormat.format(s.hours) }) : "", s.costUsd ? formatUsd(s.costUsd) : ""].filter(Boolean).join(" · ") })))) : null);
+}
+
+function addDays(iso, days) {
+  const [y, m, d] = String(iso).split("-").map(Number);
+  return localDateInputFrom(new Date(y, m - 1, d + Number(days || 0)));
+}
+
+function buildGeneratorServiceCard() {
+  const last = lastGeneratorService();
+  const hours = latestEngineHours();
+  const due = generatorServiceDue();
+  const meta = last
+    ? tr("Last: {date} · {work}", { date: formatDateLabel(last.date), work: last.work })
+    : tr("No service recorded yet");
+  const { card, header } = buildServiceCardShell(`🔧 ${tr("Generator service")}`, meta);
+  if (sessionMode === "owner") header.append(mk("div", { className: "project-card-actions" }, miniButton(tr("Record service"), openGeneratorServiceDialog)));
+  const lines = [];
+  if (hours) lines.push(tr("Hour meter: {hours} h", { hours: numberFormat.format(hours) }));
+  if (last?.nextHours) lines.push(tr("Next at {hours} h", { hours: numberFormat.format(last.nextHours) }));
+  if (last?.nextDate) lines.push(tr("or by {date}", { date: formatDateLabel(last.nextDate) }));
+  if (lines.length) card.append(note(lines.join(" · ")));
+  if (due) card.append(note(due.overdue ? tr("Service is overdue.") : tr("Service is due soon."), "is-warning"));
+  return card;
+}
+
+function renderGeneratorExtras() {
+  if (!els.generatorExtras) return;
+  if (sessionMode !== "owner") { els.generatorExtras.replaceChildren(); return; }
+  const hasGenerator = getServiceMonths("generator").length > 0 || (state.generatorServices || []).length > 0;
+  els.generatorExtras.replaceChildren(...[hasGenerator ? buildGeneratorServiceCard() : null, buildEfficiencyCard()].filter(Boolean));
+}
+
+// ── Notices ─────────────────────────────────────────────────────────────────
+function activeNotices() {
+  const today = localDateInput();
+  const cutoff = addDays(today, -60);
+  return (state.announcements || [])
+    .filter((n) => (n.until ? n.until >= today : String(n.createdAt || "").slice(0, 10) >= cutoff))
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+
+function noticeMessage(notice) {
+  return [`📢 ${state.building?.name || ""}`, notice.title, notice.body].filter(Boolean).join("\n");
+}
+
+function buildNoticeCard(notice, { compact = false } = {}) {
+  const card = mk("article", { className: "notice-card" },
+    mk("div", { className: "notice-head" },
+      mk("strong", { text: notice.title }),
+      mk("span", { text: formatDateLabel(String(notice.createdAt || "").slice(0, 10)) })),
+    notice.body ? mk("p", { className: "notice-body", text: notice.body }) : null,
+    notice.until ? mk("p", { className: "notice-until", text: tr("Until {date}", { date: formatDateLabel(notice.until) }) }) : null);
+  if (!compact && sessionMode === "owner") {
+    card.append(mk("div", { className: "notice-actions" },
+      miniButton(tr("Post to WhatsApp group"), () => window.open(whatsappLink("", noticeMessage(notice)), "_blank", "noopener")),
+      miniButton(tr("Delete"), () => deleteNotice(notice.id), "danger-mini")));
+  }
+  return card;
+}
+
+function renderNotices() {
+  if (els.newNoticeButton) els.newNoticeButton.classList.toggle("hidden", sessionMode !== "owner");
+  if (els.noticesList) {
+    const all = (state.announcements || []).slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    els.noticesList.replaceChildren(...(all.length
+      ? all.map((n) => buildNoticeCard(n))
+      : [mk("div", { className: "empty-state", text: sessionMode === "owner" ? tr("No notices yet. Post one when there's news for the residents — a water cut, maintenance work, a meeting.") : tr("No notices from the building.") })]));
+  }
+  renderTenantDashboardExtras();
+}
+
+function renderTenantDashboardExtras() {
+  if (!els.tenantNoticesPanel) return;
+  const isTenant = sessionMode === "tenant" && sessionTenantId;
+  const notices = isTenant ? activeNotices().slice(0, 3) : [];
+  const plan = isTenant ? activePlanFor(sessionTenantId) : null;
+  const myIssues = isTenant ? (state.issues || []).filter((i) => i.tenantId === sessionTenantId && i.status !== "fixed") : [];
+  const blocks = [
+    ...notices.map((n) => buildNoticeCard(n, { compact: true })),
+    plan ? mk("article", { className: "notice-card plan-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: tr("Your payment plan") })),
+      mk("p", { className: "notice-body", text: planStatusText(plan) })) : null,
+    ...myIssues.map((issue) => mk("article", { className: "notice-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: issue.title }), issueStatusPill(issue.status)),
+      issue.ownerNote ? mk("p", { className: "notice-body", text: issue.ownerNote }) : null)),
+  ].filter(Boolean);
+  els.tenantNoticesPanel.classList.toggle("hidden", !blocks.length);
+  els.tenantNoticesList.replaceChildren(...blocks);
+}
+
+function openNoticeDialog() {
+  if (sessionMode !== "owner") return;
+  const title = textInput("", { placeholder: tr("Water cut on Tuesday"), maxlength: "120" });
+  const body = mk("textarea", { rows: "4", placeholder: tr("Details for the residents"), maxlength: "1500" });
+  const until = mk("input", { type: "date" });
+  const push = checkboxRow(tr("Also send a phone notification to tenants"), true);
+  const save = () => {
+    if (!title.value.trim()) { showToast("Give the notice a title"); return; }
+    const notice = { id: newId("ntc"), title: title.value.trim(), body: body.value.trim(), until: until.value || "", createdAt: new Date().toISOString(), by: auditActor() };
+    (state.announcements ||= []).push(notice);
+    if (!saveState()) return;
+    renderAll();
+    if (push.input.checked) notifyTenants(null, `📢 ${notice.title}`, notice.body || notice.title);
+    openToolDialog(tr("Notice posted"),
+      note(tr("Tenants see it on their phones. Post it to the building's WhatsApp group too?")),
+      mk("div", { className: "button-row" },
+        primaryButton(tr("Post to WhatsApp group"), () => { window.open(whatsappLink("", noticeMessage(notice)), "_blank", "noopener"); closeToolDialog(); }),
+        secondaryButton(tr("Done"), closeToolDialog)));
+  };
+  openToolDialog(tr("New notice"),
+    field(tr("Title"), title),
+    field(tr("Message"), body),
+    field(tr("Show until (optional)"), until, tr("Without a date it shows for 60 days.")),
+    canNotify() ? push.row : null,
+    mk("div", { className: "button-row" }, primaryButton(tr("Post notice"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function deleteNotice(id) {
+  if (!window.confirm(tr("Delete this notice?"))) return;
+  state.announcements = (state.announcements || []).filter((n) => n.id !== id);
+  recordDeletedId("announcements", id);
+  if (!saveState()) return;
+  renderAll();
+}
+
+// ── Problem reports ─────────────────────────────────────────────────────────
+const ISSUE_STATUSES = [["open", "Open"], ["in_progress", "In progress"], ["fixed", "Fixed"]];
+
+function issueStatusPill(status) {
+  const label = (ISSUE_STATUSES.find(([v]) => v === status) || ISSUE_STATUSES[0])[1];
+  return mk("span", { className: `status-pill issue-${status || "open"}`, text: tr(label) });
+}
+
+async function uploadPhotoUnder(prefix, file) {
+  if (cloudProvider() !== "supabase" || !authSession) throw new Error("Photos need the cloud. Send the photo to the owner on WhatsApp instead.");
+  const prepared = await prepareInvoiceUpload({ id: "photo", invoice: "photo", description: "photo", date: localDateInput() }, file);
+  const path = `${prefix}/${Date.now()}-${randomToken()}.jpg`;
+  const c = cloudConfig();
+  await ensureFreshSession();
+  const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}`, "Content-Type": prepared.mimeType, "x-upsert": "false" },
+    body: base64ToBytes(prepared.dataBase64),
+  });
+  if (!res.ok) throw Object.assign(new Error(tr("Photo upload failed ({status})", { status: res.status })), { status: res.status });
+  return { fileName: "photo.jpg", mimeType: prepared.mimeType, storagePath: path, uploadedAt: new Date().toISOString() };
+}
+
+function openIssueDialog() {
+  const tenantPhone = isTenantSession() && sessionMode === "tenant";
+  if (sessionMode !== "owner" && !tenantPhone) { showToast("Link this phone with an invite code to report problems"); return; }
+  const title = textInput("", { placeholder: tr("Leak under the stairs"), maxlength: "200" });
+  const details = mk("textarea", { rows: "4", placeholder: tr("Where, since when, how bad"), maxlength: "2000" });
+  const photo = mk("input", { type: "file", accept: "image/*" });
+  const submit = primaryButton(tr("Send"), async () => {
+    if (!title.value.trim()) { showToast("Describe the problem in a few words"); return; }
+    submit.disabled = true;
+    try {
+      const file = photo.files?.[0] || null;
+      if (tenantPhone) {
+        const uploaded = file ? await uploadPhotoUnder(`issues/${sessionTenantId}`, file) : null;
+        await supabaseRequest("rpc/report_issue", { method: "POST", body: JSON.stringify({ p_title: title.value.trim(), p_details: details.value.trim(), ...(uploaded ? { p_photo_path: uploaded.storagePath } : {}) }) });
+        closeToolDialog();
+        showToast("Sent to the building owner");
+        syncFromSheet({ silent: true });
+      } else {
+        const uploaded = file && hasCloudConfig() && authSession ? await uploadPhotoUnder("issues/building", file) : null;
+        const now = new Date().toISOString();
+        (state.issues ||= []).push({ id: newId("iss"), tenantId: null, title: title.value.trim(), details: details.value.trim(), status: "open", createdAt: now, updatedAt: now, ...(uploaded ? { photo: uploaded } : {}) });
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+        showToast("Problem recorded");
+      }
+    } catch (error) {
+      showToast(error instanceof TypeError ? "Can't reach the cloud. Check your connection." : describeSyncProblem(error), 6000);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+  openToolDialog(tr("Report a problem"),
+    note(tenantPhone ? tr("The owner gets your report and you can follow its status here.") : tr("A building problem everyone can see, like a broken lift.")),
+    field(tr("What's wrong?"), title),
+    field(tr("Details"), details),
+    field(tr("Photo (optional)"), photo),
+    mk("div", { className: "button-row" }, submit, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openIssueManageDialog(id) {
+  const issue = (state.issues || []).find((i) => i.id === id);
+  if (!issue || sessionMode !== "owner") return;
+  const status = selectInput(ISSUE_STATUSES.map(([v, l]) => [v, tr(l)]), issue.status || "open");
+  const ownerNote = mk("textarea", { rows: "3", placeholder: tr("e.g. The plumber comes on Thursday"), maxlength: "1000" });
+  ownerNote.value = issue.ownerNote || "";
+  const save = () => {
+    const changedStatus = status.value !== issue.status;
+    issue.status = status.value;
+    issue.ownerNote = ownerNote.value.trim();
+    issue.updatedAt = new Date().toISOString();
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    if (issue.tenantId && changedStatus) {
+      notifyTenants(issue.tenantId, tr("Problem update: {title}", { title: issue.title }), [tr(ISSUE_STATUSES.find(([v]) => v === issue.status)[1]), issue.ownerNote].filter(Boolean).join(" — "));
+    }
+    showToast("Problem updated");
+  };
+  const remove = () => {
+    if (!window.confirm(tr("Delete this problem report?"))) return;
+    state.issues = (state.issues || []).filter((i) => i.id !== id);
+    recordDeletedId("issues", id);
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(issue.title,
+    issue.details ? note(issue.details) : null,
+    note(issue.tenantId ? tr("Reported by {name} on {date}", { name: tenantName(issue.tenantId) || tr("(removed tenant)"), date: formatDateLabel(String(issue.createdAt).slice(0, 10)) }) : tr("Building problem")),
+    field(tr("Status"), status),
+    field(tr("Note for the resident"), ownerNote),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), mk("button", { type: "button", className: "danger-button", text: tr("Delete"), onclick: remove })));
+}
+
+function renderIssues() {
+  if (!els.issuesList) return;
+  const canReport = sessionMode === "owner" || (sessionMode === "tenant" && isTenantSession());
+  if (els.newIssueButton) els.newIssueButton.classList.toggle("hidden", !canReport);
+  const order = { open: 0, in_progress: 1, fixed: 2 };
+  const issues = (state.issues || []).slice().sort((a, b) => (order[a.status] ?? 0) - (order[b.status] ?? 0) || String(b.createdAt).localeCompare(String(a.createdAt)));
+  if (!issues.length) {
+    els.issuesList.replaceChildren(mk("div", { className: "empty-state", text: tr("No problems reported.") }));
+    return;
+  }
+  els.issuesList.replaceChildren(...issues.map((issue) => {
+    const who = issue.tenantId ? (tenantName(issue.tenantId) || tr("(removed tenant)")) : tr("Building");
+    const card = mk("article", { className: "notice-card issue-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: issue.title }), issueStatusPill(issue.status)),
+      issue.details ? mk("p", { className: "notice-body", text: issue.details }) : null,
+      issue.ownerNote ? mk("p", { className: "notice-body owner-note", text: `${tr("Owner")}: ${issue.ownerNote}` }) : null,
+      mk("p", { className: "notice-until", text: `${who} · ${formatDateLabel(String(issue.createdAt || "").slice(0, 10))}` }));
+    const actions = mk("div", { className: "notice-actions" });
+    if (issue.photo?.storagePath) actions.append(miniButton(tr("Photo"), () => openInvoicePhoto(issue.photo)));
+    if (sessionMode === "owner") actions.append(miniButton(tr("Update"), () => openIssueManageDialog(issue.id)));
+    if (actions.childNodes.length) card.append(actions);
+    return card;
+  }));
+}
+
+// ── Payment plans ───────────────────────────────────────────────────────────
+function activePlanFor(tenantId) {
+  return (state.paymentPlans || []).find((p) => p.tenantId === tenantId && p.status === "active") || null;
+}
+
+function monthsBetween(fromMonth, toMonth) {
+  const [fy, fm] = monthKey(fromMonth).split("-").map(Number);
+  const [ty, tm] = monthKey(toMonth).split("-").map(Number);
+  return (ty - fy) * 12 + (tm - fm);
+}
+
+// The plan schedules the balance down by one instalment per completed month.
+// Measured at the last statement (month end), so charges added this month do
+// not make a tenant look behind before they are due.
+function planProgress(plan) {
+  const statementMonth = getLastCompletedMonth();
+  const completed = Math.max(0, monthsBetween(plan.startMonth, statementMonth) + 1);
+  const scheduled = roundUsd(Math.max(0, Number(plan.totalUsd || 0) - completed * Number(plan.instalmentUsd || 0)));
+  const statementBalance = completed > 0 ? getTenantMonthEndBalance(plan.tenantId, statementMonth) : Number(plan.totalUsd || 0);
+  const currentBalance = getTenantBalance(plan.tenantId);
+  const behindBy = roundUsd(Math.max(0, statementBalance - scheduled));
+  const monthsLeft = Number(plan.instalmentUsd || 0) > 0 ? Math.ceil(Math.max(0, currentBalance) / Number(plan.instalmentUsd)) : 0;
+  return { completed, scheduled, statementBalance, currentBalance, behindBy, monthsLeft, done: currentBalance <= 0.005, started: completed > 0 };
+}
+
+function planStatusText(plan) {
+  const p = planProgress(plan);
+  const base = tr("{amount} per month from {month}", { amount: formatUsd(plan.instalmentUsd), month: formatMonth(plan.startMonth) });
+  if (p.done) return `${base} · ${tr("fully paid ✓")}`;
+  if (!p.started) return `${base} · ${tr("first instalment due by the end of {month}", { month: formatMonth(plan.startMonth) })}`;
+  return p.behindBy > 0.5
+    ? `${base} · ${tr("behind by {amount}", { amount: formatUsd(p.behindBy) })}`
+    : `${base} · ${tr("on track")} · ${tr("about {n} months left", { n: p.monthsLeft })}`;
+}
+
+function plansBehind() {
+  return (state.paymentPlans || []).filter((p) => p.status === "active" && state.tenants.some((t) => t.id === p.tenantId))
+    .filter((p) => { const pr = planProgress(p); return pr.started && !pr.done && pr.behindBy > 0.5; });
+}
+
+function openPlanDialog(tenantId) {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant || sessionMode !== "owner") return;
+  const plan = activePlanFor(tenantId);
+  if (plan) {
+    const p = planProgress(plan);
+    const end = (status) => {
+      if (!window.confirm(status === "done" ? tr("Mark this plan as finished?") : tr("Cancel this payment plan? The full balance is due again."))) return;
+      plan.status = status;
+      plan.endedAt = new Date().toISOString();
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+    };
+    openToolDialog(tr("Payment plan — {name}", { name: tenant.name }),
+      note(planStatusText(plan)),
+      mk("div", { className: "cash-result" },
+        mk("div", {}, mk("span", { text: tr("Agreed amount") }), mk("b", { className: "tnum", text: formatUsd(plan.totalUsd) })),
+        mk("div", {}, mk("span", { text: tr("Balance now") }), mk("b", { className: "tnum", text: formatUsd(p.currentBalance) })),
+        p.started ? mk("div", {}, mk("span", { text: tr("Should be at most (last statement)") }), mk("b", { className: "tnum", text: formatUsd(p.scheduled) })) : null),
+      plan.note ? note(plan.note) : null,
+      mk("div", { className: "button-row" },
+        p.done ? primaryButton(tr("Mark as finished"), () => end("done")) : null,
+        mk("button", { type: "button", className: "danger-button", text: tr("Cancel plan"), onclick: () => end("cancelled") }),
+        secondaryButton(tr("Close"), closeToolDialog)));
+    return;
+  }
+  const balance = Math.max(0, getTenantBalance(tenantId));
+  const total = numberInput(balance ? balance.toFixed(2) : "");
+  const instalment = numberInput("");
+  const start = mk("input", { type: "month", value: monthKey(currentMonthValue()) });
+  const memo = textInput("", { placeholder: tr("Optional") });
+  const preview = note("");
+  const update = () => {
+    const t = Number(total.value || 0);
+    const i = Number(instalment.value || 0);
+    preview.textContent = t > 0 && i > 0 ? tr("{n} monthly instalments, on top of the normal monthly charges.", { n: Math.ceil(t / i) }) : "";
+  };
+  [total, instalment].forEach((input) => input.addEventListener("input", update));
+  const save = () => {
+    const t = Number(total.value || 0);
+    const i = Number(instalment.value || 0);
+    if (!(t > 0) || !(i > 0)) { showToast("Enter the amount and the monthly instalment"); return; }
+    if (i > t) { showToast("The instalment can't be more than the total"); return; }
+    (state.paymentPlans ||= []).push({ id: newId("plan"), tenantId, totalUsd: roundUsd(t), instalmentUsd: roundUsd(i), startMonth: monthIso(start.value) || currentMonthValue(), note: memo.value.trim(), status: "active", createdAt: new Date().toISOString() });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast("Payment plan saved");
+  };
+  openToolDialog(tr("Payment plan — {name}", { name: tenant.name }),
+    note(tr("Agree how a tenant who is behind catches up: a fixed amount each month until the arrears are cleared, while they keep paying the normal monthly charges.")),
+    field(tr("Amount to pay off (USD)"), total, tr("Current balance: {amount}", { amount: formatUsd(balance) })),
+    field(tr("Per month (USD)"), instalment),
+    field(tr("Starting"), start),
+    field(tr("Note"), memo),
+    preview,
+    mk("div", { className: "button-row" }, primaryButton(tr("Save plan"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Moving in and out ───────────────────────────────────────────────────────
+function tenantOccupiesMonth(tenant, month) {
+  const key = monthKey(month);
+  if (tenant.movedInOn && key < monthKey(tenant.movedInOn)) return false;
+  if (tenant.movedOutOn && key >= monthKey(tenant.movedOutOn)) return false;
+  return true;
+}
+
+function openMoveOutDialog(tenantId) {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant || sessionMode !== "owner") return;
+  const balance = getTenantBalance(tenantId);
+  const nextFirst = monthIso(monthKey(addMonths(currentMonthValue(), 1)));
+  const date = mk("input", { type: "date", value: nextFirst });
+  const name = textInput("", { placeholder: tr("New occupant's name") });
+  const phone = mk("input", { type: "tel", placeholder: "70 123 456" });
+  const reading = numberInput("", { step: "1", inputmode: "numeric" });
+  const choice = selectInput([
+    ["leave", tr("The leaving tenant settles it")],
+    ["transfer", tr("Transfer it to the new occupant")],
+  ], "leave");
+  const balanceLine = Math.abs(balance) < 0.005
+    ? tr("{name} is settled in full.", { name: tenant.name })
+    : balance > 0
+      ? tr("{name} owes {amount}.", { name: tenant.name, amount: formatUsd(balance) })
+      : tr("{name} has a credit of {amount}.", { name: tenant.name, amount: formatUsd(-balance) });
+  const save = () => {
+    const moveDate = date.value;
+    if (!moveDate) { showToast("Choose the handover date"); return; }
+    if (!name.value.trim()) { showToast("Enter the new occupant's name"); return; }
+    if (isMonthClosed(moveDate)) { showToast(closedMonthError(moveDate).message, 5000); return; }
+    const newTenant = {
+      id: generateTenantId(name.value.trim()),
+      name: name.value.trim(),
+      unit: tenant.unit,
+      coefficient: tenant.coefficient || 0,
+      breakerAmps: tenant.breakerAmps || 0,
+      phone: phone.value.trim(),
+      active: true,
+      pinHash: "",
+      movedInOn: moveDate,
+      ...(reading.value !== "" ? { meterStart: Number(reading.value) } : {}),
+    };
+    tenant.active = false;
+    tenant.movedOutOn = moveDate;
+    if (reading.value !== "") tenant.meterEnd = Number(reading.value);
+    state.tenants.push(newTenant);
+    if (choice.value === "transfer" && Math.abs(balance) >= 0.005) {
+      const amount = roundUsd(Math.abs(balance));
+      const owes = balance > 0;
+      const entry = (tenantIdFor, debit, description) => ({
+        id: newId("tx"), category: "Opening Balance", description, tenantId: tenantIdFor, forMonth: null, project: "", date: moveDate,
+        supplier: "", invoice: "", expenseCategory: "", serviceType: "", servicePart: "",
+        debitUsd: debit ? amount : 0, debitLbp: 0, creditUsd: debit ? 0 : amount, creditLbp: 0,
+        balanceUsd: debit ? -amount : amount, balanceLbp: 0, invoiceAttachment: null, sourceRow: null,
+      });
+      state.transactions.push(
+        entry(tenant.id, !owes, tr("Balance transferred to {name}", { name: newTenant.name })),
+        entry(newTenant.id, owes, tr("Balance taken over from {name}", { name: tenant.name })),
+      );
+    }
+    if (!saveState()) return;
+    populateTenantSelect();
+    renderAll();
+    openToolDialog(tr("Handover recorded"),
+      note(tr("{old} has moved out and {new} is now the occupant of unit {unit}. From {month}, {new} pays the monthly charges.", { old: tenant.name, new: newTenant.name, unit: tenant.unit, month: formatMonth(moveDate) })),
+      mk("div", { className: "button-row" },
+        primaryButton(tr("Final statement for {name}", { name: tenant.name }), () => { void shareTenantStatementPdf(tenant.id); }),
+        secondaryButton(tr("Invite {name}", { name: newTenant.name }), () => { closeToolDialog(); openInviteDialog(newTenant.id); })));
+  };
+  openToolDialog(tr("Move out — {name}", { name: tenant.name }),
+    note(tr("Records a change of occupant for unit {unit}. The old account is kept (inactive) with its full history.", { unit: tenant.unit })),
+    field(tr("Handover date"), date, tr("The leaving tenant pays up to the month before; the new occupant from this month.")),
+    field(tr("New occupant"), name),
+    field(tr("Phone (optional)"), phone),
+    field(tr("Generator meter at handover (optional)"), reading),
+    note(balanceLine),
+    Math.abs(balance) >= 0.005 ? field(tr("The balance"), choice) : null,
+    mk("div", { className: "button-row" }, primaryButton(tr("Record handover"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Extra administrators ────────────────────────────────────────────────────
+const ADMIN_INVITE_KEY = "building-account-tracker:admin-invite";
+
+function pendingAdminInvite() {
+  try { return localStorage.getItem(ADMIN_INVITE_KEY) || ""; } catch { return ""; }
+}
+
+// ?admin=CODE in the link the owner sent: remember it until Google sign-in.
+function captureAdminInvite() {
+  const code = new URLSearchParams(location.search).get("admin");
+  if (!code) return;
+  try { localStorage.setItem(ADMIN_INVITE_KEY, code.trim().toUpperCase()); } catch { /* private mode */ }
+  history.replaceState(null, "", location.pathname);
+}
+
+function adminInviteLink(code) {
+  return `${location.origin}${location.pathname}?admin=${encodeURIComponent(code)}`;
+}
+
+async function openAdminsDialog() {
+  if (!isOwnerSession()) { showToast("Sign in with Google as the owner to manage administrators"); return; }
+  const list = mk("div", { className: "history-list compact" }, note(tr("Loading…")));
+  const role = selectInput([["viewer", tr("View only — sees everything, changes nothing")], ["owner", tr("Full access — can change everything")]], "viewer");
+  const result = mk("div");
+  const create = primaryButton(tr("Create invite link"), async () => {
+    create.disabled = true;
+    try {
+      const res = await supabaseRequest("rpc/create_admin_invite", { method: "POST", body: JSON.stringify({ p_role: role.value }) });
+      const code = await res.json();
+      const link = adminInviteLink(code);
+      const message = tr("You're invited to help manage {building} in the Building Account Tracker. Open this link on your phone and sign in with your Google account (valid 7 days, one use):\n{link}", { building: state.building?.name || "", link });
+      result.replaceChildren(
+        mk("p", { className: "invite-code", text: code }),
+        note(link),
+        mk("div", { className: "button-row" },
+          primaryButton(tr("Send on WhatsApp"), () => window.open(whatsappLink("", message), "_blank", "noopener")),
+          secondaryButton(tr("Copy link"), () => navigator.clipboard?.writeText(link).then(() => showToast("Link copied")).catch(() => showToast(link, 8000)))));
+    } catch (error) {
+      showToast(describeSyncProblem(error), 6000);
+    } finally {
+      create.disabled = false;
+    }
+  });
+  openToolDialog(tr("Administrators"),
+    note(tr("Give a family member or the building committee their own sign-in. They use their own Google account; you can remove them at any time.")),
+    list,
+    field(tr("Invite someone"), role),
+    note(tr("Google only lets accounts sign in that are allowed in the app's Google settings. If they get an \"access blocked\" message, the account needs adding there first.")),
+    create,
+    result);
+  try {
+    const res = await supabaseRequest("rpc/list_admins", { method: "POST", body: "{}" });
+    const admins = await res.json();
+    list.replaceChildren(...admins.map((a) => mk("div", { className: "history-row" },
+      mk("div", { className: "history-head" }, mk("strong", { text: a.email || a.user_id }), mk("span", { text: a.role === "viewer" ? tr("View only") : tr("Full access") })),
+      a.is_me ? mk("div", { className: "history-by", text: tr("You") }) : miniButton(tr("Remove"), async () => {
+        if (!window.confirm(tr("Remove {email}'s access to the building?", { email: a.email }))) return;
+        try {
+          await supabaseRequest("rpc/remove_admin", { method: "POST", body: JSON.stringify({ p_user_id: a.user_id }) });
+          showToast("Access removed");
+          openAdminsDialog();
+        } catch (error) {
+          showToast(describeSyncProblem(error), 6000);
+        }
+      }, "danger-mini"))));
+  } catch (error) {
+    list.replaceChildren(note(error.status === 404 ? tr("The database update for administrators hasn't been applied yet.") : describeSyncProblem(error)));
+  }
+}
+
+// ── Phone notifications ─────────────────────────────────────────────────────
+const PUSH_STATE_KEY = "building-account-tracker:push";
+
+function pushSupported() {
+  return typeof navigator !== "undefined" && "serviceWorker" in navigator && typeof window.PushManager !== "undefined" && typeof window.Notification !== "undefined";
+}
+
+function canNotify() {
+  return hasCloudConfig() && Boolean(authSession);
+}
+
+function pushIsOn() {
+  try { return localStorage.getItem(PUSH_STATE_KEY) === "on"; } catch { return false; }
+}
+
+function urlBase64ToBytes(base64) {
+  const padded = `${base64}${"=".repeat((4 - (base64.length % 4)) % 4)}`.replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(padded);
+  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+}
+
+async function enablePushNotifications() {
+  if (!pushSupported()) { showToast("This phone or browser can't receive notifications. On an iPhone, add the app to the Home Screen first.", 7000); return; }
+  if (!authSession) { showToast("Sign in first (Google for the owner, an invite code for tenants)", 6000); return; }
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") { showToast("Notifications are blocked for this site in the phone's settings", 6000); return; }
+    const keyRes = await fetch("/api/push-key", { cache: "no-store" });
+    const { publicKey } = await keyRes.json();
+    if (!publicKey) throw new Error("Notifications aren't set up on the server yet");
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = (await registration.pushManager.getSubscription())
+      || await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToBytes(publicKey) });
+    const json = subscription.toJSON();
+    await supabaseRequest("rpc/save_push_subscription", { method: "POST", body: JSON.stringify({ p_endpoint: json.endpoint, p_p256dh: json.keys.p256dh, p_auth: json.keys.auth }) });
+    localStorage.setItem(PUSH_STATE_KEY, "on");
+    showToast("Notifications are on for this phone");
+  } catch (error) {
+    showToast(error.status ? describeSyncProblem(error) : error.message, 6000);
+  }
+  renderPushStatus();
+}
+
+async function disablePushNotifications() {
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      const endpoint = subscription.endpoint;
+      await subscription.unsubscribe();
+      await supabaseRequest("rpc/delete_push_subscription", { method: "POST", body: JSON.stringify({ p_endpoint: endpoint }) }).catch(() => {});
+    }
+  } catch { /* already gone */ }
+  try { localStorage.removeItem(PUSH_STATE_KEY); } catch { /* ignore */ }
+  showToast("Notifications are off for this phone");
+  renderPushStatus();
+}
+
+function renderPushStatus() {
+  if (!els.pushStatusText || !els.pushToggleButton) return;
+  const on = pushIsOn();
+  els.pushStatusText.textContent = !pushSupported()
+    ? tr("Not available in this browser. On an iPhone, add the app to the Home Screen first.")
+    : on
+      ? tr("On for this phone.")
+      : sessionMode === "tenant"
+        ? tr("Get a notification when the owner posts a notice, records your payment or updates a problem you reported.")
+        : tr("Get a notification when a tenant says they paid or reports a problem.");
+  els.pushToggleButton.textContent = on ? tr("Turn off") : tr("Turn on");
+  els.pushToggleButton.disabled = !pushSupported();
+}
+
+// Owner → tenant phones. Best effort: a failure never blocks the owner's work.
+function notifyTenants(tenantId, title, body) {
+  if (!isOwnerSession() || !hasCloudConfig()) return;
+  supabaseRequest("rpc/notify_tenants", { method: "POST", body: JSON.stringify({ p_tenant_id: tenantId || null, p_title: title, p_body: body || "" }) }).catch(() => {});
+}
+
+// ── Keep-alive watch ────────────────────────────────────────────────────────
+let keepaliveLastOk = null;
+let keepaliveCheckedAt = 0;
+
+async function refreshKeepaliveStatus() {
+  if (!isAdminSession() || cloudProvider() !== "supabase") return;
+  if (Date.now() - keepaliveCheckedAt < 6 * 3600000) return;
+  keepaliveCheckedAt = Date.now();
+  try {
+    const res = await supabaseRequest("rpc/keepalive_status", { method: "POST", body: "{}" });
+    const value = await res.json();
+    keepaliveLastOk = value ? new Date(value) : null;
+    renderAttention();
+  } catch { /* SQL not applied yet, or offline: say nothing */ }
+}
+
+function keepaliveStale() {
+  if (!keepaliveLastOk || Number.isNaN(keepaliveLastOk.getTime())) return false;
+  return Date.now() - keepaliveLastOk.getTime() > 36 * 3600000;
+}
+
+// ── Spending trends and the annual report ───────────────────────────────────
+function spendingCategory(t) {
+  if (t.category === "Services Expenses") {
+    if (t.serviceType === "water") return tr("Water");
+    return t.servicePart === "maintenance" ? tr("Generator maintenance") : tr("Generator fuel");
+  }
+  return t.expenseCategory || tr("General");
+}
+
+function isSpending(t) {
+  return t.category === "Expenses" || t.category === "Services Expenses";
+}
+
+function spendingByYear() {
+  const years = new Map();
+  state.transactions.filter(isSpending).forEach((t) => {
+    const year = String(transactionDateValue(t)).slice(0, 4);
+    if (!/^\d{4}$/.test(year) || year === "1900") return;
+    const cats = years.get(year) || new Map();
+    const cat = spendingCategory(t);
+    cats.set(cat, roundUsd((cats.get(cat) || 0) + toUsd(t.debitUsd, t.debitLbp)));
+    years.set(year, cats);
+  });
+  return years;
+}
+
+function buildSpendingTrends() {
+  const byYear = spendingByYear();
+  const years = [...byYear.keys()].sort().slice(-4);
+  if (!years.length) return note(tr("No expenses recorded yet."));
+  const latest = years[years.length - 1];
+  const categories = [...new Set(years.flatMap((y) => [...byYear.get(y).keys()]))]
+    .sort((a, b) => (byYear.get(latest).get(b) || 0) - (byYear.get(latest).get(a) || 0));
+  const totals = years.map((y) => roundUsd([...byYear.get(y).values()].reduce((s, v) => s + v, 0)));
+  const max = Math.max(...totals, 1);
+  const bars = mk("div", { className: "trend-bars" }, years.map((y, i) => mk("div", { className: "trend-bar-row" },
+    mk("span", { className: "trend-year", text: y }),
+    mk("div", { className: "trend-track" }, mk("div", { className: "trend-fill", style: `width:${Math.max(2, Math.round((totals[i] / max) * 100))}%` })),
+    mk("b", { className: "tnum", text: formatUsd(totals[i]) }))));
+  const change = (a, b) => (a > 0 ? `${b >= a ? "+" : ""}${Math.round(((b - a) / a) * 100)}%` : "");
+  const table = mk("table", { className: "report-table" },
+    mk("thead", {}, mk("tr", {}, mk("th", { text: tr("Category") }), years.map((y) => mk("th", { className: "num", text: y })), years.length > 1 ? mk("th", { className: "num", text: tr("Change") }) : null)),
+    mk("tbody", {}, categories.map((cat) => {
+      const values = years.map((y) => byYear.get(y).get(cat) || 0);
+      return mk("tr", {}, mk("td", { text: cat }), values.map((v) => mk("td", { className: "num", text: v ? formatUsd(v) : "—" })),
+        years.length > 1 ? mk("td", { className: "num", text: change(values[values.length - 2], values[values.length - 1]) }) : null);
+    })),
+    mk("tfoot", {}, mk("tr", {}, mk("td", { text: tr("Total") }), totals.map((v) => mk("td", { className: "num", text: formatUsd(v) })),
+      years.length > 1 ? mk("td", { className: "num", text: change(totals[totals.length - 2], totals[totals.length - 1]) }) : null)));
+  const thisYear = String(new Date().getFullYear());
+  return mk("div", {}, bars, mk("div", { className: "report-table-wrap" }, table),
+    years.includes(thisYear) ? note(tr("{year} is the year so far.", { year: thisYear })) : null);
+}
+
+function reportYears() {
+  const years = new Set(state.transactions.map((t) => String(transactionDateValue(t)).slice(0, 4)).filter((y) => /^\d{4}$/.test(y) && y !== "1900"));
+  years.add(String(new Date().getFullYear()));
+  return [...years].sort().reverse();
+}
+
+// Everything the yearly owners' meeting asks about, for one calendar year.
+function annualReportData(year) {
+  const y = String(year);
+  const start = `${y}-01-01`;
+  const end = `${y}-12-31`;
+  const isCash = (t) => !(t.category === "Opening Balance" && t.tenantId);
+  const dateOf = (t) => String(transactionDateValue(t));
+  const openingCash = roundUsd(state.transactions.filter(isCash).filter((t) => dateOf(t) < start).reduce((s, t) => s + transactionNetUsd(t), 0));
+  const inYear = state.transactions.filter((t) => dateOf(t) >= start && dateOf(t) <= end);
+  const months = [];
+  let running = openingCash;
+  for (let m = 1; m <= 12; m += 1) {
+    const key = `${y}-${String(m).padStart(2, "0")}`;
+    const row = { month: `${key}-01`, payments: 0, projects: 0, expenses: 0, services: 0, other: 0, net: 0 };
+    inYear.filter(isCash).filter((t) => dateOf(t).slice(0, 7) === key).forEach((t) => {
+      const net = transactionNetUsd(t);
+      if (t.category === "Expenses") row.expenses += toUsd(t.debitUsd, t.debitLbp);
+      else if (t.category === "Services Expenses") row.services += toUsd(t.debitUsd, t.debitLbp);
+      else if (t.category === "Payments" && t.project) row.projects += net;
+      else if (t.category === "Payments") row.payments += net;
+      else row.other += net;
+      row.net += net;
+    });
+    running = roundUsd(running + row.net);
+    Object.keys(row).forEach((k) => { if (typeof row[k] === "number") row[k] = roundUsd(row[k]); });
+    months.push({ ...row, cashEnd: running });
+  }
+  const categories = new Map();
+  inYear.filter(isSpending).forEach((t) => {
+    const cat = spendingCategory(t);
+    categories.set(cat, roundUsd((categories.get(cat) || 0) + toUsd(t.debitUsd, t.debitLbp)));
+  });
+  const nowMonth = currentMonthValue();
+  const balanceMonth = monthKey(nowMonth).slice(0, 4) === y ? getLastCompletedMonth() : `${y}-12-01`;
+  const tenants = state.tenants.filter((t) => t.active !== false || (t.movedOutOn && t.movedOutOn >= start)).map((t) => ({
+    name: t.name,
+    unit: t.unit || "",
+    paid: roundUsd(inYear.filter((x) => x.category === "Payments" && x.tenantId === t.id && !x.project).reduce((s, x) => s + transactionNetUsd(x), 0)),
+    projects: roundUsd(inYear.filter((x) => x.category === "Payments" && x.tenantId === t.id && x.project).reduce((s, x) => s + transactionNetUsd(x), 0)),
+    balance: monthKey(balanceMonth) < monthKey(start) ? 0 : getTenantMonthEndBalance(t.id, balanceMonth),
+  }));
+  const projects = (state.buildingProjects || []).map((p) => ({
+    name: p.name || "",
+    status: p.status || "",
+    budget: Number(p.totalBudget || 0),
+    collected: roundUsd(state.transactions.filter((x) => x.category === "Payments" && x.project && x.project === p.name).reduce((s, x) => s + transactionNetUsd(x), 0)),
+  }));
+  const income = roundUsd(months.reduce((s, r) => s + r.payments + r.projects + Math.max(0, r.other), 0));
+  const spending = roundUsd(months.reduce((s, r) => s + r.expenses + r.services, 0));
+  return {
+    year: y, openingCash, closingCash: running, income, spending,
+    months, categories: [...categories.entries()].sort((a, b) => b[1] - a[1]), tenants, projects,
+    owedAtEnd: roundUsd(tenants.reduce((s, t) => s + Math.max(0, t.balance), 0)),
+    balanceMonth,
+    cashChecks: (state.cashChecks || []).filter((c) => String(c.date).startsWith(y)),
+  };
+}
+
+function printAnnualReport(year) {
+  const d = annualReportData(year);
+  const page = mk("article", { className: "print-page ledger-print-page annual-print" },
+    mk("header", { className: "print-header" },
+      mk("div", {}, mk("p", { text: state.building?.name || "" }), mk("h1", { text: tr("Annual report {year}", { year: d.year }) }), mk("p", { text: tr("For the owners' meeting") })),
+      mk("div", { className: "print-meta" }, mk("span", { text: `${tr("Date")}: ${localDateInput()}` }), mk("span", { text: `App: ${APP_VERSION}` }))),
+    mk("section", { className: "print-summary" }, [
+      [tr("Cash on 1 January"), formatUsd(d.openingCash)],
+      [tr("Money in"), formatUsd(d.income)],
+      [tr("Money out"), formatUsd(d.spending)],
+      [tr("Cash on 31 December"), formatUsd(d.closingCash)],
+      [tr("Still owed by tenants"), formatUsd(d.owedAtEnd)],
+    ].map(([label, value]) => mk("div", {}, mk("span", { text: label }), mk("strong", { text: value })))),
+    mk("h2", { className: "print-section-title", text: tr("Month by month") }),
+    printTable([tr("Month"), tr("Payments"), tr("Projects"), tr("Expenses"), tr("Generator & water"), tr("Net"), tr("Cash at month end")],
+      d.months.map((r) => [formatMonth(r.month), formatUsd(r.payments), formatUsd(r.projects), formatUsd(r.expenses), formatUsd(r.services), formatUsd(r.net), formatUsd(r.cashEnd)]), [1, 2, 3, 4, 5, 6]),
+    mk("h2", { className: "print-section-title", text: tr("Where the money went") }),
+    printTable([tr("Category"), tr("Amount"), tr("Share")],
+      d.categories.map(([cat, usd]) => [cat, formatUsd(usd), d.spending > 0 ? `${Math.round((usd / d.spending) * 100)}%` : ""]), [1, 2]),
+    mk("h2", { className: "print-section-title", text: tr("Tenants") }),
+    printTable([tr("Unit"), tr("Tenant"), tr("Paid in the year"), tr("Projects"), tr("Balance (owes +)")],
+      d.tenants.map((t) => [t.unit, t.name, formatUsd(t.paid), formatUsd(t.projects), formatUsd(t.balance)]), [2, 3, 4]),
+    d.projects.length ? mk("h2", { className: "print-section-title", text: tr("Projects") }) : null,
+    d.projects.length ? printTable([tr("Project"), tr("Status"), tr("Budget"), tr("Collected")],
+      d.projects.map((p) => [p.name, tr(p.status), formatUsd(p.budget), formatUsd(p.collected)]), [2, 3]) : null,
+    mk("p", { className: "print-note", text: tr("Balances are as of the end of {month}.", { month: formatMonth(d.balanceMonth) }) }));
+  printPreparedPage(page);
+}
+
+function printTable(headers, rows, numericCols = []) {
+  const numeric = new Set(numericCols);
+  return mk("table", { className: "print-table" },
+    mk("thead", {}, mk("tr", {}, headers.map((h, i) => mk("th", { className: numeric.has(i) ? "numeric" : "", text: h })))),
+    mk("tbody", {}, rows.map((row) => mk("tr", {}, row.map((cell, i) => mk("td", { className: numeric.has(i) ? "numeric" : "", text: cell }))))));
+}
+
+function buildAnnualWorkbookFiles(year) {
+  const d = annualReportData(year);
+  const rtl = currentLang === "ar";
+  const building = state.building?.name || "Building";
+  const subtitle = tr("{building} · annual report {year}", { building, year: d.year });
+  const C = (header, width, type = "text", total = false) => ({ header: tr(header), width, type, total });
+  const used = new Set();
+  const tables = [
+    { name: tr("Month by month"), columns: [C("Month", 12, "month"), C("Payments", 14, "usd", true), C("Projects", 14, "usd", true), C("Expenses", 14, "usd", true), C("Generator & water", 16, "usd", true), C("Other", 12, "usd", true), C("Net", 13, "usd", true), C("Cash at month end", 17, "usd")],
+      rows: d.months.map((r) => [r.month, r.payments, r.projects, r.expenses, r.services, r.other, r.net, r.cashEnd]) },
+    { name: tr("Where the money went"), columns: [C("Category", 30), C("Amount", 15, "usd", true)], rows: d.categories.map(([cat, usd]) => [cat, usd]) },
+    { name: tr("Tenants"), columns: [C("Unit", 9), C("Tenant", 26), C("Paid in the year", 16, "usd", true), C("Projects", 14, "usd", true), C("Balance (owes +)", 16, "usd", true)],
+      rows: d.tenants.map((t) => [t.unit, t.name, t.paid, t.projects, t.balance]) },
+    { name: tr("Projects"), columns: [C("Project", 26), C("Status", 12), C("Budget", 14, "usd", true), C("Collected", 14, "usd", true)],
+      rows: d.projects.map((p) => [p.name, tr(p.status), p.budget, p.collected]) },
+  ];
+  const summary = [
+    { heading: tr("Annual report {year}", { year: d.year }), items: [
+      [tr("Building"), building], [tr("Cash on 1 January"), d.openingCash, "usd"], [tr("Money in"), d.income, "usd"],
+      [tr("Money out"), d.spending, "usd"], [tr("Cash on 31 December"), d.closingCash, "usd"], [tr("Still owed by tenants"), d.owedAtEnd, "usd"]] },
+  ];
+  const sheets = [
+    { name: safeSheetName(tr("Summary"), used), xml: buildSummarySheetXml(building, subtitle, summary, rtl) },
+    ...tables.map((t) => ({ name: safeSheetName(t.name, used), xml: buildTableSheetXml({ ...t, title: t.name }, subtitle, rtl) })),
+  ];
+  return workbookPackageFiles(sheets, `${building} — annual report ${d.year}`);
+}
+
+function downloadAnnualWorkbook(year) {
+  const slug = String(state.building?.name || "building").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "building";
+  downloadBlob(new Blob([buildZip(buildAnnualWorkbookFiles(year))], { type: XLSX_MIME }), XLSX_MIME, `${slug}-annual-report-${year}.xlsx`);
+  showToast("Annual report downloaded");
+}
+
+// ── The Reports screen ──────────────────────────────────────────────────────
+function reportsSection(title, ...children) {
+  return mk("section", { className: "panel report-section" }, mk("div", { className: "panel-header" }, mk("h3", { text: title })), ...children);
+}
+
+function renderReports() {
+  if (!els.reportsBody) return;
+  if (sessionMode !== "owner") { els.reportsBody.replaceChildren(); return; }
+  const years = reportYears();
+  const yearSelect = selectInput(years.map((y) => [y, y]), years.find((y) => y < String(new Date().getFullYear())) || years[0]);
+
+  const monthsWithActivity = [...new Set(state.transactions.map((t) => monthKey(transactionDateValue(t))).filter((m) => m && m !== "1900-01"))]
+    .sort().reverse().filter((m) => m <= monthKey(currentMonthValue())).slice(0, 12);
+  const monthRows = mk("div", { className: "history-list compact" }, monthsWithActivity.length
+    ? monthsWithActivity.map((m) => {
+      const closed = isMonthClosed(m);
+      return mk("div", { className: "month-lock-row" },
+        mk("span", { text: formatMonth(monthIso(m)) }),
+        mk("span", { className: `status-pill ${closed ? "status-paid" : "status-due"}`, text: closed ? tr("Closed") : tr("Open") }),
+        miniButton(closed ? tr("Reopen") : tr("Close"), () => setMonthClosed(m, !closed)));
+    })
+    : [note(tr("No months with activity yet."))]);
+
+  const checks = (state.cashChecks || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 6);
+  const cashRows = mk("div", { className: "history-list compact" }, checks.map((c) => mk("div", { className: "history-row" },
+    mk("div", { className: "history-head" }, mk("strong", { text: formatDateLabel(c.date) }),
+      mk("span", { className: Math.abs(c.differenceUsd) < 1 ? "cash-ok" : "cash-gap", text: Math.abs(c.differenceUsd) < 1 ? tr("Matches") : formatUsd(c.differenceUsd) })),
+    mk("div", { className: "history-change", text: tr("Counted {counted} · books {expected}", { counted: formatUsd(c.countedUsd), expected: formatUsd(c.expectedUsd) }) }),
+    c.note ? mk("div", { className: "history-by", text: c.note }) : null,
+    miniButton(tr("Delete"), () => deleteCashCheck(c.id), "danger-mini"))));
+
+  els.reportsBody.replaceChildren(
+    reportsSection(tr("Annual report"),
+      note(tr("Everything for the yearly owners' meeting: money in and out, where it went, the reserve, and who still owes.")),
+      field(tr("Year"), yearSelect),
+      mk("div", { className: "button-row" },
+        primaryButton(tr("PDF"), () => printAnnualReport(yearSelect.value)),
+        secondaryButton(tr("Excel"), () => downloadAnnualWorkbook(yearSelect.value)))),
+    reportsSection(tr("Spending by year"), buildSpendingTrends()),
+    reportsSection(tr("Cash check"),
+      note(tr("Once a month, type what's actually in the cash box and the bank. Missing or unrecorded money shows up straight away.")),
+      primaryButton(tr("Count the cash"), openCashCheckDialog),
+      cashRows),
+    reportsSection(tr("Close the month"),
+      note(tr("Once you've sent a month's balances, close it. Its figures can't change by accident; to edit them you reopen the month first.")),
+      monthRows),
+    reportsSection(tr("Change history"),
+      note(tr("{n} changes recorded. Every addition, change and deletion, with the date and who made it — and an Undo for mistakes.", { n: (state.auditLog || []).length })),
+      secondaryButton(tr("Open the history"), () => { historyShown = 40; openHistoryDialog(); })),
+  );
+}
+
+// ── Workbook packaging shared by the full export and the annual report ─────
+function workbookPackageFiles(sheets, docTitle) {
+  const createdAt = new Date().toISOString();
+  return [
+    { name: "[Content_Types].xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  ${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("\n  ")}
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>` },
+    { name: "_rels/.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>` },
+    { name: "docProps/app.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>Building Account Tracker</Application>
+  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>${sheets.length}</vt:i4></vt:variant></vt:vector></HeadingPairs>
+  <TitlesOfParts><vt:vector size="${sheets.length}" baseType="lpstr">${sheets.map((s) => `<vt:lpstr>${escapeXml(s.name)}</vt:lpstr>`).join("")}</vt:vector></TitlesOfParts>
+</Properties>` },
+    { name: "docProps/core.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>${escapeXml(docTitle)}</dc:title>
+  <dc:creator>Building Account Tracker</dc:creator>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${createdAt}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${createdAt}</dcterms:modified>
+</cp:coreProperties>` },
+    { name: "xl/workbook.xml", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <bookViews><workbookView activeTab="0"/></bookViews>
+  <sheets>${sheets.map((s, i) => `<sheet name="${escapeXml(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets>
+</workbook>` },
+    { name: "xl/_rels/workbook.xml.rels", content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  ${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("\n  ")}
+  <Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>` },
+    { name: "xl/styles.xml", content: WB_STYLES_XML },
+    ...sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, content: s.xml })),
+  ];
+}
+
+// ── Polls weighted by ownership share ───────────────────────────────────────
+function pollIsOpen(poll) {
+  if (poll.status !== "open") return false;
+  return !(poll.closesOn && poll.closesOn < localDateInput());
+}
+
+// Counts for a poll card. Share mode weighs each unit by its coefficient; the
+// owner's own "owner" vote is not a unit and does not count there.
+function pollTally(poll) {
+  const counts = poll.voteCounts; // present on a tenant phone (server-side tally)
+  const votes = poll.votes || {};
+  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  if (poll.weighting === "share") {
+    if (counts && counts.totalShare !== undefined) {
+      return { mode: "share", yes: Number(counts.yesShare || 0), no: Number(counts.noShare || 0), abstain: Number(counts.abstainShare || 0), total: Number(counts.totalShare || 0) };
+    }
+    const weight = (id) => Number(activeTenants.find((t) => t.id === id)?.coefficient || 0);
+    const sum = (v) => Object.entries(votes).filter(([id, x]) => x === v && id !== "owner").reduce((s, [id]) => s + weight(id), 0);
+    return { mode: "share", yes: sum("yes"), no: sum("no"), abstain: sum("abstain"), total: activeTenants.reduce((s, t) => s + Number(t.coefficient || 0), 0) };
+  }
+  const total = counts?.units !== undefined ? Number(counts.units) + 1 : activeTenants.length + 1;
+  if (counts) return { mode: "unit", yes: Number(counts.yes || 0), no: Number(counts.no || 0), abstain: Number(counts.abstain || 0), total };
+  const count = (v) => Object.values(votes).filter((x) => x === v).length;
+  return { mode: "unit", yes: count("yes"), no: count("no"), abstain: count("abstain"), total };
+}
+
+function pollSummaryLines(poll) {
+  const tally = pollTally(poll);
+  const lines = [];
+  const voted = tally.yes + tally.no + tally.abstain;
+  const turnout = tally.total > 0 ? Math.round((voted / tally.total) * 100) : 0;
+  if (tally.mode === "share") lines.push(tr("Counted by ownership share: YES {yes} · NO {no} · ABSTAIN {abstain} of {total}", { yes: tally.yes, no: tally.no, abstain: tally.abstain, total: tally.total }));
+  if (poll.quorumPct) {
+    lines.push(turnout >= Number(poll.quorumPct)
+      ? tr("Turnout {pct}% — quorum of {q}% reached", { pct: turnout, q: poll.quorumPct })
+      : tr("Turnout {pct}% — needs {q}%", { pct: turnout, q: poll.quorumPct }));
+  }
+  if (poll.closesOn) lines.push(pollIsOpen(poll) ? tr("Voting closes {date}", { date: formatDateLabel(poll.closesOn) }) : tr("Voting closed {date}", { date: formatDateLabel(poll.closesOn) }));
+  if (!pollIsOpen(poll) && voted > 0) {
+    const quorumOk = !poll.quorumPct || turnout >= Number(poll.quorumPct);
+    lines.push(!quorumOk ? tr("Result: no decision (quorum not reached)")
+      : tally.yes > tally.no ? tr("Result: YES") : tally.no > tally.yes ? tr("Result: NO") : tr("Result: tie"));
+  }
+  return lines;
+}
+
+// ── Attention items added by v148 ───────────────────────────────────────────
+function extraAttentionItems() {
+  const items = [];
+  const toClose = monthToClose();
+  if (toClose) items.push({ kind: "warn", text: tr("Close {month} now that its balances are out", { month: formatMonth(toClose) }), view: "reportsView", action: "closeMonth", arg: toClose });
+  const cash = cashCheckDue();
+  if (cash) items.push({ kind: "warn", text: cash.last ? tr("Count the cash — last count {date}", { date: formatDateLabel(cash.last.date) }) : tr("Count the cash once to check the books"), view: "reportsView", action: "cashCheck" });
+  const warning = generatorEfficiencyWarning();
+  if (warning) items.push({ kind: "danger", text: generatorWarningText(warning), view: "servicesView" });
+  const service = generatorServiceDue();
+  if (service) items.push({ kind: service.overdue ? "danger" : "warn", text: service.overdue ? tr("Generator service is overdue") : tr("Generator service is due soon"), view: "servicesView" });
+  const openIssues = (state.issues || []).filter((i) => i.status === "open");
+  if (openIssues.length) items.push({ kind: "warn", text: tr(openIssues.length === 1 ? "{n} problem reported" : "{n} problems reported", { n: openIssues.length }), view: "issuesView" });
+  const behind = plansBehind();
+  if (behind.length) items.push({ kind: "due", text: tr(behind.length === 1 ? "{n} payment plan is behind" : "{n} payment plans are behind", { n: behind.length }), view: "tenantsView" });
+  if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView" });
+  return items;
+}
+
+function handleExtraAttentionAction(row) {
+  if (row.dataset.action === "closeMonth" && row.dataset.arg) {
+    if (window.confirm(tr("Close {month}? Its figures can't change until you reopen it.", { month: formatMonth(row.dataset.arg) }))) setMonthClosed(row.dataset.arg, true);
+    return true;
+  }
+  if (row.dataset.action === "cashCheck") { openCashCheckDialog(); return true; }
+  return false;
+}
+
+function renderV148() {
+  renderNotices();
+  renderIssues();
+  renderReports();
+  renderGeneratorExtras();
+  renderPushStatus();
+  document.body.classList.toggle("view-only", isViewerSession() && sessionMode === "owner");
+}
+
+function attachV148Events() {
+  els.closeToolDialog?.addEventListener("click", closeToolDialog);
+  els.newNoticeButton?.addEventListener("click", openNoticeDialog);
+  els.newIssueButton?.addEventListener("click", openIssueDialog);
+  els.adminsButton?.addEventListener("click", openAdminsDialog);
+  els.pushToggleButton?.addEventListener("click", () => (pushIsOn() ? disablePushNotifications() : enablePushNotifications()));
+  els.transactionServicePart?.addEventListener("change", syncTransactionFormMode);
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -10010,6 +12044,7 @@ async function boot() {
 
   // Returning from Google? Finish signing in before the first sync, so that
   // sync already runs as the owner.
+  captureAdminInvite();
   if (usesOwnerAccounts()) await completeGoogleSignIn();
 
   await syncFromSheet();
@@ -10026,6 +12061,26 @@ boot().catch((error) => {
 // the network.
 export const __test = {
   setState(raw) { state = hydrateState(raw); currentLang = normalizeLang(state.settings.language); },
+  setSessionMode(mode) { sessionMode = mode; },
+  saveState,
+  diffStates,
+  recordMonths,
+  isMonthClosed,
+  planProgress,
+  planStatusText,
+  generatorEfficiencyRows,
+  generatorEfficiencyWarning,
+  spendingByYear,
+  annualReportData,
+  buildAnnualWorkbookFiles,
+  pollTally,
+  pollSummaryLines,
+  tenantOccupiesMonth,
+  occupantsOn,
+  getExpectedForTenant,
+  getPreviousMeterReading,
+  expectedCashOn,
+  extraAttentionItems,
   getState() { return state; },
   getTenantBalance,
   formatUsd,
