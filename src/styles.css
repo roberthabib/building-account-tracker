@@ -3851,7 +3851,6 @@ body.tenant-phone .building-wide {
   gap: 3px;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-left-width: 4px;
   border-radius: var(--radius-inner);
   background: var(--surface);
 }
@@ -3861,10 +3860,10 @@ body.tenant-phone .building-wide {
   margin-top: 4px;
 }
 
-.history-added { border-left-color: var(--accent-green); }
-.history-changed { border-left-color: var(--blue); }
-.history-deleted { border-left-color: var(--red); }
-.history-bulk { border-left-color: var(--amber); }
+.history-added .history-head strong { color: var(--primary); }
+.history-changed .history-head strong { color: var(--blue); }
+.history-deleted .history-head strong { color: var(--red); }
+.history-bulk .history-head strong { color: var(--amber); }
 
 .history-head {
   display: flex;
