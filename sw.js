@@ -1,4 +1,4 @@
-const CACHE_NAME = "building-account-tracker-v159";
+const CACHE_NAME = "building-account-tracker-v160";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -31,6 +31,9 @@ self.addEventListener("fetch", (event) => {
   // REST/Auth, Google Apps Script, Drive) must always hit the network so we
   // never serve stale database reads or pollute the cache.
   if (new URL(event.request.url).origin !== self.location.origin) return;
+  // Help videos are large and only fetched on demand: never cache them (and
+  // let the browser handle their range requests directly).
+  if (new URL(event.request.url).pathname.includes("/videos/")) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {

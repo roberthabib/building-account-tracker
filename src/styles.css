@@ -4168,3 +4168,106 @@ a.mini-button {
 .gen-bill-line .gen-bill-share {
   flex: 0 0 auto;
 }
+
+/* v160 Help & videos */
+.help-intro {
+  margin: 0 0 14px;
+  color: var(--muted, #61706b);
+  line-height: 1.45;
+}
+.help-video-group + .help-video-group {
+  margin-top: 22px;
+}
+.help-video-heading {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+.help-video-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--line, #e4e9e4);
+  border-radius: 16px;
+  background: var(--surface, #fff);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.help-video-thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 64px;
+  height: 92px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #163832;
+}
+.help-video-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.help-video-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(22, 56, 50, 0.35);
+}
+.help-video-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.help-video-text strong {
+  font-size: 1rem;
+}
+.help-video-text span {
+  color: var(--muted, #61706b);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+.help-video-text .help-video-length {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+}
+.help-video-card.watched .help-video-length::after {
+  content: " ✓";
+  color: var(--primary, #1f6b5a);
+}
+.video-dialog {
+  width: min(440px, 100vw - 16px);
+  padding: 12px;
+}
+.help-video-player {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 120px);
+  border-radius: 12px;
+  background: #163832;
+  aspect-ratio: 390 / 844;
+}
+.help-nudge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.help-nudge-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.help-nudge-text span {
+  color: var(--muted, #61706b);
+  font-size: 0.88rem;
+}

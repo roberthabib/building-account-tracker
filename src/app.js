@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v159";
+const APP_VERSION = "v160";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,10 @@ const I18N = {
     "common.export": "Export",
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
+    "nav.help": "Help & videos",
+    "more.helpSub": "Short videos that show how it works",
+    "help.intro": "Short videos of the app in use, with a made-up building. Tap one to watch; each is about a minute.",
+    "help.close": "Close",
     "nav.suppliers": "Suppliers",
     "more.suppliersSub": "Contacts and what you paid them",
     "nav.documents": "Documents",
@@ -744,6 +748,10 @@ const I18N = {
     "common.export": "تصدير",
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
+    "nav.help": "المساعدة والفيديوهات",
+    "more.helpSub": "فيديوهات قصيرة تشرح طريقة الاستخدام",
+    "help.intro": "فيديوهات قصيرة للتطبيق أثناء الاستخدام، على مبنى وهمي. اضغط على أي منها للمشاهدة؛ مدة كل منها دقيقة تقريباً.",
+    "help.close": "إغلاق",
     "nav.suppliers": "المورّدون",
     "more.suppliersSub": "جهات الاتصال وما دُفع لهم",
     "nav.documents": "المستندات",
@@ -1123,6 +1131,37 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "A quick tour": "جولة سريعة",
+  "Where everything is in the app": "أين تجد كل شيء في التطبيق",
+  "Record a payment": "تسجيل دفعة",
+  "With its receipt, in a few taps": "مع الإيصال، ببضع ضغطات",
+  "Record an expense": "تسجيل مصروف",
+  "With a photo of the invoice": "مع صورة الفاتورة",
+  "Share balances with the group": "مشاركة الأرصدة مع المجموعة",
+  "One picture for the building's WhatsApp group": "صورة واحدة لمجموعة واتساب المبنى",
+  "Generator readings and bills": "قراءات المولّد والفواتير",
+  "Split fairly by what each flat used": "تقسيم عادل حسب استهلاك كل شقة",
+  "Invite your tenants": "دعوة المستأجرين",
+  "Each tenant gets the app on their phone": "كل مستأجر يحصل على التطبيق على هاتفه",
+  "Reports and closing the month": "التقارير وإقفال الشهر",
+  "Monthly report, cash count, health check": "تقرير شهري، عدّ النقد، فحص البيانات",
+  "Maintenance calendar": "روزنامة الصيانة",
+  "Never miss an inspection or a cleaning": "لا تفوّت أي كشف أو تنظيف",
+  "Notices, votes and problems": "الإعلانات والتصويت والمشاكل",
+  "Keep the residents in the loop": "أبقِ المستأجرين على اطلاع",
+  "Join with your invite code": "الانضمام برمز الدعوة",
+  "For tenants, the first time": "للمستأجرين، في المرة الأولى",
+  "Your balance and payments": "رصيدك ودفعاتك",
+  "See what you owe and tell the owner you paid": "اعرف ما عليك وأبلغ المالك أنك دفعت",
+  "Votes, problems and notifications": "التصويت والمشاكل والإشعارات",
+  "Take part in the building": "شارك في شؤون المبنى",
+  "For you": "لك",
+  "What your tenants see": "ما يراه المستأجرون",
+  "New here? Watch the 1-minute tour": "جديد هنا؟ شاهد جولة من دقيقة واحدة",
+  "New to the app?": "جديد في التطبيق؟",
+  "A 1-minute video shows how it works.": "فيديو من دقيقة واحدة يشرح طريقة الاستخدام.",
+  "Watch": "شاهد",
+  "Hide": "إخفاء",
   "Bill": "الفاتورة",
   "Generator bill": "فاتورة المولد",
   "To pay for the generator": "المستحق عن المولد",
@@ -2228,6 +2267,8 @@ const LUCIDE_ICONS = {
   camera: [["path", { d: "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" }], ["circle", { cx: 12, cy: 13, r: 3 }]],
   calendar: [["path", { d: "M8 2v4" }], ["path", { d: "M16 2v4" }], ["rect", { width: 18, height: 18, x: 3, y: 4, rx: 2 }], ["path", { d: "M3 10h18" }]],
   megaphone: [["path", { d: "m3 11 18-5v12L3 14v-3z" }], ["path", { d: "M11.6 16.8a3 3 0 1 1-5.8-1.6" }]],
+  play: [["path", { d: "M7 4.5v15a1 1 0 0 0 1.5.86l12.4-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" }]],
+  playCircle: [["circle", { cx: 12, cy: 12, r: 10 }], ["path", { d: "M10 8.5v7a.5.5 0 0 0 .77.42l5.4-3.5a.5.5 0 0 0 0-.84l-5.4-3.5A.5.5 0 0 0 10 8.5z" }]],
   wrench: [["path", { d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" }]],
   barChart: [["path", { d: "M3 3v18h18" }], ["path", { d: "M18 17V9" }], ["path", { d: "M13 17V5" }], ["path", { d: "M8 17v-3" }]],
   bell: [["path", { d: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" }], ["path", { d: "M10.3 21a1.94 1.94 0 0 0 3.4 0" }]],
@@ -4252,6 +4293,7 @@ function renderAttention() {
     danger: { tint: "#f6e2e2", color: "var(--red)", icon: "alert" },
     warn: { tint: "#f6ecd7", color: "var(--amber)", icon: "alert" },
     success: { tint: "var(--green-tint-bg)", color: "var(--primary)", icon: "check" },
+    info: { tint: "var(--green-tint-bg)", color: "var(--primary)", icon: "playCircle" },
   };
   els.attentionList.replaceChildren(
     ...visibleItems.map((item) => {
@@ -6991,7 +7033,7 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView"];
 
 function setView(viewId) {
   if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView"].includes(viewId)) viewId = "moreView";
@@ -11640,6 +11682,7 @@ function renderTenantDashboardExtras() {
   const notices = isTenant ? activeNotices().slice(0, 3) : [];
   const myIssues = isTenant ? (state.issues || []).filter((i) => i.tenantId === sessionTenantId && i.status !== "fixed") : [];
   const blocks = [
+    isTenant ? tenantHelpCard() : null,
     ...notices.map((n) => buildNoticeCard(n, { compact: true })),
     isTenant ? tenantRecentPaymentsCard() : null,
     ...myIssues.map((issue) => mk("article", { className: "notice-card" },
@@ -12424,6 +12467,7 @@ function extraAttentionItems() {
   if (health.length) items.push({ kind: "warn", text: tr(health.length === 1 ? "{n} thing to check in your data" : "{n} things to check in your data", { n: health.length }), view: "reportsView", key: "dataHealth" });
   items.push(...v155AttentionItems());
   items.push(...v158AttentionItems());
+  items.push(...v160AttentionItems());
   if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView", key: "keepalive" });
   return items;
 }
@@ -12434,6 +12478,7 @@ function handleExtraAttentionAction(row) {
     return true;
   }
   if (row.dataset.action === "cashCheck") { openCashCheckDialog(); return true; }
+  if (row.dataset.action === "helpVideo") { openHelpVideo(row.dataset.arg || "tour"); return true; }
   return false;
 }
 
@@ -12446,6 +12491,7 @@ function renderV148() {
   renderSuppliers();
   renderDocuments();
   renderMeetings();
+  renderHelp();
   renderPushStatus();
   document.body.classList.toggle("view-only", isViewerSession() && sessionMode === "owner");
 }
@@ -12456,6 +12502,8 @@ function attachV148Events() {
   els.newIssueButton?.addEventListener("click", openIssueDialog);
   els.newMaintenanceButton?.addEventListener("click", () => openMaintenanceTaskDialog());
   els.inviteAllButton?.addEventListener("click", openInviteAllDialog);
+  document.querySelector("#closeVideoDialog")?.addEventListener("click", closeHelpVideo);
+  document.querySelector("#videoDialog")?.addEventListener("cancel", (event) => { event.preventDefault(); closeHelpVideo(); });
   els.readInvoiceButton?.addEventListener("click", () => { void readInvoiceIntoForm(); });
   els.newSupplierButton?.addEventListener("click", () => openSupplierDialog());
   els.newDocumentButton?.addEventListener("click", () => openDocumentDialog());
@@ -14020,6 +14068,131 @@ async function readInvoiceIntoForm() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v160 — Help & videos: short explainer videos for owners and tenants
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Recorded against a made-up demo building (no real data). Files live in
+// videos/<en|ar>/<id>.mp4 with a poster <id>.jpg; the service worker never
+// caches them, so they only download when someone presses play.
+const HELP_VIDEOS = [
+  { id: "tour", role: "owner", title: "A quick tour", sub: "Where everything is in the app", seconds: { en: 64, ar: 59 } },
+  { id: "payment", role: "owner", title: "Record a payment", sub: "With its receipt, in a few taps", seconds: { en: 62, ar: 60 } },
+  { id: "expense", role: "owner", title: "Record an expense", sub: "With a photo of the invoice", seconds: { en: 67, ar: 60 } },
+  { id: "group", role: "owner", title: "Share balances with the group", sub: "One picture for the building's WhatsApp group", seconds: { en: 40, ar: 36 } },
+  { id: "generator", role: "owner", title: "Generator readings and bills", sub: "Split fairly by what each flat used", seconds: { en: 47, ar: 43 } },
+  { id: "invite", role: "owner", title: "Invite your tenants", sub: "Each tenant gets the app on their phone", seconds: { en: 45, ar: 43 } },
+  { id: "reports", role: "owner", title: "Reports and closing the month", sub: "Monthly report, cash count, health check", seconds: { en: 59, ar: 55 } },
+  { id: "maintenance", role: "owner", title: "Maintenance calendar", sub: "Never miss an inspection or a cleaning", seconds: { en: 53, ar: 50 } },
+  { id: "residents", role: "owner", title: "Notices, votes and problems", sub: "Keep the residents in the loop", seconds: { en: 46, ar: 44 } },
+  { id: "join", role: "tenant", title: "Join with your invite code", sub: "For tenants, the first time", seconds: { en: 41, ar: 39 } },
+  { id: "tenant-home", role: "tenant", title: "Your balance and payments", sub: "See what you owe and tell the owner you paid", seconds: { en: 40, ar: 36 } },
+  { id: "tenant-more", role: "tenant", title: "Votes, problems and notifications", sub: "Take part in the building", seconds: { en: 51, ar: 48 } },
+];
+const HELP_WATCHED_KEY = "building-account-tracker:videos-watched";
+
+function helpVideosFor(role) {
+  return role === "owner" ? HELP_VIDEOS.slice() : HELP_VIDEOS.filter((v) => v.role === "tenant");
+}
+
+function helpVideoUrl(id, ext = "mp4") {
+  return `videos/${currentLang === "ar" ? "ar" : "en"}/${id}.${ext}`;
+}
+
+function formatVideoLength(seconds) {
+  const s = Math.max(0, Math.round(Number(seconds) || 0));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function watchedVideos() {
+  try { return new Set(JSON.parse(localStorage.getItem(HELP_WATCHED_KEY) || "[]")); } catch { return new Set(); }
+}
+
+function markVideoWatched(id) {
+  const seen = watchedVideos();
+  if (seen.has(id)) return;
+  seen.add(id);
+  try { localStorage.setItem(HELP_WATCHED_KEY, JSON.stringify([...seen])); } catch { /* private mode */ }
+}
+
+function helpVideoCard(video) {
+  const poster = mk("img", { className: "help-video-poster", alt: "", loading: "lazy", decoding: "async" });
+  poster.src = helpVideoUrl(video.id, "jpg");
+  const thumb = mk("span", { className: "help-video-thumb" }, poster, mk("span", { className: "help-video-play" }, lucide("play", { size: 20, color: "#fff", stroke: 2.4 })));
+  const seconds = video.seconds?.[currentLang === "ar" ? "ar" : "en"];
+  const length = seconds ? mk("span", { className: "help-video-length", text: formatVideoLength(seconds) }) : null;
+  const card = mk("button", { className: "help-video-card", type: "button" },
+    thumb,
+    mk("span", { className: "help-video-text" },
+      mk("strong", { text: tr(video.title) }),
+      mk("span", { text: tr(video.sub) }),
+      length));
+  if (watchedVideos().has(video.id)) card.classList.add("watched");
+  card.addEventListener("click", () => openHelpVideo(video.id));
+  return card;
+}
+
+function renderHelp() {
+  const list = document.querySelector("#helpVideoList");
+  if (!list) return;
+  const owner = sessionMode === "owner";
+  const videos = helpVideosFor(owner ? "owner" : "tenant");
+  const group = (title, items) => mk("div", { className: "help-video-group" },
+    title ? mk("h3", { className: "help-video-heading", text: title }) : null,
+    ...items.map(helpVideoCard));
+  list.replaceChildren(owner
+    ? mk("div", {},
+      group(tr("For you"), videos.filter((v) => v.role === "owner")),
+      group(tr("What your tenants see"), videos.filter((v) => v.role === "tenant")))
+    : group("", videos));
+}
+
+function openHelpVideo(id) {
+  const video = HELP_VIDEOS.find((v) => v.id === id);
+  const dialog = document.querySelector("#videoDialog");
+  const player = document.querySelector("#helpVideo");
+  if (!video || !dialog || !player) return;
+  document.querySelector("#videoDialogTitle").textContent = tr(video.title);
+  player.poster = helpVideoUrl(id, "jpg");
+  player.src = helpVideoUrl(id);
+  openDialog(dialog);
+  player.play().catch(() => { /* the person can press play themselves */ });
+  markVideoWatched(id);
+}
+
+function closeHelpVideo() {
+  const dialog = document.querySelector("#videoDialog");
+  const player = document.querySelector("#helpVideo");
+  if (player) {
+    player.pause();
+    // Drop the source so the phone stops downloading the rest of the video.
+    player.removeAttribute("src");
+    player.load();
+  }
+  if (dialog?.open) closeDialog(dialog);
+  renderHelp();
+  renderDashboard();
+}
+
+// Owner: a hideable "watch the tour" reminder until the tour has been opened.
+function v160AttentionItems() {
+  if (watchedVideos().has("tour")) return [];
+  return [{ kind: "info", text: tr("New here? Watch the 1-minute tour"), view: "helpView", action: "helpVideo", arg: "tour", key: "helpTour" }];
+}
+
+// Tenant: a small card on their home screen until they watch or dismiss it.
+function tenantHelpCard() {
+  if (sessionMode === "owner" || watchedVideos().has("tenant-home")) return null;
+  const dismiss = mk("button", { className: "icon-button small", type: "button", text: "×", "aria-label": tr("Hide") });
+  dismiss.addEventListener("click", () => { markVideoWatched("tenant-home"); renderDashboard(); });
+  return mk("article", { className: "notice-card help-nudge" },
+    mk("div", { className: "help-nudge-text" },
+      mk("strong", { text: tr("New to the app?") }),
+      mk("span", { text: tr("A 1-minute video shows how it works.") })),
+    primaryButton(tr("Watch"), () => openHelpVideo("tenant-home")),
+    dismiss);
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -14193,6 +14366,12 @@ export const __test = {
   buildMeetingPdf,
   yearFullyClosed,
   v158AttentionItems,
+  v160AttentionItems,
+  helpVideosFor,
+  formatVideoLength,
+  helpVideoUrl,
+  HELP_VIDEOS,
+  HELP_WATCHED_KEY,
   expectedByAccount,
   methodLabel,
   isAttentionHidden,
