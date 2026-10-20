@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v152";
+const APP_VERSION = "v153";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -546,6 +546,7 @@ const I18N = {
     "set.monthlyBudget": "Total monthly building budget USD",
     "set.currency": "Currency & Conversion",
     "set.lbpRate": "LBP per USD conversion rate",
+    "set.lbpRateNote": "A new rate applies to new entries. Past entries keep the rate they were recorded at.",
     "set.cloudDb": "Cloud database",
     "set.ownerAccount": "Owner account",
     "set.signOut": "Sign out",
@@ -893,6 +894,7 @@ const I18N = {
     "set.monthlyBudget": "إجمالي ميزانية المبنى الشهرية بالدولار",
     "set.currency": "العملة والتحويل",
     "set.lbpRate": "سعر صرف الليرة مقابل الدولار",
+    "set.lbpRateNote": "يُطبَّق السعر الجديد على القيود الجديدة. تحتفظ القيود السابقة بالسعر الذي سُجّلت به.",
     "set.cloudDb": "قاعدة البيانات السحابية",
     "set.ownerAccount": "حساب المالك",
     "set.signOut": "تسجيل الخروج",
@@ -1078,6 +1080,53 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Coefficients add up to {sum}/1000 instead of 1000": "مجموع المعاملات {sum}/1000 بدلاً من 1000",
+  "No coefficient for: {units}": "لا معامل للوحدات: {units}",
+  "{n} tenant has no phone number ({units})": "{n} مستأجر بلا رقم هاتف ({units})",
+  "{n} tenants have no phone number ({units})": "{n} مستأجرين بلا رقم هاتف ({units})",
+  "No breaker size for: {units}": "لا قيمة للقاطع للوحدات: {units}",
+  "Generator costs without meter readings: {months}": "تكاليف مولد بلا قراءات عدّاد: {months}",
+  "Possible duplicate payment: {name}, {amount} on {first} and {second}": "دفعة مكررة محتملة: {name}، {amount} بتاريخ {first} و{second}",
+  "{n} entry is dated in the future": "{n} قيد بتاريخ مستقبلي",
+  "{n} entries are dated in the future": "{n} قيود بتواريخ مستقبلية",
+  "Everything looks right ✓": "كل شيء سليم ✓",
+  "Go": "انتقال",
+  "Monthly report": "التقرير الشهري",
+  "No expenses this month.": "لا مصاريف هذا الشهر.",
+  "Collection": "التحصيل",
+  "Payments received": "الدفعات المستلمة",
+  "Units that paid this month": "الوحدات التي دفعت هذا الشهر",
+  "{n} of {total}": "{n} من {total}",
+  "Still owed at month end": "المستحق في نهاية الشهر",
+  "Fuel": "المازوت",
+  "Maintenance": "الصيانة",
+  "Electricity used": "الكهرباء المستهلكة",
+  "Cost per kWh": "الكلفة لكل ك.و.س",
+  "Diesel bought": "المازوت المشترى",
+  "{litres} litres": "{litres} ليتر",
+  "not entered yet": "لم تُدخل بعد",
+  "{n} tanker": "{n} صهريج",
+  "{n} tankers": "{n} صهاريج",
+  "In the building": "في المبنى",
+  "Problems": "المشاكل",
+  "{opened} reported, {fixed} fixed": "{opened} مُبلّغ عنها، {fixed} تم إصلاحها",
+  "Figures are from the building's account app. For any question, contact the building owner.": "الأرقام من تطبيق حسابات المبنى. لأي سؤال تواصل مع مالك المبنى.",
+  "{building} · {month}": "{building} · {month}",
+  "{building} — monthly report, {month}": "{building} — التقرير الشهري، {month}",
+  "Monthly report shared": "تمت مشاركة التقرير الشهري",
+  "Monthly report downloaded": "تم تنزيل التقرير الشهري",
+  "On the 1st of each month, send each tenant who owes money a phone notification with their balance": "في الأول من كل شهر، أرسل لكل مستأجر عليه مبلغ إشعاراً على هاتفه برصيده",
+  "Only tenants who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.": "يصل فقط إلى المستأجرين الذين ربطوا هواتفهم وفعّلوا الإشعارات. المبالغ هي الموجودة على جهازك عند آخر حفظ.",
+  "Monthly balance notifications on": "إشعارات الرصيد الشهرية مفعّلة",
+  "Monthly balance notifications off": "إشعارات الرصيد الشهرية متوقفة",
+  "{name} already has a payment of {amount} on {date}. Record this one too?": "لدى {name} دفعة بقيمة {amount} بتاريخ {date}. هل تسجّل هذه أيضاً؟",
+  "{n} thing to check in your data": "{n} أمر يجب التحقق منه في بياناتك",
+  "{n} things to check in your data": "{n} أمور يجب التحقق منها في بياناتك",
+  "Data health": "سلامة البيانات",
+  "Problems the app found in your data, each with a shortcut to fix it.": "مشاكل وجدها التطبيق في بياناتك، مع اختصار لإصلاح كل منها.",
+  "A one-page summary of the month for the residents: money in and out, where it went, and what's still owed. The generator part only appears when the building used it that month.": "ملخص من صفحة واحدة للسكان عن الشهر: المداخيل والمصاريف وأين صُرفت وما لا يزال مستحقاً. يظهر قسم المولد فقط إذا استُخدم المولد في ذلك الشهر.",
+  "Share PDF": "مشاركة PDF",
+  "Automatic reminders": "تذكيرات تلقائية",
   "Balances picture shared": "تمت مشاركة صورة الأرصدة",
   "Balances picture downloaded — attach it in the WhatsApp group": "تم تنزيل صورة الأرصدة — أرفقها في مجموعة واتساب",
   "Building balances": "أرصدة المبنى",
@@ -2156,7 +2205,7 @@ function toUsd(usdAmount = 0, lbpAmount = 0) {
 
 function transactionNetUsd(transaction) {
   const net = transactionNet(transaction);
-  return toUsd(net.usd, net.lbp);
+  return txUsd(transaction, net.usd, net.lbp);
 }
 
 function showToast(message, durationMs = 2200) {
@@ -2170,7 +2219,9 @@ function showToast(message, durationMs = 2200) {
 // Returns false when the change was refused (closed month, view-only access);
 // the previous copy is then back in `state` and the caller's render shows it.
 function saveState(options = {}) {
+  stampLbpRates(state, getConversionRate());
   if (options.sync !== false && !guardAndAuditSave()) return false;
+  if (sessionMode === "owner" && !isViewerSession()) state.balanceSnapshot = buildBalanceSnapshot();
   state.monthlyExpected = normalizedMonthlyExpected(state.monthlyExpected);
   state.meta = state.meta || {};
   state.meta.rev = Number(state.meta.rev || 0) + 1;
@@ -2281,6 +2332,7 @@ function hydrateState(rawState) {
     }
   });
   hydrated.monthlyExpected = normalizedMonthlyExpected(hydrated.monthlyExpected || []);
+  stampLbpRates(hydrated, Number(hydrated.settings.lbpPerUsd) || DEFAULT_LBP_PER_USD);
   return hydrated;
 }
 
@@ -2331,7 +2383,7 @@ function getTenantExpenseShareForTransaction(tenantId, transaction) {
   // later move-out or move-in does not reshuffle old balances.
   const activeTenants = occupantsOn(transaction.date || null);
   if (!activeTenants.length) return 0;
-  const totalUsd = toUsd(Number(transaction.debitUsd || 0), Number(transaction.debitLbp || 0));
+  const totalUsd = txUsd(transaction, transaction.debitUsd, transaction.debitLbp);
   if (!totalUsd) return 0;
   // A tenant's phone only holds its own tenant row; the server sends the
   // building-wide totals so the split matches what the owner sees.
@@ -2846,7 +2898,7 @@ function getServiceMonthPools(serviceType, month) {
   state.transactions.forEach((t) => {
     if (t.category !== "Services Expenses" || t.serviceType !== serviceType) return;
     if (monthKey(t.forMonth || t.date || "") !== monthKey(month)) return;
-    const amt = toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0));
+    const amt = txUsd(t, t.debitUsd, t.debitLbp);
     if (t.servicePart === "maintenance") { maintenanceUsd += amt; maintCount += 1; }
     else { fuelUsd += amt; fuelCount += 1; }
   });
@@ -3073,7 +3125,7 @@ function computeWaterDistribution(month) {
   const txns = state.transactions.filter(
     (t) => t.category === "Services Expenses" && t.serviceType === "water" && monthKey(t.forMonth || t.date || "") === monthKey(month),
   );
-  const totalUsd = roundUsd(txns.reduce((s, t) => s + toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0)), 0));
+  const totalUsd = roundUsd(txns.reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0));
   const shares = {};
   state.tenants.filter((t) => t.active !== false).forEach((t) => {
     shares[t.id] = roundUsd(txns.reduce((s, tx) => s + getTenantExpenseShareForTransaction(t.id, tx), 0));
@@ -3562,7 +3614,7 @@ function getAccountTotals() {
         acc.advanceUsd += netUsd;
       }
       if (transaction.category === "Expenses" || transaction.category === "Services Expenses") {
-        acc.expenseUsd += toUsd(transaction.debitUsd, transaction.debitLbp);
+        acc.expenseUsd += txUsd(transaction, transaction.debitUsd, transaction.debitLbp);
       }
       return acc;
     },
@@ -4077,7 +4129,7 @@ function renderDashboard() {
   }
 
   const totals = getPositionTotals();
-  const totalExpenses = roundUsd(state.transactions.filter((t) => t.category === "Expenses" || t.category === "Services Expenses").reduce((s, t) => s + toUsd(t.debitUsd, t.debitLbp), 0));
+  const totalExpenses = roundUsd(state.transactions.filter((t) => t.category === "Expenses" || t.category === "Services Expenses").reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0));
   const cashNegative = totals.cashUsd < -0.005 ? "is-negative" : "";
   const outstandingAmber = totals.receivableUsd > 0.005 ? "is-amber" : "";
   els.kpiGrid.replaceChildren(...buildKpiCards(
@@ -4495,9 +4547,9 @@ function renderExpenseCategoryBreakdown() {
   const categoryMap = new Map();
   monthExpenses.forEach((t) => {
     const cat = t.expenseCategory || "Uncategorized";
-    categoryMap.set(cat, (categoryMap.get(cat) || 0) + toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0)));
+    categoryMap.set(cat, (categoryMap.get(cat) || 0) + txUsd(t, t.debitUsd, t.debitLbp));
   });
-  const servicesTotal = monthServices.reduce((s, t) => s + toUsd(Number(t.debitUsd || 0), Number(t.debitLbp || 0)), 0);
+  const servicesTotal = monthServices.reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0);
   if (servicesTotal > 0.005) categoryMap.set("Generator & Water", (categoryMap.get("Generator & Water") || 0) + servicesTotal);
 
   const rows = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
@@ -4603,7 +4655,7 @@ function renderPayments() {
       const monthExpensesTotal = roundUsd(
         state.transactions
           .filter((t) => t.category === "Expenses" && monthKey(t.date || "") === monthKey(month))
-          .reduce((s, t) => s + toUsd(t.debitUsd, t.debitLbp), 0),
+          .reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0),
       );
       const monthPaymentsTotal = roundUsd(
         state.transactions
@@ -5612,10 +5664,21 @@ function pdfFillRect(x, y, width, height, hex) {
   return `q ${pdfColor(hex)} rg ${x} ${y} ${width} ${height} re f Q`;
 }
 
-// Helvetica advance widths (per 1pt of font size) for right-aligning amounts.
-function pdfTextWidth(text, size) {
-  const narrow = { ",": 0.278, ".": 0.278, " ": 0.278, "-": 0.333, "+": 0.584 };
-  return [...String(text)].reduce((w, ch) => w + (narrow[ch] ?? 0.556), 0) * size;
+// Helvetica advance widths (per 1pt of font size), for right-aligning text.
+const HELVETICA_WIDTHS = {
+  regular: "a556b556c500d556e556f278g556h556i222j222k500l222m833n556o556p556q556r333s500t278u556v500w722x500y500z500A667B667C722D722E667F611G778H722I278J500K667L556M833N722O778P667Q778R722S667T611U722V667W944X667Y667Z611",
+  bold: "a556b611c556d611e556f333g611h611i278j278k556l278m889n611o611p611q611r389s556t333u611v556w778x556y556z500A722B722C722D722E667F611G778H722I278J556K722L611M833N722O778P667Q778R722S667T611U722V667W944X667Y667Z611",
+};
+const HELVETICA_TABLES = {};
+function pdfTextWidth(text, size, bold = false) {
+  const kind = bold ? "bold" : "regular";
+  if (!HELVETICA_TABLES[kind]) {
+    const table = { ",": 278, ".": 278, " ": 278, "-": 333, "+": 584, "$": 556, "%": 889, "/": 278, "(": 333, ")": 333, ":": 278 };
+    for (const [, ch, w] of HELVETICA_WIDTHS[kind].matchAll(/([A-Za-z])(\d{3})/g)) table[ch] = Number(w);
+    HELVETICA_TABLES[kind] = table;
+  }
+  const table = HELVETICA_TABLES[kind];
+  return [...String(text)].reduce((w, ch) => w + (table[ch] ?? 556), 0) * size / 1000;
 }
 
 function pdfRectCommand(x, y, width, height) {
@@ -9375,8 +9438,8 @@ function collectFullExportData() {
     if (!m) return;
     const row = byMonth.get(m) || { opening: 0, expenses: 0, services: 0, payments: 0, projects: 0, other: 0, net: 0 };
     const net = transactionNetUsd(t);
-    if (t.category === "Expenses") row.expenses += toUsd(t.debitUsd, t.debitLbp);
-    else if (t.category === "Services Expenses") row.services += toUsd(t.debitUsd, t.debitLbp);
+    if (t.category === "Expenses") row.expenses += txUsd(t, t.debitUsd, t.debitLbp);
+    else if (t.category === "Services Expenses") row.services += txUsd(t, t.debitUsd, t.debitLbp);
     else if (t.category === "Payments" && t.project) row.projects += net;
     else if (t.category === "Payments") row.payments += net;
     else if (t.category === "Opening Balance") row.opening += net;
@@ -10146,6 +10209,12 @@ function attachEvents() {
       let invoiceUploadError = null;
       if (editingExpenseId && !existingTransaction) throw new Error("Expense entry was not found");
       assertTransactionsOpen(transactions, existingTransaction);
+      if (!existingTransaction) {
+        const duplicate = findDuplicatePayment(transactions);
+        if (duplicate && !window.confirm(tr("{name} already has a payment of {amount} on {date}. Record this one too?", {
+          name: tenantName(duplicate.match.tenantId), amount: formatUsd(transactionNetUsd(duplicate.match)), date: formatDateLabel(duplicate.match.date),
+        }))) return;
+      }
       if (existingTransaction) {
         transaction.id = existingTransaction.id;
         transaction.category = "Expenses";
@@ -11652,7 +11721,7 @@ function spendingByYear() {
     if (!/^\d{4}$/.test(year) || year === "1900") return;
     const cats = years.get(year) || new Map();
     const cat = spendingCategory(t);
-    cats.set(cat, roundUsd((cats.get(cat) || 0) + toUsd(t.debitUsd, t.debitLbp)));
+    cats.set(cat, roundUsd((cats.get(cat) || 0) + txUsd(t, t.debitUsd, t.debitLbp)));
     years.set(year, cats);
   });
   return years;
@@ -11708,8 +11777,8 @@ function annualReportData(year) {
     const row = { month: `${key}-01`, payments: 0, projects: 0, expenses: 0, services: 0, other: 0, net: 0 };
     inYear.filter(isCash).filter((t) => dateOf(t).slice(0, 7) === key).forEach((t) => {
       const net = transactionNetUsd(t);
-      if (t.category === "Expenses") row.expenses += toUsd(t.debitUsd, t.debitLbp);
-      else if (t.category === "Services Expenses") row.services += toUsd(t.debitUsd, t.debitLbp);
+      if (t.category === "Expenses") row.expenses += txUsd(t, t.debitUsd, t.debitLbp);
+      else if (t.category === "Services Expenses") row.services += txUsd(t, t.debitUsd, t.debitLbp);
       else if (t.category === "Payments" && t.project) row.projects += net;
       else if (t.category === "Payments") row.payments += net;
       else row.other += net;
@@ -11722,7 +11791,7 @@ function annualReportData(year) {
   const categories = new Map();
   inYear.filter(isSpending).forEach((t) => {
     const cat = spendingCategory(t);
-    categories.set(cat, roundUsd((categories.get(cat) || 0) + toUsd(t.debitUsd, t.debitLbp)));
+    categories.set(cat, roundUsd((categories.get(cat) || 0) + txUsd(t, t.debitUsd, t.debitLbp)));
   });
   const nowMonth = currentMonthValue();
   const balanceMonth = monthKey(nowMonth).slice(0, 4) === y ? getLastCompletedMonth() : `${y}-12-01`;
@@ -11830,6 +11899,10 @@ function renderReports() {
   if (sessionMode !== "owner") { els.reportsBody.replaceChildren(); return; }
   const years = reportYears();
   const yearSelect = selectInput(years.map((y) => [y, y]), years.find((y) => y < String(new Date().getFullYear())) || years[0]);
+  const reportMonths = getMonths().filter((m) => monthKey(m) <= monthKey(currentMonthValue())).slice().reverse().slice(0, 12);
+  if (!reportMonths.length) reportMonths.push(currentMonthValue());
+  const lastMonth = getLastCompletedMonth();
+  const monthSelect = selectInput(reportMonths.map((m) => [m, formatMonth(m)]), reportMonths.includes(lastMonth) ? lastMonth : reportMonths[0]);
 
   const monthsWithActivity = [...new Set(state.transactions.map((t) => monthKey(transactionDateValue(t))).filter((m) => m && m !== "1900-01"))]
     .sort().reverse().filter((m) => m <= monthKey(currentMonthValue())).slice(0, 12);
@@ -11852,6 +11925,14 @@ function renderReports() {
     miniButton(tr("Delete"), () => deleteCashCheck(c.id), "danger-mini"))));
 
   els.reportsBody.replaceChildren(
+    reportsSection(tr("Monthly report"),
+      note(tr("A one-page summary of the month for the residents: money in and out, where it went, and what's still owed. The generator part only appears when the building used it that month.")),
+      field(tr("Month"), monthSelect),
+      mk("div", { className: "button-row" }, primaryButton(tr("Share PDF"), () => shareMonthlyReport(monthSelect.value)))),
+    reportsSection(tr("Data health"),
+      note(tr("Problems the app found in your data, each with a shortcut to fix it.")),
+      buildDataHealthSection()),
+    reportsSection(tr("Automatic reminders"), buildAutoNoticeSection()),
     reportsSection(tr("Annual report"),
       note(tr("Everything for the yearly owners' meeting: money in and out, where it went, the reserve, and who still owes.")),
       field(tr("Year"), yearSelect),
@@ -11979,6 +12060,8 @@ function extraAttentionItems() {
   if (service) items.push({ kind: service.overdue ? "danger" : "warn", text: service.overdue ? tr("Generator service is overdue") : tr("Generator service is due soon"), view: "servicesView" });
   const openIssues = (state.issues || []).filter((i) => i.status === "open");
   if (openIssues.length) items.push({ kind: "warn", text: tr(openIssues.length === 1 ? "{n} problem reported" : "{n} problems reported", { n: openIssues.length }), view: "issuesView" });
+  const health = dataHealthIssues();
+  if (health.length) items.push({ kind: "warn", text: tr(health.length === 1 ? "{n} thing to check in your data" : "{n} things to check in your data", { n: health.length }), view: "reportsView" });
   if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView" });
   return items;
 }
@@ -12008,6 +12091,343 @@ function attachV148Events() {
   els.adminsButton?.addEventListener("click", openAdminsDialog);
   els.pushToggleButton?.addEventListener("click", () => (pushIsOn() ? disablePushNotifications() : enablePushNotifications()));
   els.transactionServicePart?.addEventListener("change", syncTransactionFormMode);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// v153 — exchange rate per entry, data health check, monthly building report,
+// automatic balance notification on the 1st
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Exchange rate locked on each entry ──────────────────────────────────────
+// An amount typed in LBP keeps the rate of the day it was recorded, so changing
+// the rate in Settings never rewrites old balances or closed months. Entries
+// from before v153 are stamped once with the rate in force when first loaded.
+function entryRate(transaction) {
+  const rate = Number(transaction?.lbpRate || 0);
+  return rate > 0 ? rate : getConversionRate();
+}
+
+function txUsd(transaction, usdAmount = 0, lbpAmount = 0) {
+  return Number(usdAmount || 0) + Number(lbpAmount || 0) / entryRate(transaction);
+}
+
+function hasLbpAmount(t) {
+  return Boolean(Number(t.debitLbp || 0) || Number(t.creditLbp || 0) || Number(t.balanceLbp || 0));
+}
+
+function stampLbpRates(target, rate) {
+  let stamped = 0;
+  (target?.transactions || []).forEach((t) => {
+    if (!(Number(t.lbpRate) > 0) && hasLbpAmount(t)) {
+      t.lbpRate = rate;
+      stamped += 1;
+    }
+  });
+  return stamped;
+}
+
+// ── Duplicate payments ──────────────────────────────────────────────────────
+function isSamePayment(a, b) {
+  if (a.category !== "Payments" || b.category !== "Payments" || a.id === b.id) return false;
+  if (!a.tenantId || a.tenantId !== b.tenantId) return false;
+  if (a.paymentGroupId && a.paymentGroupId === b.paymentGroupId) return false;
+  if (Math.abs(transactionNetUsd(a) - transactionNetUsd(b)) >= 0.01) return false;
+  const days = Math.abs(Date.parse(a.date || a.forMonth || "") - Date.parse(b.date || b.forMonth || "")) / 86400000;
+  return days <= 3;
+}
+
+function findDuplicatePayment(newTransactions) {
+  for (const entry of newTransactions) {
+    const match = state.transactions.find((t) => isSamePayment(entry, t));
+    if (match) return { entry, match };
+  }
+  return null;
+}
+
+// ── Data health check ───────────────────────────────────────────────────────
+function dataHealthIssues() {
+  const issues = [];
+  const active = state.tenants.filter((t) => t.active !== false);
+  const unitList = (list) => list.map((t) => t.unit || t.name).join(", ");
+
+  const withCoefficient = active.filter((t) => Number(t.coefficient || 0) > 0);
+  if (withCoefficient.length) {
+    const sum = active.reduce((s, t) => s + Number(t.coefficient || 0), 0);
+    if (sum !== COEFFICIENT_TOTAL) {
+      issues.push({ text: tr("Coefficients add up to {sum}/1000 instead of 1000", { sum }), view: "tenantsView" });
+    }
+    const missing = active.filter((t) => !(Number(t.coefficient || 0) > 0));
+    if (missing.length) issues.push({ text: tr("No coefficient for: {units}", { units: unitList(missing) }), view: "tenantsView" });
+  }
+
+  const noPhone = active.filter((t) => !String(t.phone || "").trim());
+  if (noPhone.length) {
+    issues.push({ text: tr(noPhone.length === 1 ? "{n} tenant has no phone number ({units})" : "{n} tenants have no phone number ({units})", { n: noPhone.length, units: unitList(noPhone) }), view: "tenantsView" });
+  }
+
+  const genMonths = getServiceMonths("generator");
+  if (genMonths.length) {
+    const noBreaker = active.filter((t) => !(Number(t.breakerAmps || 0) > 0));
+    if (noBreaker.length) issues.push({ text: tr("No breaker size for: {units}", { units: unitList(noBreaker) }), view: "tenantsView" });
+    const unbilled = genMonths.filter((m) => {
+      const dist = computeServiceDistribution("generator", m);
+      return dist.pools.totalUsd > 0.005 && !dist.distributed;
+    });
+    if (unbilled.length) issues.push({ text: tr("Generator costs without meter readings: {months}", { months: unbilled.map((m) => formatMonth(m)).join(", ") }), view: "servicesView" });
+  }
+
+  const payments = state.transactions.filter((t) => t.category === "Payments");
+  const seen = new Set();
+  payments.forEach((a) => {
+    payments.forEach((b) => {
+      if (a.id >= b.id || !isSamePayment(a, b)) return;
+      const key = [a.id, b.id].join("|");
+      if (seen.has(key)) return;
+      seen.add(key);
+      issues.push({
+        text: tr("Possible duplicate payment: {name}, {amount} on {first} and {second}", {
+          name: tenantName(a.tenantId), amount: formatUsd(transactionNetUsd(a)), first: formatDateLabel(a.date), second: formatDateLabel(b.date),
+        }),
+        view: "ledgerView",
+      });
+    });
+  });
+
+  const tomorrow = addDays(localDateInput(), 1);
+  const future = state.transactions.filter((t) => t.date && t.date > tomorrow);
+  if (future.length) issues.push({ text: tr(future.length === 1 ? "{n} entry is dated in the future" : "{n} entries are dated in the future", { n: future.length }), view: "ledgerView" });
+  return issues;
+}
+
+function buildDataHealthSection() {
+  const issues = dataHealthIssues();
+  if (!issues.length) return note(tr("Everything looks right ✓"));
+  return mk("div", { className: "history-list compact" }, issues.map((issue) => mk("div", { className: "health-row" },
+    mk("span", { text: issue.text }),
+    miniButton(tr("Go"), () => setView(issue.view)))));
+}
+
+// ── Monthly building report (PDF) ───────────────────────────────────────────
+// Only shows what the building actually uses: the generator and water parts
+// appear just for months that have generator or water costs or readings.
+function monthlyReportData(month) {
+  const key = monthKey(month);
+  const monthIsoValue = monthIso(key);
+  const inMonth = state.transactions.filter((t) => monthKey(String(transactionDateValue(t))) === key);
+  const isCash = (t) => !(t.category === "Opening Balance" && t.tenantId);
+  const payments = inMonth.filter((t) => t.category === "Payments");
+  const moneyIn = roundUsd(payments.reduce((s, t) => s + transactionNetUsd(t), 0));
+  const payers = new Set(payments.filter((t) => t.tenantId).map((t) => t.tenantId)).size;
+  const spending = inMonth.filter(isSpending);
+  const moneyOut = roundUsd(spending.reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0));
+  const categories = new Map();
+  spending.forEach((t) => {
+    const cat = spendingCategory(t);
+    categories.set(cat, roundUsd((categories.get(cat) || 0) + txUsd(t, t.debitUsd, t.debitLbp)));
+  });
+
+  const generatorUsed = state.transactions.some((t) => t.category === "Services Expenses" && t.serviceType === "generator" && monthKey(t.forMonth || t.date || "") === key)
+    || Boolean(getServiceReadingRecord("generator", monthIsoValue));
+  let generator = null;
+  if (generatorUsed) {
+    const dist = computeServiceDistribution("generator", monthIsoValue);
+    const litres = generatorEfficiencyRows().find((r) => monthKey(r.month) === key)?.litres || 0;
+    generator = {
+      fuelUsd: dist.pools.fuelUsd,
+      maintenanceUsd: dist.pools.maintenanceUsd,
+      kwh: dist.distributed ? dist.totalKwh : 0,
+      costPerKwh: dist.distributed && dist.totalKwh > 0 ? dist.pools.totalUsd / dist.totalKwh : null,
+      litres,
+      billed: dist.distributed,
+    };
+  }
+  const waterTx = state.transactions.filter((t) => t.category === "Services Expenses" && t.serviceType === "water" && monthKey(t.forMonth || t.date || "") === key);
+  const water = waterTx.length ? { count: waterTx.length, totalUsd: roundUsd(waterTx.reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0)) } : null;
+
+  const active = state.tenants.filter((t) => t.active !== false);
+  const owedAtEnd = roundUsd(active.reduce((s, t) => s + Math.max(0, getTenantMonthEndBalance(t.id, monthIsoValue)), 0));
+  const notices = (state.announcements || []).filter((n) => monthKey(String(n.createdAt || "").slice(0, 10)) === key).map((n) => n.title);
+  const issuesOpened = (state.issues || []).filter((i) => monthKey(String(i.createdAt || "").slice(0, 10)) === key).length;
+  const issuesFixed = (state.issues || []).filter((i) => i.status === "fixed" && monthKey(String(i.updatedAt || "").slice(0, 10)) === key).length;
+  return {
+    month: monthIsoValue,
+    moneyIn,
+    moneyOut,
+    payers,
+    units: active.length,
+    cashEnd: expectedCashOn(getMonthEndDate(monthIsoValue)),
+    owedAtEnd,
+    categories: [...categories.entries()].sort((a, b) => b[1] - a[1]),
+    generator,
+    water,
+    notices,
+    issuesOpened,
+    issuesFixed,
+    hasCash: inMonth.some(isCash),
+  };
+}
+
+function buildMonthlyReportPdf(month) {
+  const d = monthlyReportData(month);
+  const C = {
+    green: "#163832", soft: "#cfe3db", white: "#ffffff", ink: "#14211f", muted: "#61706b", tint: "#eef4ef",
+    bar: "#1f6b5a", track: "#e4ece7", red: "#a23b3b", ok: "#0f513f", blue: "#315f9d",
+  };
+  const W = 595;
+  const left = 40;
+  const right = 555;
+  const cmds = ["0.4 w"];
+  const text = (value, x, y, size, bold, color, bg) => cmds.push(pdfTextCommand(value, x, y, size, bold, { color, bg }));
+  const widthOf = (value, size, bold) => {
+    const shown = pdfSafeText(currentLang === "ar" ? tr(String(value)) : value);
+    return pdfNeedsImage(shown) ? shown.length * size * 0.5 : pdfTextWidth(shown, size, bold);
+  };
+  const textRight = (value, xr, y, size, bold, color, bg) => text(value, (xr - widthOf(value, size, bold)).toFixed(2), y, size, bold, color, bg);
+  let y;
+  const section = (title) => {
+    text(title, left, y, 13, true, C.ink);
+    cmds.push(`q ${pdfColor(C.soft)} RG 0.8 w ${left} ${y - 7} m ${right} ${y - 7} l S Q`);
+    y -= 26;
+  };
+  const line = (label, value, color = C.ink) => {
+    text(label, left, y, 10, false, C.muted);
+    textRight(value, right, y, 10, true, color);
+    y -= 18;
+  };
+
+  // Header and cards
+  cmds.push(pdfFillRect(0, 742, W, 100, C.green));
+  text(state.building?.name || "", left, 806, 12, true, C.soft, C.green);
+  text("Monthly report", left, 776, 24, true, C.white, C.green);
+  text(formatMonth(d.month), left, 756, 11, false, C.soft, C.green);
+  const gap = 12;
+  const cardW = (right - left - gap * 2) / 3;
+  [
+    ["Money in", formatUsd(d.moneyIn), C.ok],
+    ["Money out", formatUsd(d.moneyOut), C.red],
+    ["Cash at month end", formatUsd(d.cashEnd), d.cashEnd < -0.005 ? C.red : C.blue],
+  ].forEach(([label, value, color], i) => {
+    const x = left + i * (cardW + gap);
+    cmds.push(pdfFillRect(x.toFixed(2), 662, cardW.toFixed(2), 60, C.tint));
+    text(label, (x + 14).toFixed(2), 702, 9, false, C.muted, C.tint);
+    text(value, (x + 14).toFixed(2), 676, 17, true, color, C.tint);
+  });
+  y = 630;
+
+  // Where the money went
+  section("Where the money went");
+  if (!d.categories.length) {
+    text("No expenses this month.", left, y, 10, false, C.muted);
+    y -= 20;
+  } else {
+    const shown = d.categories.slice(0, 8);
+    const rest = d.categories.slice(8).reduce((s, [, v]) => s + v, 0);
+    if (rest > 0.005) shown.push([tr("Other"), roundUsd(rest)]);
+    const max = Math.max(...shown.map(([, v]) => v), 1);
+    const barLeft = left + 170;
+    const barRight = right - 90;
+    shown.forEach(([cat, usd]) => {
+      text(pdfClip(cat, 28), left, y, 10, false, C.ink);
+      cmds.push(pdfFillRect(barLeft, y - 2, barRight - barLeft, 9, C.track));
+      cmds.push(pdfFillRect(barLeft, y - 2, Math.max(2, ((barRight - barLeft) * usd) / max).toFixed(2), 9, C.bar));
+      textRight(formatUsd(usd), right, y, 10, true, C.ink);
+      y -= 20;
+    });
+  }
+  y -= 10;
+
+  // Collection
+  section("Collection");
+  line(tr("Payments received"), formatUsd(d.moneyIn), C.ok);
+  line(tr("Units that paid this month"), tr("{n} of {total}", { n: d.payers, total: d.units }));
+  line(tr("Still owed at month end"), formatUsd(d.owedAtEnd), d.owedAtEnd > 0.005 ? C.red : C.ok);
+  y -= 10;
+
+  if (d.generator) {
+    section("Generator");
+    line(tr("Fuel"), formatUsd(d.generator.fuelUsd));
+    line(tr("Maintenance"), formatUsd(d.generator.maintenanceUsd));
+    if (d.generator.kwh) line(tr("Electricity used"), tr("{kwh} kWh", { kwh: numberFormat.format(d.generator.kwh) }));
+    if (d.generator.costPerKwh) line(tr("Cost per kWh"), `$${d.generator.costPerKwh.toFixed(3)}`);
+    if (d.generator.litres) line(tr("Diesel bought"), tr("{litres} litres", { litres: numberFormat.format(d.generator.litres) }));
+    if (!d.generator.billed) line(tr("Meter readings"), tr("not entered yet"), C.red);
+    y -= 10;
+  }
+
+  if (d.water) {
+    section("Water");
+    line(tr(d.water.count === 1 ? "{n} tanker" : "{n} tankers", { n: d.water.count }), formatUsd(d.water.totalUsd));
+    y -= 10;
+  }
+
+  if (d.notices.length || d.issuesOpened || d.issuesFixed) {
+    section("In the building");
+    d.notices.slice(0, 4).forEach((title) => {
+      text(`- ${pdfClip(title, 80)}`, left, y, 10, false, C.ink);
+      y -= 18;
+    });
+    if (d.issuesOpened || d.issuesFixed) line(tr("Problems"), tr("{opened} reported, {fixed} fixed", { opened: d.issuesOpened, fixed: d.issuesFixed }));
+  }
+
+  text("Figures are from the building's account app. For any question, contact the building owner.", left, 61, 8.5, false, C.muted);
+  cmds.push(`q ${pdfColor(C.soft)} RG 0.6 w ${left} 48 m ${right} 48 l S Q`);
+  text(tr("{building} · {month}", { building: state.building?.name || "", month: formatMonth(d.month) }), left, 34, 8, false, C.muted);
+  return buildMultiPagePdf([`${cmds.join("\n")}\n`]);
+}
+
+async function shareMonthlyReport(month) {
+  const pdf = buildMonthlyReportPdf(month);
+  const label = formatMonth(month);
+  const caption = tr("{building} — monthly report, {month}", { building: state.building?.name || "", month: label });
+  const fileName = `Monthly_report_${safeFilePart(state.building?.name || "Building", "Building")}_${monthKey(month)}.pdf`;
+  try {
+    if (typeof navigator.share === "function" && typeof File === "function") {
+      const file = new File([pdf], fileName, { type: PDF_MIME });
+      if (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: caption, text: caption });
+        showToast("Monthly report shared");
+        return;
+      }
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") { showToast("Sharing cancelled"); return; }
+  }
+  downloadBlob(pdf, PDF_MIME, fileName);
+  showToast("Monthly report downloaded");
+}
+
+// ── Balance notification on the 1st ─────────────────────────────────────────
+// The owner's device keeps a small list of what each unit owes in the shared
+// document; on the 1st the database sends each linked tenant who owes money a
+// phone notification from it (supabase/phase2g-monthly.sql). The list is
+// removed from what tenants download.
+function buildBalanceSnapshot() {
+  const items = {};
+  state.tenants.filter((t) => t.active !== false).forEach((t) => {
+    items[t.id] = roundUsd(getTenantTotals(t.id).dueUsd);
+  });
+  return { at: localDateInput(), items };
+}
+
+function monthlyNoticesOn() {
+  return state.settings.monthlyBalanceNotices !== false;
+}
+
+function buildAutoNoticeSection() {
+  const toggle = checkboxRow(tr("On the 1st of each month, send each tenant who owes money a phone notification with their balance"), monthlyNoticesOn());
+  toggle.input.addEventListener("change", () => {
+    state.settings.monthlyBalanceNotices = toggle.input.checked;
+    if (!saveState()) return;
+    showToast(toggle.input.checked ? "Monthly balance notifications on" : "Monthly balance notifications off");
+  });
+  return mk("div", {}, toggle.row,
+    note(tr("Only tenants who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.")));
+}
+
+function refreshBalanceSnapshot() {
+  if (sessionMode !== "owner" || isViewerSession() || !hasCloudConfig()) return;
+  const next = buildBalanceSnapshot();
+  if (JSON.stringify(next.items) !== JSON.stringify(state.balanceSnapshot?.items || null)) saveState();
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.
@@ -12083,6 +12503,7 @@ async function syncFromSheet({ silent = false } = {}) {
     }
     renderCloudStatus(`Last synced at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
     setSyncChip("saved");
+    refreshBalanceSnapshot();
   } catch (error) {
     reportSyncProblem(error);
     if (!silent) renderCloudStatus(lastSyncProblem);
@@ -12164,6 +12585,13 @@ export const __test = {
   whatsappLink,
   buildGroupBalancesMessage,
   groupBalancesData,
+  txUsd,
+  stampLbpRates,
+  dataHealthIssues,
+  findDuplicatePayment,
+  monthlyReportData,
+  buildMonthlyReportPdf,
+  buildBalanceSnapshot,
   drawGroupBalancesCanvas,
   pendingRecurringExpenses,
   addRecurringTemplateFrom,
