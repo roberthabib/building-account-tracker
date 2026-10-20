@@ -73,3 +73,12 @@ test("recurring expense remembers LBP amounts in LBP", () => {
   assert.equal(tpl.currency, "LBP");
   assert.equal(tpl.amount, 1790000);
 });
+
+test("money shows real cents, never a rounded dollar or -$0.00", () => {
+  assert.equal(app.formatUsd(12.5), "$12.50");
+  assert.equal(app.formatUsd(33.333), "$33.33");
+  assert.equal(app.formatUsd(1234.567), "$1,234.57");
+  assert.equal(app.formatUsd(-7.25), "-$7.25");
+  assert.equal(app.formatUsd(-0.001), "$0.00");
+  assert.equal(app.formatUsd(null), "$0.00");
+});

@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v146";
+const APP_VERSION = "v147";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -1777,7 +1777,8 @@ function formatLbp(value) {
 }
 
 function formatUsd(value) {
-  return usdFormat.format(Math.round(value || 0));
+  // Real cents; "|| 0" turns a rounded -0 into 0 so it never prints "-$0.00".
+  return usdFormat.format(roundUsd(value) || 0);
 }
 
 function formatMonthly(value) {
@@ -10027,6 +10028,7 @@ export const __test = {
   setState(raw) { state = hydrateState(raw); currentLang = normalizeLang(state.settings.language); },
   getState() { return state; },
   getTenantBalance,
+  formatUsd,
   getTenantExpenseShare,
   getTenantServicesDue,
   getTenantPaymentsTotal,

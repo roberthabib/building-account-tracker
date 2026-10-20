@@ -139,6 +139,7 @@ app's auth), then reload.
 | 7 lockdown (`phase2d-lockdown.sql`) | ✅ shared key refused for read / write / photo upload; owner reads, writes, sees photos and backups; keep-alive on `rpc/keepalive` |
 | Daily backups | ✅ pg_cron `daily-building-backup` 00:30 UTC, 60 days, first snapshot taken |
 | Private invoice photos | ✅ bucket private, 10-minute signed links, deleted with their expense |
+| Proof-of-payment photos (`phase2e-payment-proofs.sql`, v146) | ✅ 6/6 live checks (rolled back): tenant uploads only into `proofs/<own id>/`, other tenant folder and building invoices refused (42501), declaring with another tenant's photo refused, other tenant's proof invisible, own proof visible |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.
