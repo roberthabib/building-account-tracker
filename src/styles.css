@@ -3624,3 +3624,103 @@ body.rtl .entry-chooser-btn .ec-chevron {
 body.tenant-phone .building-wide {
   display: none;
 }
+
+/* Coefficient: how much of the 1000 is still free. */
+.field-hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--label-muted);
+  font-size: 0.78rem;
+}
+
+.field-hint.is-over {
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* "Repeat every month" on the expense form. */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 2px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  accent-color: var(--primary);
+}
+
+/* Reminders dialog: one message for the building group. */
+.whatsapp-group-btn {
+  width: 100%;
+  margin: 4px 0 12px;
+}
+
+/* Monthly recurring expenses: tick, name, amount, currency, stop. */
+.recurring-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 55vh;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.recurring-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 96px auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+  background: var(--surface);
+}
+
+.recurring-tick {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+}
+
+.recurring-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recurring-text strong {
+  overflow-wrap: anywhere;
+}
+
+.recurring-text span {
+  color: var(--label-muted);
+  font-size: 0.8rem;
+}
+
+.recurring-amount {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  text-align: end;
+}
+
+.recurring-currency {
+  color: var(--label-muted);
+  font-size: 0.85rem;
+}
+
+.recurring-stop-btn {
+  color: var(--red);
+}

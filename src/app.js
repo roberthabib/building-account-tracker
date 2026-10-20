@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v145";
+const APP_VERSION = "v146";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -168,6 +168,25 @@ const els = {
   loginHint: document.querySelector("#loginHint"),
   loginEmailInput: document.querySelector("#loginEmailInput"),
   loginTenantLinked: document.querySelector("#loginTenantLinked"),
+  tenantCoefficientHint: document.querySelector("#tenantCoefficientHint"),
+  whatsappGroupButton: document.querySelector("#whatsappGroupButton"),
+  inviteWhatsAppButton: document.querySelector("#inviteWhatsAppButton"),
+  recurringExpenseRow: document.querySelector("#recurringExpenseRow"),
+  recurringExpenseInput: document.querySelector("#recurringExpenseInput"),
+  recurringSettingsButton: document.querySelector("#recurringSettingsButton"),
+  recurringDialog: document.querySelector("#recurringDialog"),
+  recurringDialogTitle: document.querySelector("#recurringDialogTitle"),
+  recurringDialogNote: document.querySelector("#recurringDialogNote"),
+  recurringList: document.querySelector("#recurringList"),
+  recurringAddButton: document.querySelector("#recurringAddButton"),
+  closeRecurringDialog: document.querySelector("#closeRecurringDialog"),
+  declareDialog: document.querySelector("#declareDialog"),
+  declareMonthNote: document.querySelector("#declareMonthNote"),
+  declareAmountInput: document.querySelector("#declareAmountInput"),
+  declareProofInput: document.querySelector("#declareProofInput"),
+  declareSubmitButton: document.querySelector("#declareSubmitButton"),
+  declareCancelButton: document.querySelector("#declareCancelButton"),
+  closeDeclareDialog: document.querySelector("#closeDeclareDialog"),
   loginUnlinkBtn: document.querySelector("#loginUnlinkBtn"),
   inviteDialog: document.querySelector("#inviteDialog"),
   closeInviteDialog: document.querySelector("#closeInviteDialog"),
@@ -352,6 +371,20 @@ const I18N = {
     "common.share": "Share",
     "common.download": "Download",
     "common.export": "Export",
+    "wa.groupButton": "Post all balances to the building group",
+    "invite.whatsapp": "Send on WhatsApp",
+    "tx.repeatMonthly": "Repeat every month (salary, cleaning, internet…)",
+    "set.recurringTitle": "Monthly recurring expenses",
+    "set.recurringDesc": "Expenses that repeat every month. Each month they wait for you as drafts to confirm.",
+    "common.manage": "Manage",
+    "recurring.title": "Monthly expenses",
+    "recurring.note": "Check the amounts, then add them. Untick anything that didn't happen this month.",
+    "recurring.add": "Add ticked expenses",
+    "declare.title": "Tell the owner you've paid",
+    "declare.amount": "Amount paid (USD)",
+    "declare.proof": "Proof of payment (optional)",
+    "declare.proofNote": "A photo of the bank transfer, OMT or Whish receipt helps the owner confirm it quickly.",
+    "declare.submit": "Notify the owner",
     "set.fullExportTitle": "Export everything to Excel",
     "set.fullExportDesc": "One workbook with every tenant, transaction, month, reading, project and poll — formatted and ready to print or share.",
     "common.restore": "Restore",
@@ -664,6 +697,20 @@ const I18N = {
     "common.share": "مشاركة",
     "common.download": "تنزيل",
     "common.export": "تصدير",
+    "wa.groupButton": "نشر كل الأرصدة في مجموعة المبنى",
+    "invite.whatsapp": "إرسال عبر واتساب",
+    "tx.repeatMonthly": "تكرار كل شهر (راتب، تنظيف، إنترنت…)",
+    "set.recurringTitle": "المصاريف الشهرية المتكررة",
+    "set.recurringDesc": "مصاريف تتكرر كل شهر. في كل شهر تنتظرك كمسودات لتأكيدها.",
+    "common.manage": "إدارة",
+    "recurring.title": "المصاريف الشهرية",
+    "recurring.note": "تحقق من المبالغ ثم أضفها. أزل العلامة عن أي مصروف لم يحدث هذا الشهر.",
+    "recurring.add": "إضافة المصاريف المحددة",
+    "declare.title": "أبلغ المالك أنك دفعت",
+    "declare.amount": "المبلغ المدفوع ($)",
+    "declare.proof": "إثبات الدفع (اختياري)",
+    "declare.proofNote": "صورة التحويل المصرفي أو إيصال OMT أو Whish تساعد المالك على التأكيد بسرعة.",
+    "declare.submit": "إبلاغ المالك",
     "set.fullExportTitle": "تصدير كل البيانات إلى Excel",
     "set.fullExportDesc": "ملف واحد يضم كل المستأجرين والقيود والأشهر والقراءات والمشاريع والاستطلاعات — منسّق وجاهز للطباعة أو المشاركة.",
     "common.restore": "استعادة",
@@ -988,6 +1035,35 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "The other tenants already use all 1000/1000. Lower someone else's coefficient first.": "المستأجرون الآخرون يستخدمون كامل الـ 1000/1000. خفّض معامل مستأجر آخر أولاً.",
+  "Only {room}/1000 is left for this tenant: the total can't go over 1000/1000.": "تبقّى {room}/1000 فقط لهذا المستأجر: لا يمكن أن يتجاوز المجموع 1000/1000.",
+  "Available: {room} of 1000": "المتاح: {room} من 1000",
+  "{building} — balances as of {date}": "{building} — الأرصدة بتاريخ {date}",
+  "paid up ✓ (credit {amount})": "مسدَّد ✓ (رصيد {amount})",
+  "paid up ✓": "مسدَّد ✓",
+  "Total outstanding: {amount}": "إجمالي المستحق: {amount}",
+  "Everyone is up to date for the {month} statement.": "الجميع مسدِّد لكشف شهر {month}.",
+  "{names}: no number saved, so WhatsApp will ask who to send it to.": "{names}: لا يوجد رقم محفوظ، لذا سيسألك واتساب لمن ترسل.",
+  "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.": "مرحباً {name}! هذه دعوتك إلى تطبيق {building} حيث يمكنك رؤية رصيدك ودفعاتك.\n1. افتح {url}\n2. اضغط \"أنا مستأجر ولديّ رمز دعوة\"\n3. أدخل: {code}\nيعمل الرمز مرة واحدة خلال 30 يوماً.",
+  "Send balance reminders for the {month} statement": "أرسل تذكيرات الرصيد لكشف شهر {month}",
+  "{n} monthly expense to confirm for {month}": "{n} مصروف شهري بانتظار التأكيد لشهر {month}",
+  "{n} monthly expenses to confirm for {month}": "{n} مصاريف شهرية بانتظار التأكيد لشهر {month}",
+  "Monthly expenses – {month}": "المصاريف الشهرية – {month}",
+  "No recurring expenses yet. When you add an expense, tick \"Repeat every month\".": "لا توجد مصاريف متكررة بعد. عند إضافة مصروف، ضع علامة على \"تكرار كل شهر\".",
+  "Expense": "مصروف",
+  "Added this month ✓": "أُضيف هذا الشهر ✓",
+  "Amount ({currency})": "المبلغ ({currency})",
+  "Stop": "إيقاف",
+  "Tick at least one expense with an amount": "حدد مصروفاً واحداً على الأقل مع مبلغ",
+  "{n} expense added": "أُضيف {n} مصروف",
+  "{n} expenses added": "أُضيفت {n} مصاريف",
+  "Stop repeating \"{name}\"? Expenses already recorded stay.": "إيقاف تكرار \"{name}\"؟ المصاريف المسجّلة سابقاً تبقى.",
+  "For {month}": "عن شهر {month}",
+  "Photos need the cloud. Send the photo to the owner on WhatsApp instead.": "الصور تحتاج إلى السحابة. أرسل الصورة إلى المالك عبر واتساب بدلاً من ذلك.",
+  "Enter the amount you paid": "أدخل المبلغ الذي دفعته",
+  "View proof": "عرض الإثبات",
+  "Invite": "دعوة",
+  "Proof photo must be one of your own uploads": "يجب أن تكون صورة الإثبات من تحميلاتك أنت",
   "Outstanding USD": "المتبقي $",
   "Payment Receipt": "إيصال دفع",
   "Tenant Account Statement": "كشف حساب المستأجر",
@@ -1846,6 +1922,7 @@ function hydrateState(rawState) {
   hydrated.building ||= {};
   hydrated.polls ||= [];
   hydrated.paymentDeclarations ||= [];
+  hydrated.recurringExpenses ||= [];
   hydrated.sharedExpenses ||= [];
   hydrated.buildingProjects ||= [];
   hydrated.serviceReadings ||= [];
@@ -3483,6 +3560,17 @@ function renderAttention() {
     items.push({ kind: "danger", icon: "⚠️", text: tr("Net position is negative ({amount})", { amount: formatUsd(totals.netPositionUsd) }), view: "ledgerView" });
   }
 
+  // Monthly routine: balance reminders not sent yet this month
+  const thisMonth = currentMonthValue();
+  if (state.settings.remindersSentMonth !== thisMonth && activeTenants.some((t) => getTenantStatementNotification(t.id))) {
+    items.push({ kind: "warn", text: tr("Send balance reminders for the {month} statement", { month: formatMonth(getLastCompletedMonth()) }), view: "paymentsView", action: "reminders" });
+  }
+  // Recurring expenses waiting to be confirmed for this month
+  const recurringDue = pendingRecurringExpenses(thisMonth);
+  if (recurringDue.length) {
+    items.push({ kind: "warn", text: tr(recurringDue.length === 1 ? "{n} monthly expense to confirm for {month}" : "{n} monthly expenses to confirm for {month}", { n: recurringDue.length, month: formatMonth(thisMonth) }), view: "ledgerView", action: "recurring" });
+  }
+
   if (!items.length) {
     els.attentionPanel.classList.add("hidden");
     return;
@@ -3501,6 +3589,7 @@ function renderAttention() {
       row.type = "button";
       row.className = "attention-row";
       row.dataset.view = item.view;
+      if (item.action) row.dataset.action = item.action;
       const chip = document.createElement("span");
       chip.className = "attention-icon";
       chip.style.background = tone.tint;
@@ -3808,6 +3897,14 @@ function wizardAddTenant() {
     coefficient: parseInt(els.wizardTenantCoeff.value, 10) || 0,
     breakerAmps: 0,
   };
+  const wizardRoom = COEFFICIENT_TOTAL - wizardTenants
+    .filter((_, i) => i !== wizardEditingIdx)
+    .reduce((sum, t) => sum + (t.coefficient || 0), 0);
+  if (data.coefficient > wizardRoom) {
+    showToast(coefficientTooHighMessage(wizardRoom), 6000);
+    els.wizardTenantCoeff.focus();
+    return;
+  }
   if (wizardEditingIdx !== null) {
     data.id = wizardTenants[wizardEditingIdx].id;
     data.active = wizardTenants[wizardEditingIdx].active;
@@ -3939,14 +4036,23 @@ function renderPaymentDeclarations() {
       dismissBtn.dataset.declId = decl.id;
       dismissBtn.textContent = tr("Dismiss");
       actions.append(recordBtn, dismissBtn);
+      if (decl.proof?.storagePath) {
+        const proofBtn = document.createElement("button");
+        proofBtn.type = "button";
+        proofBtn.className = "secondary-button declaration-proof-btn";
+        proofBtn.textContent = tr("View proof");
+        proofBtn.addEventListener("click", () => openInvoicePhoto(decl.proof));
+        actions.prepend(proofBtn);
+      }
       item.append(info, actions);
       return item;
     }),
   );
 }
 
-function declarePayment(tenantId, month, amount) {
-  if (!window.confirm(tr("Notify the owner that you've paid {amount} for {month}?", { amount: formatMonthly(amount), month: formatMonth(month) }))) return;
+// Confirmation happens in the declare dialog. Returns a promise so the dialog
+// can wait for the server.
+async function declarePayment(tenantId, month, amount, proof = null) {
   const decl = {
     id: `decl-${Date.now()}`,
     tenantId,
@@ -3954,11 +4060,12 @@ function declarePayment(tenantId, month, amount) {
     amount: Number(amount),
     declaredAt: new Date().toISOString(),
     status: "pending",
+    ...(proof ? { proof } : {}),
   };
   if (isTenantSession()) {
-    supabaseRequest("rpc/declare_my_payment", { method: "POST", body: JSON.stringify({ p_month: month, p_amount: Number(amount) }) })
-      .then(() => { showToast("Owner notified of your payment"); return syncFromSheet({ silent: true }); })
-      .catch((error) => showToast(describeSyncProblem(error), 6000));
+    await supabaseRequest("rpc/declare_my_payment", { method: "POST", body: JSON.stringify({ p_month: month, p_amount: Number(amount), p_proof_path: proof?.storagePath || null }) });
+    showToast("Owner notified of your payment");
+    syncFromSheet({ silent: true });
     return;
   }
   (state.paymentDeclarations ||= []).push(decl);
@@ -3973,7 +4080,10 @@ function acknowledgeDeclaration(id, { record = false } = {}) {
   decl.status = "acknowledged";
   saveState();
   renderDashboard();
-  if (record) openPaymentDialogFor(decl.tenantId, decl.month, decl.amount);
+  if (record) {
+    openPaymentDialogFor(decl.tenantId, decl.month, decl.amount);
+    pendingDeclarationProof = decl.proof?.storagePath ? { fileName: "payment-proof.jpg", mimeType: "image/jpeg", ...decl.proof } : null;
+  }
 }
 
 function renderTenantStatus() {
@@ -4425,6 +4535,7 @@ function renderTenants() {
         <div class="tenant-card-footer">
           <button class="text-link-btn edit-tenant-button" type="button"></button>
           <button class="text-link-btn print-statement-button" type="button"></button>
+          <button class="text-link-btn invite-tenant-button owner-only" type="button"></button>
         </div>
       `;
       card.querySelector(".tenant-id").insertBefore(avatarChip(tenant.name, 38), card.querySelector(".tenant-id-text"));
@@ -4437,6 +4548,8 @@ function renderTenants() {
       metricLabels[2].textContent = tr("Due");
       card.querySelector(".edit-tenant-button").textContent = tr("Edit");
       card.querySelector(".print-statement-button").textContent = tr("Statement");
+      card.querySelector(".invite-tenant-button").textContent = tr("Invite");
+      card.querySelector(".invite-tenant-button").dataset.tenantId = tenant.id;
       card.querySelector("strong").textContent = tenant.name;
       const unitSpan = card.querySelector(".tenant-unit-line");
       const coeffLabel = tenant.coefficient > 0 ? ` · ${tenant.coefficient}/1000` : "";
@@ -6259,6 +6372,7 @@ function syncTransactionFormMode() {
   document.querySelector(".extra-fields").classList.toggle("hidden", !expenseLike);
   document.querySelector(".expense-category-field").classList.toggle("hidden", !expenseMode);
   document.querySelector(".invoice-file-field").classList.toggle("hidden", !expenseLike);
+  els.recurringExpenseRow.classList.toggle("hidden", !expenseMode || Boolean(editingExpenseId));
   document.querySelector(".project-combobox").closest("label").classList.toggle("hidden", serviceMode);
   document.querySelector(".shared-expense-dist-field").classList.add("hidden");
   els.sharedExpenseInlinePreview.classList.add("hidden");
@@ -7158,6 +7272,7 @@ function mergeStates(local, remote) {
   merged.expenseCategories = mergeById(older.expenseCategories, newer.expenseCategories);
   merged.serviceReadings = mergeById(older.serviceReadings, newer.serviceReadings);
   merged.monthlyExpected = mergeByMonth(older.monthlyExpected, newer.monthlyExpected);
+  merged.recurringExpenses = mergeById(older.recurringExpenses, newer.recurringExpenses);
   merged.meta = {
     rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
     epoch: localEpoch,
@@ -7265,6 +7380,328 @@ async function loadCloudState() {
     reportSyncProblem(error);
     renderCloudStatus(lastSyncProblem);
     showToast(lastSyncProblem, 6000);
+  }
+}
+
+// ── Coefficients: the building totals exactly 1000/1000 ─────────────────────
+const COEFFICIENT_TOTAL = 1000;
+
+// How much of the 1000 is still free, ignoring one tenant (the one being edited).
+function coefficientRoom(tenants, excludeId = null) {
+  const used = (tenants || [])
+    .filter((t) => t.active !== false && t.id !== excludeId)
+    .reduce((sum, t) => sum + Number(t.coefficient || 0), 0);
+  return COEFFICIENT_TOTAL - used;
+}
+
+function coefficientTooHighMessage(room) {
+  return room <= 0
+    ? tr("The other tenants already use all 1000/1000. Lower someone else's coefficient first.")
+    : tr("Only {room}/1000 is left for this tenant: the total can't go over 1000/1000.", { room });
+}
+
+function renderTenantCoefficientHint() {
+  const room = coefficientRoom(state.tenants, editingTenantId);
+  els.tenantCoefficientHint.textContent = tr("Available: {room} of 1000", { room: Math.max(0, room) });
+  const entered = Number(els.tenantCoefficientInput.value || 0);
+  els.tenantCoefficientHint.classList.toggle("is-over", entered > Math.max(0, room));
+}
+
+// ── WhatsApp ─────────────────────────────────────────────────────────────────
+// wa.me needs the full international number. Lebanese numbers are usually saved
+// the local way ("70 123 456", "03 123456"), which wa.me would read as another
+// country, so local numbers get Lebanon's 961 code.
+function whatsappPhone(raw) {
+  const text = String(raw || "").trim();
+  const digits = text.replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.startsWith("00")) return digits.slice(2);
+  if (text.startsWith("+") || digits.startsWith("961")) return digits;
+  return `961${digits.replace(/^0+/, "")}`;
+}
+
+// With a number this opens that person's chat. Without one, WhatsApp asks who
+// to send it to — which is also how a message reaches the building group.
+function whatsappLink(rawPhone, message) {
+  return `https://wa.me/${whatsappPhone(rawPhone)}?text=${encodeURIComponent(message)}`;
+}
+
+// One message with every tenant's position, for the building's WhatsApp group.
+function buildGroupBalancesMessage() {
+  const tenants = state.tenants
+    .filter((t) => t.active !== false)
+    .slice()
+    .sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || ""), undefined, { numeric: true }));
+  const lines = [tr("{building} — balances as of {date}", { building: state.building?.name || "", date: formatDateLabel(localDateInput()) }), ""];
+  let totalDue = 0;
+  tenants.forEach((t) => {
+    const { dueUsd, advanceUsd } = getTenantTotals(t.id);
+    totalDue += dueUsd;
+    const status = dueUsd > 0.005
+      ? tr("{amount} due", { amount: formatUsd(dueUsd) })
+      : advanceUsd > 0.005
+        ? tr("paid up ✓ (credit {amount})", { amount: formatUsd(advanceUsd) })
+        : tr("paid up ✓");
+    lines.push(`• ${tr("Unit {unit}", { unit: t.unit || "" })} – ${t.name}: ${status}`);
+  });
+  lines.push("", tr("Total outstanding: {amount}", { amount: formatUsd(roundUsd(totalDue)) }));
+  return lines.join("\n");
+}
+
+function reminderMessage(tenant, amount, month) {
+  return [
+    tr("{building} – Payment Reminder", { building: state.building?.name || "" }),
+    tr("Hi {name}, your outstanding balance{monthLine} is {amount}.", { name: tenant.name, monthLine: month ? tr(" as of the {month} statement", { month: formatMonth(month) }) : "", amount: formatUsd(amount) }),
+    tr("Please settle at your earliest convenience. Thank you."),
+  ].join("\n");
+}
+
+// Reminders count as "sent for this month" once any of them is opened, so the
+// dashboard stops asking.
+function markRemindersSent() {
+  const month = currentMonthValue();
+  if (state.settings.remindersSentMonth === month) return;
+  state.settings.remindersSentMonth = month;
+  saveState();
+  renderAttention();
+}
+
+function openWhatsAppReminderDialog() {
+  const lastMonth = getLastCompletedMonth();
+  els.whatsappDialogTitle.textContent = tr("Payment Reminders – {month} Statement", { month: formatMonth(lastMonth) });
+  const dueEntries = state.tenants
+    .filter((t) => t.active !== false)
+    .map((tenant) => ({ tenant, notification: getTenantStatementNotification(tenant.id) }))
+    .filter(({ notification }) => notification !== null);
+  const noNumber = dueEntries.filter(({ tenant }) => !whatsappPhone(tenant.phone));
+  const note = !dueEntries.length
+    ? tr("Everyone is up to date for the {month} statement.", { month: formatMonth(lastMonth) })
+    : noNumber.length
+      ? tr("{names}: no number saved, so WhatsApp will ask who to send it to.", { names: noNumber.map(({ tenant }) => tenant.name).join("، ") })
+      : "";
+  els.whatsappDialogNote.textContent = note;
+  els.whatsappDialogNote.classList.toggle("hidden", !note);
+  els.whatsappReminderList.replaceChildren(
+    ...dueEntries.map(({ tenant, notification }) => {
+      const { month, statementBalance, paidSince, remaining } = notification;
+      const row = document.createElement("div");
+      row.className = "whatsapp-reminder-row";
+      const info = document.createElement("div");
+      const name = document.createElement("strong");
+      name.textContent = tenant.name;
+      const detail = document.createElement("span");
+      detail.textContent = paidSince > 0
+        ? tr("Unit {unit} – {remaining} remaining (stmt {stmt}, paid {paid})", { unit: tenant.unit, remaining: formatUsd(remaining), stmt: formatUsd(statementBalance), paid: formatUsd(paidSince) })
+        : tr("Unit {unit} – {amount} due ({month} statement)", { unit: tenant.unit, amount: formatUsd(remaining), month: formatMonth(month) });
+      info.append(name, detail);
+      const link = document.createElement("a");
+      link.className = "mini-button whatsapp-btn";
+      link.href = whatsappLink(tenant.phone, reminderMessage(tenant, remaining, month));
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = tr("Send");
+      link.addEventListener("click", markRemindersSent);
+      row.append(info, link);
+      return row;
+    }),
+  );
+  openDialog(els.whatsappDialog);
+}
+
+function postBalancesToGroup() {
+  window.open(whatsappLink("", buildGroupBalancesMessage()), "_blank", "noopener");
+  markRemindersSent();
+}
+
+function inviteWhatsAppMessage(tenant, code) {
+  return tr("Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.", {
+    name: tenant?.name || "", building: state.building?.name || "", url: inviteAppUrl(), code,
+  });
+}
+
+function sendInviteOnWhatsApp() {
+  const code = els.inviteCodeText.textContent;
+  const tenant = state.tenants.find((t) => t.id === els.inviteTenantSelect.value);
+  if (!code || !tenant) return;
+  window.open(whatsappLink(tenant.phone, inviteWhatsAppMessage(tenant, code)), "_blank", "noopener");
+}
+
+// ── Recurring monthly expenses ──────────────────────────────────────────────
+// A template remembers a regular expense (salary, cleaning, internet). Each
+// month it waits as a draft until the owner confirms it; the transaction it
+// creates carries recurringId, which is how a month counts as done.
+function pendingRecurringExpenses(month) {
+  const key = monthKey(month);
+  return (state.recurringExpenses || []).filter((r) =>
+    r.active !== false
+    && monthKey(r.startMonth || "") <= key
+    && !state.transactions.some((t) => t.recurringId === r.id && monthKey(t.date || "") === key));
+}
+
+function addRecurringTemplateFrom(transaction) {
+  const template = {
+    id: `rec-${Date.now()}-${randomToken().slice(0, 4)}`,
+    description: transaction.description || "",
+    expenseCategory: transaction.expenseCategory || "",
+    supplier: transaction.supplier || "",
+    currency: Number(transaction.debitLbp || 0) > 0 && !Number(transaction.debitUsd || 0) ? "LBP" : "USD",
+    amount: Number(transaction.debitLbp || 0) > 0 && !Number(transaction.debitUsd || 0) ? Number(transaction.debitLbp) : Number(transaction.debitUsd || 0),
+    startMonth: monthIso(monthKey(transaction.date || localDateInput())),
+    active: true,
+    createdAt: new Date().toISOString(),
+  };
+  (state.recurringExpenses ||= []).push(template);
+  return template;
+}
+
+let recurringDialogMonth = null;
+
+function openRecurringDialog(month = currentMonthValue()) {
+  if (sessionMode !== "owner") return;
+  recurringDialogMonth = typeof month === "string" ? month : currentMonthValue();
+  els.recurringDialogTitle.textContent = tr("Monthly expenses – {month}", { month: formatMonth(recurringDialogMonth) });
+  const templates = (state.recurringExpenses || []).filter((r) => r.active !== false);
+  const pending = new Set(pendingRecurringExpenses(recurringDialogMonth).map((r) => r.id));
+  els.recurringDialogNote.textContent = templates.length
+    ? tr("Check the amounts, then add them. Untick anything that didn't happen this month.")
+    : tr("No recurring expenses yet. When you add an expense, tick \"Repeat every month\".");
+  els.recurringList.replaceChildren(...templates.map((r) => {
+    const row = document.createElement("div");
+    row.className = "recurring-row";
+    row.dataset.id = r.id;
+    const done = !pending.has(r.id);
+    const tick = document.createElement("input");
+    tick.type = "checkbox";
+    tick.className = "recurring-tick";
+    tick.checked = !done;
+    tick.disabled = done;
+    const text = document.createElement("div");
+    text.className = "recurring-text";
+    const title = document.createElement("strong");
+    title.textContent = r.description || tr("Expense");
+    const meta = document.createElement("span");
+    meta.textContent = done ? tr("Added this month ✓") : [r.expenseCategory, r.supplier].filter(Boolean).join(" · ");
+    text.append(title, meta);
+    const amount = document.createElement("input");
+    amount.type = "number";
+    amount.min = "0";
+    amount.step = r.currency === "LBP" ? "1000" : "0.01";
+    amount.inputMode = "decimal";
+    amount.className = "recurring-amount";
+    amount.value = String(r.amount || "");
+    amount.disabled = done;
+    amount.setAttribute("aria-label", tr("Amount ({currency})", { currency: r.currency || "USD" }));
+    const currency = document.createElement("span");
+    currency.className = "recurring-currency";
+    currency.textContent = r.currency === "LBP" ? "LBP" : "$";
+    const stop = document.createElement("button");
+    stop.type = "button";
+    stop.className = "text-link-btn recurring-stop-btn";
+    stop.textContent = tr("Stop");
+    stop.addEventListener("click", () => stopRecurringExpense(r.id));
+    row.append(tick, text, amount, currency, stop);
+    return row;
+  }));
+  els.recurringAddButton.classList.toggle("hidden", pending.size === 0);
+  openDialog(els.recurringDialog);
+}
+
+function addTickedRecurringExpenses() {
+  const month = recurringDialogMonth || currentMonthValue();
+  const date = monthKey(month) === monthKey(localDateInput()) ? localDateInput() : `${monthKey(month)}-01`;
+  let added = 0;
+  els.recurringList.querySelectorAll(".recurring-row").forEach((row) => {
+    const tick = row.querySelector(".recurring-tick");
+    if (!tick.checked || tick.disabled) return;
+    const template = (state.recurringExpenses || []).find((r) => r.id === row.dataset.id);
+    const amount = Number(row.querySelector(".recurring-amount").value || 0);
+    if (!template || !(amount > 0)) return;
+    const usd = template.currency === "LBP" ? 0 : amount;
+    const lbp = template.currency === "LBP" ? amount : 0;
+    const shares = computeSharedExpenseShares(toUsd(usd, lbp), "coefficient");
+    state.transactions.push({
+      id: `tx-${Date.now()}-${added}`,
+      category: "Expenses",
+      description: template.description,
+      tenantId: null,
+      forMonth: null,
+      project: "",
+      date,
+      supplier: template.supplier || "",
+      invoice: nextExpenseInvoiceNumber(),
+      expenseCategory: template.expenseCategory || "",
+      debitUsd: usd, debitLbp: lbp, creditUsd: 0, creditLbp: 0,
+      balanceUsd: -usd, balanceLbp: -lbp,
+      shares: Object.keys(shares).length ? shares : null,
+      invoiceAttachment: null,
+      sourceRow: null,
+      recurringId: template.id,
+    });
+    template.amount = amount; // next month starts from the latest amount
+    added += 1;
+  });
+  if (!added) { showToast("Tick at least one expense with an amount"); return; }
+  saveState();
+  closeDialog(els.recurringDialog);
+  renderAll();
+  showToast(tr(added === 1 ? "{n} expense added" : "{n} expenses added", { n: added }));
+}
+
+function stopRecurringExpense(id) {
+  const template = (state.recurringExpenses || []).find((r) => r.id === id);
+  if (!template) return;
+  if (!window.confirm(tr("Stop repeating \"{name}\"? Expenses already recorded stay.", { name: template.description || tr("Expense") }))) return;
+  template.active = false;
+  saveState();
+  openRecurringDialog(recurringDialogMonth);
+  renderAttention();
+}
+
+// ── "I've paid", with an optional proof photo ───────────────────────────────
+let declareContext = null;
+// Proof attached to the payment the owner is about to record from a declaration.
+let pendingDeclarationProof = null;
+
+function openDeclareDialog(tenantId, month, amount) {
+  declareContext = { tenantId, month };
+  els.declareMonthNote.textContent = tr("For {month}", { month: formatMonth(month) });
+  els.declareAmountInput.value = amountInputValue(amount);
+  els.declareProofInput.value = "";
+  openDialog(els.declareDialog);
+}
+
+async function uploadPaymentProof(tenantId, file) {
+  if (cloudProvider() !== "supabase" || !authSession) {
+    throw new Error("Photos need the cloud. Send the photo to the owner on WhatsApp instead.");
+  }
+  const prepared = await prepareInvoiceUpload({ id: "proof", invoice: "payment-proof", description: "payment proof", date: localDateInput() }, file);
+  // Tenant phones may only write inside proofs/<their tenant id>/ (storage policy).
+  const path = `proofs/${tenantId}/${Date.now()}-${randomToken()}.jpg`;
+  const c = cloudConfig();
+  await ensureFreshSession();
+  const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}`, "Content-Type": prepared.mimeType, "x-upsert": "false" },
+    body: base64ToBytes(prepared.dataBase64),
+  });
+  if (!res.ok) throw Object.assign(new Error(`Photo upload failed (${res.status})`), { status: res.status });
+  return { fileName: "payment-proof.jpg", mimeType: prepared.mimeType, size: prepared.size, storagePath: path, uploadedAt: new Date().toISOString() };
+}
+
+async function submitDeclaration() {
+  if (!declareContext) return;
+  const amount = Number(els.declareAmountInput.value || 0);
+  if (!(amount > 0)) { showToast("Enter the amount you paid"); return; }
+  const file = els.declareProofInput.files?.[0] || null;
+  els.declareSubmitButton.disabled = true;
+  try {
+    const proof = file ? await uploadPaymentProof(declareContext.tenantId, file) : null;
+    await declarePayment(declareContext.tenantId, declareContext.month, amount, proof);
+    closeDialog(els.declareDialog);
+  } catch (error) {
+    showToast(error instanceof TypeError ? "Can't reach the cloud. Check your connection." : describeSyncProblem(error), 6000);
+  } finally {
+    els.declareSubmitButton.disabled = false;
   }
 }
 
@@ -7393,7 +7830,9 @@ function unlinkTenantPhone() {
 }
 
 // Owner side: mint a code for one tenant and hand it over.
-function openInviteDialog() {
+function openInviteDialog(preselectTenantId = null) {
+  // Called directly from a tenant card, or as a click handler (gets an event).
+  const preselect = typeof preselectTenantId === "string" ? preselectTenantId : null;
   if (!isOwnerSession()) {
     showToast("Sign in with Google first: only the signed-in owner can create invite codes", 6000);
     return;
@@ -7407,11 +7846,16 @@ function openInviteDialog() {
   }));
   resetInviteResult();
   openDialog(els.inviteDialog);
+  if (preselect) {
+    els.inviteTenantSelect.value = preselect;
+    createInviteCode();
+  }
 }
 
 function resetInviteResult() {
   els.inviteResult.classList.add("hidden");
   els.inviteShareButton.classList.add("hidden");
+  els.inviteWhatsAppButton.classList.add("hidden");
   els.inviteCreateButton.classList.remove("hidden");
   els.inviteCodeText.textContent = "";
 }
@@ -7428,6 +7872,7 @@ async function createInviteCode() {
     els.inviteHowTo.textContent = tr("Send this to {name}. On their phone: open {url}, tap \"I'm a tenant with an invite code\" and enter the code. It works once, within 30 days.", { name: tenant?.name || "", url: inviteAppUrl() });
     els.inviteResult.classList.remove("hidden");
     els.inviteShareButton.classList.remove("hidden");
+    els.inviteWhatsAppButton.classList.remove("hidden");
     els.inviteCreateButton.classList.add("hidden");
   } catch (error) {
     showToast(describeSyncProblem(error), 6000);
@@ -7656,6 +8101,7 @@ function openEntryForm(category) {
 
 function resetTransactionForm() {
   editingExpenseId = null;
+  pendingDeclarationProof = null;
   els.transactionForm.reset();
   els.transactionBackButton.classList.add("hidden"); // shown only when opened via the chooser
   document.querySelector(".type-field").classList.remove("hidden");
@@ -8670,6 +9116,7 @@ function openAddTenantDialog() {
   els.tenantPinDialogInput.placeholder = t("tenant.pinPh");
   els.removeTenantPinButton.classList.add("hidden");
   els.tenantSubmitButton.textContent = t("common.add");
+  renderTenantCoefficientHint();
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
 }
@@ -8688,6 +9135,7 @@ function openEditTenantDialog(tenantId) {
   els.tenantPinDialogInput.placeholder = tenant.pinHash ? tr("PIN set — type to change") : t("tenant.pinPh");
   els.removeTenantPinButton.classList.toggle("hidden", !tenant.pinHash);
   els.tenantSubmitButton.textContent = tr("Save");
+  renderTenantCoefficientHint();
   openDialog(els.tenantDialog);
   els.tenantNameInput.focus();
 }
@@ -8701,6 +9149,15 @@ function handleTenantFormSubmit(event) {
   const breakerAmps = Math.max(0, Number(els.tenantBreakerInput.value || 0));
   const pinEntered = els.tenantPinDialogInput.value.trim();
   if (!name || !unit) return;
+  // The building totals 1000/1000. Lowering (or keeping) a coefficient is always
+  // allowed, so a building already over the limit can still be fixed.
+  const room = coefficientRoom(state.tenants, editingTenantId);
+  const previous = editingTenantId ? Number(state.tenants.find((t) => t.id === editingTenantId)?.coefficient || 0) : 0;
+  if (coefficient > room && coefficient > previous) {
+    showToast(coefficientTooHighMessage(room), 6000);
+    els.tenantCoefficientInput.focus();
+    return;
+  }
 
   if (editingTenantId) {
     const tenant = state.tenants.find((t) => t.id === editingTenantId);
@@ -8750,7 +9207,7 @@ function deleteTenant(tenantId) {
 }
 
 function buildWhatsAppUrl(tenant, dueAmount, statementMonth = null) {
-  const phone = (tenant.phone || "").replace(/\D/g, "");
+  const phone = whatsappPhone(tenant.phone);
   if (!phone) return null;
   const monthLine = statementMonth ? tr(" as of the {month} statement", { month: formatMonth(statementMonth) }) : "";
   const message = [
@@ -8762,7 +9219,7 @@ function buildWhatsAppUrl(tenant, dueAmount, statementMonth = null) {
 }
 
 function buildMonthlyDueWhatsAppUrl(tenant, owed, month) {
-  const phone = (tenant.phone || "").replace(/\D/g, "");
+  const phone = whatsappPhone(tenant.phone);
   if (!phone) return null;
   const message = [
     tr("{building} – Payment Reminder", { building: state.building.name }),
@@ -8773,7 +9230,7 @@ function buildMonthlyDueWhatsAppUrl(tenant, owed, month) {
 }
 
 function buildSharedExpensesWhatsAppUrl(tenant, owed, month) {
-  const phone = (tenant.phone || "").replace(/\D/g, "");
+  const phone = whatsappPhone(tenant.phone);
   if (!phone) return null;
   const message = [
     tr("{building} – Shared Expenses Reminder", { building: state.building.name }),
@@ -8828,7 +9285,7 @@ function openSharedExpensesWhatsAppReminderDialog() {
 }
 
 function buildProjectWhatsAppUrl(tenant, project, owedAmount) {
-  const phone = (tenant.phone || "").replace(/\D/g, "");
+  const phone = whatsappPhone(tenant.phone);
   if (!phone) return null;
   const message = [
     tr("{building} – Project Payment Reminder", { building: state.building.name }),
@@ -8889,55 +9346,6 @@ function openProjectWhatsAppReminderDialog(project) {
   openDialog(els.whatsappDialog);
 }
 
-function openWhatsAppReminderDialog() {
-  const lastMonth = getLastCompletedMonth();
-  els.whatsappDialogTitle.textContent = tr("Payment Reminders – {month} Statement", { month: formatMonth(lastMonth) });
-
-  const activeTenants = state.tenants.filter((t) => t.active !== false);
-  const dueEntries = activeTenants
-    .map((tenant) => ({ tenant, notification: getTenantStatementNotification(tenant.id) }))
-    .filter(({ notification }) => notification !== null);
-
-  if (!dueEntries.length) { showToast("No outstanding statement balances"); return; }
-
-  const withPhone = dueEntries.filter(({ tenant }) => tenant.phone);
-  const withoutPhone = dueEntries.filter(({ tenant }) => !tenant.phone);
-
-  els.whatsappDialogNote.textContent = withoutPhone.length
-    ? tr("{names} skipped – no phone number saved.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
-    : "";
-  els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
-
-  if (!withPhone.length) { showToast("No due tenants have a phone number saved"); return; }
-
-  els.whatsappReminderList.replaceChildren(
-    ...withPhone.map(({ tenant, notification }) => {
-      const { month, statementBalance, paidSince, remaining } = notification;
-      const url = buildWhatsAppUrl(tenant, remaining, month);
-      const row = document.createElement("div");
-      row.className = "whatsapp-reminder-row";
-      const info = document.createElement("div");
-      const name = document.createElement("strong");
-      name.textContent = tenant.name;
-      const detail = document.createElement("span");
-      detail.textContent = paidSince > 0
-        ? tr("Unit {unit} – {remaining} remaining (stmt {stmt}, paid {paid})", { unit: tenant.unit, remaining: formatUsd(remaining), stmt: formatUsd(statementBalance), paid: formatUsd(paidSince) })
-        : tr("Unit {unit} – {amount} due ({month} statement)", { unit: tenant.unit, amount: formatUsd(remaining), month: formatMonth(month) });
-      info.append(name, detail);
-      const link = document.createElement("a");
-      link.className = "mini-button whatsapp-btn";
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.textContent = tr("Send");
-      row.append(info, link);
-      return row;
-    }),
-  );
-
-  openDialog(els.whatsappDialog);
-}
-
 function navigateMonth(direction) {
   const months = getMonths();
   const idx = months.indexOf(selectedMonth);
@@ -8982,7 +9390,7 @@ function attachEvents() {
   });
   els.tenantPaymentList.addEventListener("click", (event) => {
     const paidBtn = event.target.closest(".paid-declaration-btn[data-tenant-id]");
-    if (paidBtn) { declarePayment(paidBtn.dataset.tenantId, paidBtn.dataset.month, paidBtn.dataset.amount); return; }
+    if (paidBtn) { openDeclareDialog(paidBtn.dataset.tenantId, paidBtn.dataset.month, paidBtn.dataset.amount); return; }
     const noPhoneBtn = event.target.closest(".whatsapp-no-phone[data-edit-tenant-id]");
     if (noPhoneBtn) { openEditTenantDialog(noPhoneBtn.dataset.editTenantId); return; }
     const button = event.target.closest("button[data-tenant-id]");
@@ -8991,7 +9399,10 @@ function attachEvents() {
   });
   els.attentionList.addEventListener("click", (event) => {
     const row = event.target.closest(".attention-row[data-view]");
-    if (row) setView(row.dataset.view);
+    if (!row) return;
+    if (row.dataset.action === "reminders") openWhatsAppReminderDialog();
+    else if (row.dataset.action === "recurring") openRecurringDialog();
+    else setView(row.dataset.view);
   });
   els.declarationsList.addEventListener("click", (event) => {
     const recordBtn = event.target.closest(".declaration-record-btn[data-decl-id]");
@@ -9022,6 +9433,8 @@ function attachEvents() {
     showToast("Tenant PIN removed");
   });
   els.tenantList.addEventListener("click", (event) => {
+    const inviteBtn = event.target.closest(".invite-tenant-button[data-tenant-id]");
+    if (inviteBtn) { openInviteDialog(inviteBtn.dataset.tenantId); return; }
     const statBtn = event.target.closest(".print-statement-button[data-tenant-id]");
     if (statBtn) { void shareTenantStatementPdf(statBtn.dataset.tenantId); return; }
     const editBtn = event.target.closest(".edit-tenant-button[data-tenant-id]");
@@ -9174,6 +9587,14 @@ function attachEvents() {
           invoiceUploadError = error;
         }
       }
+      if (!existingTransaction && transaction.category === "Expenses" && els.recurringExpenseInput.checked) {
+        transaction.recurringId = addRecurringTemplateFrom(transaction).id;
+      }
+      // Recording a tenant's declared payment: keep their proof photo on it.
+      if (!existingTransaction && transaction.category === "Payments" && pendingDeclarationProof) {
+        transaction.invoiceAttachment = pendingDeclarationProof;
+      }
+      pendingDeclarationProof = null;
       if (existingTransaction) state.transactions[editingIndex] = { ...existingTransaction, ...transaction };
       else {
         state.transactions.push(...transactions);
@@ -9286,6 +9707,15 @@ function attachEvents() {
   els.inviteShareButton.addEventListener("click", shareInviteCode);
   els.inviteTenantSelect.addEventListener("change", resetInviteResult);
   els.cloudBackupsButton.addEventListener("click", openBackupsDialog);
+  els.whatsappGroupButton.addEventListener("click", postBalancesToGroup);
+  els.inviteWhatsAppButton.addEventListener("click", sendInviteOnWhatsApp);
+  els.tenantCoefficientInput.addEventListener("input", renderTenantCoefficientHint);
+  els.recurringSettingsButton.addEventListener("click", () => openRecurringDialog());
+  els.recurringAddButton.addEventListener("click", addTickedRecurringExpenses);
+  els.closeRecurringDialog.addEventListener("click", () => closeDialog(els.recurringDialog));
+  els.declareSubmitButton.addEventListener("click", submitDeclaration);
+  els.declareCancelButton.addEventListener("click", () => closeDialog(els.declareDialog));
+  els.closeDeclareDialog.addEventListener("click", () => closeDialog(els.declareDialog));
   els.closeBackupsDialog.addEventListener("click", () => closeDialog(els.backupsDialog));
   els.downloadBackupButton.addEventListener("click", downloadBackup);
   els.fullExportButton.addEventListener("click", handleFullExcelExport);
@@ -9607,6 +10037,12 @@ export const __test = {
   mergeStates,
   remoteWouldWipeLocalData,
   describeSyncProblem,
+  coefficientRoom,
+  whatsappPhone,
+  whatsappLink,
+  buildGroupBalancesMessage,
+  pendingRecurringExpenses,
+  addRecurringTemplateFrom,
   collectFullExportData,
   buildFullWorkbookXlsx,
   buildFullWorkbookFiles,

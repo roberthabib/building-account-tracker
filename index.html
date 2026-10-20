@@ -401,6 +401,10 @@
 
             <p class="settings-section-header" data-i18n="set.backup">Backup &amp; Restore</p>
             <div class="settings-action owner-only">
+              <div class="settings-action-text"><strong data-i18n="set.recurringTitle">Monthly recurring expenses</strong><span data-i18n="set.recurringDesc">Expenses that repeat every month. Each month they wait for you as drafts to confirm.</span></div>
+              <button class="secondary-button" id="recurringSettingsButton" type="button" data-i18n="common.manage">Manage</button>
+            </div>
+            <div class="settings-action owner-only">
               <div class="settings-action-text"><strong data-i18n="set.cloudBackupsTitle">Restore a daily cloud backup</strong><span data-i18n="set.cloudBackupsDesc">The cloud keeps a copy of your data every night for 60 days. Pick a day to go back to.</span></div>
               <button class="secondary-button" id="cloudBackupsButton" type="button" data-i18n="common.choose">Choose…</button>
             </div>
@@ -646,6 +650,10 @@
           <span class="file-selection-status" id="invoiceFileSelectionStatus" data-i18n="tx.noPhoto">No photo selected</span>
         </div>
         <div class="attachment-status hidden" id="invoiceAttachmentStatus"></div>
+        <label class="checkbox-row hidden" id="recurringExpenseRow">
+          <input type="checkbox" id="recurringExpenseInput" />
+          <span data-i18n="tx.repeatMonthly">Repeat every month (salary, cleaning, internet…)</span>
+        </label>
 
         <datalist id="supplierList"></datalist>
         <datalist id="projectList"></datalist>
@@ -678,6 +686,7 @@
         <label>
           <span data-i18n="tenant.coefficient">Coefficient (X / 1000)</span>
           <input id="tenantCoefficientInput" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" data-i18n-ph="tenant.coefficientPh" />
+          <span class="field-hint" id="tenantCoefficientHint"></span>
         </label>
         <label>
           <span data-i18n="tenant.breaker">Generator breaker size (Amps)</span>
@@ -700,6 +709,7 @@
         <h2 id="whatsappDialogTitle" data-i18n="wa.title">Send Payment Reminders</h2>
         <button class="icon-button small" id="closeWhatsappDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
+      <button class="primary-button whatsapp-group-btn" id="whatsappGroupButton" type="button" data-i18n="wa.groupButton">Post all balances to the building group</button>
       <p class="settings-note" id="whatsappDialogNote"></p>
       <div id="whatsappReminderList"></div>
     </dialog>
@@ -717,7 +727,36 @@
       </div>
       <div class="button-row">
         <button class="primary-button" id="inviteCreateButton" type="button" data-i18n="invite.create">Create invite code</button>
+        <button class="primary-button hidden" id="inviteWhatsAppButton" type="button" data-i18n="invite.whatsapp">Send on WhatsApp</button>
         <button class="secondary-button hidden" id="inviteShareButton" type="button" data-i18n="common.share">Share</button>
+      </div>
+    </dialog>
+
+    <dialog id="recurringDialog">
+      <div class="dialog-header">
+        <h2 id="recurringDialogTitle" data-i18n="recurring.title">Monthly expenses</h2>
+        <button class="icon-button small" id="closeRecurringDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
+      </div>
+      <p class="settings-note" id="recurringDialogNote" data-i18n="recurring.note">Check the amounts, then add them. Untick anything that didn't happen this month.</p>
+      <div class="recurring-list" id="recurringList"></div>
+      <div class="button-row">
+        <button class="primary-button" id="recurringAddButton" type="button" data-i18n="recurring.add">Add ticked expenses</button>
+      </div>
+    </dialog>
+
+    <dialog id="declareDialog">
+      <div class="dialog-header">
+        <h2 data-i18n="declare.title">Tell the owner you've paid</h2>
+        <button class="icon-button small" id="closeDeclareDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
+      </div>
+      <p class="settings-note" id="declareMonthNote"></p>
+      <label><span data-i18n="declare.amount">Amount paid (USD)</span><input id="declareAmountInput" type="number" min="0.01" step="0.01" inputmode="decimal" /></label>
+      <span class="field-label" data-i18n="declare.proof">Proof of payment (optional)</span>
+      <p class="settings-note" data-i18n="declare.proofNote">A photo of the bank transfer, OMT or Whish receipt helps the owner confirm it quickly.</p>
+      <input id="declareProofInput" type="file" accept="image/*" />
+      <div class="button-row">
+        <button class="primary-button" id="declareSubmitButton" type="button" data-i18n="declare.submit">Notify the owner</button>
+        <button class="secondary-button" id="declareCancelButton" type="button" data-i18n="common.cancel">Cancel</button>
       </div>
     </dialog>
 
