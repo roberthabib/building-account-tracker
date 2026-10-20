@@ -4163,3 +4163,8 @@ a.mini-button {
   align-items: center;
   text-decoration: none;
 }
+
+/* Generator card: share one tenant's bill as a picture. */
+.gen-bill-line .gen-bill-share {
+  flex: 0 0 auto;
+}

@@ -6,6 +6,9 @@
     },
     "api/push.js": {
       "includeFiles": "src/cloud-config.js"
+    },
+    "api/read-invoice.js": {
+      "includeFiles": "src/cloud-config.js"
     }
   },
   "crons": [

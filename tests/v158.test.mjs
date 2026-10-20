@@ -49,3 +49,20 @@ test("a year counts as closed only when all twelve months are", () => {
   app.getState().monthLocks[5].closed = false;
   assert.equal(app.yearFullyClosed("2025"), false);
 });
+
+test("generator bill: one tenant's readings, kWh and shares", () => {
+  const fuel = { id: "g1", category: "Services Expenses", serviceType: "generator", servicePart: "fuel", forMonth: "2026-09-01", date: "2026-09-03", debitUsd: 300, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -300, balanceLbp: 0 };
+  const maint = { ...fuel, id: "g2", servicePart: "maintenance", debitUsd: 60, balanceUsd: -60 };
+  app.setState(baseState({
+    tenants: [{ id: "a", name: "A", unit: "1A", active: true, coefficient: 500, breakerAmps: 10 }, { id: "b", name: "B", unit: "1B", active: true, coefficient: 500, breakerAmps: 20 }],
+    transactions: [fuel, maint],
+    serviceReadings: [{ id: "r", serviceType: "generator", forMonth: "2026-09-01", lines: { a: { breakerAmps: 10, previousReading: 100, currentReading: 300 }, b: { breakerAmps: 20, previousReading: 0, currentReading: 400 } } }],
+  }));
+  const bill = app.generatorBillData("a", "2026-09-01");
+  assert.equal(bill.kwh, 200);
+  assert.equal(bill.fuelUsd, 100, "200 of 600 kWh");
+  assert.equal(bill.maintenanceUsd, 20, "10 of 30 A");
+  assert.equal(bill.totalUsd, 120);
+  assert.equal(bill.pricePerKwh, 0.5);
+  assert.equal(app.generatorBillData("a", "2026-10-01"), null, "no readings, no bill");
+});

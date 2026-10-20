@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v158";
+const APP_VERSION = "v159";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -384,6 +384,7 @@ const I18N = {
     "ten.inviteAll": "Invite all",
     "pay.whoPaid": "Who paid?",
     "tx.paidBy": "Paid by",
+    "tx.readInvoice": "Fill in from the photo",
     "tx.paidFrom": "Paid from",
     "opt.cash": "Cash",
     "opt.bank": "Bank transfer",
@@ -752,6 +753,7 @@ const I18N = {
     "ten.inviteAll": "دعوة الجميع",
     "pay.whoPaid": "من دفع؟",
     "tx.paidBy": "طريقة الدفع",
+    "tx.readInvoice": "تعبئة البيانات من الصورة",
     "tx.paidFrom": "دُفع من",
     "opt.cash": "نقداً",
     "opt.bank": "تحويل مصرفي",
@@ -1121,6 +1123,23 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Bill": "الفاتورة",
+  "Generator bill": "فاتورة المولد",
+  "To pay for the generator": "المستحق عن المولد",
+  "Your meter": "عدّادك",
+  "How it is calculated": "كيف تُحتسب",
+  "Fuel: {kwh} kWh × ${price}": "المازوت: {kwh} ك.و.س × ${price}",
+  "Maintenance: {amps}A of {total}A": "الصيانة: {amps} أمبير من {total} أمبير",
+  "Building total this month: {kwh} kWh, fuel {fuel}, maintenance {maint}.": "مجموع المبنى هذا الشهر: {kwh} ك.و.س، مازوت {fuel}، صيانة {maint}.",
+  "Fuel is shared by the electricity each unit used; maintenance by breaker size.": "يُوزَّع المازوت حسب الكهرباء التي استهلكتها كل وحدة، والصيانة حسب حجم القاطع.",
+  "Enter this month's meter readings first": "أدخل قراءات العدّادات لهذا الشهر أولاً",
+  "{name} — generator bill, {month}: {amount}": "{name} — فاتورة المولد، {month}: {amount}",
+  "Reading the photo…": "جارٍ قراءة الصورة…",
+  "Invoice reading failed ({status})": "فشلت قراءة الفاتورة ({status})",
+  "Filled in from the photo — please check the numbers": "تمت التعبئة من الصورة — يرجى التحقق من الأرقام",
+  "Couldn't find the amount on the photo": "لم يُعثر على المبلغ في الصورة",
+  "Can't reach the server. Check your connection.": "تعذّر الوصول إلى الخادم. تحقق من الاتصال.",
+  "Fill in from the photo": "تعبئة البيانات من الصورة",
   "Contract": "عقد",
   "Insurance": "تأمين",
   "Permit": "ترخيص",
@@ -3457,13 +3476,13 @@ function buildGeneratorCard(month, tenantsById) {
     const line = dist.lines[id];
     const tenant = tenantsById.get(id);
     if (!tenant && sessionMode !== "owner") return;
-    lineList.append(
-      buildServiceLine(
-        tenant ? tenant.name : tr("(removed)"),
-        formatUsd(line.totalUsd),
-        tr("{amps}A · {kwh} kWh · {cons} consumption + {maint} maintenance", { amps: line.breakerAmps || 0, kwh: line.kwh || 0, cons: formatUsd(line.consumptionUsd), maint: formatUsd(line.maintenanceUsd) }),
-      ),
+    const lineEl = buildServiceLine(
+      tenant ? tenant.name : tr("(removed)"),
+      formatUsd(line.totalUsd),
+      tr("{amps}A · {kwh} kWh · {cons} consumption + {maint} maintenance", { amps: line.breakerAmps || 0, kwh: line.kwh || 0, cons: formatUsd(line.consumptionUsd), maint: formatUsd(line.maintenanceUsd) }),
     );
+    if (tenant) lineEl.append(miniButton(tr("Bill"), () => { void shareGeneratorBill(id, month); }, "gen-bill-share"));
+    lineList.append(lineEl);
   });
   card.append(lineList);
   return card;
@@ -4030,6 +4049,7 @@ function enterAsOwner() {
   checkSetupWizard();
   refreshKeepaliveStatus();
   refreshTenantLinks();
+  checkInvoiceReading();
 }
 
 function hideLoginScreen() {
@@ -7107,6 +7127,7 @@ function syncTransactionFormMode() {
   els.litresWrap?.classList.toggle("hidden", !serviceMode || waterMode || els.transactionServicePart.value === "maintenance");
   els.methodField?.classList.toggle("hidden", !tenantMode);
   els.paidFromField?.classList.toggle("hidden", !expenseLike);
+  updateReadInvoiceButton();
   document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
@@ -7163,6 +7184,7 @@ function selectedInvoiceFile() {
 function updateInvoiceFileSelectionStatus() {
   const file = selectedInvoiceFile();
   els.invoiceFileSelectionStatus.textContent = file ? file.name : t("tx.noPhoto");
+  updateReadInvoiceButton();
 }
 
 function clearInvoiceFileSelection() {
@@ -10902,6 +10924,7 @@ Object.assign(els, {
   pollQuorumInput: document.querySelector("#pollQuorumInput"),
   maintenanceList: document.querySelector("#maintenanceList"),
   inviteAllButton: document.querySelector("#inviteAllButton"),
+  readInvoiceButton: document.querySelector("#readInvoiceButton"),
   supplierList: document.querySelector("#suppliersList"),
   newSupplierButton: document.querySelector("#newSupplierButton"),
   documentList: document.querySelector("#documentsList"),
@@ -12433,6 +12456,7 @@ function attachV148Events() {
   els.newIssueButton?.addEventListener("click", openIssueDialog);
   els.newMaintenanceButton?.addEventListener("click", () => openMaintenanceTaskDialog());
   els.inviteAllButton?.addEventListener("click", openInviteAllDialog);
+  els.readInvoiceButton?.addEventListener("click", () => { void readInvoiceIntoForm(); });
   els.newSupplierButton?.addEventListener("click", () => openSupplierDialog());
   els.newDocumentButton?.addEventListener("click", () => openDocumentDialog());
   els.newMeetingButton?.addEventListener("click", () => openMeetingDialog());
@@ -13823,6 +13847,179 @@ function v158AttentionItems() {
   return items;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v159 — personal generator bill as a picture, reading an invoice photo
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Personal generator bill (picture for one tenant) ────────────────────────
+function generatorBillData(tenantId, month) {
+  const dist = computeServiceDistribution("generator", month);
+  const line = dist.lines?.[tenantId];
+  if (!dist.distributed || !line) return null;
+  const totalAmps = Object.values(dist.lines).reduce((s, l) => s + Number(l.breakerAmps || 0), 0);
+  return {
+    month,
+    previous: line.previousReading,
+    current: line.currentReading,
+    kwh: line.kwh,
+    breakerAmps: line.breakerAmps,
+    fuelUsd: line.consumptionUsd,
+    maintenanceUsd: line.maintenanceUsd,
+    totalUsd: line.totalUsd,
+    buildingKwh: dist.totalKwh,
+    buildingFuelUsd: dist.pools.fuelUsd,
+    buildingMaintenanceUsd: dist.pools.maintenanceUsd,
+    pricePerKwh: dist.totalKwh > 0 ? dist.pools.fuelUsd / dist.totalKwh : 0,
+    totalAmps,
+  };
+}
+
+function drawGeneratorBillCanvas(tenant, month) {
+  const d = generatorBillData(tenant.id, month);
+  if (!d) return null;
+  const rtl = currentLang === "ar";
+  const C = { green: "#163832", soft: "#cfe3db", white: "#ffffff", ink: "#14211f", muted: "#61706b", tint: "#eef4ef", line: "#e4e9e4", accent: "#1f6b5a" };
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const W = 1080;
+  const PAD = 64;
+  const H = 1180;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const X = (x) => (rtl ? W - x : x);
+  const box = (x, y, w, h, color, radius = 0) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    const left = rtl ? W - x - w : x;
+    if (radius && typeof ctx.roundRect === "function") ctx.roundRect(left, y, w, h, radius);
+    else ctx.rect(left, y, w, h);
+    ctx.fill();
+  };
+  const text = (value, x, y, { size = 30, weight = 400, color = C.ink, align = "start" } = {}) => {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.fillText(String(value ?? ""), X(x), y);
+  };
+  const monthLabel = rtl
+    ? new Date(`${monthKey(month)}-01T00:00:00`).toLocaleDateString("ar-LB-u-nu-latn", { month: "long", year: "numeric" })
+    : formatMonth(month);
+
+  box(0, 0, W, H, C.white);
+  box(0, 0, W, 250, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Generator bill"), PAD, 160, { size: 64, weight: 800, color: C.white });
+  text(`${tenant.name} · ${tr("Unit {unit}", { unit: tenant.unit || "" })} · ${monthLabel}`, PAD, 212, { size: 30, color: C.soft });
+
+  // Big total
+  box(PAD, 300, W - PAD * 2, 170, C.tint, 26);
+  text(tr("To pay for the generator"), PAD + 36, 360, { size: 30, color: C.muted });
+  text(formatUsd(d.totalUsd), PAD + 36, 436, { size: 72, weight: 800, color: C.accent });
+
+  // Meter
+  let y = 540;
+  const row = (label, value, opts = {}) => {
+    text(label, PAD, y, { size: 32, color: C.muted });
+    text(value, W - PAD, y, { size: 34, weight: 700, color: C.ink, align: "end", ...opts });
+    y += 64;
+  };
+  text(tr("Your meter"), PAD, y, { size: 38, weight: 800 });
+  y += 60;
+  row(tr("Previous reading"), numberFormat.format(d.previous));
+  row(tr("Current reading"), numberFormat.format(d.current));
+  row(tr("Electricity used"), tr("{kwh} kWh", { kwh: numberFormat.format(d.kwh) }));
+  box(PAD, y - 34, W - PAD * 2, 2, C.line);
+  y += 30;
+  text(tr("How it is calculated"), PAD, y, { size: 38, weight: 800 });
+  y += 60;
+  row(tr("Fuel: {kwh} kWh × ${price}", { kwh: numberFormat.format(d.kwh), price: d.pricePerKwh.toFixed(3) }), formatUsd(d.fuelUsd));
+  row(tr("Maintenance: {amps}A of {total}A", { amps: d.breakerAmps, total: d.totalAmps }), formatUsd(d.maintenanceUsd));
+  box(PAD, y - 34, W - PAD * 2, 4, C.green);
+  y += 24;
+  row(tr("Total"), formatUsd(d.totalUsd), { color: C.accent, size: 40 });
+
+  text(tr("Building total this month: {kwh} kWh, fuel {fuel}, maintenance {maint}.", { kwh: numberFormat.format(d.buildingKwh), fuel: formatUsd(d.buildingFuelUsd), maint: formatUsd(d.buildingMaintenanceUsd) }), PAD, H - 90, { size: 24, color: C.muted });
+  text(tr("Fuel is shared by the electricity each unit used; maintenance by breaker size."), PAD, H - 52, { size: 24, color: C.muted });
+  return canvas;
+}
+
+async function shareGeneratorBill(tenantId, month) {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant) return;
+  const canvas = drawGeneratorBillCanvas(tenant, month);
+  if (!canvas) { showToast("Enter this month's meter readings first"); return; }
+  const dataUrl = canvas.toDataURL("image/png");
+  const fileName = `Generator_${safeFilePart(tenant.unit || tenant.name, "unit")}_${monthKey(month)}.png`;
+  const file = new File([base64ToBytes(dataUrl.split(",")[1] || "")], fileName, { type: "image/png" });
+  const caption = tr("{name} — generator bill, {month}: {amount}", { name: tenant.name, month: formatMonth(month), amount: formatUsd(generatorBillData(tenantId, month).totalUsd) });
+  try {
+    if (typeof navigator.share === "function" && (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] }))) {
+      await navigator.share({ files: [file], title: caption, text: caption });
+      return;
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(file, "image/png", fileName);
+  if (tenant.phone) window.open(whatsappLink(tenant.phone, caption), "_blank", "noopener");
+}
+
+// ── Read an invoice photo ───────────────────────────────────────────────────
+let invoiceReadingAvailable = false;
+
+async function checkInvoiceReading() {
+  try {
+    const res = await fetch("/api/read-invoice", { cache: "no-store" });
+    invoiceReadingAvailable = res.ok && Boolean((await res.json()).configured);
+  } catch {
+    invoiceReadingAvailable = false;
+  }
+  updateReadInvoiceButton();
+}
+
+function updateReadInvoiceButton() {
+  if (!els.readInvoiceButton) return;
+  const show = invoiceReadingAvailable && isOwnerSession() && Boolean(selectedInvoiceFile())
+    && (els.transactionCategory.value === "Expenses" || els.transactionCategory.value === "Services Expenses");
+  els.readInvoiceButton.classList.toggle("hidden", !show);
+}
+
+async function readInvoiceIntoForm() {
+  const file = selectedInvoiceFile();
+  if (!file) return;
+  const button = els.readInvoiceButton;
+  button.disabled = true;
+  button.textContent = tr("Reading the photo…");
+  try {
+    const prepared = await prepareInvoiceUpload({ id: "read", invoice: "read", description: "invoice", date: localDateInput() }, file);
+    await ensureFreshSession();
+    const res = await fetch("/api/read-invoice", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${authBearer()}` },
+      body: JSON.stringify({ image: prepared.dataBase64 }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || tr("Invoice reading failed ({status})", { status: res.status }));
+    if (body.amount > 0) {
+      setTransactionCurrency(body.currency === "LBP" ? "LBP" : "USD");
+      els.transactionAmount.value = String(body.amount);
+    }
+    if (body.date) els.transactionDate.value = body.date;
+    if (body.supplier && !els.transactionSupplier.value.trim()) els.transactionSupplier.value = body.supplier;
+    if (body.invoiceNumber) els.transactionInvoice.value = body.invoiceNumber;
+    if (body.description && !els.transactionDescription.value.trim()) els.transactionDescription.value = body.description;
+    updateExpenseConversionPreview();
+    showToast(body.amount > 0 ? "Filled in from the photo — please check the numbers" : "Couldn't find the amount on the photo", 5000);
+  } catch (error) {
+    showToast(error instanceof TypeError ? "Can't reach the server. Check your connection." : error.message, 6000);
+  } finally {
+    button.disabled = false;
+    button.textContent = tr("Fill in from the photo");
+  }
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -13988,6 +14185,8 @@ export const __test = {
   attentionKey,
   transactionAccount,
   budgetRows,
+  generatorBillData,
+  drawGeneratorBillCanvas,
   reserveStatus,
   documentsExpiring,
   supplierExpenses,
