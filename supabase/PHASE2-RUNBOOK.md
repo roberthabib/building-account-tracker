@@ -140,7 +140,7 @@ app's auth), then reload.
 | Daily backups | ✅ pg_cron `daily-building-backup` 00:30 UTC, 60 days, first snapshot taken |
 | Private invoice photos | ✅ bucket private, 10-minute signed links, deleted with their expense |
 | Proof-of-payment photos (`phase2e-payment-proofs.sql`, v146) | ✅ 6/6 live checks (rolled back): tenant uploads only into `proofs/<own id>/`, other tenant folder and building invoices refused (42501), declaring with another tenant's photo refused, other tenant's proof invisible, own proof visible |
-| v148 features (`phase2f-v148-features.sql`) | pending — viewer admins, admin invites, problem reports + photos, plans/history/cash counts stripped from tenants, share-weighted poll counts, push notifications, keep-alive watch |
+| v148 features (`phase2f-v148-features.sql`) | ✅ applied 2026-10-20; 21 live checks (rolled back): tenant gets no history/cash counts and only own plans, issue photos own-folder only, report_issue refuses other tenants' photos, enqueue_push/notify/admin invites/keepalive_status refused for tenants, anon can only claim real jobs, share-weighted poll counts correct; VAPID keys in Vercel env — viewer admins, admin invites, problem reports + photos, plans/history/cash counts stripped from tenants, share-weighted poll counts, push notifications, keep-alive watch |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.
