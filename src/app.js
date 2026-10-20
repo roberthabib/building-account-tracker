@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v151";
+const APP_VERSION = "v152";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -392,7 +392,7 @@ const I18N = {
     "poll.byShare": "By ownership share (coefficient)",
     "poll.closes": "Voting closes on (optional)",
     "poll.quorum": "Minimum turnout % (optional)",
-    "wa.groupButton": "Share balances PDF with the building group",
+    "wa.groupButton": "Share balances picture with the building group",
     "wa.groupText": "Send as text instead",
     "invite.whatsapp": "Send on WhatsApp",
     "tx.repeatMonthly": "Repeat every month (salary, cleaning, internet…)",
@@ -739,7 +739,7 @@ const I18N = {
     "poll.byShare": "حسب حصة الملكية (المعامل)",
     "poll.closes": "يُغلق التصويت في (اختياري)",
     "poll.quorum": "الحد الأدنى للمشاركة % (اختياري)",
-    "wa.groupButton": "مشاركة ملف PDF بالأرصدة مع مجموعة المبنى",
+    "wa.groupButton": "مشاركة صورة الأرصدة مع مجموعة المبنى",
     "wa.groupText": "الإرسال كنص بدلاً من ذلك",
     "invite.whatsapp": "إرسال عبر واتساب",
     "tx.repeatMonthly": "تكرار كل شهر (راتب، تنظيف، إنترنت…)",
@@ -1078,6 +1078,8 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Balances picture shared": "تمت مشاركة صورة الأرصدة",
+  "Balances picture downloaded — attach it in the WhatsApp group": "تم تنزيل صورة الأرصدة — أرفقها في مجموعة واتساب",
   "Building balances": "أرصدة المبنى",
   "As of {date}": "بتاريخ {date}",
   "Total outstanding": "إجمالي المستحق",
@@ -1086,13 +1088,8 @@ const DYN_AR = {
   "Tenant credit": "أرصدة دائنة للمستأجرين",
   "In credit": "رصيد دائن",
   "Paid up": "مسدَّد",
-  "{building} — balances (continued)": "{building} — الأرصدة (تابع)",
   "Balances include monthly charges, generator and water up to today.": "تشمل الأرصدة الرسوم الشهرية والمولد والمياه حتى اليوم.",
   "For any question about your balance, contact the building owner.": "لأي سؤال عن رصيدك، تواصل مع مالك المبنى.",
-  "{building} · {date}": "{building} · {date}",
-  "(PDF attached)": "(ملف PDF مرفق)",
-  "Balances PDF shared": "تمت مشاركة ملف الأرصدة",
-  "Balances PDF downloaded — attach it in the WhatsApp group": "تم تنزيل ملف الأرصدة — أرفقه في مجموعة واتساب",
   "You have view-only access. Changes aren't saved.": "لديك صلاحية الاطلاع فقط. لا تُحفظ التغييرات.",
   "{month} is closed. Reopen it in Reports before changing it.": "شهر {month} مُقفل. أعد فتحه من التقارير قبل تعديله.",
   "Reopen {month}? Its figures can then be changed again.": "إعادة فتح شهر {month}؟ يمكن بعدها تعديل أرقامه من جديد.",
@@ -7957,18 +7954,8 @@ function postBalancesAsText() {
   markRemindersSent();
 }
 
-// Everyone's position on one designed page (more pages for big buildings):
-// header, three summary cards, then one colour-coded row per unit.
-function buildGroupBalancesPdf() {
-  const C = {
-    green: "#163832", primary: "#1f6b5a", tint: "#eef4ef", zebra: "#f6f9f7", white: "#ffffff", ink: "#14211f",
-    muted: "#61706b", soft: "#cfe3db", red: "#a23b3b", redBg: "#f6dede", okText: "#0f513f", okBg: "#dcefe8",
-    blue: "#315f9d", blueBg: "#e3ecf7",
-  };
-  const W = 595;
-  const left = 40;
-  const right = 555;
-  const ROW = 26;
+// Everyone's position, for the building's WhatsApp group: the numbers…
+function groupBalancesData() {
   const rows = state.tenants
     .filter((t) => t.active !== false)
     .slice()
@@ -7976,119 +7963,172 @@ function buildGroupBalancesPdf() {
     .map((t) => {
       const { dueUsd, advanceUsd } = getTenantTotals(t.id);
       const status = dueUsd > 0.005 ? "due" : advanceUsd > 0.005 ? "credit" : "paid";
-      return { tenant: t, dueUsd, advanceUsd, status };
+      return { unit: t.unit || "", name: t.name || "", status, dueUsd: roundUsd(dueUsd), creditUsd: status === "credit" ? roundUsd(advanceUsd) : 0 };
     });
-  const totalDue = roundUsd(rows.reduce((s, r) => s + r.dueUsd, 0));
-  const totalCredit = roundUsd(rows.reduce((s, r) => s + (r.status === "credit" ? r.advanceUsd : 0), 0));
-  const upToDate = rows.filter((r) => r.status === "paid" || r.status === "credit").length;
-  const dateLabel = formatDateLabel(localDateInput());
-  const PILL = {
-    due: ["Due", C.redBg, C.red],
-    credit: ["In credit", C.blueBg, C.blue],
-    paid: ["Paid up", C.okBg, C.okText],
+  return {
+    rows,
+    totalDue: roundUsd(rows.reduce((s, r) => s + r.dueUsd, 0)),
+    totalCredit: roundUsd(rows.reduce((s, r) => s + r.creditUsd, 0)),
+    upToDate: rows.filter((r) => r.status !== "due").length,
+  };
+}
+
+// …drawn as one picture (WhatsApp shows it inline in the chat): a header band,
+// three summary cards, one colour-coded row per unit, the total and a footer.
+// Arabic is laid out right-to-left. Returns the canvas.
+function drawGroupBalancesCanvas() {
+  const d = groupBalancesData();
+  const rtl = currentLang === "ar";
+  const C = {
+    page: "#ffffff", green: "#163832", soft: "#cfe3db", white: "#ffffff", ink: "#14211f", muted: "#61706b",
+    tint: "#eef4ef", zebra: "#f6f9f7", line: "#e4e9e4", red: "#a23b3b", redBg: "#f6dede",
+    ok: "#0f513f", okBg: "#dcefe8", blue: "#315f9d", blueBg: "#e3ecf7",
+  };
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const W = 1080;
+  const PAD = 56;
+  const HEADER = 250;
+  const CARDS_TOP = HEADER + 44;
+  const CARD_H = 150;
+  const TABLE_TOP = CARDS_TOP + CARD_H + 52;
+  const HEAD_H = 72;
+  const ROW_H = 80;
+  const rowsBottom = TABLE_TOP + HEAD_H + d.rows.length * ROW_H;
+  const H = rowsBottom + 120 + 150;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  // x is measured from the reading edge: the left in English, the right in Arabic.
+  const X = (x) => (rtl ? W - x : x);
+  const box = (x, y, w, h, color, radius = 0) => {
+    ctx.fillStyle = color;
+    const left = rtl ? W - x - w : x;
+    ctx.beginPath();
+    if (radius && typeof ctx.roundRect === "function") ctx.roundRect(left, y, w, h, radius);
+    else ctx.rect(left, y, w, h);
+    ctx.fill();
+  };
+  // max: width limit. fit: shrink the font to fit (cards); otherwise cut with "…".
+  const text = (value, x, y, { size = 30, weight = 400, color = C.ink, align = "start", max = 0, fit = false } = {}) => {
+    let shown = String(value ?? "");
+    let px = size;
+    ctx.font = `${weight} ${px}px ${FONT}`;
+    while (fit && max && px > 18 && ctx.measureText(shown).width > max) {
+      px -= 2;
+      ctx.font = `${weight} ${px}px ${FONT}`;
+    }
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.textBaseline = "alphabetic";
+    if (max && ctx.measureText(shown).width > max) {
+      while (shown.length > 1 && ctx.measureText(`${shown}…`).width > max) shown = shown.slice(0, -1);
+      shown = `${shown.trimEnd()}…`;
+    }
+    ctx.fillText(shown, X(x), y);
+    return ctx.measureText(shown).width;
   };
 
-  const pages = [];
-  let cmds;
-  let y;
-  const text = (value, x, ty, size, bold, color, bg) => cmds.push(pdfTextCommand(value, x, ty, size, bold, { color, bg }));
-  // Arabic is drawn as an image whose width is only known later: estimate it.
-  const widthOf = (value, size) => (pdfNeedsImage(pdfSafeText(currentLang === "ar" ? tr(String(value)) : value)) ? String(currentLang === "ar" ? tr(String(value)) : value).length * size * 0.5 : pdfTextWidth(value, size));
-  const textRight = (value, xr, ty, size, bold, color, bg) => text(value, (xr - widthOf(value, size)).toFixed(2), ty, size, bold, color, bg);
+  box(0, 0, W, H, C.page);
 
-  function tableHeader() {
-    cmds.push(pdfFillRect(left, y - 24, right - left, 24, C.green));
-    [["Unit", left + 12], ["Tenant", left + 74], ["Status", left + 300]].forEach(([label, x]) => text(label, x, y - 16, 9, true, C.white, C.green));
-    textRight("Amount", right - 12, y - 16, 9, true, C.white, C.green);
-    y -= 24;
-  }
+  // Header
+  box(0, 0, W, HEADER, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Building balances"), PAD, 160, { size: 66, weight: 800, color: C.white });
+  // Arabic month names with Western digits, so the date reads correctly right-to-left.
+  const today = rtl
+    ? new Date().toLocaleDateString("ar-LB-u-nu-latn", { day: "numeric", month: "long", year: "numeric" })
+    : formatDateLabel(localDateInput());
+  text(tr("As of {date}", { date: today }), PAD, 210, { size: 30, color: C.soft });
 
-  function startPage(first) {
-    if (cmds) pages.push(`${cmds.join("\n")}\n`);
-    cmds = ["0.4 w"];
-    if (first) {
-      cmds.push(pdfFillRect(0, 742, W, 100, C.green));
-      text(state.building?.name || "", left, 806, 12, true, C.soft, C.green);
-      text("Building balances", left, 776, 24, true, C.white, C.green);
-      text(tr("As of {date}", { date: dateLabel }), left, 756, 10, false, C.soft, C.green);
-      // Summary cards
-      const gap = 12;
-      const cardW = (right - left - gap * 2) / 3;
-      const cards = [
-        ["Total outstanding", formatUsd(totalDue), totalDue > 0.005 ? C.red : C.okText],
-        ["Up to date", tr("{n} of {total} units", { n: upToDate, total: rows.length }), C.okText],
-        ["Tenant credit", formatUsd(totalCredit), C.blue],
-      ];
-      cards.forEach(([label, value, color], i) => {
-        const x = left + i * (cardW + gap);
-        cmds.push(pdfFillRect(x.toFixed(2), 662, cardW.toFixed(2), 60, C.tint));
-        cmds.push(pdfFillRect(x.toFixed(2), 662, 4, 60, color));
-        text(label, (x + 14).toFixed(2), 702, 9, false, C.muted, C.tint);
-        text(value, (x + 14).toFixed(2), 676, 17, true, color, C.tint);
-      });
-      y = 640;
-    } else {
-      text(tr("{building} — balances (continued)", { building: state.building?.name || "" }), left, 806, 11, true, C.ink);
-      y = 790;
-    }
-    tableHeader();
-  }
+  // Summary cards
+  const gap = 24;
+  const cardW = (W - PAD * 2 - gap * 2) / 3;
+  [
+    [tr("Total outstanding"), formatUsd(d.totalDue), d.totalDue > 0.005 ? C.red : C.ok],
+    [tr("Up to date"), tr("{n} of {total} units", { n: d.upToDate, total: d.rows.length }), C.ok],
+    [tr("Tenant credit"), formatUsd(d.totalCredit), C.blue],
+  ].forEach(([label, value, color], i) => {
+    const x = PAD + i * (cardW + gap);
+    box(x, CARDS_TOP, cardW, CARD_H, C.tint, 22);
+    text(label, x + 28, CARDS_TOP + 58, { size: 26, color: C.muted, max: cardW - 56, fit: true });
+    text(value, x + 28, CARDS_TOP + 116, { size: 44, weight: 800, color, max: cardW - 56, fit: true });
+  });
 
-  startPage(true);
-  rows.forEach((row, index) => {
-    if (y - ROW < 120) startPage(false);
-    const bg = index % 2 ? C.zebra : C.white;
-    if (bg !== C.white) cmds.push(pdfFillRect(left, y - ROW, right - left, ROW, bg));
-    const base = y - 17;
-    text(row.tenant.unit || "", left + 12, base, 10, true, C.ink, bg);
-    text(pdfClip(row.tenant.name, 38), left + 74, base, 10, false, C.ink, bg);
+  // Table
+  const colUnit = PAD + 28;
+  const colName = PAD + 170;
+  const colStatus = PAD + 600;
+  const colAmount = W - PAD - 28;
+  box(PAD, TABLE_TOP, W - PAD * 2, HEAD_H, C.green, 18);
+  const headY = TABLE_TOP + 46;
+  text(tr("Unit"), colUnit, headY, { size: 26, weight: 700, color: C.white });
+  text(tr("Tenant"), colName, headY, { size: 26, weight: 700, color: C.white });
+  text(tr("Status"), colStatus, headY, { size: 26, weight: 700, color: C.white });
+  text(tr("Amount"), colAmount, headY, { size: 26, weight: 700, color: C.white, align: "end" });
+
+  const PILL = {
+    due: [tr("Due"), C.redBg, C.red],
+    credit: [tr("In credit"), C.blueBg, C.blue],
+    paid: [tr("Paid up"), C.okBg, C.ok],
+  };
+  d.rows.forEach((row, i) => {
+    const top = TABLE_TOP + HEAD_H + i * ROW_H;
+    if (i % 2) box(PAD, top, W - PAD * 2, ROW_H, C.zebra);
+    const baseY = top + 52;
+    text(row.unit, colUnit, baseY, { size: 32, weight: 700, max: colName - colUnit - 20 });
+    text(row.name, colName, baseY, { size: 32, max: colStatus - colName - 30 });
     const [label, pillBg, pillInk] = PILL[row.status];
-    const pillW = Math.max(52, widthOf(label, 8) + 16);
-    cmds.push(pdfFillRect(left + 296, y - 19, pillW.toFixed(2), 15, pillBg));
-    text(label, left + 304, y - 15, 8, true, pillInk, pillBg);
-    const amount = row.dueUsd > 0.005 ? formatUsd(row.dueUsd) : row.status === "credit" ? `+${formatUsd(row.advanceUsd)}` : formatUsd(0);
-    const amountInk = row.dueUsd > 0.005 ? C.red : row.status === "credit" ? C.blue : C.okText;
-    textRight(amount, right - 12, base, 10, true, amountInk, bg);
-    y -= ROW;
+    ctx.font = `700 24px ${FONT}`;
+    const pillW = ctx.measureText(label).width + 40;
+    box(colStatus - 4, top + 20, pillW, 42, pillBg, 21);
+    text(label, colStatus + 16, top + 50, { size: 24, weight: 700, color: pillInk });
+    const amount = row.status === "due" ? formatUsd(row.dueUsd) : row.status === "credit" ? `+${formatUsd(row.creditUsd)}` : formatUsd(0);
+    text(amount, colAmount, baseY, { size: 32, weight: 800, color: row.status === "due" ? C.red : row.status === "credit" ? C.blue : C.ok, align: "end" });
   });
 
   // Total
-  cmds.push(`q ${pdfColor(C.green)} RG 1.2 w ${left} ${y - 4} m ${right} ${y - 4} l S Q`);
-  text("Total outstanding", left + 12, y - 22, 11, true, C.ink);
-  textRight(formatUsd(totalDue), right - 12, y - 22, 12, true, totalDue > 0.005 ? C.red : C.okText);
+  box(PAD, rowsBottom + 6, W - PAD * 2, 4, C.green);
+  text(tr("Total outstanding"), colUnit, rowsBottom + 72, { size: 34, weight: 800 });
+  text(formatUsd(d.totalDue), colAmount, rowsBottom + 72, { size: 40, weight: 800, color: d.totalDue > 0.005 ? C.red : C.ok, align: "end" });
 
   // Footer
-  text("Balances include monthly charges, generator and water up to today.", left, 74, 8.5, false, C.muted);
-  text("For any question about your balance, contact the building owner.", left, 61, 8.5, false, C.muted);
-  cmds.push(`q ${pdfColor(C.soft)} RG 0.6 w ${left} 48 m ${right} 48 l S Q`);
-  text(tr("{building} · {date}", { building: state.building?.name || "", date: dateLabel }), left, 34, 8, false, C.muted);
-  pages.push(`${cmds.join("\n")}\n`);
-  return buildMultiPagePdf(pages);
+  const footTop = rowsBottom + 120;
+  box(PAD, footTop, W - PAD * 2, 2, C.line);
+  text(tr("Balances include monthly charges, generator and water up to today."), PAD, footTop + 50, { size: 24, color: C.muted, max: W - PAD * 2 });
+  text(tr("For any question about your balance, contact the building owner."), PAD, footTop + 90, { size: 24, color: C.muted, max: W - PAD * 2 });
+  return canvas;
+}
+
+// A PNG file from the canvas, made synchronously so the share sheet still
+// counts as a direct response to the tap.
+function groupBalancesImageFile() {
+  const dataUrl = drawGroupBalancesCanvas().toDataURL("image/png");
+  const fileName = `Balances_${safeFilePart(state.building?.name || "Building", "Building")}_${localDateInput()}.png`;
+  return new File([base64ToBytes(dataUrl.split(",")[1] || "")], fileName, { type: "image/png" });
 }
 
 async function postBalancesToGroup() {
-  const pdf = buildGroupBalancesPdf();
+  const file = groupBalancesImageFile();
   const caption = tr("{building} — balances as of {date}", { building: state.building?.name || "", date: formatDateLabel(localDateInput()) });
-  const fileName = `Balances_${safeFilePart(state.building?.name || "Building", "Building")}_${localDateInput()}.pdf`;
   try {
-    if (typeof navigator.share === "function" && typeof File === "function") {
-      const file = new File([pdf], fileName, { type: PDF_MIME });
-      if (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: caption, text: caption });
-        markRemindersSent();
-        showToast("Balances PDF shared");
-        return;
-      }
+    if (typeof navigator.share === "function" && (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] }))) {
+      await navigator.share({ files: [file], title: caption, text: caption });
+      markRemindersSent();
+      showToast("Balances picture shared");
+      return;
     }
   } catch (error) {
     if (error?.name === "AbortError") { showToast("Sharing cancelled"); return; }
   }
-  // No file sharing here (e.g. a computer): save the PDF and open WhatsApp so
-  // it can be attached in the group.
-  downloadBlob(pdf, PDF_MIME, fileName);
-  window.open(whatsappLink("", `${caption}\n${tr("(PDF attached)")}`), "_blank", "noopener");
+  // No file sharing here (e.g. a computer): save the picture and open WhatsApp
+  // so it can be attached in the group.
+  downloadBlob(file, "image/png", file.name);
+  window.open(whatsappLink("", caption), "_blank", "noopener");
   markRemindersSent();
-  showToast("Balances PDF downloaded — attach it in the WhatsApp group", 6000);
+  showToast("Balances picture downloaded — attach it in the WhatsApp group", 6000);
 }
 
 function inviteWhatsAppMessage(tenant, code) {
@@ -12123,7 +12163,8 @@ export const __test = {
   whatsappPhone,
   whatsappLink,
   buildGroupBalancesMessage,
-  buildGroupBalancesPdf,
+  groupBalancesData,
+  drawGroupBalancesCanvas,
   pendingRecurringExpenses,
   addRecurringTemplateFrom,
   collectFullExportData,
