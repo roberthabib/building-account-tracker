@@ -4131,3 +4131,35 @@ body.tenant-phone #createPollButton {
   padding: 6px 0 0;
   background: none;
 }
+
+/* Budget editor rows: category and amount on one line. */
+.budget-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.report-table .over-budget {
+  color: var(--red);
+  font-weight: 800;
+}
+
+.decision-list {
+  margin: 8px 0 0;
+  padding-inline-start: 20px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.notice-until.is-warning-text {
+  color: var(--red);
+  font-weight: 700;
+}
+
+a.mini-button {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}

@@ -312,6 +312,15 @@
             <button class="more-menu-item owner-only" type="button" data-view="maintenanceView" data-nav-icon="calendar">
               <span class="mm-text"><strong data-i18n="nav.maintenance">Maintenance</strong><span data-i18n="more.maintenanceSub">Inspections, cleanings, renewals</span></span>
             </button>
+            <button class="more-menu-item" type="button" data-view="meetingsView" data-nav-icon="users">
+              <span class="mm-text"><strong data-i18n="nav.meetings">Meetings</strong><span data-i18n="more.meetingsSub">Minutes and decisions</span></span>
+            </button>
+            <button class="more-menu-item owner-only" type="button" data-view="suppliersView" data-nav-icon="wrench">
+              <span class="mm-text"><strong data-i18n="nav.suppliers">Suppliers</strong><span data-i18n="more.suppliersSub">Contacts and what you paid them</span></span>
+            </button>
+            <button class="more-menu-item owner-only" type="button" data-view="documentsView" data-nav-icon="folder">
+              <span class="mm-text"><strong data-i18n="nav.documents">Documents</strong><span data-i18n="more.documentsSub">Contracts, insurance, permits</span></span>
+            </button>
             <button class="more-menu-item owner-only" type="button" data-view="reportsView" data-nav-icon="barChart">
               <span class="mm-text"><strong data-i18n="nav.reports">Reports</strong><span data-i18n="more.reportsSub">Annual report, cash count, history</span></span>
             </button>
@@ -400,6 +409,42 @@
             <button class="primary-button" id="newMaintenanceButton" type="button" data-i18n="maint.new">+ Add</button>
           </div>
           <div class="notice-list" id="maintenanceList"></div>
+        </section>
+
+        <section class="view sub-view" id="meetingsView" aria-labelledby="meetingsViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="meetingsViewTitle" data-i18n="nav.meetings">Meetings</h2>
+            </div>
+            <button class="primary-button" id="newMeetingButton" type="button" data-i18n="maint.new">+ Add</button>
+          </div>
+          <div class="notice-list" id="meetingsList"></div>
+        </section>
+
+        <section class="view sub-view" id="suppliersView" aria-labelledby="suppliersViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="suppliersViewTitle" data-i18n="nav.suppliers">Suppliers</h2>
+            </div>
+            <button class="primary-button" id="newSupplierButton" type="button" data-i18n="maint.new">+ Add</button>
+          </div>
+          <div class="notice-list" id="suppliersList"></div>
+        </section>
+
+        <section class="view sub-view" id="documentsView" aria-labelledby="documentsViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="documentsViewTitle" data-i18n="nav.documents">Documents</h2>
+            </div>
+            <button class="primary-button" id="newDocumentButton" type="button" data-i18n="maint.new">+ Add</button>
+          </div>
+          <div class="notice-list" id="documentsList"></div>
         </section>
 
         <section class="view sub-view" id="reportsView" aria-labelledby="reportsTitle">

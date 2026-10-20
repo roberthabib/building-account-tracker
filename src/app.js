@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v157";
+const APP_VERSION = "v158";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,12 @@ const I18N = {
     "common.export": "Export",
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
+    "nav.suppliers": "Suppliers",
+    "more.suppliersSub": "Contacts and what you paid them",
+    "nav.documents": "Documents",
+    "more.documentsSub": "Contracts, insurance, permits",
+    "nav.meetings": "Meetings",
+    "more.meetingsSub": "Minutes and decisions",
     "ten.inviteAll": "Invite all",
     "pay.whoPaid": "Who paid?",
     "tx.paidBy": "Paid by",
@@ -737,6 +743,12 @@ const I18N = {
     "common.export": "تصدير",
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
+    "nav.suppliers": "المورّدون",
+    "more.suppliersSub": "جهات الاتصال وما دُفع لهم",
+    "nav.documents": "المستندات",
+    "more.documentsSub": "العقود والتأمين والتراخيص",
+    "nav.meetings": "الاجتماعات",
+    "more.meetingsSub": "المحاضر والقرارات",
     "ten.inviteAll": "دعوة الجميع",
     "pay.whoPaid": "من دفع؟",
     "tx.paidBy": "طريقة الدفع",
@@ -1109,6 +1121,97 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Contract": "عقد",
+  "Insurance": "تأمين",
+  "Permit": "ترخيص",
+  "Attendees": "الحضور",
+  "Discussion": "النقاش",
+  "Decisions": "القرارات",
+  "Votes": "التصويت",
+  "Meeting minutes": "محضر الاجتماع",
+  "Supplier name": "اسم المورّد",
+  "Plumber, electrician, generator…": "سمكري، كهربائي، مولّد…",
+  "Remove {name} from the supplier book? Their past expenses stay.": "إزالة {name} من دفتر المورّدين؟ تبقى مصاريفه السابقة.",
+  "Edit supplier": "تعديل المورّد",
+  "New supplier": "مورّد جديد",
+  "What they do": "طبيعة العمل",
+  "{n} invoices · {total} in total": "{n} فواتير · {total} إجمالاً",
+  "No expenses recorded with this supplier yet.": "لا مصاريف مسجّلة مع هذا المورّد بعد.",
+  "No suppliers yet. Add the people you call for the building: plumber, electrician, generator technician, cleaner…": "لا مورّدين بعد. أضف من تتصل بهم للمبنى: السمكري، الكهربائي، فني المولّد، عامل التنظيف…",
+  "{n} invoices · {total} · last {date}": "{n} فواتير · {total} · آخرها {date}",
+  "No expenses yet": "لا مصاريف بعد",
+  "Call": "اتصال",
+  "History": "السجل",
+  "Upload failed ({status})": "فشل الرفع ({status})",
+  "Building insurance 2026": "تأمين المبنى 2026",
+  "Delete \"{name}\"? The file is deleted too.": "حذف \"{name}\"؟ يُحذف الملف أيضاً.",
+  "Edit document": "تعديل المستند",
+  "New document": "مستند جديد",
+  "Contracts, insurance, permits… stored privately: only administrators can open them.": "العقود والتأمين والتراخيص… محفوظة بشكل خاص: لا يفتحها إلا المسؤولون.",
+  "Type": "النوع",
+  "Expires on (optional)": "ينتهي في (اختياري)",
+  "You'll be reminded a month before.": "ستصلك تذكرة قبل شهر.",
+  "Replace the file (optional)": "استبدال الملف (اختياري)",
+  "File (PDF or photo)": "الملف (PDF أو صورة)",
+  "No documents yet. Keep the building's contracts, insurance and permits here, with a reminder before they expire.": "لا مستندات بعد. احفظ هنا عقود المبنى وتأمينه وتراخيصه، مع تذكير قبل انتهاء صلاحيتها.",
+  "Expired {date}": "انتهى في {date}",
+  "Expires {date}": "ينتهي في {date}",
+  "Add a category": "أضف فئة",
+  "Budget for {year}": "موازنة {year}",
+  "What you expect to spend this year in each category. Leave empty for no budget.": "ما تتوقع صرفه هذه السنة في كل فئة. اتركه فارغاً لعدم وضع موازنة.",
+  "Another category": "فئة أخرى",
+  "Spent": "المصروف",
+  "{year} so far against your budget. Categories over budget are in red.": "سنة {year} حتى الآن مقارنة بموازنتك. الفئات التي تجاوزت الموازنة باللون الأحمر.",
+  "Set what you expect to spend this year per category, and see how the year is going.": "حدد ما تتوقع صرفه هذه السنة لكل فئة، وتابع سير السنة.",
+  "Edit budget": "تعديل الموازنة",
+  "Set a budget": "وضع موازنة",
+  "The least the building should keep in cash for emergencies. The dashboard warns you when cash drops below it.": "أدنى مبلغ يجب أن يحتفظ به المبنى نقداً للطوارئ. تنبّهك الشاشة الرئيسية عندما ينخفض النقد عنه.",
+  "Reserve target (USD)": "الاحتياطي المطلوب (دولار)",
+  "Cash is {cash}, below the target of {target}.": "النقد {cash}، أقل من الهدف {target}.",
+  "Cash is {cash}, above the target of {target} ✓": "النقد {cash}، فوق الهدف {target} ✓",
+  "Annual owners' meeting": "الاجتماع السنوي للمالكين",
+  "Who attended (units or names)": "من حضر (الوحدات أو الأسماء)",
+  "What was discussed": "ما تمت مناقشته",
+  "One decision per line": "قرار واحد في كل سطر",
+  "Delete these minutes?": "حذف هذا المحضر؟",
+  "Edit minutes": "تعديل المحضر",
+  "New meeting": "اجتماع جديد",
+  "Polls decided at this meeting": "التصويتات التي حُسمت في هذا الاجتماع",
+  "{title} (continued)": "{title} (تابع)",
+  "YES {yes} · NO {no} · ABSTAIN {abstain}": "نعم {yes} · لا {no} · امتناع {abstain}",
+  "by ownership share": "حسب حصة الملكية",
+  "{building} · {date}": "{building} · {date}",
+  "No meetings yet. Write down what was decided at each owners' meeting and share the minutes as a PDF.": "لا اجتماعات بعد. دوّن ما تقرر في كل اجتماع للمالكين وشارك المحضر كملف PDF.",
+  "No meeting minutes yet.": "لا محاضر اجتماعات بعد.",
+  "Close {year}? Every month of {year} is locked. Nothing is erased: balances carry into the new year as they are, and you can still reopen a month in Reports.": "إقفال سنة {year}؟ تُقفل كل أشهر {year}. لا يُمحى شيء: تنتقل الأرصدة إلى السنة الجديدة كما هي، ويمكنك إعادة فتح أي شهر من التقارير.",
+  "{year} is closed": "تم إقفال سنة {year}",
+  "Keep a copy of the year: the annual report for the owners' meeting and a full backup with photos.": "احتفظ بنسخة من السنة: التقرير السنوي لاجتماع المالكين ونسخة احتياطية كاملة مع الصور.",
+  "Annual report (Excel)": "التقرير السنوي (Excel)",
+  "Annual report (PDF)": "التقرير السنوي (PDF)",
+  "Backup with photos": "نسخة احتياطية مع الصور",
+  "Every year so far is closed.": "كل السنوات حتى الآن مقفلة.",
+  "At the end of the year, lock all its months and keep a copy. Nothing is erased; balances simply carry on into the new year.": "في نهاية السنة، أقفل كل أشهرها واحتفظ بنسخة. لا يُمحى شيء؛ تنتقل الأرصدة ببساطة إلى السنة الجديدة.",
+  "Close the year": "إقفال السنة",
+  "{name} expired on {date}": "{name} انتهى في {date}",
+  "{name} expires on {date}": "{name} ينتهي في {date}",
+  "Cash ({cash}) is below the reserve target of {target}": "النقد ({cash}) أقل من الاحتياطي المطلوب {target}",
+  "{n} category is over budget ({names})": "{n} فئة تجاوزت الموازنة ({names})",
+  "{n} categories are over budget ({names})": "{n} فئات تجاوزت الموازنة ({names})",
+  "Reserve target": "الاحتياطي المطلوب",
+  "Enter the supplier's name": "أدخل اسم المورّد",
+  "That supplier is already in the book": "هذا المورّد موجود في الدفتر",
+  "Supplier saved": "تم حفظ المورّد",
+  "Give the document a title": "أعطِ المستند عنواناً",
+  "Choose the file": "اختر الملف",
+  "Document saved": "تم حفظ المستند",
+  "Sign in with Google to upload documents": "سجّل الدخول عبر Google لرفع المستندات",
+  "That file is too big (15 MB at most)": "الملف كبير جداً (15 ميغابايت كحد أقصى)",
+  "Budget saved": "تم حفظ الموازنة",
+  "Reserve target saved": "تم حفظ الاحتياطي المطلوب",
+  "Give the meeting a title": "أعطِ الاجتماع عنواناً",
+  "Minutes saved": "تم حفظ المحضر",
+  "Document": "مستند",
+  "Meeting": "اجتماع",
   "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.": "مرحباً {name}! هذه دعوتك إلى تطبيق {building} حيث يمكنك رؤية رصيدك ودفعاتك.\n1. افتح {url}\n2. اضغط \"أنا مستأجر ولديّ رمز دعوة\"\n3. أدخل: {code}\nيعمل الرمز مرة واحدة خلال 30 يوماً.\n\nنصيحة: أضف التطبيق إلى شاشتك الرئيسية. على iPhone: اضغط مشاركة ثم \"إضافة إلى الشاشة الرئيسية\". على Android: اضغط ⋮ ثم \"تثبيت التطبيق\". ثم افتح المزيد > إشعارات الهاتف لتصلك أرصدتك والأخبار.",
   "Phone not linked yet": "الهاتف غير مربوط بعد",
   "Phone linked · notifications on": "الهاتف مربوط · الإشعارات مفعّلة",
@@ -2395,6 +2498,9 @@ function hydrateState(rawState) {
   hydrated.deleted.issues ||= [];
   hydrated.deleted.cashChecks ||= [];
   hydrated.deleted.maintenanceTasks ||= [];
+  hydrated.deleted.suppliers ||= [];
+  hydrated.deleted.documents ||= [];
+  hydrated.deleted.meetings ||= [];
   hydrated.security ||= {};
   hydrated.security.salt ||= randomToken();
   hydrated.transactions ||= [];
@@ -2430,6 +2536,9 @@ function hydrateState(rawState) {
   hydrated.issues ||= [];
   hydrated.generatorServices ||= [];
   hydrated.maintenanceTasks ||= [];
+  hydrated.documents ||= [];
+  hydrated.meetings ||= [];
+  hydrated.budgets ||= {};
   hydrated.settings.sharedExpensesEnabled = false; // v108: merged into unified Expenses model
   if (hydrated.setupComplete === undefined) {
     hydrated.setupComplete = Boolean(
@@ -2457,7 +2566,7 @@ function hydrateState(rawState) {
   hydrated.tenants = hydrated.tenants.filter((t) => !deletedTenants.has(t.id));
   hydrated.polls = hydrated.polls.filter((p) => !deletedPolls.has(p.id));
   hydrated.buildingProjects = hydrated.buildingProjects.filter((p) => !deletedProjects.has(p.id));
-  ["announcements", "issues", "cashChecks", "maintenanceTasks"].forEach((kind) => {
+  ["announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings"].forEach((kind) => {
     const gone = new Set(hydrated.deleted[kind]);
     hydrated[kind] = hydrated[kind].filter((item) => !gone.has(item.id));
   });
@@ -6862,10 +6971,10 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView"];
 
 function setView(viewId) {
-  if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView"].includes(viewId)) viewId = "moreView";
+  if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView"].includes(viewId)) viewId = "moreView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
   // Re-run the enter animation each time a view is shown.
   const active = document.getElementById(viewId);
@@ -7915,7 +8024,7 @@ function mergeDeclarations(olderArr, newerArr) {
 }
 
 function mergeDeletedLists(local, remote) {
-  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks", "maintenanceTasks"];
+  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings"];
   const merged = {};
   kinds.forEach((kind) => {
     merged[kind] = [...new Set([...(local?.[kind] || []), ...(remote?.[kind] || [])])].slice(-1000);
@@ -7940,7 +8049,7 @@ function mergeStates(local, remote) {
   merged.buildingProjects = mergeById(older.buildingProjects, newer.buildingProjects, merged.deleted.projects);
   merged.polls = mergePolls(older.polls, newer.polls, merged.deleted.polls);
   merged.paymentDeclarations = mergeDeclarations(older.paymentDeclarations, newer.paymentDeclarations);
-  merged.suppliers = mergeById(older.suppliers, newer.suppliers);
+  merged.suppliers = mergeById(older.suppliers, newer.suppliers, merged.deleted.suppliers);
   merged.projects = mergeById(older.projects, newer.projects);
   merged.expenseCategories = mergeById(older.expenseCategories, newer.expenseCategories);
   merged.serviceReadings = mergeById(older.serviceReadings, newer.serviceReadings);
@@ -7952,6 +8061,8 @@ function mergeStates(local, remote) {
   merged.announcements = mergeById(older.announcements, newer.announcements, merged.deleted.announcements);
   merged.issues = mergeByStamp(older.issues, newer.issues, merged.deleted.issues, "updatedAt");
   merged.generatorServices = mergeById(older.generatorServices, newer.generatorServices);
+  merged.documents = mergeByStamp(older.documents, newer.documents, merged.deleted.documents, "updatedAt");
+  merged.meetings = mergeByStamp(older.meetings, newer.meetings, merged.deleted.meetings, "updatedAt");
   merged.maintenanceTasks = mergeByStamp(older.maintenanceTasks, newer.maintenanceTasks, merged.deleted.maintenanceTasks, "updatedAt");
   merged.meta = {
     rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
@@ -10791,6 +10902,12 @@ Object.assign(els, {
   pollQuorumInput: document.querySelector("#pollQuorumInput"),
   maintenanceList: document.querySelector("#maintenanceList"),
   inviteAllButton: document.querySelector("#inviteAllButton"),
+  supplierList: document.querySelector("#suppliersList"),
+  newSupplierButton: document.querySelector("#newSupplierButton"),
+  documentList: document.querySelector("#documentsList"),
+  newDocumentButton: document.querySelector("#newDocumentButton"),
+  meetingList: document.querySelector("#meetingsList"),
+  newMeetingButton: document.querySelector("#newMeetingButton"),
   whoPaidButton: document.querySelector("#whoPaidButton"),
   methodField: document.querySelector(".method-field"),
   paidFromField: document.querySelector(".paidfrom-field"),
@@ -10905,6 +11022,9 @@ const TRACKED_COLLECTIONS = [
   ["issues", "issue"],
   ["generatorServices", "genService"],
   ["maintenanceTasks", "maintenance"],
+  ["suppliers", "supplier"],
+  ["documents", "document"],
+  ["meetings", "meeting"],
   ["monthLocks", "monthLock"],
   ["polls", "poll"],
 ];
@@ -11074,7 +11194,7 @@ function monthToClose() {
 const AUDIT_KIND_LABELS = {
   transaction: "Entry", tenant: "Tenant", project: "Project", reading: "Meter readings", recurring: "Monthly expense",
   cashCheck: "Cash count", notice: "Notice", issue: "Problem", genService: "Generator service",
-  monthLock: "Month lock", maintenance: "Maintenance job", poll: "Poll", budget: "Monthly budget", settings: "Settings", many: "Many records",
+  monthLock: "Month lock", maintenance: "Maintenance job", supplier: "Supplier", document: "Document", meeting: "Meeting", poll: "Poll", budget: "Monthly budget", settings: "Settings", many: "Many records",
 };
 
 function describeRecord(kind, record) {
@@ -11095,6 +11215,9 @@ function describeRecord(kind, record) {
     case "genService": return `${formatDateLabel(record.date)} · ${record.work || ""}`;
     case "monthLock": return `${formatMonth(monthIso(record.id))} · ${record.closed ? tr("Closed") : tr("Open")}`;
     case "poll": return record.title || "";
+    case "supplier": return record.name || "";
+    case "document": return record.title || "";
+    case "meeting": return `${record.title || ""} · ${record.date ? formatDateLabel(record.date) : ""}`;
     case "maintenance": return `${record.title || ""} · ${record.nextDue ? formatDateLabel(record.nextDue) : ""}`;
     case "budget": return `${formatMonth(record.month)} · ${formatUsd(record.expectedUsd)}`;
     case "settings": return tr("Building settings");
@@ -12144,6 +12267,9 @@ function renderReports() {
       note(tr("Problems the app found in your data, each with a shortcut to fix it.")),
       buildDataHealthSection()),
     reportsSection(tr("Automatic reminders"), buildAutoNoticeSection()),
+    reportsSection(tr("Budget"), buildBudgetSection()),
+    reportsSection(tr("Reserve target"), buildReserveSection()),
+    reportsSection(tr("Close the year"), buildCloseYearSection()),
     reportsSection(tr("Annual report"),
       note(tr("Everything for the yearly owners' meeting: money in and out, where it went, the reserve, and who still owes.")),
       field(tr("Year"), yearSelect),
@@ -12274,6 +12400,7 @@ function extraAttentionItems() {
   const health = dataHealthIssues();
   if (health.length) items.push({ kind: "warn", text: tr(health.length === 1 ? "{n} thing to check in your data" : "{n} things to check in your data", { n: health.length }), view: "reportsView", key: "dataHealth" });
   items.push(...v155AttentionItems());
+  items.push(...v158AttentionItems());
   if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView", key: "keepalive" });
   return items;
 }
@@ -12293,6 +12420,9 @@ function renderV148() {
   renderReports();
   renderGeneratorExtras();
   renderMaintenance();
+  renderSuppliers();
+  renderDocuments();
+  renderMeetings();
   renderPushStatus();
   document.body.classList.toggle("view-only", isViewerSession() && sessionMode === "owner");
 }
@@ -12303,6 +12433,9 @@ function attachV148Events() {
   els.newIssueButton?.addEventListener("click", openIssueDialog);
   els.newMaintenanceButton?.addEventListener("click", () => openMaintenanceTaskDialog());
   els.inviteAllButton?.addEventListener("click", openInviteAllDialog);
+  els.newSupplierButton?.addEventListener("click", () => openSupplierDialog());
+  els.newDocumentButton?.addEventListener("click", () => openDocumentDialog());
+  els.newMeetingButton?.addEventListener("click", () => openMeetingDialog());
   els.whoPaidButton?.addEventListener("click", openWhoPaidDialog);
   els.adminsButton?.addEventListener("click", openAdminsDialog);
   els.pushToggleButton?.addEventListener("click", () => (pushIsOn() ? disablePushNotifications() : enablePushNotifications()));
@@ -12676,6 +12809,9 @@ function backupPhotoList() {
     });
   (state.paymentDeclarations || []).forEach((d) => {
     if (d.proof) add(d.proof, "payment-proofs", [String(d.declaredAt || "").slice(0, 10), tenantName(d.tenantId), "declared", String(d.id).slice(-6)]);
+  });
+  (state.documents || []).forEach((d) => {
+    if (d.storagePath) add({ storagePath: d.storagePath }, "documents", [d.category, d.title]);
   });
   (state.issues || []).forEach((i) => {
     if (i.photo) add(i.photo, "problems", [String(i.createdAt || "").slice(0, 10), i.title, String(i.id).slice(-6)]);
@@ -13215,6 +13351,478 @@ function openUnitDetailsDialog(tenantId) {
     mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v158 — supplier book, documents folder, budget vs actual, reserve target,
+// meeting minutes, close the year
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Supplier book ───────────────────────────────────────────────────────────
+function supplierExpenses(name) {
+  const key = String(name || "").trim().toLowerCase();
+  return state.transactions
+    .filter((t) => (t.category === "Expenses" || t.category === "Services Expenses") && String(t.supplier || "").trim().toLowerCase() === key)
+    .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+}
+
+function openSupplierDialog(supplierId = null) {
+  if (sessionMode !== "owner") return;
+  const supplier = supplierId ? (state.suppliers || []).find((s) => s.id === supplierId) : null;
+  const name = textInput(supplier?.name || "", { placeholder: tr("Supplier name"), maxlength: "120" });
+  const trade = textInput(supplier?.trade || "", { placeholder: tr("Plumber, electrician, generator…"), maxlength: "80" });
+  const phone = mk("input", { type: "tel", value: supplier?.phone || "", placeholder: "70 123 456" });
+  const memo = mk("textarea", { rows: "3", maxlength: "600" });
+  memo.value = supplier?.notes || "";
+  const save = () => {
+    const n = name.value.trim();
+    if (!n) { showToast("Enter the supplier's name"); return; }
+    const fields = { name: n, trade: trade.value.trim(), phone: phone.value.trim(), notes: memo.value.trim() };
+    if (supplier) {
+      const oldName = supplier.name;
+      Object.assign(supplier, fields);
+      // Renaming keeps the history: expenses follow the new name.
+      if (oldName !== n) state.transactions.forEach((t) => { if (String(t.supplier || "").trim().toLowerCase() === oldName.toLowerCase()) t.supplier = n; });
+    } else {
+      if ((state.suppliers || []).some((s) => s.name.toLowerCase() === n.toLowerCase())) { showToast("That supplier is already in the book"); return; }
+      (state.suppliers ||= []).push({ id: newId("sup"), ...fields });
+    }
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast("Supplier saved");
+  };
+  const remove = () => {
+    if (!window.confirm(tr("Remove {name} from the supplier book? Their past expenses stay.", { name: supplier.name }))) return;
+    state.suppliers = (state.suppliers || []).filter((s) => s.id !== supplier.id);
+    recordDeletedId("suppliers", supplier.id);
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(supplier ? tr("Edit supplier") : tr("New supplier"),
+    field(tr("Name"), name),
+    field(tr("What they do"), trade),
+    field(tr("Phone"), phone),
+    field(tr("Notes"), memo),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), save),
+      supplier ? mk("button", { type: "button", className: "danger-button", text: tr("Delete"), onclick: remove }) : secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openSupplierHistory(supplierId) {
+  const supplier = (state.suppliers || []).find((s) => s.id === supplierId);
+  if (!supplier) return;
+  const list = supplierExpenses(supplier.name);
+  openToolDialog(supplier.name,
+    note(list.length ? tr("{n} invoices · {total} in total", { n: list.length, total: formatUsd(list.reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0)) }) : tr("No expenses recorded with this supplier yet.")),
+    mk("div", { className: "history-list compact" }, list.slice(0, 40).map((t) => mk("div", { className: "health-row" },
+      mk("span", {}, mk("strong", { text: `${formatDateLabel(t.date)} · ${formatUsd(txUsd(t, t.debitUsd, t.debitLbp))}` }), mk("small", { className: "field-hint", text: [t.description, t.invoice].filter(Boolean).join(" · ") })),
+      hasInvoicePhoto(t.invoiceAttachment) ? miniButton(tr("Invoice"), () => openInvoicePhoto(t.invoiceAttachment)) : mk("span")))));
+}
+
+function renderSuppliers() {
+  if (!els.supplierList) return;
+  if (sessionMode !== "owner") { els.supplierList.replaceChildren(); return; }
+  const suppliers = (state.suppliers || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+  if (!suppliers.length) {
+    els.supplierList.replaceChildren(mk("div", { className: "empty-state", text: tr("No suppliers yet. Add the people you call for the building: plumber, electrician, generator technician, cleaner…") }));
+    return;
+  }
+  els.supplierList.replaceChildren(...suppliers.map((s) => {
+    const spent = supplierExpenses(s.name);
+    const total = spent.reduce((sum, t) => sum + txUsd(t, t.debitUsd, t.debitLbp), 0);
+    return mk("article", { className: "notice-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: s.name }), s.trade ? mk("span", { text: s.trade }) : null),
+      mk("p", { className: "notice-until", text: spent.length ? tr("{n} invoices · {total} · last {date}", { n: spent.length, total: formatUsd(total), date: formatDateLabel(spent[0].date) }) : tr("No expenses yet") }),
+      s.notes ? mk("p", { className: "notice-until", text: s.notes }) : null,
+      mk("div", { className: "notice-actions" },
+        s.phone ? mk("a", { className: "mini-button", href: `tel:${String(s.phone).replace(/[^\d+]/g, "")}`, text: tr("Call") }) : null,
+        s.phone ? mk("a", { className: "mini-button", href: whatsappLink(s.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }) : null,
+        miniButton(tr("History"), () => openSupplierHistory(s.id)),
+        miniButton(tr("Edit"), () => openSupplierDialog(s.id))));
+  }));
+}
+
+// ── Documents folder (owner only) ───────────────────────────────────────────
+const DOCUMENT_CATEGORIES = ["Contract", "Insurance", "Permit", "Invoice", "Other"];
+
+async function uploadDocumentFile(file, id) {
+  if (cloudProvider() !== "supabase" || !authSession) throw new Error("Sign in with Google to upload documents");
+  if (file.size > 15 * 1024 * 1024) throw new Error("That file is too big (15 MB at most)");
+  const ext = (/\.[a-z0-9]{1,5}$/i.exec(file.name)?.[0] || "").toLowerCase();
+  const path = `documents/${id}-${safeFilePart(file.name.replace(/\.[^.]+$/, ""), "document").slice(0, 60)}${ext}`;
+  const c = cloudConfig();
+  await ensureFreshSession();
+  const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}`, "Content-Type": file.type || "application/octet-stream", "x-upsert": "false" },
+    body: file,
+  });
+  if (!res.ok) throw Object.assign(new Error(tr("Upload failed ({status})", { status: res.status })), { status: res.status });
+  return { storagePath: path, fileName: file.name, mimeType: file.type || "application/octet-stream", size: file.size };
+}
+
+function openDocumentDialog(documentId = null) {
+  if (sessionMode !== "owner") return;
+  const doc = documentId ? (state.documents || []).find((d) => d.id === documentId) : null;
+  const title = textInput(doc?.title || "", { placeholder: tr("Building insurance 2026"), maxlength: "120" });
+  const category = selectInput(DOCUMENT_CATEGORIES.map((c) => [c, tr(c)]), doc?.category || "Contract");
+  const expires = mk("input", { type: "date", value: doc?.expiresOn || "" });
+  const file = mk("input", { type: "file", accept: "application/pdf,image/*" });
+  const submit = primaryButton(tr("Save"), async () => {
+    if (!title.value.trim()) { showToast("Give the document a title"); return; }
+    const picked = file.files?.[0] || null;
+    if (!doc && !picked) { showToast("Choose the file"); return; }
+    submit.disabled = true;
+    try {
+      const id = doc?.id || newId("doc");
+      const uploaded = picked ? await uploadDocumentFile(picked, id) : null;
+      const fields = { title: title.value.trim(), category: category.value, expiresOn: expires.value || "", updatedAt: new Date().toISOString() };
+      if (doc) {
+        const previous = uploaded ? { storagePath: doc.storagePath } : null;
+        Object.assign(doc, fields, uploaded || {});
+        if (previous?.storagePath) deleteInvoicePhoto(previous);
+      } else {
+        (state.documents ||= []).push({ id, ...fields, ...uploaded, uploadedAt: new Date().toISOString() });
+      }
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+      showToast("Document saved");
+    } catch (error) {
+      showToast(error.status ? describeSyncProblem(error) : error.message, 6000);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+  const remove = () => {
+    if (!window.confirm(tr("Delete \"{name}\"? The file is deleted too.", { name: doc.title }))) return;
+    state.documents = (state.documents || []).filter((d) => d.id !== doc.id);
+    recordDeletedId("documents", doc.id);
+    if (!saveState()) return;
+    if (doc.storagePath) deleteInvoicePhoto({ storagePath: doc.storagePath });
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(doc ? tr("Edit document") : tr("New document"),
+    note(tr("Contracts, insurance, permits… stored privately: only administrators can open them.")),
+    field(tr("Title"), title),
+    field(tr("Type"), category),
+    field(tr("Expires on (optional)"), expires, tr("You'll be reminded a month before.")),
+    field(doc ? tr("Replace the file (optional)") : tr("File (PDF or photo)"), file),
+    mk("div", { className: "button-row" }, submit,
+      doc ? mk("button", { type: "button", className: "danger-button", text: tr("Delete"), onclick: remove }) : secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function documentsExpiring() {
+  const today = localDateInput();
+  const soon = addDays(today, 30);
+  return (state.documents || []).filter((d) => d.expiresOn && d.expiresOn <= soon);
+}
+
+function renderDocuments() {
+  if (!els.documentList) return;
+  if (sessionMode !== "owner") { els.documentList.replaceChildren(); return; }
+  const docs = (state.documents || []).slice().sort((a, b) => String(a.category).localeCompare(String(b.category)) || String(a.title).localeCompare(String(b.title)));
+  if (!docs.length) {
+    els.documentList.replaceChildren(mk("div", { className: "empty-state", text: tr("No documents yet. Keep the building's contracts, insurance and permits here, with a reminder before they expire.") }));
+    return;
+  }
+  const today = localDateInput();
+  els.documentList.replaceChildren(...docs.map((d) => {
+    const expired = d.expiresOn && d.expiresOn < today;
+    const soon = d.expiresOn && !expired && d.expiresOn <= addDays(today, 30);
+    return mk("article", { className: "notice-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: d.title }), mk("span", { text: tr(d.category || "Other") })),
+      d.expiresOn ? mk("p", { className: `notice-until${expired || soon ? " is-warning-text" : ""}`, text: expired ? tr("Expired {date}", { date: formatDateLabel(d.expiresOn) }) : tr("Expires {date}", { date: formatDateLabel(d.expiresOn) }) }) : null,
+      mk("p", { className: "notice-until", text: `${d.fileName || ""}${d.size ? ` · ${Math.max(1, Math.round(d.size / 1024))} KB` : ""}` }),
+      mk("div", { className: "notice-actions" },
+        d.storagePath ? miniButton(tr("Open"), () => openInvoicePhoto({ storagePath: d.storagePath, fileName: d.fileName })) : null,
+        miniButton(tr("Edit"), () => openDocumentDialog(d.id))));
+  }));
+}
+
+// ── Budget vs actual ────────────────────────────────────────────────────────
+function budgetYear() {
+  return String(new Date().getFullYear());
+}
+
+function budgetRows(year = budgetYear()) {
+  const plan = state.budgets?.[year] || {};
+  const actual = spendingByYear().get(year) || new Map();
+  const categories = [...new Set([...Object.keys(plan), ...actual.keys()])].sort((a, b) => (Number(plan[b] || 0) - Number(plan[a] || 0)) || a.localeCompare(b));
+  return categories.map((cat) => {
+    const budget = Number(plan[cat] || 0);
+    const spent = roundUsd(actual.get(cat) || 0);
+    return { category: cat, budget, spent, pct: budget > 0 ? Math.round((spent / budget) * 100) : null };
+  });
+}
+
+function openBudgetDialog(year = budgetYear()) {
+  const rows = budgetRows(year);
+  const extra = textInput("", { placeholder: tr("Add a category") });
+  const inputs = rows.map((r) => ({ category: r.category, input: numberInput(r.budget || "", { step: "1" }) }));
+  const save = () => {
+    const plan = {};
+    inputs.forEach(({ category, input }) => { const v = Number(input.value || 0); if (v > 0) plan[category] = roundUsd(v); });
+    const added = extra.value.trim();
+    if (added && !plan[added]) plan[added] = 0;
+    state.budgets = { ...(state.budgets || {}), [year]: plan };
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    if (added) openBudgetDialog(year);
+    else showToast("Budget saved");
+  };
+  openToolDialog(tr("Budget for {year}", { year }),
+    note(tr("What you expect to spend this year in each category. Leave empty for no budget.")),
+    mk("div", { className: "history-list compact" }, inputs.map(({ category, input }) => mk("label", { className: "budget-row" }, mk("span", { text: category }), input))),
+    field(tr("Another category"), extra),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function buildBudgetSection() {
+  const year = budgetYear();
+  const rows = budgetRows(year).filter((r) => r.budget > 0 || r.spent > 0);
+  const hasBudget = rows.some((r) => r.budget > 0);
+  const table = rows.length ? mk("div", { className: "report-table-wrap" }, mk("table", { className: "report-table" },
+    mk("thead", {}, mk("tr", {}, mk("th", { text: tr("Category") }), mk("th", { className: "num", text: tr("Budget") }), mk("th", { className: "num", text: tr("Spent") }), mk("th", { className: "num", text: "%" }))),
+    mk("tbody", {}, rows.map((r) => mk("tr", {},
+      mk("td", { text: r.category }),
+      mk("td", { className: "num", text: r.budget ? formatUsd(r.budget) : "—" }),
+      mk("td", { className: "num", text: formatUsd(r.spent) }),
+      mk("td", { className: `num${r.pct !== null && r.pct > 100 ? " over-budget" : ""}`, text: r.pct === null ? "—" : `${r.pct}%` })))))) : null;
+  return mk("div", {},
+    note(hasBudget ? tr("{year} so far against your budget. Categories over budget are in red.", { year }) : tr("Set what you expect to spend this year per category, and see how the year is going.")),
+    table,
+    mk("div", { className: "button-row" }, secondaryButton(hasBudget ? tr("Edit budget") : tr("Set a budget"), () => openBudgetDialog(year))));
+}
+
+function overBudgetCategories() {
+  return budgetRows().filter((r) => r.budget > 0 && r.spent > r.budget);
+}
+
+// ── Reserve target ──────────────────────────────────────────────────────────
+function reserveStatus() {
+  const target = Number(state.settings.reserveTargetUsd || 0);
+  if (!(target > 0)) return null;
+  const cash = roundUsd(getAccountTotals().usd);
+  return { target, cash, below: cash < target };
+}
+
+function buildReserveSection() {
+  const input = numberInput(state.settings.reserveTargetUsd || "", { step: "1", placeholder: "0" });
+  const status = reserveStatus();
+  return mk("div", {},
+    note(tr("The least the building should keep in cash for emergencies. The dashboard warns you when cash drops below it.")),
+    field(tr("Reserve target (USD)"), input),
+    status ? note(status.below
+      ? tr("Cash is {cash}, below the target of {target}.", { cash: formatUsd(status.cash), target: formatUsd(status.target) })
+      : tr("Cash is {cash}, above the target of {target} ✓", { cash: formatUsd(status.cash), target: formatUsd(status.target) }), status.below ? "is-warning" : "") : null,
+    mk("div", { className: "button-row" }, secondaryButton(tr("Save"), () => {
+      state.settings.reserveTargetUsd = Math.max(0, Number(input.value || 0));
+      if (!saveState()) return;
+      renderAll();
+      showToast("Reserve target saved");
+    })));
+}
+
+// ── Meeting minutes ─────────────────────────────────────────────────────────
+function openMeetingDialog(meetingId = null) {
+  if (sessionMode !== "owner") return;
+  const meeting = meetingId ? (state.meetings || []).find((m) => m.id === meetingId) : null;
+  const date = mk("input", { type: "date", value: meeting?.date || localDateInput() });
+  const title = textInput(meeting?.title || "", { placeholder: tr("Annual owners' meeting"), maxlength: "120" });
+  const attendees = mk("textarea", { rows: "2", placeholder: tr("Who attended (units or names)"), maxlength: "600" });
+  attendees.value = meeting?.attendees || "";
+  const notesBox = mk("textarea", { rows: "4", placeholder: tr("What was discussed"), maxlength: "4000" });
+  notesBox.value = meeting?.notes || "";
+  const decisions = mk("textarea", { rows: "4", placeholder: tr("One decision per line"), maxlength: "3000" });
+  decisions.value = (meeting?.decisions || []).join("\n");
+  const pollTicks = (state.polls || []).map((p) => ({ poll: p, box: checkboxRow(p.title, (meeting?.pollIds || []).includes(p.id)) }));
+  const save = () => {
+    if (!title.value.trim()) { showToast("Give the meeting a title"); return; }
+    const fields = {
+      date: date.value || localDateInput(), title: title.value.trim(), attendees: attendees.value.trim(), notes: notesBox.value.trim(),
+      decisions: decisions.value.split("\n").map((l) => l.trim()).filter(Boolean), pollIds: pollTicks.filter((p) => p.box.input.checked).map((p) => p.poll.id),
+      updatedAt: new Date().toISOString(),
+    };
+    if (meeting) Object.assign(meeting, fields);
+    else (state.meetings ||= []).push({ id: newId("mtg"), ...fields });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast("Minutes saved");
+  };
+  const remove = () => {
+    if (!window.confirm(tr("Delete these minutes?"))) return;
+    state.meetings = (state.meetings || []).filter((m) => m.id !== meeting.id);
+    recordDeletedId("meetings", meeting.id);
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(meeting ? tr("Edit minutes") : tr("New meeting"),
+    field(tr("Date"), date),
+    field(tr("Title"), title),
+    field(tr("Attendees"), attendees),
+    field(tr("Discussion"), notesBox),
+    field(tr("Decisions"), decisions),
+    pollTicks.length ? mk("div", {}, mk("span", { className: "field-label", text: tr("Polls decided at this meeting") }), pollTicks.map((p) => p.box.row)) : null,
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), save),
+      meeting ? mk("button", { type: "button", className: "danger-button", text: tr("Delete"), onclick: remove }) : secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function buildMeetingPdf(meeting) {
+  const C = { green: "#163832", soft: "#cfe3db", white: "#ffffff", ink: "#14211f", muted: "#61706b" };
+  const left = 40;
+  const right = 555;
+  const pages = [];
+  let cmds;
+  let y;
+  const text = (value, x, ty, size, bold, color, bg) => cmds.push(pdfTextCommand(value, x, ty, size, bold, { color, bg }));
+  const newPage = (first) => {
+    if (cmds) pages.push(`${cmds.join("\n")}\n`);
+    cmds = ["0.4 w"];
+    if (first) {
+      cmds.push(pdfFillRect(0, 742, 595, 100, C.green));
+      text(state.building?.name || "", left, 806, 12, true, C.soft, C.green);
+      text("Meeting minutes", left, 776, 24, true, C.white, C.green);
+      text(`${formatDateLabel(meeting.date)} · ${pdfClip(meeting.title, 60)}`, left, 756, 11, false, C.soft, C.green);
+      y = 710;
+    } else {
+      text(tr("{title} (continued)", { title: meeting.title }), left, 806, 11, true, C.ink);
+      y = 780;
+    }
+  };
+  const ensure = (needed) => { if (y - needed < 70) newPage(false); };
+  const section = (title) => {
+    ensure(40);
+    text(title, left, y, 13, true, C.ink);
+    cmds.push(`q ${pdfColor(C.soft)} RG 0.8 w ${left} ${y - 7} m ${right} ${y - 7} l S Q`);
+    y -= 26;
+  };
+  // Splits long text into lines of about `width` characters.
+  const wrap = (value, width = 95) => String(value || "").split("\n").flatMap((para) => {
+    const words = para.split(/\s+/).filter(Boolean);
+    const lines = [];
+    let line = "";
+    words.forEach((w) => { if ((line + " " + w).trim().length > width) { lines.push(line); line = w; } else line = `${line} ${w}`.trim(); });
+    if (line) lines.push(line);
+    return lines.length ? lines : [""];
+  });
+  const paragraph = (value) => wrap(value).forEach((l) => { ensure(16); text(l, left, y, 10, false, C.ink); y -= 15; });
+
+  newPage(true);
+  if (meeting.attendees) { section("Attendees"); paragraph(meeting.attendees); y -= 8; }
+  if (meeting.notes) { section("Discussion"); paragraph(meeting.notes); y -= 8; }
+  if ((meeting.decisions || []).length) {
+    section("Decisions");
+    meeting.decisions.forEach((d, i) => wrap(d, 90).forEach((l, j) => { ensure(16); text(`${j === 0 ? `${i + 1}.` : "  "} ${l}`, left, y, 10, j === 0, C.ink); y -= 15; }));
+    y -= 8;
+  }
+  const polls = (state.polls || []).filter((p) => (meeting.pollIds || []).includes(p.id));
+  if (polls.length) {
+    section("Votes");
+    polls.forEach((p) => {
+      ensure(32);
+      text(pdfClip(p.title, 90), left, y, 10, true, C.ink);
+      y -= 15;
+      const t = pollTally(p);
+      text(tr("YES {yes} · NO {no} · ABSTAIN {abstain}", { yes: t.yes, no: t.no, abstain: t.abstain }) + (t.mode === "share" ? ` (${tr("by ownership share")})` : ""), left, y, 9.5, false, C.muted);
+      y -= 20;
+    });
+  }
+  text(tr("{building} · {date}", { building: state.building?.name || "", date: formatDateLabel(meeting.date) }), left, 34, 8, false, C.muted);
+  pages.push(`${cmds.join("\n")}\n`);
+  return buildMultiPagePdf(pages);
+}
+
+async function shareMeetingPdf(meetingId) {
+  const meeting = (state.meetings || []).find((m) => m.id === meetingId);
+  if (!meeting) return;
+  const pdf = buildMeetingPdf(meeting);
+  const fileName = `Minutes_${safeFilePart(meeting.title, "meeting")}_${meeting.date}.pdf`;
+  try {
+    if (typeof navigator.share === "function" && typeof File === "function") {
+      const file = new File([pdf], fileName, { type: PDF_MIME });
+      if (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: meeting.title, text: meeting.title });
+        return;
+      }
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(pdf, PDF_MIME, fileName);
+}
+
+function renderMeetings() {
+  if (!els.meetingList) return;
+  if (els.newMeetingButton) els.newMeetingButton.classList.toggle("hidden", sessionMode !== "owner");
+  const meetings = (state.meetings || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  if (!meetings.length) {
+    els.meetingList.replaceChildren(mk("div", { className: "empty-state", text: sessionMode === "owner" ? tr("No meetings yet. Write down what was decided at each owners' meeting and share the minutes as a PDF.") : tr("No meeting minutes yet.") }));
+    return;
+  }
+  els.meetingList.replaceChildren(...meetings.map((m) => mk("article", { className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: m.title }), mk("span", { text: formatDateLabel(m.date) })),
+    (m.decisions || []).length ? mk("ol", { className: "decision-list" }, m.decisions.map((d) => mk("li", { text: d }))) : null,
+    mk("div", { className: "notice-actions" },
+      miniButton(tr("Share PDF"), () => { void shareMeetingPdf(m.id); }),
+      sessionMode === "owner" ? miniButton(tr("Edit"), () => openMeetingDialog(m.id)) : null))));
+}
+
+// ── Close the year ──────────────────────────────────────────────────────────
+function yearFullyClosed(year) {
+  for (let m = 1; m <= 12; m += 1) if (!isMonthClosed(`${year}-${String(m).padStart(2, "0")}`)) return false;
+  return true;
+}
+
+function closeYear(year) {
+  if (!window.confirm(tr("Close {year}? Every month of {year} is locked. Nothing is erased: balances carry into the new year as they are, and you can still reopen a month in Reports.", { year }))) return;
+  state.monthLocks ||= [];
+  const stamp = { closed: true, at: new Date().toISOString(), by: auditActor() };
+  for (let m = 1; m <= 12; m += 1) {
+    const id = `${year}-${String(m).padStart(2, "0")}`;
+    const lock = state.monthLocks.find((l) => l.id === id);
+    if (lock) Object.assign(lock, stamp);
+    else state.monthLocks.push({ id, ...stamp });
+  }
+  if (!saveState()) return;
+  renderAll();
+  openToolDialog(tr("{year} is closed", { year }),
+    note(tr("Keep a copy of the year: the annual report for the owners' meeting and a full backup with photos.")),
+    mk("div", { className: "hide-choices" },
+      primaryButton(tr("Annual report (Excel)"), () => downloadAnnualWorkbook(year)),
+      secondaryButton(tr("Annual report (PDF)"), () => { closeToolDialog(); printAnnualReport(year); }),
+      secondaryButton(tr("Backup with photos"), () => { closeToolDialog(); void downloadBackupWithPhotos(); }),
+      mk("button", { type: "button", className: "mini-button", text: tr("Done"), onclick: closeToolDialog })));
+}
+
+function buildCloseYearSection() {
+  const thisYear = new Date().getFullYear();
+  const years = reportYears().filter((y) => Number(y) <= thisYear && !yearFullyClosed(y));
+  if (!years.length) return note(tr("Every year so far is closed."));
+  const pick = selectInput(years.map((y) => [y, y]), years.find((y) => Number(y) < thisYear) || years[0]);
+  return mk("div", {},
+    note(tr("At the end of the year, lock all its months and keep a copy. Nothing is erased; balances simply carry on into the new year.")),
+    field(tr("Year"), pick),
+    mk("div", { className: "button-row" }, secondaryButton(tr("Close the year"), () => closeYear(pick.value))));
+}
+
+function v158AttentionItems() {
+  const items = [];
+  documentsExpiring().forEach((d) => {
+    const expired = d.expiresOn < localDateInput();
+    items.push({ kind: expired ? "danger" : "warn", text: expired ? tr("{name} expired on {date}", { name: d.title, date: formatDateLabel(d.expiresOn) }) : tr("{name} expires on {date}", { name: d.title, date: formatDateLabel(d.expiresOn) }), view: "documentsView", key: `doc:${d.id}:${d.expiresOn}` });
+  });
+  const reserve = reserveStatus();
+  if (reserve?.below) items.push({ kind: "warn", text: tr("Cash ({cash}) is below the reserve target of {target}", { cash: formatUsd(reserve.cash), target: formatUsd(reserve.target) }), view: "reportsView", key: "reserve" });
+  const over = overBudgetCategories();
+  if (over.length) items.push({ kind: "warn", text: tr(over.length === 1 ? "{n} category is over budget ({names})" : "{n} categories are over budget ({names})", { n: over.length, names: over.map((r) => r.category).join(", ") }), view: "reportsView", key: `budget:${budgetYear()}:${over.map((r) => r.category).join("|")}` });
+  return items;
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -13379,6 +13987,13 @@ export const __test = {
   v155AttentionItems,
   attentionKey,
   transactionAccount,
+  budgetRows,
+  reserveStatus,
+  documentsExpiring,
+  supplierExpenses,
+  buildMeetingPdf,
+  yearFullyClosed,
+  v158AttentionItems,
   expectedByAccount,
   methodLabel,
   isAttentionHidden,
