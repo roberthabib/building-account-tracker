@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v155";
+const APP_VERSION = "v156";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -1091,6 +1091,22 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Hide this reminder": "إخفاء هذا التذكير",
+  "For a week": "لمدة أسبوع",
+  "For a month": "لمدة شهر",
+  "Don't show it again": "عدم إظهاره مجدداً",
+  "Hidden for a week": "أُخفي لمدة أسبوع",
+  "Hidden for a month": "أُخفي لمدة شهر",
+  "Reminder hidden": "تم إخفاء التذكير",
+  "Hidden reminders are listed at the bottom of Needs Attention, where you can show them again.": "تظهر التذكيرات المخفية أسفل قائمة \"يحتاج إلى انتباه\"، ويمكنك إظهارها مجدداً من هناك.",
+  "Hidden reminders": "التذكيرات المخفية",
+  "Hidden for good": "مخفي نهائياً",
+  "Hidden until {date}": "مخفي حتى {date}",
+  "Show again": "إظهار مجدداً",
+  "Show all again": "إظهار الكل مجدداً",
+  "Nothing else needs attention.": "لا شيء آخر يحتاج إلى انتباه.",
+  "1 hidden reminder — show": "تذكير مخفي واحد — إظهار",
+  "{n} hidden reminders — show": "{n} تذكيرات مخفية — إظهار",
   "Edit Payment": "تعديل الدفعة",
   "Payment updated. Same receipt number": "تم تعديل الدفعة. رقم الإيصال نفسه",
   "That entry was not found": "لم يُعثر على هذا القيد",
@@ -3996,6 +4012,7 @@ function renderAttention() {
       icon: "💰",
       text: tr(overdue.length === 1 ? "{n} tenant owes {amount}" : "{n} tenants owe {amount}", { n: overdue.length, amount: formatUsd(total) }),
       view: "paymentsView",
+      key: "owing",
     });
   }
 
@@ -4027,16 +4044,18 @@ function renderAttention() {
   // Monthly routine: balance reminders not sent yet this month
   const thisMonth = currentMonthValue();
   if (state.settings.remindersSentMonth !== thisMonth && activeTenants.some((t) => getTenantStatementNotification(t.id))) {
-    items.push({ kind: "warn", text: tr("Send balance reminders for the {month} statement", { month: formatMonth(getLastCompletedMonth()) }), view: "paymentsView", action: "reminders" });
+    items.push({ kind: "warn", text: tr("Send balance reminders for the {month} statement", { month: formatMonth(getLastCompletedMonth()) }), view: "paymentsView", action: "reminders", key: `reminders:${thisMonth}` });
   }
   // Recurring expenses waiting to be confirmed for this month
   const recurringDue = pendingRecurringExpenses(thisMonth);
   if (recurringDue.length) {
-    items.push({ kind: "warn", text: tr(recurringDue.length === 1 ? "{n} monthly expense to confirm for {month}" : "{n} monthly expenses to confirm for {month}", { n: recurringDue.length, month: formatMonth(thisMonth) }), view: "ledgerView", action: "recurring" });
+    items.push({ kind: "warn", text: tr(recurringDue.length === 1 ? "{n} monthly expense to confirm for {month}" : "{n} monthly expenses to confirm for {month}", { n: recurringDue.length, month: formatMonth(thisMonth) }), view: "ledgerView", action: "recurring", key: `recurring:${thisMonth}` });
   }
 
   items.push(...extraAttentionItems());
 
+  hiddenAttentionItems = items.filter((item) => isAttentionHidden(item));
+  const visibleItems = items.filter((item) => !isAttentionHidden(item));
   if (!items.length) {
     els.attentionPanel.classList.add("hidden");
     return;
@@ -4049,7 +4068,7 @@ function renderAttention() {
     success: { tint: "var(--green-tint-bg)", color: "var(--primary)", icon: "check" },
   };
   els.attentionList.replaceChildren(
-    ...items.map((item) => {
+    ...visibleItems.map((item) => {
       const tone = TONE[item.kind] || TONE.warn;
       const row = document.createElement("button");
       row.type = "button";
@@ -4074,8 +4093,25 @@ function renderAttention() {
       const chev = lucide("chevronRight", { size: 18, color: "#b3bbb6", stroke: 2.2 });
       chev.classList.add("attention-chevron");
       row.append(chip, text, chev);
-      return row;
+      const hide = document.createElement("button");
+      hide.type = "button";
+      hide.className = "attention-hide";
+      hide.dataset.key = attentionKey(item);
+      hide.dataset.text = item.text;
+      hide.setAttribute("aria-label", tr("Hide this reminder"));
+      hide.title = tr("Hide this reminder");
+      hide.textContent = "×";
+      const wrap = document.createElement("div");
+      wrap.className = "attention-item";
+      wrap.append(row, hide);
+      return wrap;
     }),
+    ...(!visibleItems.length ? [mk("p", { className: "settings-note", text: tr("Nothing else needs attention.") })] : []),
+    ...(hiddenAttentionItems.length ? [mk("button", {
+      type: "button",
+      className: "attention-hidden-link",
+      text: tr(hiddenAttentionItems.length === 1 ? "1 hidden reminder — show" : "{n} hidden reminders — show", { n: hiddenAttentionItems.length }),
+    })] : []),
   );
   els.attentionPanel.classList.remove("hidden");
 }
@@ -10107,6 +10143,9 @@ function attachEvents() {
     openPaymentDialogFor(button.dataset.tenantId, button.dataset.month, button.dataset.due);
   });
   els.attentionList.addEventListener("click", (event) => {
+    const hide = event.target.closest(".attention-hide[data-key]");
+    if (hide) { openAttentionHideDialog(hide.dataset.key, hide.dataset.text); return; }
+    if (event.target.closest(".attention-hidden-link")) { openHiddenAttentionDialog(); return; }
     const row = event.target.closest(".attention-row[data-view]");
     if (!row) return;
     if (row.dataset.action === "reminders") openWhatsAppReminderDialog();
@@ -12134,9 +12173,9 @@ function pollSummaryLines(poll) {
 function extraAttentionItems() {
   const items = [];
   const toClose = monthToClose();
-  if (toClose) items.push({ kind: "warn", text: tr("Close {month} now that its balances are out", { month: formatMonth(toClose) }), view: "reportsView", action: "closeMonth", arg: toClose });
+  if (toClose) items.push({ kind: "warn", text: tr("Close {month} now that its balances are out", { month: formatMonth(toClose) }), view: "reportsView", action: "closeMonth", arg: toClose, key: `closeMonth:${toClose}` });
   const cash = cashCheckDue();
-  if (cash) items.push({ kind: "warn", text: cash.last ? tr("Count the cash — last count {date}", { date: formatDateLabel(cash.last.date) }) : tr("Count the cash once to check the books"), view: "reportsView", action: "cashCheck" });
+  if (cash) items.push({ kind: "warn", text: cash.last ? tr("Count the cash — last count {date}", { date: formatDateLabel(cash.last.date) }) : tr("Count the cash once to check the books"), view: "reportsView", action: "cashCheck", key: "cashCheck" });
   const warning = generatorEfficiencyWarning();
   if (warning) items.push({ kind: "danger", text: generatorWarningText(warning), view: "servicesView" });
   const service = generatorServiceDue();
@@ -12144,9 +12183,9 @@ function extraAttentionItems() {
   const openIssues = (state.issues || []).filter((i) => i.status === "open");
   if (openIssues.length) items.push({ kind: "warn", text: tr(openIssues.length === 1 ? "{n} problem reported" : "{n} problems reported", { n: openIssues.length }), view: "issuesView" });
   const health = dataHealthIssues();
-  if (health.length) items.push({ kind: "warn", text: tr(health.length === 1 ? "{n} thing to check in your data" : "{n} things to check in your data", { n: health.length }), view: "reportsView" });
+  if (health.length) items.push({ kind: "warn", text: tr(health.length === 1 ? "{n} thing to check in your data" : "{n} things to check in your data", { n: health.length }), view: "reportsView", key: "dataHealth" });
   items.push(...v155AttentionItems());
-  if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView" });
+  if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView", key: "keepalive" });
   return items;
 }
 
@@ -12825,9 +12864,81 @@ function v155AttentionItems() {
   }
   const backup = photoBackupDue();
   if (backup) {
-    items.push({ kind: "warn", text: backup.last ? tr("Download a backup with photos — last one {date}", { date: formatDateLabel(backup.last) }) : tr("Download your first backup with photos"), view: "settingsView", action: "photoBackup" });
+    items.push({ kind: "warn", text: backup.last ? tr("Download a backup with photos — last one {date}", { date: formatDateLabel(backup.last) }) : tr("Download your first backup with photos"), view: "settingsView", action: "photoBackup", key: "photoBackup" });
   }
   return items;
+}
+
+// ── Hiding "Needs Attention" reminders (v156) ───────────────────────────────
+// Each reminder has a key. Ones tied to a period (this month's reminders, a
+// month to close) carry that period, so hiding one never hides next month's.
+// Reminders without an explicit key use their text: if the situation changes
+// (a new amount, another date), the reminder comes back.
+function attentionKey(item) {
+  return item.key || `text:${item.text}`;
+}
+
+function hiddenAttention() {
+  return state.settings.hiddenAttention || {};
+}
+
+function isAttentionHidden(item, today = localDateInput()) {
+  const until = hiddenAttention()[attentionKey(item)];
+  return until === "forever" || (Boolean(until) && until > today);
+}
+
+function hideAttention(key, until) {
+  const map = { ...hiddenAttention() };
+  // Drop expired entries while we're here.
+  const today = localDateInput();
+  Object.keys(map).forEach((k) => { if (map[k] !== "forever" && map[k] <= today) delete map[k]; });
+  if (until) map[key] = until;
+  else delete map[key];
+  state.settings.hiddenAttention = map;
+  if (!saveState()) return;
+  renderAttention();
+}
+
+function openAttentionHideDialog(key, text) {
+  const choose = (until, message) => {
+    closeToolDialog();
+    hideAttention(key, until);
+    showToast(message);
+  };
+  openToolDialog(tr("Hide this reminder"),
+    note(text),
+    mk("div", { className: "hide-choices" },
+      secondaryButton(tr("For a week"), () => choose(addDays(localDateInput(), 7), "Hidden for a week")),
+      secondaryButton(tr("For a month"), () => choose(addDays(localDateInput(), 30), "Hidden for a month")),
+      primaryButton(tr("Don't show it again"), () => choose("forever", "Reminder hidden")),
+      mk("button", { type: "button", className: "mini-button", text: tr("Cancel"), onclick: closeToolDialog })),
+    note(tr("Hidden reminders are listed at the bottom of Needs Attention, where you can show them again.")));
+}
+
+let hiddenAttentionItems = [];
+function openHiddenAttentionDialog() {
+  const items = hiddenAttentionItems;
+  if (!items.length) return;
+  const map = hiddenAttention();
+  openToolDialog(tr("Hidden reminders"),
+    mk("div", { className: "history-list compact" }, items.map((item) => {
+      const until = map[attentionKey(item)];
+      return mk("div", { className: "health-row" },
+        mk("span", {},
+          mk("strong", { text: item.text }),
+          mk("small", { className: "field-hint", text: until === "forever" ? tr("Hidden for good") : tr("Hidden until {date}", { date: formatDateLabel(until) }) })),
+        miniButton(tr("Show again"), () => { hideAttention(attentionKey(item), null); openHiddenAttentionDialog(); if (!hiddenAttentionItems.length) closeToolDialog(); }));
+    })),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Show all again"), () => {
+        const map2 = { ...hiddenAttention() };
+        items.forEach((item) => delete map2[attentionKey(item)]);
+        state.settings.hiddenAttention = map2;
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAttention();
+      }),
+      secondaryButton(tr("Close"), closeToolDialog)));
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.
@@ -12992,6 +13103,8 @@ export const __test = {
   addMonthsToDate,
   photoBackupDue,
   v155AttentionItems,
+  attentionKey,
+  isAttentionHidden,
   stampLbpRates,
   dataHealthIssues,
   findDuplicatePayment,

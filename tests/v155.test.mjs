@@ -44,3 +44,12 @@ test("deleted maintenance jobs stay deleted when devices merge", () => {
   const remote = baseState({ meta: { rev: 3, epoch: 0, updatedAt: "2026-10-03T00:00:00Z" }, maintenanceTasks: [], deleted: { transactions: [], tenants: [], polls: [], projects: [], maintenanceTasks: ["m1"] } });
   assert.equal(app.mergeStates(local, remote).maintenanceTasks.length, 0);
 });
+
+test("hidden reminders: for a while, for good, and by period", () => {
+  app.setState(baseState({ settings: { hiddenAttention: { photoBackup: "forever", "reminders:2026-10-01": "2999-01-01", cashCheck: "2020-01-01" } } }));
+  assert.equal(app.isAttentionHidden({ key: "photoBackup", text: "x" }), true, "hidden for good");
+  assert.equal(app.isAttentionHidden({ key: "reminders:2026-10-01", text: "x" }), true, "hidden until a later date");
+  assert.equal(app.isAttentionHidden({ key: "reminders:2026-11-01", text: "x" }), false, "next month's reminder shows");
+  assert.equal(app.isAttentionHidden({ key: "cashCheck", text: "x" }), false, "the hiding period is over");
+  assert.equal(app.attentionKey({ text: "2 tenants owe $80.00" }), "text:2 tenants owe $80.00", "no key: the text itself");
+});

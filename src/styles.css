@@ -4032,3 +4032,54 @@ body.tenant-phone #createPollButton {
   flex-basis: 100%;
   margin: 0;
 }
+
+/* Needs Attention: each row can be hidden; hidden ones sit behind a link. */
+.attention-item {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.attention-item .attention-row {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.attention-hide {
+  flex: 0 0 40px;
+  border: 1px solid var(--line-inner);
+  border-radius: var(--radius-inner);
+  background: var(--surface-soft);
+  color: var(--label-muted);
+  font: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.attention-hide:active {
+  background: #f1f4f1;
+}
+
+.attention-hidden-link {
+  align-self: flex-start;
+  border: 0;
+  background: none;
+  padding: 4px 2px;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hide-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hide-choices .mini-button {
+  align-self: center;
+}
