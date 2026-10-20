@@ -72,3 +72,26 @@ test("balance snapshot lists what each active unit owes", () => {
   app.setState(baseState({ tenants: [T("a", 600), T("b", 400), T("x", 0, { active: false })], transactions: [{ id: "e1", category: "Expenses", date: "2026-09-02", debitUsd: 100, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -100, balanceLbp: 0, shares: { a: 60, b: 40 } }, payment("p1", "b", "2026-09-05", 40)] }));
   assert.deepEqual(app.buildBalanceSnapshot().items, { a: 60, b: 0 });
 });
+
+test("backup with photos: every stored picture once, with readable unique names", () => {
+  const photo = (p) => ({ fileName: "x.jpg", storagePath: p });
+  app.setState(baseState({
+    tenants: [T("a", 1000, { name: "Alice" })],
+    transactions: [
+      { id: "tx-1", category: "Expenses", date: "2026-09-05", description: "Lift repair", invoice: "INV-7", debitUsd: 50, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -50, balanceLbp: 0, invoiceAttachment: photo("2026/aa-lift.jpg") },
+      { id: "tx-2", category: "Expenses", date: "2026-09-05", description: "Lift repair", invoice: "INV-7", debitUsd: 50, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -50, balanceLbp: 0, invoiceAttachment: photo("2026/bb-lift.jpg") },
+      { ...payment("p1", "a", "2026-09-10", 50), invoiceAttachment: photo("proofs/a/1.jpg") },
+      { id: "tx-3", category: "Expenses", date: "2026-09-06", description: "Old", debitUsd: 5, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -5, balanceLbp: 0, invoiceAttachment: { fileName: "old.jpg", driveUrl: "https://drive.example/old" } },
+    ],
+    paymentDeclarations: [{ id: "d1", tenantId: "a", declaredAt: "2026-09-09T00:00:00Z", proof: photo("proofs/a/1.jpg") }],
+    issues: [{ id: "iss-1", title: "Leak", createdAt: "2026-09-08T00:00:00Z", photo: photo("issues/a/2.png") }],
+  }));
+  const list = app.backupPhotoList();
+  const stored = list.filter((i) => i.path);
+  assert.equal(stored.length, 4, "the shared proof is included once");
+  assert.ok(stored.every((i) => i.zipName.startsWith("photos/")));
+  assert.equal(new Set(stored.map((i) => i.zipName)).size, 4, "names are unique");
+  assert.ok(stored.some((i) => i.zipName.startsWith("photos/problems/") && i.zipName.endsWith(".png")));
+  assert.ok(stored.some((i) => i.zipName.startsWith("photos/payment-proofs/2026-09-10_Alice")));
+  assert.equal(list.filter((i) => i.external).length, 1, "a Drive-only photo is listed, not downloaded");
+});

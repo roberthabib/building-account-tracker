@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v153";
+const APP_VERSION = "v154";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -136,6 +136,7 @@ const els = {
   saveSettingsButton: document.querySelector("#saveSettingsButton"),
   loadCloudButton: document.querySelector("#loadCloudButton"),
   downloadBackupButton: document.querySelector("#downloadBackupButton"),
+  downloadBackupPhotosButton: document.querySelector("#downloadBackupPhotosButton"),
   fullExportButton: document.querySelector("#fullExportButton"),
   restoreBackupButton: document.querySelector("#restoreBackupButton"),
   restoreBackupInput: document.querySelector("#restoreBackupInput"),
@@ -564,6 +565,8 @@ const I18N = {
     "set.shareAccessDesc": "Create a one-time code that links a tenant's phone to their own account. They only ever see their own figures.",
     "set.backup": "Backup & Restore",
     "set.downloadBackupTitle": "Download backup",
+    "set.backupPhotosTitle": "Download backup with photos",
+    "set.backupPhotosDesc": "One ZIP file with all your data and every picture: invoices, payment proofs and problem photos.",
     "set.downloadBackupDesc": "Save all your data to a file on this device. Keep it somewhere safe.",
     "set.restoreTitle": "Restore from a backup file",
     "set.restoreDesc": "Load data from a backup file you saved before. Replaces the data on this device — a safety copy is downloaded first.",
@@ -912,6 +915,8 @@ const I18N = {
     "set.shareAccessDesc": "أنشئ رمزاً لمرة واحدة يربط هاتف المستأجر بحسابه فقط. لن يرى سوى أرقامه.",
     "set.backup": "النسخ الاحتياطي والاستعادة",
     "set.downloadBackupTitle": "تنزيل نسخة احتياطية",
+    "set.backupPhotosTitle": "تنزيل نسخة احتياطية مع الصور",
+    "set.backupPhotosDesc": "ملف ZIP واحد يضم كل بياناتك وجميع الصور: الفواتير وإثباتات الدفع وصور المشاكل.",
     "set.downloadBackupDesc": "احفظ كل بياناتك في ملف على هذا الجهاز. احتفظ به في مكان آمن.",
     "set.restoreTitle": "الاستعادة من ملف احتياطي",
     "set.restoreDesc": "حمّل البيانات من ملف احتياطي حفظته سابقاً. يستبدل بيانات هذا الجهاز — تُنزّل نسخة أمان أولاً.",
@@ -1080,6 +1085,10 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Sign in with Google as the owner to include the photos": "سجّل الدخول عبر Google كمالك لتضمين الصور",
+  "{done} of {total}…": "{done} من {total}…",
+  "Backup downloaded — {n} photos could not be included (listed in README.txt)": "تم تنزيل النسخة — تعذّر تضمين {n} صور (مذكورة في README.txt)",
+  "Backup with {n} photos downloaded": "تم تنزيل النسخة الاحتياطية مع {n} صور",
   "Coefficients add up to {sum}/1000 instead of 1000": "مجموع المعاملات {sum}/1000 بدلاً من 1000",
   "No coefficient for: {units}": "لا معامل للوحدات: {units}",
   "{n} tenant has no phone number ({units})": "{n} مستأجر بلا رقم هاتف ({units})",
@@ -10372,6 +10381,7 @@ function attachEvents() {
   els.closeDeclareDialog.addEventListener("click", () => closeDialog(els.declareDialog));
   els.closeBackupsDialog.addEventListener("click", () => closeDialog(els.backupsDialog));
   els.downloadBackupButton.addEventListener("click", downloadBackup);
+  els.downloadBackupPhotosButton?.addEventListener("click", downloadBackupWithPhotos);
   els.fullExportButton.addEventListener("click", handleFullExcelExport);
   els.restoreBackupButton.addEventListener("click", () => els.restoreBackupInput.click());
   els.restoreBackupInput.addEventListener("change", () => {
@@ -12430,6 +12440,119 @@ function refreshBalanceSnapshot() {
   if (JSON.stringify(next.items) !== JSON.stringify(state.balanceSnapshot?.items || null)) saveState();
 }
 
+// ── Backup with photos (v154) ────────────────────────────────────────────────
+// The plain backup file holds the data and only the storage path of each
+// picture. This ZIP adds the pictures themselves, so nothing depends on the
+// cloud storage surviving.
+function backupPhotoList() {
+  const list = [];
+  const seen = new Set();
+  const extOf = (p) => (/\.(jpe?g|png|webp|gif|heic|pdf)$/i.exec(p || "")?.[0] || ".jpg").toLowerCase();
+  const add = (attachment, folder, parts, extra = {}) => {
+    const storagePath = attachment?.storagePath;
+    if (!storagePath) {
+      if (attachment && attachmentUrl(attachment)) list.push({ external: attachmentUrl(attachment), label: parts.filter(Boolean).join(" "), ...extra });
+      return;
+    }
+    if (seen.has(storagePath)) return;
+    seen.add(storagePath);
+    const base = parts.filter(Boolean).map((p) => safeFilePart(String(p), "photo")).join("_").slice(0, 90) || "photo";
+    list.push({ path: storagePath, zipName: `photos/${folder}/${base}${extOf(storagePath)}`, label: parts.filter(Boolean).join(" "), ...extra });
+  };
+  state.transactions
+    .slice()
+    .sort((a, b) => String(transactionDateValue(a)).localeCompare(String(transactionDateValue(b))))
+    .forEach((t) => {
+      if (!t.invoiceAttachment) return;
+      const isPayment = t.category === "Payments";
+      add(t.invoiceAttachment, isPayment ? "payment-proofs" : "expenses",
+        [t.date, isPayment ? tenantName(t.tenantId) : t.description, t.invoice || t.receiptRef, String(t.id).slice(-6)]);
+    });
+  (state.paymentDeclarations || []).forEach((d) => {
+    if (d.proof) add(d.proof, "payment-proofs", [String(d.declaredAt || "").slice(0, 10), tenantName(d.tenantId), "declared", String(d.id).slice(-6)]);
+  });
+  (state.issues || []).forEach((i) => {
+    if (i.photo) add(i.photo, "problems", [String(i.createdAt || "").slice(0, 10), i.title, String(i.id).slice(-6)]);
+  });
+  // Names must be unique inside the ZIP.
+  const used = new Set();
+  list.forEach((item) => {
+    if (!item.zipName) return;
+    let name = item.zipName;
+    for (let n = 2; used.has(name.toLowerCase()); n += 1) name = item.zipName.replace(/(\.[a-z]+)$/, `-${n}$1`);
+    used.add(name.toLowerCase());
+    item.zipName = name;
+  });
+  return list;
+}
+
+async function fetchStoredPhoto(storagePath) {
+  const c = cloudConfig();
+  await ensureFreshSession();
+  const res = await fetch(`${c.supabaseUrl}/storage/v1/object/authenticated/${SUPABASE_INVOICE_BUCKET}/${encodeURI(storagePath)}`, {
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}` },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return new Uint8Array(await res.arrayBuffer());
+}
+
+let photoBackupBusy = false;
+async function downloadBackupWithPhotos() {
+  if (sessionMode !== "owner") return;
+  if (photoBackupBusy) return;
+  if (cloudProvider() !== "supabase" || !authSession) {
+    showToast("Sign in with Google as the owner to include the photos", 6000);
+    return;
+  }
+  photoBackupBusy = true;
+  const button = els.downloadBackupPhotosButton;
+  if (button) button.disabled = true;
+  try {
+    const list = backupPhotoList();
+    const stored = list.filter((item) => item.path);
+    const files = [{ name: "backup.json", content: JSON.stringify(state, null, 2) }];
+    const failed = [];
+    let done = 0;
+    const queue = stored.slice();
+    const worker = async () => {
+      while (queue.length) {
+        const item = queue.shift();
+        try {
+          files.push({ name: item.zipName, content: await fetchStoredPhoto(item.path) });
+        } catch (error) {
+          failed.push(`${item.label} (${error.message})`);
+        }
+        done += 1;
+        if (button) button.textContent = tr("{done} of {total}…", { done, total: stored.length });
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+    const external = list.filter((item) => item.external);
+    const readme = [
+      `${state.building?.name || "Building"} — backup with photos, ${localDateInput()}`,
+      "",
+      `backup.json: all the data. Restore it from Settings → Restore from a backup file.`,
+      `photos/: ${files.length - 1} pictures (expenses, payment proofs, problems).`,
+      ...(failed.length ? ["", "Could not be downloaded:", ...failed.map((f) => `- ${f}`)] : []),
+      ...(external.length ? ["", "Older photos kept on Google Drive (not in this file):", ...external.map((e) => `- ${e.label}: ${e.external}`)] : []),
+    ].join("\r\n");
+    files.splice(1, 0, { name: "README.txt", content: readme });
+    const slug = safeFilePart(state.building?.name || "building", "building").toLowerCase();
+    downloadBlob(new Blob([buildZip(files)], { type: "application/zip" }), "application/zip", `${slug}-backup-with-photos-${localDateInput()}.zip`);
+    showToast(failed.length
+      ? tr("Backup downloaded — {n} photos could not be included (listed in README.txt)", { n: failed.length })
+      : tr("Backup with {n} photos downloaded", { n: files.length - 2 }), 6000);
+  } catch (error) {
+    showToast(describeSyncProblem(error), 6000);
+  } finally {
+    photoBackupBusy = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent = t("common.download");
+    }
+  }
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -12586,6 +12709,7 @@ export const __test = {
   buildGroupBalancesMessage,
   groupBalancesData,
   txUsd,
+  backupPhotoList,
   stampLbpRates,
   dataHealthIssues,
   findDuplicatePayment,
