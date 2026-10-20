@@ -4083,3 +4083,51 @@ body.tenant-phone #createPollButton {
 .hide-choices .mini-button {
   align-self: center;
 }
+
+/* Tenant card: is the tenant's phone linked? */
+.tenant-link-line {
+  display: block;
+  margin-top: 2px;
+  color: var(--primary);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.tenant-link-line.is-off {
+  color: var(--label-muted);
+  font-weight: 600;
+}
+
+/* "Who paid?": tick, name, amount, method. */
+.whopaid-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 92px;
+  grid-template-areas: "tick text amount" "tick method method";
+  align-items: center;
+  gap: 6px 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+  background: var(--surface);
+}
+
+.whopaid-row .recurring-tick { grid-area: tick; }
+.whopaid-row .recurring-text { grid-area: text; }
+.whopaid-row .recurring-amount { grid-area: amount; }
+.whopaid-row .whopaid-method {
+  grid-area: method;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0 8px;
+}
+
+.health-row.plain {
+  border: 0;
+  padding: 6px 0 0;
+  background: none;
+}

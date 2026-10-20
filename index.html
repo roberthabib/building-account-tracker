@@ -197,6 +197,7 @@
             </div>
           </div>
           <div class="payment-actions-bar">
+            <button class="secondary-button owner-only" id="whoPaidButton" type="button" data-i18n="pay.whoPaid">Who paid?</button>
             <button class="secondary-button owner-only" id="lastReceiptButton" type="button" data-i18n="pay.lastReceipt">Last Receipt</button>
             <button class="secondary-button owner-only" id="dueOnlyToggle" type="button" data-i18n="pay.dueOnly">Due Only</button>
             <button class="secondary-button whatsapp-all-btn owner-only" id="whatsappAllDueButton" type="button" data-i18n="pay.messageDue">Message Due</button>
@@ -243,7 +244,10 @@
               <p class="eyebrow" data-i18n="ten.eyebrow">Residents</p>
               <h2 id="tenantsTitle" data-i18n="ten.title">Tenant Accounts</h2>
             </div>
-            <button class="primary-button owner-only" id="addTenantButton" type="button" data-i18n="ten.add">+ Add</button>
+            <div class="section-actions">
+              <button class="secondary-button owner-only" id="inviteAllButton" type="button" data-i18n="ten.inviteAll">Invite all</button>
+              <button class="primary-button owner-only" id="addTenantButton" type="button" data-i18n="ten.add">+ Add</button>
+            </div>
           </div>
           <div class="search-field" data-nav-icon="search">
             <input id="tenantSearch" type="search" placeholder="Search tenants" data-i18n-ph="ten.searchPh" />
@@ -659,6 +663,23 @@
           </select>
         </div>
         <div class="conversion-preview hidden" id="expenseConversionPreview"></div>
+        <label class="method-field hidden">
+          <span data-i18n="tx.paidBy">Paid by</span>
+          <select id="transactionMethod">
+            <option value="cash" data-i18n="opt.cash">Cash</option>
+            <option value="bank" data-i18n="opt.bank">Bank transfer</option>
+            <option value="omt">OMT</option>
+            <option value="whish">Whish</option>
+            <option value="cheque" data-i18n="opt.cheque">Cheque</option>
+          </select>
+        </label>
+        <label class="paidfrom-field hidden">
+          <span data-i18n="tx.paidFrom">Paid from</span>
+          <select id="transactionPaidFrom">
+            <option value="cash" data-i18n="opt.cashBox">Cash box</option>
+            <option value="bank" data-i18n="opt.bankWallets">Bank &amp; wallets</option>
+          </select>
+        </label>
 
         <div class="two-col extra-fields">
           <label class="supplier-field">

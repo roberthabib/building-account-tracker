@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v156";
+const APP_VERSION = "v157";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,15 @@ const I18N = {
     "common.export": "Export",
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
+    "ten.inviteAll": "Invite all",
+    "pay.whoPaid": "Who paid?",
+    "tx.paidBy": "Paid by",
+    "tx.paidFrom": "Paid from",
+    "opt.cash": "Cash",
+    "opt.bank": "Bank transfer",
+    "opt.cheque": "Cheque",
+    "opt.cashBox": "Cash box",
+    "opt.bankWallets": "Bank & wallets",
     "nav.maintenance": "Maintenance",
     "more.maintenanceSub": "Inspections, cleanings, renewals",
     "maint.new": "+ Add",
@@ -728,6 +737,15 @@ const I18N = {
     "common.export": "تصدير",
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
+    "ten.inviteAll": "دعوة الجميع",
+    "pay.whoPaid": "من دفع؟",
+    "tx.paidBy": "طريقة الدفع",
+    "tx.paidFrom": "دُفع من",
+    "opt.cash": "نقداً",
+    "opt.bank": "تحويل مصرفي",
+    "opt.cheque": "شيك",
+    "opt.cashBox": "الصندوق",
+    "opt.bankWallets": "المصرف والمحافظ",
     "nav.maintenance": "الصيانة",
     "more.maintenanceSub": "الفحوصات والتنظيف والتجديدات",
     "maint.new": "+ إضافة",
@@ -1091,6 +1109,44 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.": "مرحباً {name}! هذه دعوتك إلى تطبيق {building} حيث يمكنك رؤية رصيدك ودفعاتك.\n1. افتح {url}\n2. اضغط \"أنا مستأجر ولديّ رمز دعوة\"\n3. أدخل: {code}\nيعمل الرمز مرة واحدة خلال 30 يوماً.\n\nنصيحة: أضف التطبيق إلى شاشتك الرئيسية. على iPhone: اضغط مشاركة ثم \"إضافة إلى الشاشة الرئيسية\". على Android: اضغط ⋮ ثم \"تثبيت التطبيق\". ثم افتح المزيد > إشعارات الهاتف لتصلك أرصدتك والأخبار.",
+  "Phone not linked yet": "الهاتف غير مربوط بعد",
+  "Phone linked · notifications on": "الهاتف مربوط · الإشعارات مفعّلة",
+  "Phone linked · notifications off": "الهاتف مربوط · الإشعارات متوقفة",
+  "Already linked": "مربوط مسبقاً",
+  "Not linked yet": "غير مربوط بعد",
+  "Not linked yet · no phone number saved": "غير مربوط بعد · لا رقم هاتف محفوظ",
+  "Send again": "إرسال مجدداً",
+  "Send invite": "إرسال الدعوة",
+  "Sent ✓": "أُرسلت ✓",
+  "Invite all tenants": "دعوة كل المستأجرين",
+  "Each tenant gets their own one-time code on WhatsApp, with the link and how to add the app to their home screen. Tap Send for each one.": "يتلقى كل مستأجر رمزه الخاص لمرة واحدة عبر واتساب، مع الرابط وطريقة إضافة التطبيق إلى شاشته الرئيسية. اضغط إرسال لكل واحد.",
+  "Cash": "نقداً",
+  "Bank transfer": "تحويل مصرفي",
+  "OMT": "OMT",
+  "Whish": "Whish",
+  "Cheque": "شيك",
+  "Paid by": "طريقة الدفع",
+  "Paid by {v}": "طريقة الدفع: {v}",
+  "Paid from the bank": "دُفع من المصرف",
+  "Cash box: counted {counted}, books {books}": "الصندوق: المعدود {counted}، الدفاتر {books}",
+  "Bank & wallets: counted {counted}, books {books}": "المصرف والمحافظ: المعدود {counted}، الدفاتر {books}",
+  "Nothing due": "لا شيء مستحق",
+  "Tick at least one tenant with an amount": "حدد مستأجراً واحداً على الأقل مع مبلغ",
+  "{n} payment recorded with its receipt": "سُجّلت {n} دفعة مع إيصالها",
+  "{n} payments recorded with their receipts": "سُجّلت {n} دفعات مع إيصالاتها",
+  "Who paid? — {month}": "من دفع؟ — {month}",
+  "Tick everyone who paid and check the amount. Each payment gets its own receipt.": "حدد كل من دفع وتحقق من المبلغ. لكل دفعة إيصالها الخاص.",
+  "Date received": "تاريخ الاستلام",
+  "Record payments": "تسجيل الدفعات",
+  "Your recent payments": "دفعاتك الأخيرة",
+  "Second phone": "هاتف ثانٍ",
+  "Number of residents": "عدد السكان",
+  "Parking spot / car plate": "موقف السيارة / رقم اللوحة",
+  "Emergency contact": "جهة اتصال للطوارئ",
+  "Unit details saved": "تم حفظ تفاصيل الوحدة",
+  "Unit {unit} — details": "الوحدة {unit} — التفاصيل",
+  "Only you see these.": "أنت فقط ترى هذه المعلومات.",
   "Hide this reminder": "إخفاء هذا التذكير",
   "For a week": "لمدة أسبوع",
   "For a month": "لمدة شهر",
@@ -3864,6 +3920,7 @@ function enterAsOwner() {
   renderAll();
   checkSetupWizard();
   refreshKeepaliveStatus();
+  refreshTenantLinks();
 }
 
 function hideLoginScreen() {
@@ -5040,6 +5097,7 @@ function renderTenants() {
           <button class="text-link-btn print-statement-button" type="button"></button>
           <button class="text-link-btn invite-tenant-button owner-only" type="button"></button>
           <button class="text-link-btn moveout-tenant-button owner-only" type="button"></button>
+          <button class="text-link-btn details-tenant-button owner-only" type="button"></button>
         </div>
       `;
       card.querySelector(".tenant-id").insertBefore(avatarChip(tenant.name, 38), card.querySelector(".tenant-id-text"));
@@ -5054,6 +5112,13 @@ function renderTenants() {
       card.querySelector(".print-statement-button").textContent = tr("Statement");
       card.querySelector(".invite-tenant-button").textContent = tr("Invite");
       card.querySelector(".invite-tenant-button").dataset.tenantId = tenant.id;
+      const detailsBtn = card.querySelector(".details-tenant-button");
+      detailsBtn.textContent = tr("Details");
+      detailsBtn.dataset.tenantId = tenant.id;
+      if (sessionMode === "owner") {
+        const linkLine = tenantLinkLine(tenant);
+        if (linkLine) card.querySelector(".tenant-id-text").append(linkLine);
+      }
       const moveBtn = card.querySelector(".moveout-tenant-button");
       moveBtn.textContent = tr("Move out");
       moveBtn.dataset.tenantId = tenant.id;
@@ -5418,6 +5483,7 @@ function receiptSummaryRows(data) {
         ["Received From", data.tenant.name],
         ["Months Covered", formatCoveredMonths(data.receiptEntries)],
         ["Amount Received", formatUsd(data.amount)],
+        ...(data.transaction.method ? [["Paid by", methodLabel(data.transaction.method)]] : []),
         ...(data.advanceAmount > 0 ? [["Advance Credit", formatUsd(data.advanceAmount)]] : []),
       ];
 }
@@ -6280,6 +6346,8 @@ function renderLedger() {
       transaction.project ? tr("Project: {v}", { v: transaction.project }) : "",
       transaction.invoice ? tr("Invoice: {v}", { v: transaction.invoice }) : "",
       receiptReference ? tr("Receipt: {v}", { v: receiptReference }) : "",
+      transaction.method ? tr("Paid by {v}", { v: methodLabel(transaction.method) }) : "",
+      transaction.paidFrom === "bank" ? tr("Paid from the bank") : "",
       transaction.invoiceAttachment?.fileName ? tr("Attachment: {v}", { v: transaction.invoiceAttachment.fileName }) : "",
     ].filter(Boolean);
     const expand = item.querySelector(".ledger-expand");
@@ -6928,6 +6996,8 @@ function syncTransactionFormMode() {
   document.querySelector(".service-part-wrap").classList.toggle("hidden", !serviceMode || waterMode);
   document.querySelector(".service-split-wrap").classList.toggle("hidden", !waterMode);
   els.litresWrap?.classList.toggle("hidden", !serviceMode || waterMode || els.transactionServicePart.value === "maintenance");
+  els.methodField?.classList.toggle("hidden", !tenantMode);
+  els.paidFromField?.classList.toggle("hidden", !expenseLike);
   document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
@@ -7085,6 +7155,8 @@ function createTransactionsFromForm() {
     servicePart,
     ...(isServiceExpense && !isWater && servicePart !== "maintenance" && Number(els.transactionLitres?.value || 0) > 0
       ? { litres: Number(els.transactionLitres.value) } : {}),
+    ...(tenantMode && els.transactionMethod ? { method: els.transactionMethod.value } : {}),
+    ...(isExpenseLike && els.transactionPaidFrom ? { paidFrom: els.transactionPaidFrom.value } : {}),
     debitUsd: isDebit ? amountUsd : 0,
     debitLbp: isDebit ? amountLbp : 0,
     creditUsd: isDebit ? 0 : amountUsd,
@@ -8299,7 +8371,7 @@ async function postBalancesToGroup() {
 }
 
 function inviteWhatsAppMessage(tenant, code) {
-  return tr("Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.", {
+  return tr("Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.", {
     name: tenant?.name || "", building: state.building?.name || "", url: inviteAppUrl(), code,
   });
 }
@@ -8957,6 +9029,7 @@ function openExpenseEditDialog(transactionId) {
   }
   els.transactionSupplier.value = transaction.supplier || "";
   els.transactionInvoice.value = transaction.invoice || "";
+  if (els.transactionPaidFrom) els.transactionPaidFrom.value = transaction.paidFrom === "bank" ? "bank" : "cash";
   els.transactionExpenseCategory.value = transaction.expenseCategory || "";
   els.transactionProject.value = transaction.project || "";
   clearInvoiceFileSelection();
@@ -10181,6 +10254,8 @@ function attachEvents() {
     showToast("Tenant PIN removed");
   });
   els.tenantList.addEventListener("click", (event) => {
+    const detailsBtn = event.target.closest(".details-tenant-button[data-tenant-id]");
+    if (detailsBtn) { openUnitDetailsDialog(detailsBtn.dataset.tenantId); return; }
     const moveBtn = event.target.closest(".moveout-tenant-button[data-tenant-id]");
     if (moveBtn) { openMoveOutDialog(moveBtn.dataset.tenantId); return; }
     const inviteBtn = event.target.closest(".invite-tenant-button[data-tenant-id]");
@@ -10715,6 +10790,12 @@ Object.assign(els, {
   pollClosesInput: document.querySelector("#pollClosesInput"),
   pollQuorumInput: document.querySelector("#pollQuorumInput"),
   maintenanceList: document.querySelector("#maintenanceList"),
+  inviteAllButton: document.querySelector("#inviteAllButton"),
+  whoPaidButton: document.querySelector("#whoPaidButton"),
+  methodField: document.querySelector(".method-field"),
+  paidFromField: document.querySelector(".paidfrom-field"),
+  transactionMethod: document.querySelector("#transactionMethod"),
+  transactionPaidFrom: document.querySelector("#transactionPaidFrom"),
   newMaintenanceButton: document.querySelector("#newMaintenanceButton"),
 });
 
@@ -11155,7 +11236,14 @@ function openCashCheckDialog() {
     const counted = roundUsd(Number(cashUsd.value || 0) + Number(bankUsd.value || 0) + Number(cashLbp.value || 0) / rate);
     const expected = expectedCashOn(date.value || localDateInput());
     const diff = roundUsd(counted - expected);
+    const byAccount = expectedByAccount(date.value || localDateInput());
+    const countedCash = roundUsd(Number(cashUsd.value || 0) + Number(cashLbp.value || 0) / rate);
+    const countedBank = roundUsd(Number(bankUsd.value || 0));
     result.replaceChildren(
+      mk("div", {}, mk("span", { text: tr("Cash box: counted {counted}, books {books}", { counted: formatUsd(countedCash), books: formatUsd(byAccount.cash) }) }),
+        mk("b", { className: Math.abs(countedCash - byAccount.cash) < 1 ? "tnum cash-ok" : "tnum cash-gap", text: formatUsd(roundUsd(countedCash - byAccount.cash)) })),
+      mk("div", {}, mk("span", { text: tr("Bank & wallets: counted {counted}, books {books}", { counted: formatUsd(countedBank), books: formatUsd(byAccount.bank) }) }),
+        mk("b", { className: Math.abs(countedBank - byAccount.bank) < 1 ? "tnum cash-ok" : "tnum cash-gap", text: formatUsd(roundUsd(countedBank - byAccount.bank)) })),
       mk("div", {}, mk("span", { text: tr("You counted") }), mk("b", { className: "tnum", text: formatUsd(counted) })),
       mk("div", {}, mk("span", { text: tr("The books say") }), mk("b", { className: "tnum", text: formatUsd(expected) })),
       mk("div", { className: Math.abs(diff) < 1 ? "cash-ok" : "cash-gap" },
@@ -11407,6 +11495,7 @@ function renderTenantDashboardExtras() {
   const myIssues = isTenant ? (state.issues || []).filter((i) => i.tenantId === sessionTenantId && i.status !== "fixed") : [];
   const blocks = [
     ...notices.map((n) => buildNoticeCard(n, { compact: true })),
+    isTenant ? tenantRecentPaymentsCard() : null,
     ...myIssues.map((issue) => mk("article", { className: "notice-card" },
       mk("div", { className: "notice-head" }, mk("strong", { text: issue.title }), issueStatusPill(issue.status)),
       issue.ownerNote ? mk("p", { className: "notice-body", text: issue.ownerNote }) : null)),
@@ -12213,6 +12302,8 @@ function attachV148Events() {
   els.newNoticeButton?.addEventListener("click", openNoticeDialog);
   els.newIssueButton?.addEventListener("click", openIssueDialog);
   els.newMaintenanceButton?.addEventListener("click", () => openMaintenanceTaskDialog());
+  els.inviteAllButton?.addEventListener("click", openInviteAllDialog);
+  els.whoPaidButton?.addEventListener("click", openWhoPaidDialog);
   els.adminsButton?.addEventListener("click", openAdminsDialog);
   els.pushToggleButton?.addEventListener("click", () => (pushIsOn() ? disablePushNotifications() : enablePushNotifications()));
   els.transactionServicePart?.addEventListener("change", syncTransactionFormMode);
@@ -12694,6 +12785,7 @@ function openPaymentEditDialog(transactionId) {
   els.transactionDate.value = transaction.date || localDateInput();
   els.transactionMonth.value = monthKey(transaction.forMonth || transaction.date || localDateInput());
   els.transactionProject.value = transaction.project || "";
+  if (els.transactionMethod) els.transactionMethod.value = transaction.method || "cash";
   const lbp = Number(transaction.creditLbp || 0);
   const usd = Number(transaction.creditUsd || 0);
   if (lbp > 0 && usd === 0) {
@@ -12941,6 +13033,188 @@ function openHiddenAttentionDialog() {
       secondaryButton(tr("Close"), closeToolDialog)));
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v157 — tenants on board, how payments were made, "Who paid?", receipts on
+// tenants' phones, unit details
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Who's connected ─────────────────────────────────────────────────────────
+// { tenantId: { phones, notifications } } from rpc/list_tenant_links (owner).
+let tenantLinkInfo = null;
+
+async function refreshTenantLinks() {
+  if (!isAdminSession() || cloudProvider() !== "supabase") return;
+  try {
+    const res = await supabaseRequest("rpc/list_tenant_links", { method: "POST", body: "{}" });
+    const rows = await res.json();
+    tenantLinkInfo = Object.fromEntries((rows || []).map((r) => [r.tenant_id, { phones: Number(r.phones || 0), notifications: Number(r.notifications || 0) }]));
+    renderTenants();
+  } catch { /* SQL not applied yet, or offline: show nothing */ }
+}
+
+function tenantLinkLine(tenant) {
+  if (!tenantLinkInfo || tenant.active === false) return null;
+  const info = tenantLinkInfo[tenant.id];
+  if (!info?.phones) return mk("span", { className: "tenant-link-line is-off", text: tr("Phone not linked yet") });
+  return mk("span", { className: "tenant-link-line", text: info.notifications ? tr("Phone linked · notifications on") : tr("Phone linked · notifications off") });
+}
+
+function openInviteAllDialog() {
+  if (!isOwnerSession()) { showToast("Sign in with Google first: only the signed-in owner can create invite codes", 6000); return; }
+  const active = state.tenants.filter((t) => t.active !== false)
+    .slice().sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || ""), undefined, { numeric: true }));
+  const rows = active.map((tenant) => {
+    const info = tenantLinkInfo?.[tenant.id];
+    const status = mk("small", { className: "field-hint", text: info?.phones ? tr("Already linked") : tenant.phone ? tr("Not linked yet") : tr("Not linked yet · no phone number saved") });
+    const button = miniButton(info?.phones ? tr("Send again") : tr("Send invite"), async () => {
+      // Open the WhatsApp window inside the tap so the phone doesn't block it.
+      const win = window.open("", "_blank");
+      button.disabled = true;
+      try {
+        const res = await supabaseRequest("rpc/create_claim_code", { method: "POST", body: JSON.stringify({ p_tenant_id: tenant.id }) });
+        const code = String(await res.json());
+        const link = whatsappLink(tenant.phone, inviteWhatsAppMessage(tenant, code));
+        if (win) win.location.href = link;
+        else window.open(link, "_blank", "noopener");
+        button.textContent = tr("Sent ✓");
+      } catch (error) {
+        if (win) win.close();
+        button.disabled = false;
+        showToast(describeSyncProblem(error), 6000);
+      }
+    });
+    return mk("div", { className: "health-row" },
+      mk("span", {}, mk("strong", { text: `${tenant.unit || ""} · ${tenant.name}` }), status),
+      button);
+  });
+  openToolDialog(tr("Invite all tenants"),
+    note(tr("Each tenant gets their own one-time code on WhatsApp, with the link and how to add the app to their home screen. Tap Send for each one.")),
+    mk("div", { className: "history-list compact" }, rows),
+    mk("div", { className: "button-row" }, secondaryButton(tr("Done"), () => { closeToolDialog(); refreshTenantLinks(); })));
+}
+
+// ── How a payment was made, where an expense was paid from ──────────────────
+const PAYMENT_METHODS = [["cash", "Cash"], ["bank", "Bank transfer"], ["omt", "OMT"], ["whish", "Whish"], ["cheque", "Cheque"]];
+// OMT is picked up as cash; transfers, Whish and cheques land in the bank/wallet.
+const METHOD_ACCOUNT = { cash: "cash", omt: "cash", bank: "bank", whish: "bank", cheque: "bank" };
+
+function methodLabel(method) {
+  return tr((PAYMENT_METHODS.find(([v]) => v === method) || [null, method])[1] || "");
+}
+
+function transactionAccount(t) {
+  if (t.category === "Payments" || t.category === "Advance Payments") return METHOD_ACCOUNT[t.method] || "cash";
+  if (t.category === "Expenses" || t.category === "Services Expenses") return t.paidFrom === "bank" ? "bank" : "cash";
+  return t.account === "bank" ? "bank" : "cash";
+}
+
+// What the books say is in the cash box and in the bank/wallets on a date.
+function expectedByAccount(date) {
+  const totals = { cash: 0, bank: 0 };
+  state.transactions
+    .filter((t) => !(t.category === "Opening Balance" && t.tenantId))
+    .filter((t) => String(transactionDateValue(t)) <= date)
+    .forEach((t) => { totals[transactionAccount(t)] += transactionNetUsd(t); });
+  return { cash: roundUsd(totals.cash), bank: roundUsd(totals.bank) };
+}
+
+// ── "Who paid?" checklist ───────────────────────────────────────────────────
+function openWhoPaidDialog() {
+  if (sessionMode !== "owner") return;
+  const month = selectedMonth || currentMonthValue();
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const tenants = state.tenants.filter((t) => t.active !== false)
+    .slice().sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || ""), undefined, { numeric: true }));
+  const rows = tenants.map((tenant) => {
+    const owed = roundUsd(Math.max(0, getTenantBalance(tenant.id)));
+    const tick = mk("input", { type: "checkbox", className: "recurring-tick" });
+    const amount = mk("input", { type: "number", className: "recurring-amount", min: "0", step: "0.01", inputmode: "decimal", value: owed ? owed.toFixed(2) : "" });
+    const method = selectInput(PAYMENT_METHODS.map(([v, l]) => [v, tr(l)]), "cash");
+    method.className = "whopaid-method";
+    amount.addEventListener("input", () => { tick.checked = Number(amount.value || 0) > 0; });
+    const row = mk("div", { className: "whopaid-row" },
+      tick,
+      mk("div", { className: "recurring-text" }, mk("strong", { text: `${tenant.unit || ""} · ${tenant.name}` }), mk("span", { text: owed ? tr("Owes {amount}", { amount: formatUsd(owed) }) : tr("Nothing due") })),
+      amount, method);
+    return { tenant, tick, amount, method, row };
+  });
+  const save = () => {
+    const chosen = rows.filter((r) => r.tick.checked && Number(r.amount.value || 0) > 0);
+    if (!chosen.length) { showToast("Tick at least one tenant with an amount"); return; }
+    const day = date.value || localDateInput();
+    if (isMonthClosed(day)) { showToast(closedMonthError(day).message, 5000); return; }
+    const created = [];
+    chosen.forEach((r, i) => {
+      const value = roundUsd(Number(r.amount.value));
+      const groupId = `pay-${Date.now()}-${i}`;
+      const payment = {
+        id: `${groupId}-01`, category: "Payments", description: r.tenant.name, tenantId: r.tenant.id, forMonth: month, project: "",
+        date: day, supplier: "", invoice: "", expenseCategory: "", serviceType: "", servicePart: "",
+        debitUsd: 0, debitLbp: 0, creditUsd: value, creditLbp: 0, balanceUsd: value, balanceLbp: 0,
+        invoiceAttachment: null, sourceRow: null, paymentGroupId: groupId, method: r.method.value,
+      };
+      payment.receiptRef = nextReceiptReference(day);
+      state.transactions.push(payment);
+      created.push(payment);
+    });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    created.forEach((p) => notifyTenants(p.tenantId, tr("Payment received"), tr("{amount} recorded — thank you.", { amount: formatUsd(p.creditUsd) })));
+    showToast(tr(created.length === 1 ? "{n} payment recorded with its receipt" : "{n} payments recorded with their receipts", { n: created.length }));
+  };
+  openToolDialog(tr("Who paid? — {month}", { month: formatMonth(month) }),
+    note(tr("Tick everyone who paid and check the amount. Each payment gets its own receipt.")),
+    field(tr("Date received"), date),
+    mk("div", { className: "recurring-list" }, rows.map((r) => r.row)),
+    mk("div", { className: "button-row" }, primaryButton(tr("Record payments"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Receipts on the tenant's own phone ──────────────────────────────────────
+function tenantRecentPaymentsCard() {
+  const mine = state.transactions
+    .filter((t) => t.tenantId === sessionTenantId && isReceiptablePayment(t))
+    .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
+    .slice(0, 3);
+  if (!mine.length) return null;
+  return mk("article", { className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Your recent payments") })),
+    mine.map((t) => mk("div", { className: "health-row plain" },
+      mk("span", { text: `${formatDateLabel(t.date)} · ${formatUsd(transactionNetUsd(t))}${t.method ? ` · ${methodLabel(t.method)}` : ""}` }),
+      miniButton(tr("Receipt"), () => { void sharePaymentReceiptPdf(t.id); }))));
+}
+
+// ── Unit details (owner only) ───────────────────────────────────────────────
+const UNIT_DETAIL_FIELDS = [
+  ["phone2", "Second phone"],
+  ["residents", "Number of residents"],
+  ["parking", "Parking spot / car plate"],
+  ["emergency", "Emergency contact"],
+  ["notes", "Notes"],
+];
+
+function openUnitDetailsDialog(tenantId) {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant || sessionMode !== "owner") return;
+  const details = tenant.details || {};
+  const inputs = Object.fromEntries(UNIT_DETAIL_FIELDS.map(([key]) => [key, key === "notes"
+    ? Object.assign(mk("textarea", { rows: "3", maxlength: "600" }), { value: details.notes || "" })
+    : textInput(details[key] || "", { maxlength: "120", ...(key === "residents" ? { inputmode: "numeric" } : {}) })]));
+  const save = () => {
+    const next = {};
+    UNIT_DETAIL_FIELDS.forEach(([key]) => { const v = String(inputs[key].value || "").trim(); if (v) next[key] = v; });
+    tenant.details = next;
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showToast("Unit details saved");
+  };
+  openToolDialog(tr("Unit {unit} — details", { unit: tenant.unit || "" }),
+    note(tr("Only you see these.")),
+    UNIT_DETAIL_FIELDS.map(([key, label]) => field(tr(label), inputs[key])),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -13104,6 +13378,9 @@ export const __test = {
   photoBackupDue,
   v155AttentionItems,
   attentionKey,
+  transactionAccount,
+  expectedByAccount,
+  methodLabel,
   isAttentionHidden,
   stampLbpRates,
   dataHealthIssues,
