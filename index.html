@@ -100,8 +100,6 @@
               <h2 id="dashboardTitle" data-i18n="dash.title">Account Position</h2>
             </div>
           </div>
-          <div class="month-chips segmented on-card" id="monthChips" role="tablist" aria-label="Month"></div>
-
           <section class="panel owner-only hidden" id="attentionPanel">
             <div class="panel-header">
               <h3 data-i18n="attention.title">Needs Attention</h3>
@@ -126,21 +124,11 @@
           <section class="panel building-wide">
             <div class="panel-header">
               <h3 data-i18n="financial.title">Building Financial Position</h3>
+              <span class="panel-note" id="positionAsOf"></span>
             </div>
             <div class="kpi-grid" id="kpiGrid"></div>
           </section>
 
-          <div id="newMonthBanner" class="new-month-banner hidden" role="alert">
-            <div class="new-month-banner-top">
-              <span class="new-month-banner-icon" id="newMonthBannerIcon"></span>
-              <div class="new-month-banner-body">
-                <strong id="newMonthBannerTitle"></strong>
-                <span id="newMonthBannerText"></span>
-              </div>
-              <button id="newMonthBannerDismiss" class="new-month-banner-dismiss" type="button" aria-label="Dismiss" data-i18n-aria="common.dismiss">&#x2715;</button>
-            </div>
-            <button id="newMonthBannerAdd" class="primary-button block-button" type="button" data-i18n="newMonth.add">Add Month</button>
-          </div>
 
           <section class="panel owner-only hidden" id="declarationsPanel">
             <div class="panel-header">
@@ -161,6 +149,26 @@
             <div class="tenant-status-grid" id="tenantStatusGrid"></div>
           </section>
 
+
+          <div id="monthSection">
+          <div class="section-title month-section-title" id="monthSectionHead">
+            <div>
+              <p class="eyebrow" data-i18n="dash.monthByMonth">Month by month</p>
+              <h2 id="monthSectionTitle"></h2>
+            </div>
+          </div>
+          <div class="month-chips segmented on-card" id="monthChips" role="tablist" aria-label="Month"></div>
+          <div id="newMonthBanner" class="new-month-banner hidden" role="alert">
+            <div class="new-month-banner-top">
+              <span class="new-month-banner-icon" id="newMonthBannerIcon"></span>
+              <div class="new-month-banner-body">
+                <strong id="newMonthBannerTitle"></strong>
+                <span id="newMonthBannerText"></span>
+              </div>
+              <button id="newMonthBannerDismiss" class="new-month-banner-dismiss" type="button" aria-label="Dismiss" data-i18n-aria="common.dismiss">&#x2715;</button>
+            </div>
+            <button id="newMonthBannerAdd" class="primary-button block-button" type="button" data-i18n="newMonth.add">Add Month</button>
+          </div>
           <section class="panel hidden" id="sharedExpensesPanel">
             <div class="panel-header">
               <h3 data-i18n="monthlyServices.title">Monthly Services Expenses</h3>
@@ -187,6 +195,7 @@
             </div>
             <div class="summary-list" id="expenseByCategoryList"></div>
           </section>
+          </div>
         </section>
 
         <section class="view" id="paymentsView" aria-labelledby="paymentsTitle">

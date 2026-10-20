@@ -4271,3 +4271,12 @@ a.mini-button {
   color: var(--muted, #61706b);
   font-size: 0.88rem;
 }
+
+/* v162 dashboard: month-dependent panels grouped under their own picker. */
+.month-section-title {
+  margin-top: 26px;
+}
+.panel-note {
+  color: var(--muted, #61706b);
+  font-size: 0.85rem;
+}

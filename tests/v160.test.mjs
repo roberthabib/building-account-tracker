@@ -43,3 +43,11 @@ test("the tour reminder shows until the tour has been opened", () => {
   assert.deepEqual(app.v160AttentionItems(), []);
   localStorage.removeItem(app.HELP_WATCHED_KEY);
 });
+
+test("v162: the expenses card counts only this calendar year", () => {
+  const year = new Date().getFullYear();
+  const exp = (id, date, usd, category = "Expenses") => ({ id, category, date, debitUsd: usd, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -usd, balanceLbp: 0 });
+  app.setState(baseState({ transactions: [exp("a", `${year}-01-05`, 100), exp("b", `${year}-06-01`, 40, "Services Expenses"), exp("c", `${year - 1}-12-31`, 999)] }));
+  assert.equal(app.expensesThisYearUsd(), 140);
+  assert.equal(app.expensesThisYearUsd(String(year - 1)), 999);
+});

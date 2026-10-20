@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v161";
+const APP_VERSION = "v162";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -499,6 +499,7 @@ const I18N = {
     "nav.settings": "Settings",
     // Dashboard
     "dash.eyebrow": "Overview",
+    "dash.monthByMonth": "Month by month",
     "dash.title": "Account Position",
     "attention.title": "Needs Attention",
     "tenantDues.title": "My Outstanding Dues",
@@ -871,6 +872,7 @@ const I18N = {
     "nav.settings": "الإعدادات",
     // Dashboard
     "dash.eyebrow": "نظرة عامة",
+    "dash.monthByMonth": "شهراً بشهر",
     "dash.title": "وضع الحساب",
     "attention.title": "يحتاج انتباهاً",
     "tenantDues.title": "مستحقاتي المتبقية",
@@ -1128,6 +1130,8 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Expenses this year": "مصاريف هذه السنة",
+  "Since 1 January {year}": "منذ 1 كانون الثاني {year}",
   "A quick tour": "جولة سريعة",
   "Where everything is in the app": "أين تجد كل شيء في التطبيق",
   "Record a payment": "تسجيل دفعة",
@@ -4003,7 +4007,13 @@ function renderMonthSelect() {
   );
   // Keep the active chip in view.
   const active = els.monthChips.querySelector(".is-active");
-  if (active) active.scrollIntoView({ inline: "center", block: "nearest" });
+  if (active && typeof active.getBoundingClientRect === "function" && typeof els.monthChips.scrollBy === "function") {
+    const chip = active.getBoundingClientRect();
+    const strip = els.monthChips.getBoundingClientRect();
+    els.monthChips.scrollBy({ left: chip.left + chip.width / 2 - (strip.left + strip.width / 2) });
+  }
+  const title = document.querySelector("#monthSectionTitle");
+  if (title) title.textContent = selectedMonth ? formatMonth(selectedMonth) : "";
 }
 
 function hasPaymentInMonth(month) {
@@ -4457,20 +4467,22 @@ function renderDashboard() {
   }
 
   const totals = getPositionTotals();
-  const totalExpenses = roundUsd(state.transactions.filter((t) => t.category === "Expenses" || t.category === "Services Expenses").reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0));
+  const yearExpenses = expensesThisYearUsd();
+  const asOf = document.querySelector("#positionAsOf");
+  if (asOf) asOf.textContent = tr("As of {date}", { date: formatDateLabel(localDateInput()) });
   const cashNegative = totals.cashUsd < -0.005 ? "is-negative" : "";
   const outstandingAmber = totals.receivableUsd > 0.005 ? "is-amber" : "";
   els.kpiGrid.replaceChildren(...buildKpiCards(
     isFixedMode()
       ? [
           { label: "Reserve Fund", value: formatUsd(totals.cashUsd), note: "Collected funds minus expenses", valueClass: cashNegative },
-          { label: "Total Expenses", value: formatUsd(totalExpenses), note: "All recorded building costs" },
+          { label: "Expenses this year", value: formatUsd(yearExpenses), note: tr("Since 1 January {year}", { year: new Date().getFullYear() }) },
           { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Tenant dues owed", valueClass: outstandingAmber },
           { label: "Net Position", value: formatUsd(totals.netPositionUsd), note: "Reserve + outstanding - credits", hero: true },
         ]
       : [
           { label: "Cash Balance", value: formatUsd(totals.cashUsd), note: "Ledger net cash", valueClass: cashNegative },
-          { label: "Total Expenses", value: formatUsd(totalExpenses), note: "All shared building costs" },
+          { label: "Expenses this year", value: formatUsd(yearExpenses), note: tr("Since 1 January {year}", { year: new Date().getFullYear() }) },
           { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Tenant balances owed", valueClass: outstandingAmber },
           { label: "Net Position", value: formatUsd(totals.netPositionUsd), note: "Cash + outstanding - credits", hero: true },
         ],
@@ -4485,6 +4497,28 @@ function renderDashboard() {
   els.categorySummary.closest(".panel").classList.remove("hidden");
   renderCategorySummary();
   renderExpenseCategoryBreakdown();
+  updateMonthSectionHead();
+}
+
+// Building costs (expenses + services) dated this calendar year.
+function expensesThisYearUsd(year = String(new Date().getFullYear())) {
+  return roundUsd(state.transactions
+    .filter((t) => (t.category === "Expenses" || t.category === "Services Expenses") && String(transactionDateValue(t)).startsWith(`${year}-`))
+    .reduce((sum, t) => sum + txUsd(t, t.debitUsd, t.debitLbp), 0));
+}
+
+// The month picker only makes sense when a month panel is showing (a tenant
+// phone, for instance, may have none).
+function updateMonthSectionHead() {
+  const head = document.querySelector("#monthSectionHead");
+  if (!head) return;
+  const tenantPhone = document.body.classList.contains("tenant-phone");
+  const shown = ["#sharedExpensesPanel", "#expenseByCategoryPanel", "#categorySummary"]
+    .map((sel) => document.querySelector(sel))
+    .map((el) => (el && el.id === "categorySummary" ? el.closest(".panel") : el))
+    .some((panel) => panel && !panel.classList.contains("hidden") && !(tenantPhone && panel.classList.contains("building-wide")));
+  head.classList.toggle("hidden", !shown);
+  els.monthChips.classList.toggle("hidden", !shown);
 }
 
 function checkNewMonthBanner() {
@@ -14342,6 +14376,7 @@ export const __test = {
   yearFullyClosed,
   v158AttentionItems,
   v160AttentionItems,
+  expensesThisYearUsd,
   helpVideosFor,
   formatVideoLength,
   helpVideoUrl,
