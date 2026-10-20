@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v148";
+const APP_VERSION = "v149";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -170,6 +170,7 @@ const els = {
   loginTenantLinked: document.querySelector("#loginTenantLinked"),
   tenantCoefficientHint: document.querySelector("#tenantCoefficientHint"),
   whatsappGroupButton: document.querySelector("#whatsappGroupButton"),
+  whatsappGroupTextButton: document.querySelector("#whatsappGroupTextButton"),
   inviteWhatsAppButton: document.querySelector("#inviteWhatsAppButton"),
   recurringExpenseRow: document.querySelector("#recurringExpenseRow"),
   recurringExpenseInput: document.querySelector("#recurringExpenseInput"),
@@ -391,7 +392,8 @@ const I18N = {
     "poll.byShare": "By ownership share (coefficient)",
     "poll.closes": "Voting closes on (optional)",
     "poll.quorum": "Minimum turnout % (optional)",
-    "wa.groupButton": "Post all balances to the building group",
+    "wa.groupButton": "Share balances PDF with the building group",
+    "wa.groupText": "Send as text instead",
     "invite.whatsapp": "Send on WhatsApp",
     "tx.repeatMonthly": "Repeat every month (salary, cleaning, internet…)",
     "set.recurringTitle": "Monthly recurring expenses",
@@ -737,7 +739,8 @@ const I18N = {
     "poll.byShare": "حسب حصة الملكية (المعامل)",
     "poll.closes": "يُغلق التصويت في (اختياري)",
     "poll.quorum": "الحد الأدنى للمشاركة % (اختياري)",
-    "wa.groupButton": "نشر كل الأرصدة في مجموعة المبنى",
+    "wa.groupButton": "مشاركة ملف PDF بالأرصدة مع مجموعة المبنى",
+    "wa.groupText": "الإرسال كنص بدلاً من ذلك",
     "invite.whatsapp": "إرسال عبر واتساب",
     "tx.repeatMonthly": "تكرار كل شهر (راتب، تنظيف، إنترنت…)",
     "set.recurringTitle": "المصاريف الشهرية المتكررة",
@@ -1075,6 +1078,21 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Building balances": "أرصدة المبنى",
+  "As of {date}": "بتاريخ {date}",
+  "Total outstanding": "إجمالي المستحق",
+  "Up to date": "المسدِّدون",
+  "{n} of {total} units": "{n} من {total} وحدات",
+  "Tenant credit": "أرصدة دائنة للمستأجرين",
+  "In credit": "رصيد دائن",
+  "Paid up": "مسدَّد",
+  "{building} — balances (continued)": "{building} — الأرصدة (تابع)",
+  "Balances include monthly charges, generator and water up to today.": "تشمل الأرصدة الرسوم الشهرية والمولد والمياه حتى اليوم.",
+  "For any question about your balance, contact the building owner.": "لأي سؤال عن رصيدك، تواصل مع مالك المبنى.",
+  "{building} · {date}": "{building} · {date}",
+  "(PDF attached)": "(ملف PDF مرفق)",
+  "Balances PDF shared": "تمت مشاركة ملف الأرصدة",
+  "Balances PDF downloaded — attach it in the WhatsApp group": "تم تنزيل ملف الأرصدة — أرفقه في مجموعة واتساب",
   "You have view-only access. Changes aren't saved.": "لديك صلاحية الاطلاع فقط. لا تُحفظ التغييرات.",
   "{month} is closed. Reopen it in Reports before changing it.": "شهر {month} مُقفل. أعد فتحه من التقارير قبل تعديله.",
   "Reopen {month}? Its figures can then be changed again.": "إعادة فتح شهر {month}؟ يمكن بعدها تعديل أرقامه من جديد.",
@@ -5423,8 +5441,10 @@ function pdfNeedsImage(text) {
   return /[^\x20-\x7E]/.test(text);
 }
 
-function pdfTextImageCommand(text, x, y, size, bold) {
-  const key = `${bold ? 1 : 0}|${size}|${text}`;
+function pdfTextImageCommand(text, x, y, size, bold, style = null) {
+  const background = style?.bg || "#ffffff";
+  const ink = style?.color || "#111111";
+  const key = `${bold ? 1 : 0}|${size}|${background}|${ink}|${text}`;
   let img = pdfTextImageCache.get(key);
   if (!img) {
     const canvas = document.createElement("canvas");
@@ -5440,10 +5460,10 @@ function pdfTextImageCommand(text, x, y, size, bold) {
     const height = ascent + descent;
     canvas.width = width;
     canvas.height = height;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = background;
     ctx.fillRect(0, 0, width, height);
     ctx.font = font;
-    ctx.fillStyle = "#111111";
+    ctx.fillStyle = ink;
     ctx.textBaseline = "alphabetic";
     ctx.direction = rtl ? "rtl" : "ltr";
     ctx.textAlign = rtl ? "right" : "left";
@@ -5474,7 +5494,12 @@ function takePdfTextImages() {
 function pdfImagesFirst(content) {
   const lines = content.split("\n");
   const isImage = (line) => /^q .* \/Tx\d+ Do Q$/.test(line);
-  return [...lines.filter(isImage), ...lines.filter((line) => !isImage(line))].join("\n");
+  const isFill = (line) => /^q [\d.]+ [\d.]+ [\d.]+ rg [-\d. ]+ re f Q$/.test(line);
+  return [
+    ...lines.filter(isFill),
+    ...lines.filter(isImage),
+    ...lines.filter((line) => !isImage(line) && !isFill(line)),
+  ].join("\n");
 }
 
 function pdfImageObject(img) {
@@ -5607,13 +5632,33 @@ function buildMultiPagePdf(pageContents) {
   return new Blob([pdf], { type: PDF_MIME });
 }
 
-function pdfTextCommand(text, x, y, size = 10, bold = false) {
+// style (optional): { color: "#rrggbb", bg: "#rrggbb" } — bg is the colour the
+// text sits on, so text drawn as an image blends into a filled box.
+function pdfTextCommand(text, x, y, size = 10, bold = false, style = null) {
   // Labels are written in English in the builders; in Arabic, exact labels
   // ("Monthly Dues", "Paid", …) translate here. Data (names, amounts) has no
   // dictionary entry and passes through unchanged.
   const shown = pdfSafeText(currentLang === "ar" ? tr(String(text ?? "")) : text);
-  if (pdfNeedsImage(shown)) return pdfTextImageCommand(shown, x, y, size, bold);
-  return `BT /${bold ? "F2" : "F1"} ${size} Tf ${x} ${y} Td (${pdfEscape(shown)}) Tj ET`;
+  if (pdfNeedsImage(shown)) return pdfTextImageCommand(shown, x, y, size, bold, style);
+  const op = `BT /${bold ? "F2" : "F1"} ${size} Tf ${x} ${y} Td (${pdfEscape(shown)}) Tj ET`;
+  return style?.color ? `q ${pdfColor(style.color)} rg ${op} Q` : op;
+}
+
+function pdfColor(hex) {
+  const n = parseInt(String(hex).replace("#", ""), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => (v / 255).toFixed(3)).join(" ");
+}
+
+// Filled boxes are moved in front of everything else (see pdfImagesFirst), so
+// text and lines always land on top of them.
+function pdfFillRect(x, y, width, height, hex) {
+  return `q ${pdfColor(hex)} rg ${x} ${y} ${width} ${height} re f Q`;
+}
+
+// Helvetica advance widths (per 1pt of font size) for right-aligning amounts.
+function pdfTextWidth(text, size) {
+  const narrow = { ",": 0.278, ".": 0.278, " ": 0.278, "-": 0.333, "+": 0.584 };
+  return [...String(text)].reduce((w, ch) => w + (narrow[ch] ?? 0.556), 0) * size;
 }
 
 function pdfRectCommand(x, y, width, height) {
@@ -7950,9 +7995,144 @@ function openWhatsAppReminderDialog() {
   openDialog(els.whatsappDialog);
 }
 
-function postBalancesToGroup() {
+function postBalancesAsText() {
   window.open(whatsappLink("", buildGroupBalancesMessage()), "_blank", "noopener");
   markRemindersSent();
+}
+
+// Everyone's position on one designed page (more pages for big buildings):
+// header, three summary cards, then one colour-coded row per unit.
+function buildGroupBalancesPdf() {
+  const C = {
+    green: "#163832", primary: "#1f6b5a", tint: "#eef4ef", zebra: "#f6f9f7", white: "#ffffff", ink: "#14211f",
+    muted: "#61706b", soft: "#cfe3db", red: "#a23b3b", redBg: "#f6dede", okText: "#0f513f", okBg: "#dcefe8",
+    blue: "#315f9d", blueBg: "#e3ecf7", amber: "#6e4410", amberBg: "#f7e6c7",
+  };
+  const W = 595;
+  const left = 40;
+  const right = 555;
+  const ROW = 26;
+  const rows = state.tenants
+    .filter((t) => t.active !== false)
+    .slice()
+    .sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || ""), undefined, { numeric: true }))
+    .map((t) => {
+      const { dueUsd, advanceUsd } = getTenantTotals(t.id);
+      const status = dueUsd > 0.005 ? (activePlanFor(t.id) ? "plan" : "due") : advanceUsd > 0.005 ? "credit" : "paid";
+      return { tenant: t, dueUsd, advanceUsd, status };
+    });
+  const totalDue = roundUsd(rows.reduce((s, r) => s + r.dueUsd, 0));
+  const totalCredit = roundUsd(rows.reduce((s, r) => s + (r.status === "credit" ? r.advanceUsd : 0), 0));
+  const upToDate = rows.filter((r) => r.status === "paid" || r.status === "credit").length;
+  const dateLabel = formatDateLabel(localDateInput());
+  const PILL = {
+    due: ["Due", C.redBg, C.red],
+    plan: ["Payment plan", C.amberBg, C.amber],
+    credit: ["In credit", C.blueBg, C.blue],
+    paid: ["Paid up", C.okBg, C.okText],
+  };
+
+  const pages = [];
+  let cmds;
+  let y;
+  const text = (value, x, ty, size, bold, color, bg) => cmds.push(pdfTextCommand(value, x, ty, size, bold, { color, bg }));
+  // Arabic is drawn as an image whose width is only known later: estimate it.
+  const widthOf = (value, size) => (pdfNeedsImage(pdfSafeText(currentLang === "ar" ? tr(String(value)) : value)) ? String(currentLang === "ar" ? tr(String(value)) : value).length * size * 0.5 : pdfTextWidth(value, size));
+  const textRight = (value, xr, ty, size, bold, color, bg) => text(value, (xr - widthOf(value, size)).toFixed(2), ty, size, bold, color, bg);
+
+  function tableHeader() {
+    cmds.push(pdfFillRect(left, y - 24, right - left, 24, C.green));
+    [["Unit", left + 12], ["Tenant", left + 74], ["Status", left + 300]].forEach(([label, x]) => text(label, x, y - 16, 9, true, C.white, C.green));
+    textRight("Amount", right - 12, y - 16, 9, true, C.white, C.green);
+    y -= 24;
+  }
+
+  function startPage(first) {
+    if (cmds) pages.push(`${cmds.join("\n")}\n`);
+    cmds = ["0.4 w"];
+    if (first) {
+      cmds.push(pdfFillRect(0, 742, W, 100, C.green));
+      text(state.building?.name || "", left, 806, 12, true, C.soft, C.green);
+      text("Building balances", left, 776, 24, true, C.white, C.green);
+      text(tr("As of {date}", { date: dateLabel }), left, 756, 10, false, C.soft, C.green);
+      // Summary cards
+      const gap = 12;
+      const cardW = (right - left - gap * 2) / 3;
+      const cards = [
+        ["Total outstanding", formatUsd(totalDue), totalDue > 0.005 ? C.red : C.okText],
+        ["Up to date", tr("{n} of {total} units", { n: upToDate, total: rows.length }), C.okText],
+        ["Tenant credit", formatUsd(totalCredit), C.blue],
+      ];
+      cards.forEach(([label, value, color], i) => {
+        const x = left + i * (cardW + gap);
+        cmds.push(pdfFillRect(x.toFixed(2), 662, cardW.toFixed(2), 60, C.tint));
+        cmds.push(pdfFillRect(x.toFixed(2), 662, 4, 60, color));
+        text(label, (x + 14).toFixed(2), 702, 9, false, C.muted, C.tint);
+        text(value, (x + 14).toFixed(2), 676, 17, true, color, C.tint);
+      });
+      y = 640;
+    } else {
+      text(tr("{building} — balances (continued)", { building: state.building?.name || "" }), left, 806, 11, true, C.ink);
+      y = 790;
+    }
+    tableHeader();
+  }
+
+  startPage(true);
+  rows.forEach((row, index) => {
+    if (y - ROW < 120) startPage(false);
+    const bg = index % 2 ? C.zebra : C.white;
+    if (bg !== C.white) cmds.push(pdfFillRect(left, y - ROW, right - left, ROW, bg));
+    const base = y - 17;
+    text(row.tenant.unit || "", left + 12, base, 10, true, C.ink, bg);
+    text(pdfClip(row.tenant.name, 38), left + 74, base, 10, false, C.ink, bg);
+    const [label, pillBg, pillInk] = PILL[row.status];
+    const pillW = Math.max(52, widthOf(label, 8) + 16);
+    cmds.push(pdfFillRect(left + 296, y - 19, pillW.toFixed(2), 15, pillBg));
+    text(label, left + 304, y - 15, 8, true, pillInk, pillBg);
+    const amount = row.dueUsd > 0.005 ? formatUsd(row.dueUsd) : row.status === "credit" ? `+${formatUsd(row.advanceUsd)}` : formatUsd(0);
+    const amountInk = row.dueUsd > 0.005 ? C.red : row.status === "credit" ? C.blue : C.okText;
+    textRight(amount, right - 12, base, 10, true, amountInk, bg);
+    y -= ROW;
+  });
+
+  // Total
+  cmds.push(`q ${pdfColor(C.green)} RG 1.2 w ${left} ${y - 4} m ${right} ${y - 4} l S Q`);
+  text("Total outstanding", left + 12, y - 22, 11, true, C.ink);
+  textRight(formatUsd(totalDue), right - 12, y - 22, 12, true, totalDue > 0.005 ? C.red : C.okText);
+
+  // Footer
+  text("Balances include monthly charges, generator and water up to today.", left, 74, 8.5, false, C.muted);
+  text("For any question about your balance, contact the building owner.", left, 61, 8.5, false, C.muted);
+  cmds.push(`q ${pdfColor(C.soft)} RG 0.6 w ${left} 48 m ${right} 48 l S Q`);
+  text(tr("{building} · {date}", { building: state.building?.name || "", date: dateLabel }), left, 34, 8, false, C.muted);
+  pages.push(`${cmds.join("\n")}\n`);
+  return buildMultiPagePdf(pages);
+}
+
+async function postBalancesToGroup() {
+  const pdf = buildGroupBalancesPdf();
+  const caption = tr("{building} — balances as of {date}", { building: state.building?.name || "", date: formatDateLabel(localDateInput()) });
+  const fileName = `Balances_${safeFilePart(state.building?.name || "Building", "Building")}_${localDateInput()}.pdf`;
+  try {
+    if (typeof navigator.share === "function" && typeof File === "function") {
+      const file = new File([pdf], fileName, { type: PDF_MIME });
+      if (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: caption, text: caption });
+        markRemindersSent();
+        showToast("Balances PDF shared");
+        return;
+      }
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") { showToast("Sharing cancelled"); return; }
+  }
+  // No file sharing here (e.g. a computer): save the PDF and open WhatsApp so
+  // it can be attached in the group.
+  downloadBlob(pdf, PDF_MIME, fileName);
+  window.open(whatsappLink("", `${caption}\n${tr("(PDF attached)")}`), "_blank", "noopener");
+  markRemindersSent();
+  showToast("Balances PDF downloaded — attach it in the WhatsApp group", 6000);
 }
 
 function inviteWhatsAppMessage(tenant, code) {
@@ -10118,6 +10298,7 @@ function attachEvents() {
   els.inviteTenantSelect.addEventListener("change", resetInviteResult);
   els.cloudBackupsButton.addEventListener("click", openBackupsDialog);
   els.whatsappGroupButton.addEventListener("click", postBalancesToGroup);
+  els.whatsappGroupTextButton?.addEventListener("click", postBalancesAsText);
   els.inviteWhatsAppButton.addEventListener("click", sendInviteOnWhatsApp);
   els.tenantCoefficientInput.addEventListener("input", renderTenantCoefficientHint);
   els.recurringSettingsButton.addEventListener("click", () => openRecurringDialog());
@@ -12098,6 +12279,7 @@ export const __test = {
   whatsappPhone,
   whatsappLink,
   buildGroupBalancesMessage,
+  buildGroupBalancesPdf,
   pendingRecurringExpenses,
   addRecurringTemplateFrom,
   collectFullExportData,

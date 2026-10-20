@@ -4004,3 +4004,9 @@ body.tenant-phone #createPollButton {
     font-size: 13pt;
   }
 }
+
+/* Reminders dialog: the text version of the group post, under the PDF button. */
+.whatsapp-group-text-btn {
+  display: block;
+  margin: -6px auto 12px;
+}

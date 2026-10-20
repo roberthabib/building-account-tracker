@@ -82,3 +82,23 @@ test("money shows real cents, never a rounded dollar or -$0.00", () => {
   assert.equal(app.formatUsd(-0.001), "$0.00");
   assert.equal(app.formatUsd(null), "$0.00");
 });
+
+test("group balances PDF lists every active unit with its amount and the total", async () => {
+  app.setState(baseState({
+    building: { name: "Test Bldg" },
+    tenants: [T("a", 600, { unit: "1A", name: "Alice" }), T("b", 400, { unit: "2B", name: "Bob" }), T("g", 0, { unit: "3C", name: "Gone", active: false })],
+    transactions: [
+      { id: "e1", category: "Expenses", date: "2026-09-02", debitUsd: 100, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -100, balanceLbp: 0, shares: { a: 60, b: 40 } },
+      { id: "p1", category: "Payments", tenantId: "b", date: "2026-09-10", forMonth: "2026-09-01", creditUsd: 50, creditLbp: 0, debitUsd: 0, debitLbp: 0, balanceUsd: 50, balanceLbp: 0 },
+    ],
+  }));
+  const pdf = await app.buildGroupBalancesPdf().text();
+  assert.ok(pdf.startsWith("%PDF-1.4"));
+  for (const expected of ["Building balances", "(1A)", "(Alice)", "($60.00)", "(+$10.00)", "(In credit)", "(Due)", "(Total outstanding)"]) {
+    assert.ok(pdf.includes(expected), `missing ${expected}`);
+  }
+  assert.ok(!pdf.includes("(Gone)"), "inactive tenants are left out");
+  const fills = pdf.split("\n").findIndex((l) => / re f Q$/.test(l));
+  const firstText = pdf.split("\n").findIndex((l) => l.includes(" Tj ET"));
+  assert.ok(fills < firstText, "coloured boxes are drawn before any text");
+});
