@@ -860,30 +860,6 @@ label select {
   color: #772c2c;
 }
 
-.payment-month-row {
-  width: 100%;
-  border-color: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--ink);
-  text-align: left;
-}
-
-.month-progress {
-  min-width: 90px;
-  text-align: right;
-}
-
-.month-progress b {
-  display: block;
-}
-
-.month-progress small {
-  color: var(--muted);
-  font-size: 0.76rem;
-}
-
 .tenant-card {
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -4279,4 +4255,70 @@ a.mini-button {
 .panel-note {
   color: var(--muted, #61706b);
   font-size: 0.85rem;
+}
+
+/* v163 Payments → Month History */
+.mh-hint {
+  margin: -4px 0 6px;
+  color: var(--label-muted, #61706b);
+  font-size: 0.8rem;
+}
+.month-history-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 12px;
+  border: 0;
+  border-top: 1px solid var(--line-inner, #e4e9e4);
+  border-radius: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.month-history-row:first-child {
+  border-top: 0;
+}
+.month-history-row.is-selected {
+  border-radius: 14px;
+  background: var(--surface-2, #eef4ef);
+}
+.month-history-row.is-selected + .month-history-row {
+  border-top-color: transparent;
+}
+.mh-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.mh-top strong {
+  font-size: 1rem;
+  font-weight: 800;
+}
+.mh-bar {
+  display: block;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--line-inner, #e4e9e4);
+  overflow: hidden;
+}
+.mh-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: #c9a227;
+}
+.mh-bar-fill.is-done {
+  background: var(--primary);
+}
+.mh-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--label-muted, #61706b);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
 }

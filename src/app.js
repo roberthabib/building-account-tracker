@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v162";
+const APP_VERSION = "v163";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -521,6 +521,7 @@ const I18N = {
     "pay.statusTitle": "Monthly Payment Status",
     "pay.servicesStatusTitle": "Monthly Services Expenses Status",
     "pay.monthHistory": "Month History",
+    "pay.monthHistoryHint": "Tap a month to see who paid.",
     // Tenants view
     "ten.eyebrow": "Residents",
     "ten.title": "Tenant Accounts",
@@ -894,6 +895,7 @@ const I18N = {
     "pay.statusTitle": "حالة الدفع الشهري",
     "pay.servicesStatusTitle": "حالة مصاريف الخدمات الشهرية",
     "pay.monthHistory": "سجل الأشهر",
+    "pay.monthHistoryHint": "اضغط على شهر لترى من دفع.",
     // Tenants view
     "ten.eyebrow": "السكان",
     "ten.title": "حسابات المستأجرين",
@@ -1130,6 +1132,10 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "All paid": "الكل دفع",
+  "{n} of {m} paid": "{n} من {m} دفعوا",
+  "{collected} of {expected} collected": "حُصّل {collected} من {expected}",
+  "Spent {amount}": "صُرف {amount}",
   "Expenses this year": "مصاريف هذه السنة",
   "Since 1 January {year}": "منذ 1 كانون الثاني {year}",
   "A quick tour": "جولة سريعة",
@@ -5011,34 +5017,49 @@ function renderPayments() {
   els.paymentSharedSummary.classList.add("hidden");
   els.paymentSharedSummaryLabel.classList.add("hidden");
 
-  const months = getMonths().slice().reverse();
-  els.monthOverviewList.replaceChildren(
-    ...months.map((month) => {
-      const monthExpensesTotal = roundUsd(
-        state.transactions
-          .filter((t) => t.category === "Expenses" && monthKey(t.date || "") === monthKey(month))
-          .reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0),
-      );
-      const monthPaymentsTotal = roundUsd(
-        state.transactions
-          .filter((t) => t.category === "Payments" && !t.project && monthKey(t.date || t.forMonth || "") === monthKey(month))
-          .reduce((s, t) => s + transactionNetUsd(t), 0),
-      );
-      const row = document.createElement("button");
-      row.className = "payment-month-row";
-      row.type = "button";
-      row.dataset.month = month;
-      row.innerHTML = `
-        <div><strong></strong><span></span></div>
-        <div class="month-progress"><b></b><small></small></div>
-      `;
-      row.querySelector("strong").textContent = formatMonth(month);
-      row.querySelector("span").textContent = tr("{amount} collected", { amount: formatUsd(monthPaymentsTotal) });
-      row.querySelector("b").textContent = formatUsd(monthExpensesTotal);
-      row.querySelector("small").textContent = tr("expenses");
-      return row;
-    }),
-  );
+  els.monthOverviewList.replaceChildren(...getMonths().slice().reverse().map(buildMonthHistoryRow));
+}
+
+// One month in Payments → Month History. Fixed dues: how much of what was
+// expected for that month came in (same basis as the cards above). Actual
+// expenses: what came in and what was spent that month.
+function monthHistoryData(month) {
+  const key = monthKey(month);
+  const spent = roundUsd(state.transactions
+    .filter((t) => (t.category === "Expenses" || t.category === "Services Expenses") && monthKey(transactionDateValue(t)) === key)
+    .reduce((sum, t) => sum + txUsd(t, t.debitUsd, t.debitLbp), 0));
+  if (isFixedMode()) {
+    const c = getMonthCollection(month);
+    return { month, fixed: true, expected: roundUsd(c.expectedTotal), collected: roundUsd(c.paidTotal), due: roundUsd(c.dueTotal), paidCount: c.paidCount, tenantCount: c.tenantStatuses.length, spent };
+  }
+  const collected = roundUsd(state.transactions
+    .filter((t) => t.category === "Payments" && !t.project && monthKey(t.forMonth || transactionDateValue(t)) === key)
+    .reduce((sum, t) => sum + transactionNetUsd(t), 0));
+  return { month, fixed: false, collected, spent };
+}
+
+function buildMonthHistoryRow(month) {
+  const d = monthHistoryData(month);
+  const row = mk("button", { type: "button", className: `month-history-row${month === selectedMonth ? " is-selected" : ""}`, dataset: { month } });
+  const top = mk("span", { className: "mh-top" }, mk("strong", { text: formatMonth(month) }));
+  if (d.fixed && d.expected > 0) {
+    const done = d.due <= 0.005;
+    top.append(mk("span", { className: `status-pill ${done ? "status-paid" : "status-due"}`, text: done ? tr("All paid") : tr("{n} of {m} paid", { n: d.paidCount, m: d.tenantCount }) }));
+  }
+  row.append(top);
+  if (d.fixed && d.expected > 0) {
+    const pct = Math.min(100, Math.round((d.collected / d.expected) * 100));
+    const fill = mk("span", { className: `mh-bar-fill${d.due <= 0.005 ? " is-done" : ""}` });
+    fill.style.width = `${pct}%`;
+    row.append(mk("span", { className: "mh-bar" }, fill));
+  }
+  const collectedText = d.fixed && d.expected > 0
+    ? tr("{collected} of {expected} collected", { collected: formatUsd(d.collected), expected: formatUsd(d.expected) })
+    : tr("{amount} collected", { amount: formatUsd(d.collected) });
+  row.append(mk("span", { className: "mh-meta" },
+    mk("span", { text: collectedText }),
+    mk("span", { text: tr("Spent {amount}", { amount: formatUsd(d.spent) }) })));
+  return row;
 }
 
 function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsappUrl = null, declarationDue = 0 } = {}) {
@@ -10422,6 +10443,8 @@ function attachEvents() {
     selectedMonth = row.dataset.month;
     renderDashboard();
     renderPayments();
+    // The chosen month's tenants are at the top of the screen.
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
   els.tenantSearch.addEventListener("input", renderTenants);
   els.addTenantButton.addEventListener("click", openAddTenantDialog);
@@ -14376,6 +14399,7 @@ export const __test = {
   yearFullyClosed,
   v158AttentionItems,
   v160AttentionItems,
+  monthHistoryData,
   expensesThisYearUsd,
   helpVideosFor,
   formatVideoLength,

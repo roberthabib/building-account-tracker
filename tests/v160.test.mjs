@@ -51,3 +51,19 @@ test("v162: the expenses card counts only this calendar year", () => {
   assert.equal(app.expensesThisYearUsd(), 140);
   assert.equal(app.expensesThisYearUsd(String(year - 1)), 999);
 });
+
+test("v163: month history uses the same month basis as the payment cards", () => {
+  const pay = (id, tenantId, forMonth, date, usd) => ({ id, category: "Payments", tenantId, forMonth, date, creditUsd: usd, creditLbp: 0, debitUsd: 0, debitLbp: 0, balanceUsd: usd, balanceLbp: 0 });
+  app.setState(baseState({
+    settings: { collectionMode: "fixed", defaultDueUsd: 100, lbpPerUsd: 100000, language: "en" },
+    tenants: [{ id: "a", name: "A", unit: "1", active: true, coefficient: 1000 }],
+    monthlyExpected: [{ month: "2026-08-01", expectedUsd: 100 }],
+    // paid in October for August: counts for August
+    transactions: [pay("p1", "a", "2026-08-01", "2026-10-03", 40), { id: "e", category: "Expenses", date: "2026-08-10", debitUsd: 58, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -58, balanceLbp: 0 }],
+  }));
+  const aug = app.monthHistoryData("2026-08-01");
+  assert.equal(aug.fixed, true);
+  assert.equal(aug.collected, 40);
+  assert.equal(aug.spent, 58);
+  assert.ok(aug.expected > 0);
+});
