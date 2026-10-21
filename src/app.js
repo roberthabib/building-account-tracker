@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v164";
+const APP_VERSION = "v165";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -1132,6 +1132,96 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "now": "الآن",
+  "{n}m": "{n} د",
+  "{n}h": "{n} س",
+  "Saved": "محفوظ",
+  "Saving…": "جارٍ الحفظ…",
+  "Offline": "غير متصل",
+  "Sync error": "خطأ في المزامنة",
+  "Local": "محلي",
+  "A phone number for every tenant": "رقم هاتف لكل مستأجر",
+  "Add the first entry": "أضف أول قيد",
+  "Add the flats and tenants": "أضف الشقق والمستأجرين",
+  "After that day, unpaid tenants show as late. 0 or empty = no due day.": "بعد هذا اليوم يظهر غير الدافعين متأخرين. 0 أو فارغ = بلا يوم استحقاق.",
+  "All receipts": "كل الإيصالات",
+  "Breaker size for every flat (generator)": "حجم القاطع لكل شقة (المولّد)",
+  "Building app": "تطبيق المبنى",
+  "Change rate": "تغيير السعر",
+  "Coefficients add up to 1000": "مجموع المعاملات 1000",
+  "Copied — check the date and amount, then Add": "تم النسخ — تحقّق من التاريخ والمبلغ ثم اضغط إضافة",
+  "Covers {months}": "يغطي {months}",
+  "Dues are due by day": "تستحق الدفعات قبل اليوم",
+  "Every expense this year has its invoice photo ✓": "لكل مصروف هذه السنة صورة فاتورة ✓",
+  "Generator hours": "ساعات المولّد",
+  "Generator hours (shown to tenants)": "ساعات المولّد (تظهر للمستأجرين)",
+  "Getting started": "البداية",
+  "How tenants can pay (Settings)": "طريقة دفع المستأجرين (الإعدادات)",
+  "In {amount}": "دخل {amount}",
+  "Invite tenants to the app": "ادعُ المستأجرين إلى التطبيق",
+  "Invoice photos missing": "صور فواتير ناقصة",
+  "LBP rate": "سعر الليرة",
+  "Late · {amount}": "متأخر · {amount}",
+  "Leave empty for the standard message": "اتركه فارغاً لاستخدام الرسالة المعتادة",
+  "Lebanese pounds per dollar": "ليرة لبنانية مقابل الدولار",
+  "Lower than last month's reading": "أقل من قراءة الشهر الماضي",
+  "Messages in": "لغة الرسائل",
+  "Meter photo": "صورة العدّاد",
+  "Money in and out": "الداخل والخارج",
+  "Money in and out, last 12 months": "الداخل والخارج خلال آخر 12 شهراً",
+  "New entries use the new rate. Past entries keep theirs.": "القيود الجديدة تستخدم السعر الجديد. القيود السابقة تحتفظ بسعرها.",
+  "No receipts yet": "لا إيصالات بعد",
+  "No votes were cast.": "لم يُدلَ بأي صوت.",
+  "Nothing found.": "لا نتائج.",
+  "On average {amount} a month {dir} over the last 6 months. At this pace: about {dec} by December.": "في المتوسط {amount} شهرياً {dir} خلال آخر 6 أشهر. بهذا المعدل: حوالي {dec} بحلول كانون الأول.",
+  "Or let them scan this with the phone camera.": "أو دعهم يمسحون هذا الرمز بكاميرا الهاتف.",
+  "Out {amount}": "خرج {amount}",
+  "Photo ✓": "الصورة ✓",
+  "Print": "طباعة",
+  "Rate set to {rate} LBP/USD": "تم ضبط السعر على {rate} ل.ل/دولار",
+  "Record the first payment": "سجّل أول دفعة",
+  "Reminder message — Arabic": "رسالة التذكير — بالعربية",
+  "Reminder message — English": "رسالة التذكير — بالإنكليزية",
+  "Reminders and invites to this tenant use this language.": "تُرسل التذكيرات والدعوات لهذا المستأجر بهذه اللغة.",
+  "Repeat": "تكرار",
+  "Same as the app": "مثل التطبيق",
+  "Scan to see your balance and the news": "امسح الرمز لترى رصيدك وأخبار المبنى",
+  "Search": "بحث",
+  "Sign in with Google as the owner to keep meter photos": "سجّل الدخول عبر Google كمالك لحفظ صور العدادات",
+  "Spending is ahead of income by {amount} a month on average. At this pace the cash runs out in about {n} months.": "المصاريف تفوق المداخيل بـ{amount} شهرياً في المتوسط. بهذا المعدل ينفد النقد خلال {n} أشهر تقريباً.",
+  "Tenant, supplier, receipt no., notice…": "مستأجر، مورّد، رقم إيصال، إعلان…",
+  "Type at least two letters.": "اكتب حرفين على الأقل.",
+  "Uploading…": "جارٍ الرفع…",
+  "View": "عرض",
+  "Vote closed: {title}": "انتهى التصويت: {title}",
+  "YES {y} · NO {n}": "نعم {y} · لا {n}",
+  "YES {y}% · NO {n}% of the shares": "نعم {y}% · لا {n}% من الحصص",
+  "You can use {name}, {amount}, {month}, {unit} and {building}. Each tenant gets the language set in their Details.": "يمكنك استخدام {name} و{amount} و{month} و{unit} و{building}. يتلقى كل مستأجر الرسالة باللغة المحددة في تفاصيله.",
+  "You have {amount} outstanding. Please contact the building owner to settle your balance.": "عليك {amount} مستحقة. يرجى التواصل مع مالك المبنى لتسوية رصيدك.",
+  "comes in more than goes out": "يدخل أكثر مما يخرج",
+  "e.g. 10": "مثال: 10",
+  "e.g. On 6:00–1:00, off 1:00–6:00": "مثال: يعمل 6:00–1:00، ينطفئ 1:00–6:00",
+  "earlier": "سابقاً",
+  "from {date}": "منذ {date}",
+  "goes out more than comes in": "يخرج أكثر مما يدخل",
+  "just now": "الآن",
+  "last {ago}": "آخر مرة {ago}",
+  "will send": "سيُرسل لاحقاً",
+  "{amount} in advance": "{amount} مسبقاً",
+  "{amount} toward {month}": "{amount} على حساب {month}",
+  "{done} of {total} done": "أُنجز {done} من {total}",
+  "{kwh} kWh (last month {last})": "{kwh} ك.و.س (الشهر الماضي {last})",
+  "{kwh} kWh — more than double last month ({last})": "{kwh} ك.و.س — أكثر من ضعف الشهر الماضي ({last})",
+  "{name} scans this with the phone camera, opens the link and taps Link this phone. Code: {code}": "يمسح {name} هذا الرمز بكاميرا الهاتف، يفتح الرابط ويضغط «ربط هذا الهاتف». الرمز: {code}",
+  "{n} expenses this year have no invoice photo. Tap one to add it.": "{n} مصروف هذه السنة بلا صورة فاتورة. اضغط على أي منها لإضافتها.",
+  "{n} h ago": "منذ {n} ساعة",
+  "{n} min ago": "منذ {n} دقيقة",
+  "{n} reading(s) are lower than last month. Save anyway?": "{n} قراءة أقل من الشهر الماضي. هل تريد الحفظ رغم ذلك؟",
+  "{n} receipts downloaded": "تم تنزيل {n} إيصال",
+  "{n} tenant is late for {month}": "مستأجر واحد متأخر عن {month}",
+  "{n} tenants are late for {month}": "{n} مستأجرين متأخرون عن {month}",
+  "{rate} LBP/USD": "{rate} ل.ل/دولار",
+  "{rate} since {date}": "{rate} منذ {date}",
   "$ / litre": "$ / لتر",
   "+ Owed by tenants": "+ المستحق على المستأجرين",
   "− Paid in advance": "− المدفوع مسبقاً",
@@ -3348,6 +3438,7 @@ function readGeneratorFormReadings() {
       breakerAmps: Number(row.dataset.breakerAmps || 0),
       previousReading: Number(row.querySelector(".gen-prev").value || 0),
       currentReading: Number(row.querySelector(".gen-curr").value || 0),
+      ...(row.dataset.photo ? { photo: JSON.parse(row.dataset.photo) } : {}),
     };
   });
   return readings;
@@ -3390,9 +3481,11 @@ function buildGeneratorReadingRows(month) {
       return row;
     }),
   );
+  addMeterPhotoButtons(month);
 }
 
 function updateGeneratorReadingsPreview() {
+  checkGeneratorReadingRows();
   const month = monthIso(els.generatorBillMonth.value);
   const pools = getServiceMonthPools("generator", month);
   els.generatorPoolsSummary.textContent = month
@@ -3469,6 +3562,8 @@ function submitGeneratorReadings(event) {
   if (!month) { showToast("Select a month"); return; }
   if (isMonthClosed(month)) { showToast(closedMonthError(month).message, 5000); return; }
   const readings = readGeneratorFormReadings();
+  const lower = Object.values(readings).filter((r) => r.currentReading && r.currentReading < r.previousReading).length;
+  if (lower && !window.confirm(tr("{n} reading(s) are lower than last month. Save anyway?", { n: lower }))) return;
   const engineHours = Number(els.generatorEngineHours?.value || 0);
   const lines = {};
   Object.keys(readings).forEach((id) => {
@@ -3476,6 +3571,7 @@ function submitGeneratorReadings(event) {
       breakerAmps: readings[id].breakerAmps,
       previousReading: readings[id].previousReading,
       currentReading: readings[id].currentReading,
+      ...(readings[id].photo ? { photo: readings[id].photo } : {}),
     };
   });
   state.serviceReadings ||= [];
@@ -4057,7 +4153,8 @@ function getMonthlyActivityRows(month) {
 function paymentStatus(tenantId, month) {
   const expected = getMonthlyDueForTenant(tenantId, month);
   const rawPaid = isFixedMode() ? getRawPaidForMonth(tenantId, month).usd : getTenantPaymentsTotal(tenantId, month);
-  const paid = expected > 0 ? Math.min(rawPaid, expected) : rawPaid;
+  // Fixed amount: payments fill the oldest unpaid month first.
+  const paid = isFixedMode() && expected > 0 ? (fifoMonthPaid(tenantId).allocated.get(month) || 0) : expected > 0 ? Math.min(rawPaid, expected) : rawPaid;
   if (!expected && !paid) return { label: "No due", className: "none", paid, expected };
   if (paid >= expected) return { label: "Paid", className: "paid", paid, expected };
   if (paid > 0) return { label: "Partial", className: "partial", paid, expected };
@@ -4297,7 +4394,7 @@ function checkDueBanner() {
   const projectsDue = getTenantProjectOutstanding(sessionTenantId);
   const totalDue = roundUsd(Math.max(0, balance) + projectsDue);
   if (totalDue > 0) {
-    els.dueBannerText.textContent = `You have ${formatUsd(totalDue)} outstanding. Please contact the building owner to settle your balance.`;
+    els.dueBannerText.textContent = tr("You have {amount} outstanding. Please contact the building owner to settle your balance.", { amount: formatUsd(totalDue) });
     els.dueBanner.classList.remove("hidden");
   } else {
     els.dueBanner.classList.add("hidden");
@@ -4579,6 +4676,7 @@ function renderDashboard() {
   renderExpenseCategoryBreakdown();
   updateMonthSectionHead();
   renderMonthSteppers();
+  renderGettingStarted();
 }
 
 // Building costs (expenses + services) dated this calendar year.
@@ -5260,7 +5358,7 @@ function renderPaymentsFixed() {
     ...visible.map(({ tenant, status }) => {
       const due = roundUsd(Math.max(0, status.expected - status.paid));
       const settled = due <= 0.005 && status.expected > 0;
-      const pillText = due > 0 ? tr("{amount} due", { amount: formatUsd(due) }) : status.expected > 0 ? tr("Fully paid") : tr("No due");
+      const pillText = due > 0 ? (isMonthLate(selectedMonth) ? tr("Late · {amount}", { amount: formatUsd(due) }) : tr("{amount} due", { amount: formatUsd(due) })) : status.expected > 0 ? tr("Fully paid") : tr("No due");
       const pct = status.expected > 0 ? `${Math.min(100, Math.round((status.paid / status.expected) * 100))}%` : (status.paid > 0 ? "100%" : "0%");
       const row = buildTenantPaymentRowBase({
         tenant,
@@ -6664,6 +6762,14 @@ function renderLedger() {
       btn.textContent = tr("Edit");
       actionGroup.append(btn);
     }
+    if (transaction.category === "Expenses" && !transaction.serviceType && sessionMode === "owner") {
+      const btn = document.createElement("button");
+      btn.className = "ledger-action-btn repeat-expense-button";
+      btn.type = "button";
+      btn.dataset.transactionId = transaction.id;
+      btn.textContent = tr("Repeat");
+      actionGroup.append(btn);
+    }
     if (hasInvoicePhoto(transaction.invoiceAttachment)) {
       const link = document.createElement("button");
       link.className = "ledger-action-btn attachment-button";
@@ -7062,7 +7168,9 @@ function closePoll(pollId) {
   const poll = (state.polls || []).find((p) => p.id === pollId);
   if (!poll) return;
   poll.status = "closed";
+  poll.closedAt = localDateInput();
   saveState();
+  announceClosedPolls();
   renderPolls();
   showToast("Poll closed");
 }
@@ -7283,6 +7391,7 @@ function syncTransactionFormMode() {
   updateReadInvoiceButton();
   renderRecentExpenseChips();
   renderExpenseSplitPreview();
+  renderPaymentCoverage();
   document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
@@ -7306,6 +7415,7 @@ function syncTransactionFormMode() {
 
 function updateExpenseConversionPreview() {
   renderExpenseSplitPreview();
+  renderPaymentCoverage();
   const cat = els.transactionCategory.value;
   if (cat !== "Expenses" && cat !== "Services Expenses") return;
   const { amountUsd, amountLbp } = readFormAmount();
@@ -7313,6 +7423,7 @@ function updateExpenseConversionPreview() {
   if (amountLbp > 0) {
     els.expenseConversionPreview.textContent =
       tr("{lbp} = {usd} at {rate} LBP/USD", { lbp: formatLbp(amountLbp), usd: formatUsd(toUsd(amountUsd, amountLbp)), rate: numberFormat.format(rate) });
+    if (sessionMode === "owner") els.expenseConversionPreview.append(" ", miniButton(tr("Change rate"), openRateDialog, "rate-change"));
   } else {
     els.expenseConversionPreview.textContent = tr("{amount} balance impact", { amount: formatUsd(amountUsd) });
   }
@@ -8076,6 +8187,7 @@ function setSyncChip(kind) {
   els.syncChipText.textContent = SYNC_CHIP_TEXT[state_] || "";
   if (state_ === "saved") lastSyncProblem = "";
   els.syncChip.title = lastSyncProblem;
+  decorateSyncChip(state_);
 }
 
 function downloadBackup() {
@@ -8418,11 +8530,7 @@ function buildGroupBalancesMessage() {
 }
 
 function reminderMessage(tenant, amount, month) {
-  return [
-    tr("{building} – Payment Reminder", { building: state.building?.name || "" }),
-    tr("Hi {name}, your outstanding balance{monthLine} is {amount}.", { name: tenant.name, monthLine: month ? tr(" as of the {month} statement", { month: formatMonth(month) }) : "", amount: formatUsd(amount) }),
-    tr("Please settle at your earliest convenience. Thank you."),
-  ].join("\n");
+  return reminderText(tenant, amount, month, { statement: true });
 }
 
 // Reminders count as "sent for this month" once any of them is opened, so the
@@ -8661,7 +8769,7 @@ async function postBalancesToGroup() {
 
 function inviteWhatsAppMessage(tenant, code) {
   return tr("Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.", {
-    name: tenant?.name || "", building: state.building?.name || "", url: inviteAppUrl(), code,
+    name: tenant?.name || "", building: state.building?.name || "", url: joinLink(code), code,
   });
 }
 
@@ -9016,6 +9124,10 @@ async function createInviteCode() {
     const tenant = state.tenants.find((t) => t.id === tenantId);
     els.inviteCodeText.textContent = code;
     els.inviteHowTo.textContent = tr("Send this to {name}. On their phone: open {url}, tap \"I'm a tenant with an invite code\" and enter the code. It works once, within 30 days.", { name: tenant?.name || "", url: inviteAppUrl() });
+    document.querySelector("#inviteQr")?.remove();
+    const qr = qrBlock(joinLink(code), tr("Or let them scan this with the phone camera."));
+    qr.id = "inviteQr";
+    els.inviteCodeText.after(qr);
     els.inviteResult.classList.remove("hidden");
     els.inviteShareButton.classList.remove("hidden");
     els.inviteWhatsAppButton.classList.remove("hidden");
@@ -10329,11 +10441,7 @@ function buildWhatsAppUrl(tenant, dueAmount, statementMonth = null) {
 function buildMonthlyDueWhatsAppUrl(tenant, owed, month) {
   const phone = whatsappPhone(tenant.phone);
   if (!phone) return null;
-  const message = [
-    tr("{building} – Payment Reminder", { building: state.building.name }),
-    tr("Hi {name}, your building payment for {month} is outstanding: {amount}.", { name: tenant.name, month: formatMonth(month), amount: formatUsd(owed) }),
-    tr("Please settle at your earliest convenience. Thank you."),
-  ].join("\n");
+  const message = reminderText(tenant, owed, month);
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 
@@ -10590,6 +10698,8 @@ function attachEvents() {
     }
     const deleteButton = event.target.closest(".delete-transaction-button[data-transaction-id]");
     if (deleteButton) { deleteLedgerTransaction(deleteButton.dataset.transactionId); return; }
+    const repeatButton = event.target.closest(".repeat-expense-button[data-transaction-id]");
+    if (repeatButton) { repeatTransaction(repeatButton.dataset.transactionId); return; }
     const mainRow = event.target.closest(".ledger-row-main");
     if (mainRow) {
       // Tap a row to reveal its details + actions (Delete never one tap away).
@@ -10820,6 +10930,7 @@ function attachEvents() {
     state.settings.sharedExpensesEnabled = false;
     const payInput = document.querySelector("#paymentInstructionsInput");
     if (payInput) state.settings.paymentInstructions = payInput.value.trim();
+    readV165SettingsFields();
     saveState();
     renderAll();
     updateExpenseConversionPreview();
@@ -11783,6 +11894,7 @@ function buildNoticeCard(notice, { compact = false } = {}) {
   if (!compact && sessionMode === "owner") {
     card.append(mk("div", { className: "notice-actions" },
       miniButton(tr("Post to WhatsApp group"), () => window.open(whatsappLink("", noticeMessage(notice)), "_blank", "noopener")),
+      miniButton(tr("Print"), () => { void shareNoticePoster(notice); }),
       miniButton(tr("Delete"), () => deleteNotice(notice.id), "danger-mini")));
   }
   return card;
@@ -11807,6 +11919,7 @@ function renderTenantDashboardExtras() {
   const blocks = [
     isTenant ? tenantHelpCard() : null,
     isTenant ? howToPayCard() : null,
+    isTenant ? generatorScheduleCard() : null,
     ...notices.map((n) => buildNoticeCard(n, { compact: true })),
     isTenant ? tenantRecentPaymentsCard() : null,
     ...myIssues.map((issue) => mk("article", { className: "notice-card" },
@@ -12458,7 +12571,7 @@ function renderReports() {
       buildDataHealthSection()),
     reportsSection(tr("Automatic reminders"), buildAutoNoticeSection()),
     reportsSection(tr("Budget"), buildBudgetSection()),
-    reportsSection(tr("Reserve target"), buildReserveSection()),
+    reportsSection(tr("Reserve target"), buildReserveSection(), reserveForecastText() ? note(reserveForecastText()) : null),
     reportsSection(tr("Close the year"), buildCloseYearSection()),
     reportsSection(tr("Annual report"),
       note(tr("Everything for the yearly owners' meeting: money in and out, where it went, the reserve, and who still owes.")),
@@ -12478,6 +12591,8 @@ function renderReports() {
       note(tr("{n} changes recorded. Every addition, change and deletion, with the date and who made it — and an Undo for mistakes.", { n: (state.auditLog || []).length })),
       secondaryButton(tr("Open the history"), () => { historyShown = 40; openHistoryDialog(); })),
     reportsSection(tr("For the accountant"), buildAccountantSection()),
+    reportsSection(tr("Money in and out"), buildMoneyFlowChart()),
+    reportsSection(tr("Invoice photos missing"), buildMissingInvoiceSection()),
   );
 }
 
@@ -12595,6 +12710,10 @@ function extraAttentionItems() {
   items.push(...v155AttentionItems());
   items.push(...v158AttentionItems());
   items.push(...v160AttentionItems());
+  [currentMonthValue()].forEach((m) => {
+    const late = lateTenants(m);
+    if (late.length) items.push({ kind: "danger", text: tr(late.length === 1 ? "{n} tenant is late for {month}" : "{n} tenants are late for {month}", { n: late.length, month: formatMonth(m) }), view: "paymentsView", key: `late:${monthKey(m)}` });
+  });
   if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView", key: "keepalive" });
   return items;
 }
@@ -12621,6 +12740,13 @@ function renderV148() {
   renderHelp();
   renderDisplayPanel();
   renderPaymentInstructionsField();
+  renderV165SettingsFields();
+  if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
+  renderGeneratorScheduleNote();
+  ensureSearchButton();
+  announceClosedPolls();
+  runLaunchAction();
+  decorateEmptyStates();
   renderCoefficientBanner();
   renderTestDataAction();
   renderPushStatus();
@@ -12633,6 +12759,7 @@ function attachV148Events() {
   els.newIssueButton?.addEventListener("click", openIssueDialog);
   els.newMaintenanceButton?.addEventListener("click", () => openMaintenanceTaskDialog());
   els.inviteAllButton?.addEventListener("click", openInviteAllDialog);
+  attachV165Events();
   els.tenantList.addEventListener("click", (event) => {
     if (event.target.closest("button, a, input, select")) return;
     const card = event.target.closest(".tenant-card[data-tenant-id]");
@@ -13021,6 +13148,9 @@ function backupPhotoList() {
   (state.documents || []).forEach((d) => {
     if (d.storagePath) add({ storagePath: d.storagePath }, "documents", [d.category, d.title]);
   });
+  (state.serviceReadings || []).forEach((r) => Object.entries(r.lines || {}).forEach(([tid, line]) => {
+    if (line.photo) add(line.photo, "meters", [monthKey(r.forMonth), tenantName(tid)]);
+  }));
   (state.issues || []).forEach((i) => {
     if (i.photo) add(i.photo, "problems", [String(i.createdAt || "").slice(0, 10), i.title, String(i.id).slice(-6)]);
   });
@@ -13429,7 +13559,7 @@ function openInviteAllDialog() {
     });
     return mk("div", { className: "health-row" },
       mk("span", {}, mk("strong", { text: `${tenant.unit || ""} · ${tenant.name}` }), status),
-      button);
+      mk("span", { className: "invite-actions" }, miniButton("QR", () => { void openInviteQr(tenant); }), button));
   });
   openToolDialog(tr("Invite all tenants"),
     note(tr("Each tenant gets their own one-time code on WhatsApp, with the link and how to add the app to their home screen. Tap Send for each one.")),
@@ -13522,7 +13652,7 @@ function tenantRecentPaymentsCard() {
     .slice(0, 3);
   if (!mine.length) return null;
   return mk("article", { className: "notice-card" },
-    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Your recent payments") })),
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Your recent payments") }), miniButton(tr("All receipts"), downloadAllMyReceipts)),
     mine.map((t) => mk("div", { className: "health-row plain" },
       mk("span", { text: `${formatDateLabel(t.date)} · ${formatUsd(transactionNetUsd(t))}${t.method ? ` · ${methodLabel(t.method)}` : ""}` }),
       miniButton(tr("Receipt"), () => { void sharePaymentReceiptPdf(t.id); }))));
@@ -13544,10 +13674,12 @@ function openUnitDetailsDialog(tenantId) {
   const inputs = Object.fromEntries(UNIT_DETAIL_FIELDS.map(([key]) => [key, key === "notes"
     ? Object.assign(mk("textarea", { rows: "3", maxlength: "600" }), { value: details.notes || "" })
     : textInput(details[key] || "", { maxlength: "120", ...(key === "residents" ? { inputmode: "numeric" } : {}) })]));
+  const language = selectInput([["", tr("Same as the app")], ["en", "English"], ["ar", "العربية"]], tenant.language || "");
   const save = () => {
     const next = {};
     UNIT_DETAIL_FIELDS.forEach(([key]) => { const v = String(inputs[key].value || "").trim(); if (v) next[key] = v; });
     tenant.details = next;
+    if (language.value) tenant.language = language.value; else delete tenant.language;
     if (!saveState()) return;
     closeToolDialog();
     renderAll();
@@ -13556,6 +13688,7 @@ function openUnitDetailsDialog(tenantId) {
   openToolDialog(tr("Unit {unit} — details", { unit: tenant.unit || "" }),
     note(tr("Only you see these.")),
     UNIT_DETAIL_FIELDS.map(([key, label]) => field(tr(label), inputs[key])),
+    field(tr("Messages in"), language, tr("Reminders and invites to this tenant use this language.")),
     mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
 }
 
@@ -14507,6 +14640,7 @@ function openCashBreakdown() {
     breakdownRow(tr("Cash box"), formatUsd(byAccount.cash)),
     breakdownRow(tr("Bank & wallets"), formatUsd(byAccount.bank), tr("Bank transfers, Whish and cheques")),
     breakdownRow(tr("Total"), formatUsd(roundUsd(byAccount.cash + byAccount.bank))),
+    reserveForecastText() ? note(reserveForecastText()) : null,
     sessionMode === "owner" ? mk("div", { className: "button-row" }, primaryButton(tr("Count the cash"), () => { closeToolDialog(); openCashCheckDialog(); })) : null);
 }
 
@@ -15038,6 +15172,1015 @@ function renderTestDataAction() {
 
 applyDisplayPrefs();
 
+// ── QR codes (byte mode, error correction M, versions 1–10), no library ─────
+// Enough for an invite link (~70 characters). Returns rows of booleans.
+const QR_M_BLOCKS = [
+  null,
+  [10, [[1, 16]]], [16, [[1, 28]]], [26, [[1, 44]]], [18, [[2, 32]]], [24, [[2, 43]]],
+  [16, [[4, 27]]], [18, [[4, 31]]], [22, [[2, 38], [2, 39]]], [22, [[3, 36], [2, 37]]], [26, [[4, 43], [1, 44]]],
+];
+const QR_ALIGN = [null, [], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50]];
+
+const QR_EXP = new Uint8Array(512);
+const QR_LOG = new Uint8Array(256);
+(() => {
+  let x = 1;
+  for (let i = 0; i < 255; i += 1) {
+    QR_EXP[i] = x;
+    QR_LOG[x] = i;
+    x <<= 1;
+    if (x & 0x100) x ^= 0x11d;
+  }
+  for (let i = 255; i < 512; i += 1) QR_EXP[i] = QR_EXP[i - 255];
+})();
+const qrMul = (a, b) => (a && b ? QR_EXP[QR_LOG[a] + QR_LOG[b]] : 0);
+
+function qrEcc(data, ecLen) {
+  let gen = [1];
+  for (let i = 0; i < ecLen; i += 1) {
+    const next = new Array(gen.length + 1).fill(0);
+    gen.forEach((g, j) => { next[j] ^= g; next[j + 1] ^= qrMul(g, QR_EXP[i]); });
+    gen = next;
+  }
+  const res = new Array(ecLen).fill(0);
+  data.forEach((byte) => {
+    const factor = byte ^ res.shift();
+    res.push(0);
+    for (let j = 0; j < ecLen; j += 1) res[j] ^= qrMul(gen[j + 1], factor);
+  });
+  return res;
+}
+
+function qrMatrix(text) {
+  const bytes = [...new TextEncoder().encode(String(text))];
+  let version = 0;
+  for (let v = 1; v <= 10; v += 1) {
+    const dataCap = QR_M_BLOCKS[v][1].reduce((s, [n, len]) => s + n * len, 0);
+    const countBits = v < 10 ? 8 : 16;
+    if (4 + countBits + bytes.length * 8 <= dataCap * 8) { version = v; break; }
+  }
+  if (!version) throw new Error("Text too long for a QR code");
+  const [ecLen, groups] = QR_M_BLOCKS[version];
+  const dataCap = groups.reduce((s, [n, len]) => s + n * len, 0);
+
+  // Bit stream: mode 0100, length, bytes, terminator, padding.
+  const bits = [];
+  const put = (value, len) => { for (let i = len - 1; i >= 0; i -= 1) bits.push((value >>> i) & 1); };
+  put(4, 4);
+  put(bytes.length, version < 10 ? 8 : 16);
+  bytes.forEach((b) => put(b, 8));
+  put(0, Math.min(4, dataCap * 8 - bits.length));
+  while (bits.length % 8) bits.push(0);
+  const data = [];
+  for (let i = 0; i < bits.length; i += 8) data.push(bits.slice(i, i + 8).reduce((a, b) => (a << 1) | b, 0));
+  for (let pad = 0; data.length < dataCap; pad += 1) data.push(pad % 2 ? 0x11 : 0xec);
+
+  // Split into blocks, add error correction, interleave.
+  const blocks = [];
+  let offset = 0;
+  groups.forEach(([n, len]) => {
+    for (let i = 0; i < n; i += 1) { blocks.push(data.slice(offset, offset + len)); offset += len; }
+  });
+  const ecBlocks = blocks.map((b) => qrEcc(b, ecLen));
+  const codewords = [];
+  const maxLen = Math.max(...blocks.map((b) => b.length));
+  for (let i = 0; i < maxLen; i += 1) blocks.forEach((b) => { if (i < b.length) codewords.push(b[i]); });
+  for (let i = 0; i < ecLen; i += 1) ecBlocks.forEach((b) => codewords.push(b[i]));
+
+  const size = version * 4 + 17;
+  const grid = Array.from({ length: size }, () => new Array(size).fill(null));
+  const reserved = Array.from({ length: size }, () => new Array(size).fill(false));
+  const set = (r, c, dark, fn = true) => { grid[r][c] = dark; if (fn) reserved[r][c] = true; };
+
+  const finder = (r0, c0) => {
+    for (let r = -1; r <= 7; r += 1) for (let c = -1; c <= 7; c += 1) {
+      const rr = r0 + r, cc = c0 + c;
+      if (rr < 0 || cc < 0 || rr >= size || cc >= size) continue;
+      const inRing = r >= 0 && r <= 6 && c >= 0 && c <= 6 && (r === 0 || r === 6 || c === 0 || c === 6);
+      const inCore = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+      set(rr, cc, inRing || inCore);
+    }
+  };
+  finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+  for (let i = 8; i < size - 8; i += 1) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+  const align = QR_ALIGN[version];
+  const last = align.length - 1;
+  align.forEach((r, i) => align.forEach((c, j) => {
+    if ((i === 0 && j === 0) || (i === 0 && j === last) || (i === last && j === 0)) return;
+    for (let dr = -2; dr <= 2; dr += 1) for (let dc = -2; dc <= 2; dc += 1) {
+      set(r + dr, c + dc, Math.max(Math.abs(dr), Math.abs(dc)) !== 1);
+    }
+  }));
+  set(size - 8, 8, true); // dark module
+  // Reserve format areas (filled after masking).
+  for (let i = 0; i < 9; i += 1) { reserved[8][i] = true; reserved[i][8] = true; }
+  for (let i = 0; i < 8; i += 1) { reserved[8][size - 1 - i] = true; reserved[size - 1 - i][8] = true; }
+  if (version >= 7) {
+    let rem = version;
+    for (let i = 0; i < 12; i += 1) rem = (rem << 1) ^ ((rem >>> 11) * 0x1f25);
+    const vbits = (version << 12) | rem;
+    for (let i = 0; i < 18; i += 1) {
+      const bit = ((vbits >>> i) & 1) === 1;
+      const a = size - 11 + (i % 3), b = Math.floor(i / 3);
+      set(a, b, bit); set(b, a, bit);
+    }
+  }
+
+  // Place the data bits in the zig-zag.
+  const all = [];
+  codewords.forEach((cw) => { for (let i = 7; i >= 0; i -= 1) all.push((cw >>> i) & 1); });
+  let bitIndex = 0;
+  let upward = true;
+  for (let col = size - 1; col > 0; col -= 2) {
+    if (col === 6) col -= 1;
+    for (let k = 0; k < size; k += 1) {
+      const row = upward ? size - 1 - k : k;
+      for (let j = 0; j < 2; j += 1) {
+        const c = col - j;
+        if (reserved[row][c]) continue;
+        grid[row][c] = bitIndex < all.length ? all[bitIndex] === 1 : false;
+        bitIndex += 1;
+      }
+    }
+    upward = !upward;
+  }
+
+  const MASKS = [
+    (r, c) => (r + c) % 2 === 0, (r) => r % 2 === 0, (r, c) => c % 3 === 0, (r, c) => (r + c) % 3 === 0,
+    (r, c) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0, (r, c) => ((r * c) % 2) + ((r * c) % 3) === 0,
+    (r, c) => (((r * c) % 2) + ((r * c) % 3)) % 2 === 0, (r, c) => (((r + c) % 2) + ((r * c) % 3)) % 2 === 0,
+  ];
+  const withFormat = (m, mask) => {
+    let rem = mask; // EC level M = 00
+    for (let i = 0; i < 10; i += 1) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+    const fbits = ((mask << 10) | rem) ^ 0x5412;
+    const bit = (i) => ((fbits >>> i) & 1) === 1;
+    for (let i = 0; i <= 5; i += 1) m[i][8] = bit(i);
+    m[7][8] = bit(6); m[8][8] = bit(7); m[8][7] = bit(8);
+    for (let i = 9; i < 15; i += 1) m[8][14 - i] = bit(i);
+    for (let i = 0; i < 8; i += 1) m[8][size - 1 - i] = bit(i);
+    for (let i = 8; i < 15; i += 1) m[size - 15 + i][8] = bit(i);
+    m[size - 8][8] = true;
+    return m;
+  };
+  const penalty = (m) => {
+    let score = 0;
+    for (let r = 0; r < size; r += 1) {
+      for (const line of [m[r], m.map((row) => row[r])]) {
+        let run = 1;
+        for (let i = 1; i <= size; i += 1) {
+          if (i < size && line[i] === line[i - 1]) { run += 1; continue; }
+          if (run >= 5) score += run - 2;
+          run = 1;
+        }
+        for (let i = 0; i + 10 < size + 1; i += 1) {
+          const s = line.slice(i, i + 11).map((v) => (v ? 1 : 0)).join("");
+          if (s === "10111010000" || s === "00001011101") score += 40;
+        }
+      }
+    }
+    for (let r = 0; r < size - 1; r += 1) for (let c = 0; c < size - 1; c += 1) {
+      const v = m[r][c];
+      if (v === m[r][c + 1] && v === m[r + 1][c] && v === m[r + 1][c + 1]) score += 3;
+    }
+    const dark = m.flat().filter(Boolean).length;
+    score += Math.floor(Math.abs((dark * 100) / (size * size) - 50) / 5) * 10;
+    return score;
+  };
+  let best = null;
+  let bestScore = Infinity;
+  MASKS.forEach((fn, mask) => {
+    const m = grid.map((row, r) => row.map((v, c) => (reserved[r][c] ? v : v !== fn(r, c))));
+    withFormat(m, mask);
+    const s = penalty(m);
+    if (s < bestScore) { bestScore = s; best = m; }
+  });
+  return best.map((row) => row.map(Boolean));
+}
+
+// Draws a QR code on a new canvas (with the white quiet zone).
+function qrCanvas(text, pixels = 360) {
+  const m = qrMatrix(text);
+  const n = m.length + 8;
+  const scale = Math.max(1, Math.floor(pixels / n));
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = n * scale;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#000000";
+  m.forEach((row, r) => row.forEach((dark, c) => { if (dark) ctx.fillRect((c + 4) * scale, (r + 4) * scale, scale, scale); }));
+  return canvas;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// v165 — shortcuts, search, oldest-month-first payments, due day, message
+// wording, meter checks and photos, QR invites, notices to print, reports
+// charts, getting started, empty states, swipe gestures
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── App-icon shortcuts (?do=payment / ?do=expense) and QR joins (?join=) ────
+let pendingLaunchAction = "";
+let pendingJoinCode = "";
+function captureLaunchParams() {
+  const query = new URLSearchParams(location.search);
+  const action = query.get("do");
+  const join = query.get("join");
+  if (!action && !join) return;
+  if (action === "payment" || action === "expense") pendingLaunchAction = action;
+  if (join && /^[A-Za-z0-9]{6,12}$/.test(join)) pendingJoinCode = join.toUpperCase();
+  history.replaceState(null, "", location.pathname);
+}
+
+function runLaunchAction() {
+  if (pendingJoinCode && !sessionMode) {
+    const code = pendingJoinCode;
+    pendingJoinCode = "";
+    if (els.connectCodeInput && els.connectDialog) {
+      els.connectCodeInput.value = code;
+      openDialog(els.connectDialog);
+    }
+    return;
+  }
+  if (!pendingLaunchAction || sessionMode !== "owner") return;
+  const action = pendingLaunchAction;
+  pendingLaunchAction = "";
+  window.setTimeout(() => openEntryForm(action === "payment" ? "Payments" : "Expenses"), 300);
+}
+
+// ── Repeat an expense from the ledger ───────────────────────────────────────
+function repeatTransaction(transactionId) {
+  const source = state.transactions.find((t) => t.id === transactionId);
+  if (!source || sessionMode !== "owner") return;
+  openEntryForm("Expenses");
+  els.transactionDescription.value = source.description || "";
+  if (Number(source.debitLbp || 0) > 0 && !Number(source.debitUsd || 0)) {
+    setTransactionCurrency("LBP");
+    els.transactionAmount.value = String(source.debitLbp);
+  } else {
+    setTransactionCurrency("USD");
+    els.transactionAmount.value = String(roundUsd(source.debitUsd || 0));
+  }
+  els.transactionSupplier.value = source.supplier || "";
+  els.transactionExpenseCategory.value = source.expenseCategory || "";
+  if (els.transactionPaidFrom) els.transactionPaidFrom.value = source.paidFrom || "cash";
+  updateExpenseConversionPreview();
+  showToast("Copied — check the date and amount, then Add");
+}
+
+// ── Swipe gestures: ledger rows open, sheets close ──────────────────────────
+function attachSwipeGestures() {
+  let start = null;
+  els.ledgerList.addEventListener("touchstart", (event) => {
+    const item = event.target.closest(".ledger-item");
+    if (!item) return;
+    const t = event.touches[0];
+    start = { item, x: t.clientX, y: t.clientY };
+  }, { passive: true });
+  els.ledgerList.addEventListener("touchend", (event) => {
+    if (!start) return;
+    const t = event.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    const item = start.item;
+    start = null;
+    if (Math.abs(dx) < 50 || Math.abs(dy) > 40) return;
+    const towardStart = currentLang === "ar" ? dx > 0 : dx < 0;
+    item.classList.toggle("is-open", towardStart);
+  }, { passive: true });
+
+  // Pull a sheet down by its top edge to close it.
+  let drag = null;
+  document.addEventListener("touchstart", (event) => {
+    const dialog = event.target.closest("dialog[open]");
+    if (!dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    const t = event.touches[0];
+    if (t.clientY - rect.top > 56) return;
+    if (event.target.closest("input, select, textarea, button")) return;
+    drag = { dialog, y: t.clientY, dy: 0 };
+  }, { passive: true });
+  document.addEventListener("touchmove", (event) => {
+    if (!drag) return;
+    drag.dy = Math.max(0, event.touches[0].clientY - drag.y);
+    drag.dialog.style.transform = `translateY(${drag.dy}px)`;
+  }, { passive: true });
+  document.addEventListener("touchend", () => {
+    if (!drag) return;
+    const { dialog, dy } = drag;
+    drag = null;
+    dialog.style.transform = "";
+    if (dy < 90) return;
+    const close = dialog.querySelector('.dialog-header .icon-button, button[id^="close"], [data-close]');
+    if (close) close.click(); else closeDialog(dialog);
+  });
+}
+
+// ── Search everything ───────────────────────────────────────────────────────
+function searchEverything(query) {
+  const q = String(query || "").trim().toLowerCase();
+  if (q.length < 2) return [];
+  const has = (...values) => values.some((v) => String(v || "").toLowerCase().includes(q));
+  const results = [];
+  state.tenants.forEach((t) => { if (has(t.name, t.unit, t.phone)) results.push({ kind: "tenant", id: t.id, title: t.name, sub: tr("Unit {unit}", { unit: t.unit || "" }) }); });
+  (state.suppliers || []).forEach((s) => { if (has(s.name, s.trade, s.phone)) results.push({ kind: "supplier", id: s.id, title: s.name, sub: s.trade || tr("Supplier") }); });
+  (state.announcements || []).forEach((n) => { if (has(n.title, n.body)) results.push({ kind: "notice", id: n.id, title: n.title, sub: tr("Notice") }); });
+  (state.issues || []).forEach((i) => { if (has(i.title, i.details)) results.push({ kind: "issue", id: i.id, title: i.title, sub: tr("Problem") }); });
+  (state.meetings || []).forEach((m) => { if (has(m.title, m.notes, ...(m.decisions || []))) results.push({ kind: "meeting", id: m.id, title: m.title, sub: tr("Meeting") }); });
+  state.transactions
+    .filter((t) => has(t.description, t.supplier, t.invoice, t.receiptRef, t.expenseCategory, t.tenantId ? tenantName(t.tenantId) : ""))
+    .sort((a, b) => String(transactionDateValue(b)).localeCompare(String(transactionDateValue(a))))
+    .slice(0, 25)
+    .forEach((t) => results.push({ kind: "transaction", id: t.id, title: (t.tenantId ? tenantName(t.tenantId) : t.description) || tr(t.category), sub: `${formatDateLabel(transactionDateValue(t))} · ${formatUsd(transactionNetUsd(t))}`, query: q }));
+  return results.slice(0, 40);
+}
+
+function openSearch() {
+  const input = mk("input", { type: "search", className: "search-everything", placeholder: tr("Tenant, supplier, receipt no., notice…"), autocomplete: "off" });
+  const list = mk("div", { className: "search-results" });
+  const go = (r) => {
+    closeToolDialog();
+    if (r.kind === "tenant") openTenantPage(r.id);
+    else if (r.kind === "supplier") setView("suppliersView");
+    else if (r.kind === "notice") setView("noticesView");
+    else if (r.kind === "issue") setView("issuesView");
+    else if (r.kind === "meeting") setView("meetingsView");
+    else {
+      setView("ledgerView");
+      els.ledgerSearch.value = r.query;
+      els.ledgerSearch.dispatchEvent(new Event("input", { bubbles: true }));
+      renderLedger();
+    }
+  };
+  const draw = () => {
+    const results = searchEverything(input.value);
+    list.replaceChildren(...(input.value.trim().length < 2
+      ? [note(tr("Type at least two letters."))]
+      : results.length
+        ? results.map((r) => {
+          const row = breakdownRow(r.title, "", r.sub);
+          row.classList.add("is-tappable");
+          row.addEventListener("click", () => go(r));
+          return row;
+        })
+        : [note(tr("Nothing found."))]));
+  };
+  input.addEventListener("input", draw);
+  openToolDialog(tr("Search"), input, list);
+  draw();
+  window.setTimeout(() => input.focus(), 60);
+}
+
+function ensureSearchButton() {
+  if (document.querySelector("#searchButton") || !els.openAddButton) return;
+  const button = mk("button", { id: "searchButton", type: "button", className: "icon-button", "aria-label": tr("Search") });
+  button.append(lucide("search", { size: 20, color: "currentColor" }));
+  button.addEventListener("click", openSearch);
+  els.openAddButton.before(button);
+}
+
+// ── "Saved · 2 min ago" ─────────────────────────────────────────────────────
+const LAST_SYNC_KEY = "building-account-tracker:last-synced";
+let lastSyncChipKind = "";
+function syncAgoText(ms, now = Date.now()) {
+  if (!ms) return "";
+  const minutes = Math.floor((now - ms) / 60000);
+  if (minutes < 1) return tr("now");
+  if (minutes < 60) return tr("{n}m", { n: minutes });
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return tr("{n}h", { n: hours });
+  return formatDateLabel(localDateInputFrom(new Date(ms)));
+}
+
+function decorateSyncChip(kind) {
+  lastSyncChipKind = kind;
+  if (kind === "saved") { try { localStorage.setItem(LAST_SYNC_KEY, String(Date.now())); } catch { /* private mode */ } }
+  if (!els.syncChipText) return;
+  let last = 0;
+  try { last = Number(localStorage.getItem(LAST_SYNC_KEY) || 0); } catch { last = 0; }
+  const base = tr(SYNC_CHIP_TEXT[kind] || "");
+  if (kind === "saved" && last) els.syncChipText.textContent = `${base} · ${syncAgoText(last)}`;
+  else if (kind === "offline") els.syncChipText.textContent = `${base} · ${tr("will send")}`;
+  else if (kind === "error" && last) els.syncChipText.textContent = `${base} · ${tr("last {ago}", { ago: syncAgoText(last) })}`;
+}
+window.setInterval(() => { if (lastSyncChipKind === "saved") decorateSyncChip("saved"); }, 30000);
+
+// ── Payments count toward the oldest unpaid month first (fixed amount) ──────
+function fifoMonthPaid(tenantId) {
+  const months = getMonths().slice().sort();
+  let pool = months.reduce((sum, m) => sum + getRawPaidForMonth(tenantId, m).usd, 0);
+  const allocated = new Map();
+  months.forEach((m) => {
+    const expected = getMonthlyDueForTenant(tenantId, m);
+    const take = Math.max(0, Math.min(expected, pool));
+    allocated.set(m, roundUsd(take));
+    pool = roundUsd(pool - take);
+  });
+  return { allocated, leftover: roundUsd(Math.max(0, pool)) };
+}
+
+// What a new payment would cover, e.g. "Covers Aug 2026 + $20.00 toward Sep 2026".
+function paymentCoverage(tenantId, amountUsd) {
+  if (!isFixedMode() || !tenantId || !(amountUsd > 0)) return "";
+  const { allocated } = fifoMonthPaid(tenantId);
+  let pool = amountUsd;
+  const covered = [];
+  let partial = null;
+  getMonths().slice().sort().forEach((m) => {
+    if (pool <= 0.005) return;
+    const owed = roundUsd(getMonthlyDueForTenant(tenantId, m) - (allocated.get(m) || 0));
+    if (owed <= 0.005) return;
+    if (pool + 0.005 >= owed) { covered.push(m); pool = roundUsd(pool - owed); } else { partial = { month: m, usd: pool }; pool = 0; }
+  });
+  const parts = [];
+  if (covered.length) parts.push(tr("Covers {months}", { months: covered.map((m) => formatMonth(m)).join(", ") }));
+  if (partial) parts.push(tr("{amount} toward {month}", { amount: formatUsd(partial.usd), month: formatMonth(partial.month) }));
+  if (pool > 0.005) parts.push(tr("{amount} in advance", { amount: formatUsd(pool) }));
+  return parts.join(" · ");
+}
+
+function renderPaymentCoverage() {
+  let box = document.querySelector("#paymentCoverage");
+  if (!box) {
+    box = mk("div", { id: "paymentCoverage", className: "split-preview hidden" });
+    els.expenseConversionPreview.after(box);
+  }
+  const isPayment = els.transactionCategory.value === "Payments" && !editingExpenseId;
+  const { amountUsd, amountLbp } = readFormAmount();
+  const text = isPayment ? paymentCoverage(els.transactionTenant.value, toUsd(amountUsd, amountLbp)) : "";
+  box.classList.toggle("hidden", !text);
+  box.textContent = text;
+}
+
+// ── Due day and "late" ──────────────────────────────────────────────────────
+function monthDueDate(month) {
+  const day = Number(state.settings.dueDay || 0);
+  if (!day) return "";
+  return `${monthKey(month)}-${String(Math.min(28, Math.max(1, day))).padStart(2, "0")}`;
+}
+
+function isMonthLate(month, today = localDateInput()) {
+  const due = monthDueDate(month);
+  return Boolean(due) && today > due;
+}
+
+function lateTenants(month, today = localDateInput()) {
+  if (!isFixedMode() || !isMonthLate(month, today)) return [];
+  return state.tenants.filter((t) => t.active !== false).filter((t) => {
+    const s = paymentStatus(t.id, month);
+    return s.expected > 0 && s.paid + 0.005 < s.expected;
+  });
+}
+
+// ── Message wording, per tenant language ────────────────────────────────────
+function trIn(lang, en, params) {
+  let str = lang === "ar" && DYN_AR[en] != null ? DYN_AR[en] : en;
+  if (params) for (const name in params) str = str.split(`{${name}}`).join(String(params[name]));
+  return str;
+}
+
+function tenantLanguage(tenant) {
+  return tenant?.language === "ar" || tenant?.language === "en" ? tenant.language : currentLang;
+}
+
+function fillTemplate(template, values) {
+  return String(template).replace(/\{(name|amount|month|building|unit)\}/g, (_, key) => String(values[key] ?? ""));
+}
+
+// The reminder text a tenant receives: the owner's own wording when set,
+// otherwise the standard text, in the tenant's language.
+function reminderText(tenant, amount, month, { statement = false } = {}) {
+  const lang = tenantLanguage(tenant);
+  const custom = String(state.settings.messageTemplates?.reminder?.[lang] || "").trim();
+  const values = { name: tenant.name, amount: formatUsd(amount), month: month ? formatMonth(month) : "", building: state.building?.name || "", unit: tenant.unit || "" };
+  if (custom) return fillTemplate(custom, values);
+  const lines = [trIn(lang, "{building} – Payment Reminder", { building: values.building })];
+  lines.push(statement
+    ? trIn(lang, "Hi {name}, your outstanding balance{monthLine} is {amount}.", { name: tenant.name, monthLine: month ? trIn(lang, " as of the {month} statement", { month: values.month }) : "", amount: values.amount })
+    : trIn(lang, "Hi {name}, your building payment for {month} is outstanding: {amount}.", { name: tenant.name, month: values.month, amount: values.amount }));
+  const pay = String(state.settings.paymentInstructions || "").trim();
+  if (pay) lines.push(pay);
+  lines.push(trIn(lang, "Please settle at your earliest convenience. Thank you."));
+  return lines.join("\n");
+}
+
+// ── Expenses without an invoice photo ───────────────────────────────────────
+function expensesMissingInvoice(year = String(new Date().getFullYear())) {
+  return state.transactions
+    .filter((t) => t.category === "Expenses" && !t.serviceType && String(transactionDateValue(t)).startsWith(`${year}-`) && !hasInvoicePhoto(t.invoiceAttachment))
+    .sort((a, b) => String(transactionDateValue(b)).localeCompare(String(transactionDateValue(a))));
+}
+
+function buildMissingInvoiceSection() {
+  const list = expensesMissingInvoice();
+  if (!list.length) return note(tr("Every expense this year has its invoice photo ✓"));
+  return mk("div", {},
+    note(tr("{n} expenses this year have no invoice photo. Tap one to add it.", { n: list.length })),
+    mk("div", {}, list.slice(0, 30).map((t) => {
+      const row = breakdownRow(t.description || tr(t.expenseCategory || "Expense"), formatUsd(txUsd(t, t.debitUsd, t.debitLbp)), `${formatDateLabel(t.date)}${t.supplier ? ` · ${t.supplier}` : ""}`);
+      row.classList.add("is-tappable");
+      row.addEventListener("click", () => openExpenseEditDialog(t.id));
+      return row;
+    })));
+}
+
+// ── Meter readings: checks and photos ───────────────────────────────────────
+function lastMonthKwh(tenantId, month) {
+  const before = (state.serviceReadings || [])
+    .filter((r) => r.serviceType === "generator" && monthKey(r.forMonth) < monthKey(month) && r.lines?.[tenantId])
+    .sort((a, b) => String(b.forMonth).localeCompare(String(a.forMonth)))[0];
+  if (!before) return null;
+  const l = before.lines[tenantId];
+  return Math.max(0, Number(l.currentReading || 0) - Number(l.previousReading || 0));
+}
+
+function meterReadingCheck(previous, current, lastKwh) {
+  if (!current) return null;
+  if (current < previous) return { level: "error", text: tr("Lower than last month's reading") };
+  const kwh = current - previous;
+  if (lastKwh && lastKwh > 0 && kwh > lastKwh * 2) return { level: "warn", text: tr("{kwh} kWh — more than double last month ({last})", { kwh, last: lastKwh }) };
+  return null;
+}
+
+function checkGeneratorReadingRows() {
+  const month = monthIso(els.generatorBillMonth.value);
+  els.generatorReadingRows.querySelectorAll(".gen-reading-row").forEach((row) => {
+    const prev = Number(row.querySelector(".gen-prev").value || 0);
+    const curr = Number(row.querySelector(".gen-curr").value || 0);
+    const last = lastMonthKwh(row.dataset.tenantId, month);
+    let hint = row.querySelector(".gen-reading-check");
+    if (!hint) { hint = mk("div", { className: "gen-reading-check" }); row.append(hint); }
+    const check = meterReadingCheck(prev, curr, last);
+    hint.className = `gen-reading-check ${check ? `is-${check.level}` : ""}`;
+    hint.textContent = check ? check.text : last != null && curr > prev ? tr("{kwh} kWh (last month {last})", { kwh: curr - prev, last }) : "";
+  });
+}
+
+function addMeterPhotoButtons(month) {
+  const existing = getServiceReadingRecord("generator", month);
+  els.generatorReadingRows.querySelectorAll(".gen-reading-row").forEach((row) => {
+    if (row.querySelector(".gen-photo")) return;
+    const saved = existing?.lines?.[row.dataset.tenantId]?.photo;
+    if (saved) row.dataset.photo = JSON.stringify(saved);
+    const input = mk("input", { type: "file", accept: "image/*", capture: "environment", className: "file-input-hidden" });
+    const button = miniButton(saved ? tr("Photo ✓") : tr("Meter photo"), () => input.click(), "gen-photo");
+    input.addEventListener("change", async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (cloudProvider() !== "supabase" || !authSession) { showToast("Sign in with Google as the owner to keep meter photos", 5000); return; }
+      button.disabled = true;
+      button.textContent = tr("Uploading…");
+      try {
+        const tenant = state.tenants.find((t) => t.id === row.dataset.tenantId);
+        const record = { id: `meter-${row.dataset.tenantId}`, invoice: `meter-${safeFilePart(tenant?.unit || "unit", "unit")}`, description: "meter", date: `${monthKey(month)}-28` };
+        const prepared = await prepareInvoiceUpload(record, file);
+        const attachment = await uploadInvoiceToSupabase(record, prepared);
+        row.dataset.photo = JSON.stringify(attachment);
+        button.textContent = tr("Photo ✓");
+      } catch (error) {
+        button.textContent = tr("Meter photo");
+        showToast(error.message || String(error), 5000);
+      } finally {
+        button.disabled = false;
+      }
+    });
+    row.append(input, button);
+    if (saved) row.append(miniButton(tr("View"), () => openInvoicePhoto(saved), "gen-photo-view"));
+  });
+}
+
+// ── QR invites ──────────────────────────────────────────────────────────────
+function joinLink(code) {
+  return `${location.origin}${location.pathname}?join=${encodeURIComponent(code)}`;
+}
+
+function qrBlock(text, caption) {
+  const canvas = qrCanvas(text, 300);
+  canvas.className = "qr-canvas";
+  return mk("div", { className: "qr-block" }, canvas, caption ? mk("p", { className: "settings-note", text: caption }) : null);
+}
+
+async function openInviteQr(tenant) {
+  if (!isOwnerSession()) { showToast("Sign in with Google first: only the signed-in owner can create invite codes", 6000); return; }
+  try {
+    const res = await supabaseRequest("rpc/create_claim_code", { method: "POST", body: JSON.stringify({ p_tenant_id: tenant.id }) });
+    const code = String(await res.json());
+    openToolDialog(tr("Invite {name}", { name: tenant.name }),
+      qrBlock(joinLink(code), tr("{name} scans this with the phone camera, opens the link and taps Link this phone. Code: {code}", { name: tenant.name, code })),
+      mk("div", { className: "button-row" }, secondaryButton(tr("Done"), closeToolDialog)));
+  } catch (error) {
+    showToast(describeSyncProblem(error), 6000);
+  }
+}
+
+// ── A notice to print, with a QR code to the app ────────────────────────────
+function wrapCanvasText(ctx, text, maxWidth) {
+  const lines = [];
+  String(text || "").split("\n").forEach((paragraph) => {
+    let line = "";
+    paragraph.split(/\s+/).forEach((word) => {
+      const test = line ? `${line} ${word}` : word;
+      if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = word; } else line = test;
+    });
+    lines.push(line);
+  });
+  return lines;
+}
+
+function drawNoticePoster(notice) {
+  const rtl = currentLang === "ar";
+  const W = 1240;
+  const H = 1754;
+  const PAD = 110;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const X = (x) => (rtl ? W - x : x);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#163832";
+  ctx.fillRect(0, 0, W, 300);
+  ctx.textAlign = "start";
+  ctx.fillStyle = "#cfe3db";
+  ctx.font = `700 46px ${FONT}`;
+  ctx.fillText(state.building?.name || "", X(PAD), 130);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `800 64px ${FONT}`;
+  ctx.fillText(tr("Notice"), X(PAD), 220);
+  ctx.fillStyle = "#14211f";
+  ctx.font = `800 72px ${FONT}`;
+  let y = 440;
+  wrapCanvasText(ctx, notice.title, W - PAD * 2).forEach((line) => { ctx.fillText(line, X(PAD), y); y += 90; });
+  y += 30;
+  ctx.font = `400 46px ${FONT}`;
+  ctx.fillStyle = "#2a3b37";
+  wrapCanvasText(ctx, notice.body || "", W - PAD * 2).forEach((line) => { if (y < H - 520) { ctx.fillText(line, X(PAD), y); y += 66; } });
+  if (notice.until) {
+    y += 30;
+    ctx.font = `600 40px ${FONT}`;
+    ctx.fillStyle = "#61706b";
+    ctx.fillText(tr("Until {date}", { date: formatDateLabel(notice.until) }), X(PAD), y);
+  }
+  const qr = qrCanvas(inviteAppUrl(), 300);
+  const qx = rtl ? PAD : W - PAD - 300;
+  ctx.drawImage(qr, qx, H - 420, 300, 300);
+  ctx.font = `600 38px ${FONT}`;
+  ctx.fillStyle = "#14211f";
+  ctx.textAlign = rtl ? "right" : "left";
+  ctx.fillText(tr("Building app"), rtl ? W - PAD : PAD, H - 300);
+  ctx.font = `400 32px ${FONT}`;
+  ctx.fillStyle = "#61706b";
+  ctx.fillText(tr("Scan to see your balance and the news"), rtl ? W - PAD : PAD, H - 250);
+  ctx.fillText(formatDateLabel(String(notice.createdAt || localDateInput()).slice(0, 10)), rtl ? W - PAD : PAD, H - 200);
+  return canvas;
+}
+
+// A one-page PDF holding a single JPEG (A4).
+function singleImagePdf(jpegBytes, width, height) {
+  const enc = new TextEncoder();
+  const parts = [];
+  const offsets = [];
+  let length = 0;
+  const push = (chunk) => { const bytes = typeof chunk === "string" ? enc.encode(chunk) : chunk; parts.push(bytes); length += bytes.length; };
+  push("%PDF-1.4\n");
+  const obj = (n, body) => { offsets[n] = length; push(`${n} 0 obj\n${body}\nendobj\n`); };
+  obj(1, "<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2, "<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+  obj(3, "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>");
+  offsets[4] = length;
+  push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`);
+  push(jpegBytes);
+  push("\nendstream\nendobj\n");
+  const content = "q 595 0 0 842 0 0 cm /Im0 Do Q";
+  obj(5, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  const xref = length;
+  push(`xref\n0 6\n0000000000 65535 f \n${[1, 2, 3, 4, 5].map((n) => `${String(offsets[n]).padStart(10, "0")} 00000 n \n`).join("")}`);
+  push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  const out = new Uint8Array(length);
+  let at = 0;
+  parts.forEach((p) => { out.set(p, at); at += p.length; });
+  return out;
+}
+
+async function shareNoticePoster(notice) {
+  const canvas = drawNoticePoster(notice);
+  const jpeg = base64ToBytes(canvas.toDataURL("image/jpeg", 0.9).split(",")[1] || "");
+  const pdf = singleImagePdf(jpeg, canvas.width, canvas.height);
+  const fileName = `Notice_${safeFilePart(notice.title, "notice")}.pdf`;
+  const file = new File([pdf], fileName, { type: PDF_MIME });
+  try {
+    if (typeof navigator.share === "function" && (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] }))) {
+      await navigator.share({ files: [file], title: notice.title });
+      return;
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(file, PDF_MIME, fileName);
+}
+
+// ── Tenant: every receipt in one file ───────────────────────────────────────
+function tenantReceiptFiles(tenantId) {
+  return state.transactions
+    .filter((t) => t.tenantId === tenantId && isReceiptablePayment(t))
+    .map((t) => getPaymentReceiptData(t.id))
+    .filter(Boolean)
+    .map((data) => ({ name: receiptPdfFileName(data), content: buildPaymentReceiptPdf(data) }));
+}
+
+function downloadAllMyReceipts() {
+  const files = tenantReceiptFiles(sessionTenantId);
+  if (!files.length) { showToast("No receipts yet"); return; }
+  const tenant = state.tenants.find((t) => t.id === sessionTenantId);
+  downloadBlob(new Blob([buildZip(files)], { type: "application/zip" }), "application/zip", `receipts-${safeFilePart(tenant?.unit || "unit", "unit")}.zip`);
+  showToast(tr("{n} receipts downloaded", { n: files.length }));
+}
+
+// ── Vote results go to tenants' phones ──────────────────────────────────────
+const POLL_RESULTS_FROM = "2026-10-21";
+function pollResultLine(poll) {
+  const t = pollTally(poll);
+  const voted = t.yes + t.no + t.abstain;
+  if (!voted) return tr("No votes were cast.");
+  const pct = (v) => (t.total > 0 ? Math.round((v / t.total) * 100) : 0);
+  const verdict = t.yes > t.no ? tr("Result: YES") : t.no > t.yes ? tr("Result: NO") : tr("Result: tie");
+  return t.mode === "share"
+    ? `${verdict} — ${tr("YES {y}% · NO {n}% of the shares", { y: pct(t.yes), n: pct(t.no) })}`
+    : `${verdict} — ${tr("YES {y} · NO {n}", { y: t.yes, n: t.no })}`;
+}
+
+function announceClosedPolls(today = localDateInput()) {
+  if (sessionMode !== "owner" || isViewerSession()) return 0;
+  let sent = 0;
+  (state.polls || []).forEach((poll) => {
+    if (pollIsOpen(poll) || poll.resultNotifiedAt) return;
+    const closedOn = String(poll.closedAt || poll.closesOn || "").slice(0, 10);
+    if (!closedOn || closedOn < POLL_RESULTS_FROM || closedOn > today) return;
+    notifyTenants(null, tr("Vote closed: {title}", { title: poll.title }), pollResultLine(poll));
+    poll.resultNotifiedAt = new Date().toISOString();
+    sent += 1;
+  });
+  if (sent) saveState();
+  return sent;
+}
+
+// ── Reports: money in and out, 12 months ────────────────────────────────────
+function moneyFlowByMonth(count = 12, today = localDateInput()) {
+  const end = monthKey(today);
+  const months = [];
+  let [y, m] = end.split("-").map(Number);
+  for (let i = 0; i < count; i += 1) {
+    months.unshift(`${y}-${String(m).padStart(2, "0")}`);
+    m -= 1;
+    if (!m) { m = 12; y -= 1; }
+  }
+  const map = new Map(months.map((k) => [k, { month: k, in: 0, out: 0 }]));
+  state.transactions.filter((t) => t.category !== "Opening Balance").forEach((t) => {
+    const row = map.get(monthKey(transactionDateValue(t)));
+    if (!row) return;
+    const net = transactionNetUsd(t);
+    if (net >= 0) row.in += net; else row.out += -net;
+  });
+  return months.map((k) => ({ ...map.get(k), in: roundUsd(map.get(k).in), out: roundUsd(map.get(k).out) }));
+}
+
+function buildMoneyFlowChart() {
+  const rows = moneyFlowByMonth();
+  const max = Math.max(1, ...rows.flatMap((r) => [r.in, r.out]));
+  const W = 340;
+  const H = 150;
+  const slot = W / rows.length;
+  const bar = Math.max(3, slot / 2 - 2);
+  const svgNs = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H + 18}`);
+  svg.setAttribute("class", "flow-chart");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", tr("Money in and out, last 12 months"));
+  rows.forEach((r, i) => {
+    const x = i * slot + 2;
+    [[r.in, "flow-in", 0], [r.out, "flow-out", bar + 1]].forEach(([v, cls, dx]) => {
+      const h = Math.round((v / max) * H);
+      const rect = document.createElementNS(svgNs, "rect");
+      rect.setAttribute("x", String(x + dx));
+      rect.setAttribute("y", String(H - h));
+      rect.setAttribute("width", String(bar));
+      rect.setAttribute("height", String(Math.max(h, v > 0 ? 1 : 0)));
+      rect.setAttribute("rx", "2");
+      rect.setAttribute("class", cls);
+      svg.append(rect);
+    });
+    if (i % 2 === rows.length % 2) {
+      const label = document.createElementNS(svgNs, "text");
+      label.setAttribute("x", String(x + bar));
+      label.setAttribute("y", String(H + 14));
+      label.setAttribute("text-anchor", "middle");
+      label.setAttribute("class", "flow-label");
+      label.textContent = shortMonth(`${r.month}-01`).split(" ")[0];
+      svg.append(label);
+    }
+  });
+  const totalIn = roundUsd(rows.reduce((s, r) => s + r.in, 0));
+  const totalOut = roundUsd(rows.reduce((s, r) => s + r.out, 0));
+  return mk("div", {},
+    svg,
+    mk("div", { className: "flow-legend" },
+      mk("span", { className: "flow-key in", text: tr("In {amount}", { amount: formatUsd(totalIn) }) }),
+      mk("span", { className: "flow-key out", text: tr("Out {amount}", { amount: formatUsd(totalOut) }) })));
+}
+
+// ── Reserve forecast ────────────────────────────────────────────────────────
+function reserveForecast(today = localDateInput()) {
+  const rows = moneyFlowByMonth(7, today).slice(0, 6); // the 6 complete months before this one
+  const withActivity = rows.filter((r) => r.in || r.out);
+  if (withActivity.length < 3) return null;
+  const avg = roundUsd(withActivity.reduce((s, r) => s + r.in - r.out, 0) / withActivity.length);
+  const cash = getPositionTotals().cashUsd;
+  const monthsLeft = 12 - Number(String(today).slice(5, 7));
+  const byDecember = roundUsd(cash + avg * monthsLeft);
+  const monthsUntilEmpty = avg < 0 && cash > 0 ? Math.floor(cash / -avg) : null;
+  return { avg, cash, byDecember, monthsLeft, monthsUntilEmpty };
+}
+
+function reserveForecastText(f = reserveForecast()) {
+  if (!f) return "";
+  if (f.monthsUntilEmpty !== null) {
+    return tr("Spending is ahead of income by {amount} a month on average. At this pace the cash runs out in about {n} months.", { amount: formatUsd(-f.avg), n: f.monthsUntilEmpty });
+  }
+  return tr("On average {amount} a month {dir} over the last 6 months. At this pace: about {dec} by December.", {
+    amount: formatUsd(Math.abs(f.avg)), dir: f.avg >= 0 ? tr("comes in more than goes out") : tr("goes out more than comes in"), dec: formatUsd(f.byDecember),
+  });
+}
+
+// ── LBP rate: quick change with history ─────────────────────────────────────
+function setConversionRate(rate, date = localDateInput()) {
+  const value = Math.max(1, Math.round(Number(rate || 0)));
+  if (!value || value === getConversionRate()) return false;
+  const history = (state.settings.rateHistory ||= []);
+  if (!history.length) history.push({ date: "", rate: getConversionRate() });
+  history.push({ date, rate: value });
+  state.settings.rateHistory = history.slice(-24);
+  state.settings.lbpPerUsd = value;
+  return true;
+}
+
+function openRateDialog() {
+  const input = numberInput(getConversionRate(), { step: "100", min: "1" });
+  const history = (state.settings.rateHistory || []).slice().reverse().slice(0, 6);
+  openToolDialog(tr("LBP rate"),
+    field(tr("Lebanese pounds per dollar"), input, tr("New entries use the new rate. Past entries keep theirs.")),
+    history.length ? mk("div", {}, history.map((h) => breakdownRow(numberFormat.format(h.rate), "", h.date ? tr("from {date}", { date: formatDateLabel(h.date) }) : tr("earlier")))) : null,
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), () => {
+      if (!setConversionRate(input.value)) { closeToolDialog(); return; }
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+      updateExpenseConversionPreview();
+      showToast(tr("Rate set to {rate} LBP/USD", { rate: numberFormat.format(getConversionRate()) }));
+    }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Getting started (owner) ─────────────────────────────────────────────────
+const SETUP_DISMISS_KEY = "building-account-tracker:setup-dismissed";
+function setupSteps() {
+  const active = state.tenants.filter((t) => t.active !== false);
+  const generatorUsed = state.transactions.some((t) => t.serviceType === "generator");
+  const linked = Object.values(tenantLinkInfo || {}).some((i) => i?.phones);
+  return [
+    { key: "tenants", done: active.length > 0, text: tr("Add the flats and tenants"), go: () => setView("tenantsView") },
+    { key: "coef", done: active.length > 0 && active.reduce((s, t) => s + Number(t.coefficient || 0), 0) === 1000, text: tr("Coefficients add up to 1000"), go: () => setView("tenantsView") },
+    { key: "phones", done: active.length > 0 && active.every((t) => t.phone), text: tr("A phone number for every tenant"), go: () => setView("tenantsView") },
+    ...(generatorUsed ? [{ key: "amps", done: active.every((t) => Number(t.breakerAmps || 0) > 0), text: tr("Breaker size for every flat (generator)"), go: () => setView("tenantsView") }] : []),
+    { key: "pay", done: Boolean(String(state.settings.paymentInstructions || "").trim()), text: tr("How tenants can pay (Settings)"), go: () => setView("settingsView") },
+    { key: "invite", done: linked, text: tr("Invite tenants to the app"), go: () => openInviteAllDialog() },
+    { key: "payment", done: state.transactions.some((t) => t.category === "Payments"), text: tr("Record the first payment"), go: () => openEntryForm("Payments") },
+  ];
+}
+
+function gettingStartedCard() {
+  if (sessionMode !== "owner" || isViewerSession()) return null;
+  try { if (localStorage.getItem(SETUP_DISMISS_KEY)) return null; } catch { /* private mode */ }
+  const steps = setupSteps();
+  const done = steps.filter((s) => s.done).length;
+  if (done === steps.length) return null;
+  const hide = mk("button", { type: "button", className: "icon-button small", text: "×", "aria-label": tr("Hide") });
+  hide.addEventListener("click", () => { try { localStorage.setItem(SETUP_DISMISS_KEY, "1"); } catch { /* */ } renderDashboard(); });
+  return mk("section", { id: "gettingStarted", className: "panel getting-started" },
+    mk("div", { className: "panel-header" }, mk("h3", { text: tr("Getting started") }), mk("span", { className: "panel-note", text: tr("{done} of {total} done", { done, total: steps.length }) }), hide),
+    mk("div", { className: "mh-bar" }, mk("span", { className: "mh-bar-fill is-done", style: `width:${Math.round((done / steps.length) * 100)}%` })),
+    mk("div", { className: "setup-steps" }, steps.map((s) => {
+      const row = mk("button", { type: "button", className: `setup-step${s.done ? " is-done" : ""}` },
+        mk("span", { className: "setup-tick", text: s.done ? "✓" : "" }), mk("span", { text: s.text }));
+      if (!s.done) row.addEventListener("click", s.go);
+      return row;
+    })));
+}
+
+function renderGettingStarted() {
+  document.querySelector("#gettingStarted")?.remove();
+  const card = gettingStartedCard();
+  if (card && els.attentionPanel) els.attentionPanel.before(card);
+}
+
+// ── Empty screens point to the first step ───────────────────────────────────
+const EMPTY_ACTIONS = [
+  ["noticesView", "#newNoticeButton"], ["issuesView", "#newIssueButton"], ["maintenanceView", "#newMaintenanceButton"],
+  ["meetingsView", "#newMeetingButton"], ["suppliersView", "#newSupplierButton"], ["documentsView", "#newDocumentButton"],
+  ["pollsView", "#createPollButton"], ["tenantsView", "#addTenantButton"], ["ledgerView", "#openAddButton"], ["projectsView", "#createProjectButton"],
+];
+function decorateEmptyStates() {
+  EMPTY_ACTIONS.forEach(([viewId, buttonSel]) => {
+    const view = document.getElementById(viewId);
+    const source = document.querySelector(buttonSel);
+    if (!view || !source) return;
+    const visible = !source.classList.contains("hidden") && !(source.classList.contains("owner-only") && sessionMode !== "owner");
+    view.querySelectorAll(".empty-state").forEach((empty) => {
+      if (!visible || empty.querySelector(".empty-action")) return;
+      const label = buttonSel === "#openAddButton" ? tr("Add the first entry") : (source.textContent || "").trim().replace(/^\+\s*/, "") || tr("Add");
+      empty.append(mk("div", {}, primaryButton(label, () => source.click())));
+      empty.lastChild.firstChild.classList.add("empty-action");
+    });
+  });
+}
+
+// ── Generator schedule shown to tenants ─────────────────────────────────────
+function generatorScheduleCard() {
+  const text = String(state.settings.generatorSchedule || "").trim();
+  if (!text) return null;
+  return mk("article", { className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Generator hours") })),
+    mk("p", { className: "notice-body how-to-pay-text", text }));
+}
+
+function renderGeneratorScheduleNote() {
+  const view = document.querySelector("#servicesView");
+  if (!view) return;
+  document.querySelector("#generatorScheduleNote")?.remove();
+  const card = generatorScheduleCard();
+  if (!card) return;
+  card.id = "generatorScheduleNote";
+  const anchor = view.querySelector(".section-title");
+  if (anchor) anchor.after(card);
+}
+
+// ── Settings fields added in v165 ───────────────────────────────────────────
+function renderV165SettingsFields() {
+  const after = document.querySelector("#paymentInstructionsField");
+  if (!after) return;
+  if (!document.querySelector("#v165SettingsFields")) {
+    const due = mk("input", { id: "dueDayInput", type: "number", min: "0", max: "28", step: "1", inputmode: "numeric", placeholder: tr("e.g. 10") });
+    const schedule = mk("textarea", { id: "generatorScheduleInput", rows: "2", maxlength: "300", placeholder: tr("e.g. On 6:00–1:00, off 1:00–6:00") });
+    const tplEn = mk("textarea", { id: "reminderTemplateEn", rows: "3", maxlength: "600", placeholder: tr("Leave empty for the standard message") });
+    const tplAr = mk("textarea", { id: "reminderTemplateAr", rows: "3", maxlength: "600", dir: "rtl", placeholder: tr("Leave empty for the standard message") });
+    after.after(mk("div", { id: "v165SettingsFields" },
+      mk("label", { id: "dueDayField" }, mk("span", { text: tr("Dues are due by day") }), due, mk("small", { className: "field-hint", text: tr("After that day, unpaid tenants show as late. 0 or empty = no due day.") })),
+      mk("label", {}, mk("span", { text: tr("Generator hours (shown to tenants)") }), schedule),
+      mk("label", {}, mk("span", { text: tr("Reminder message — English") }), tplEn),
+      mk("label", {}, mk("span", { text: tr("Reminder message — Arabic") }), tplAr),
+      mk("small", { className: "field-hint", text: tr("You can use {name}, {amount}, {month}, {unit} and {building}. Each tenant gets the language set in their Details.") }),
+      mk("div", { className: "settings-action" },
+        mk("div", { className: "settings-action-text" }, mk("strong", { text: tr("LBP rate") }), mk("span", { id: "rateHistoryText" })),
+        secondaryButton(tr("Change"), openRateDialog))));
+  }
+  const set = (id, value) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = value ?? ""; };
+  set("dueDayInput", state.settings.dueDay || "");
+  set("generatorScheduleInput", state.settings.generatorSchedule || "");
+  set("reminderTemplateEn", state.settings.messageTemplates?.reminder?.en || "");
+  set("reminderTemplateAr", state.settings.messageTemplates?.reminder?.ar || "");
+  document.querySelector("#dueDayField")?.classList.toggle("hidden", !isFixedMode());
+  const rateText = document.querySelector("#rateHistoryText");
+  if (rateText) {
+    const last = (state.settings.rateHistory || []).at(-1);
+    rateText.textContent = last?.date
+      ? tr("{rate} since {date}", { rate: numberFormat.format(getConversionRate()), date: formatDateLabel(last.date) })
+      : tr("{rate} LBP/USD", { rate: numberFormat.format(getConversionRate()) });
+  }
+}
+
+function readV165SettingsFields() {
+  const value = (id) => document.getElementById(id)?.value ?? null;
+  const due = value("dueDayInput");
+  if (due !== null) state.settings.dueDay = Math.max(0, Math.min(28, Math.round(Number(due || 0)))) || 0;
+  const schedule = value("generatorScheduleInput");
+  if (schedule !== null) state.settings.generatorSchedule = schedule.trim();
+  const en = value("reminderTemplateEn");
+  const ar = value("reminderTemplateAr");
+  if (en !== null || ar !== null) state.settings.messageTemplates = { ...(state.settings.messageTemplates || {}), reminder: { en: String(en || "").trim(), ar: String(ar || "").trim() } };
+}
+
+// ── Loading placeholders while the first sync runs ──────────────────────────
+function setFirstSyncLoading(on) {
+  document.body.classList.toggle("is-first-sync", Boolean(on) && !state.tenants.length);
+}
+
+function attachV165Events() {
+  attachSwipeGestures();
+  els.transactionTenant?.addEventListener("change", renderPaymentCoverage);
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -15141,9 +16284,13 @@ async function boot() {
   // Returning from Google? Finish signing in before the first sync, so that
   // sync already runs as the owner.
   captureAdminInvite();
+  captureLaunchParams();
+  runLaunchAction();
   if (usesOwnerAccounts()) await completeGoogleSignIn();
 
+  setFirstSyncLoading(true);
   await syncFromSheet();
+  setFirstSyncLoading(false);
 
   setInterval(() => { if (sessionMode) syncFromSheet({ silent: true }); }, 60000);
 }
@@ -15212,6 +16359,28 @@ export const __test = {
   yearFullyClosed,
   v158AttentionItems,
   v160AttentionItems,
+  qrMatrix,
+  fifoMonthPaid,
+  paymentCoverage,
+  isMonthLate,
+  lateTenants,
+  reminderText,
+  trIn,
+  fillTemplate,
+  expensesMissingInvoice,
+  meterReadingCheck,
+  lastMonthKwh,
+  searchEverything,
+  syncAgoText,
+  pollResultLine,
+  announceClosedPolls,
+  moneyFlowByMonth,
+  reserveForecast,
+  setConversionRate,
+  setupSteps,
+  singleImagePdf,
+  tenantReceiptFiles,
+  paymentStatus,
   recentExpenseTemplates,
   expenseSplitPreview,
   lastPaymentMethod,

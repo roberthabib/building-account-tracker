@@ -4725,3 +4725,224 @@ html[data-theme="dark"] #toast .toast-undo { color: #1f6b5a; }
   html[data-theme="auto"] #toast { background: #e4ece9; color: #14211f; }
   html[data-theme="auto"] #toast .toast-undo { color: #1f6b5a; }
 }
+
+/* ═══ v165 ═══ */
+/* Search */
+#searchButton {
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.search-everything {
+  width: 100%;
+  min-height: 46px;
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 14px;
+  font: inherit;
+  background: var(--surface);
+  color: var(--ink);
+}
+.search-results {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Meter readings: checks and photos */
+.gen-reading-check {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.gen-reading-check.is-error {
+  color: var(--red);
+  font-weight: 700;
+}
+.gen-reading-check.is-warn {
+  color: var(--amber);
+  font-weight: 700;
+}
+.gen-reading-row .gen-photo,
+.gen-reading-row .gen-photo-view {
+  margin-top: 6px;
+}
+
+/* QR codes */
+.qr-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+.qr-canvas {
+  width: 220px;
+  height: 220px;
+  image-rendering: pixelated;
+  border-radius: 8px;
+  background: #fff;
+}
+.invite-actions {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+/* Money in and out chart */
+.flow-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.flow-chart .flow-in {
+  fill: var(--primary);
+}
+.flow-chart .flow-out {
+  fill: var(--red);
+  opacity: 0.75;
+}
+.flow-chart .flow-label {
+  fill: var(--muted);
+  font-size: 9px;
+}
+.flow-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.flow-key::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-inline-end: 6px;
+  vertical-align: -1px;
+}
+.flow-key.in::before {
+  background: var(--primary);
+}
+.flow-key.out::before {
+  background: var(--red);
+  opacity: 0.75;
+}
+
+/* Getting started */
+.getting-started .panel-header {
+  gap: 10px;
+}
+.getting-started .panel-note {
+  margin-inline-start: auto;
+}
+.getting-started .mh-bar {
+  margin: 4px 0 10px;
+}
+.setup-steps {
+  display: flex;
+  flex-direction: column;
+}
+.setup-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 2px;
+  border: 0;
+  border-top: 1px solid var(--line-inner);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+}
+.setup-step:first-child {
+  border-top: 0;
+}
+.setup-step.is-done {
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration: line-through;
+  cursor: default;
+}
+.setup-tick {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  color: #fff;
+}
+.setup-step.is-done .setup-tick {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Empty screens with a first action */
+.empty-state .primary-button {
+  margin-top: 14px;
+}
+
+/* Sheets follow the finger when pulled down */
+dialog[open] {
+  transition: transform 160ms ease;
+}
+
+/* Rate change inside the expense form */
+.rate-change {
+  margin-inline-start: 6px;
+}
+
+/* First sync: placeholders instead of empty cards */
+@keyframes shimmer {
+  from { background-position: -200px 0; }
+  to { background-position: 200px 0; }
+}
+body.is-first-sync .kpi strong,
+body.is-first-sync .kpi small {
+  color: transparent;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--line-inner) 0, var(--surface-2) 80px, var(--line-inner) 160px);
+  background-size: 400px 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+/* v165 header: room for the search button */
+.topbar {
+  gap: 10px;
+}
+.brand-lockup {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.brand-lockup > div {
+  min-width: 0;
+}
+.topbar .eyebrow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar-actions {
+  flex: 0 0 auto;
+}
+.topbar-actions .icon-button {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+}
+.sync-chip {
+  white-space: nowrap;
+}
+
+#generatorScheduleInput,
+#reminderTemplateEn,
+#reminderTemplateAr {
+  font: inherit;
+}
