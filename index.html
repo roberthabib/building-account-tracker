@@ -339,6 +339,15 @@
             <button class="more-menu-item owner-only" type="button" data-view="equipmentView" data-nav-icon="wrench">
               <span class="mm-text"><strong data-i18n="nav.equipment">Equipment</strong><span data-i18n="more.equipmentSub">Pump, lift, generator: warranties and service</span></span>
             </button>
+            <button class="more-menu-item staff-only" type="button" data-view="staffView" data-nav-icon="check">
+              <span class="mm-text"><strong data-i18n="nav.staff">Jobs &amp; supplies</strong><span data-i18n="more.staffSub">Concierge's jobs, supplies, visitors</span></span>
+            </button>
+            <button class="more-menu-item" type="button" data-view="bookingsView" data-nav-icon="calendar">
+              <span class="mm-text"><strong data-i18n="nav.bookings">Bookings</strong><span data-i18n="more.bookingsSub">Roof, hall, guest parking</span></span>
+            </button>
+            <button class="more-menu-item" type="button" data-view="boardView" data-nav-icon="users">
+              <span class="mm-text"><strong data-i18n="nav.board">Residents' board</strong><span data-i18n="more.boardSub">Neighbours' posts</span></span>
+            </button>
             <button class="more-menu-item" type="button" data-view="helpView" data-nav-icon="playCircle">
               <span class="mm-text"><strong data-i18n="nav.help">Help &amp; videos</strong><span data-i18n="more.helpSub">Short videos that show how it works</span></span>
             </button>
@@ -448,6 +457,39 @@
             <button class="primary-button" id="newEquipmentButton" type="button" data-i18n="maint.new">+ Add</button>
           </div>
           <div class="notice-list" id="equipmentList"></div>
+        </section>
+
+        <section class="view sub-view" id="staffView" aria-labelledby="staffViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="staffViewTitle" data-i18n="nav.staff">Jobs &amp; supplies</h2>
+            </div>
+          </div>
+          <div id="staffBody"></div>
+        </section>
+
+        <section class="view sub-view" id="bookingsView" aria-labelledby="bookingsViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="bookingsViewTitle" data-i18n="nav.bookings">Bookings</h2>
+            </div>
+          </div>
+          <div id="bookingsBody"></div>
+        </section>
+
+        <section class="view sub-view" id="boardView" aria-labelledby="boardViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="boardViewTitle" data-i18n="nav.board">Residents' board</h2>
+            </div>
+          </div>
+          <div id="boardBody"></div>
         </section>
 
         <section class="view sub-view" id="helpView" aria-labelledby="helpViewTitle">
@@ -695,6 +737,7 @@
             <select id="transactionServiceSplit">
               <option value="equal" data-i18n="opt.equalSplit">Equal split</option>
               <option value="coefficient" data-i18n="opt.byCoefficient">By coefficient</option>
+              <option value="meter" data-i18n="opt.byWaterMeter">By water meter</option>
             </select>
           </label>
         </div>

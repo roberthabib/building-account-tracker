@@ -5160,3 +5160,338 @@ body.concierge-mode #transactionPaidFrom {
   background: var(--primary);
   color: #ffffff;
 }
+
+/* ── v167 ─────────────────────────────────────────────────────────────────── */
+/* Jobs & supplies: owner and concierge only; the board is for residents. */
+body.tenant-mode:not(.concierge-mode) .staff-only,
+body.concierge-mode .more-menu-item[data-view="boardView"] {
+  display: none !important;
+}
+
+/* Paid until */
+.tenant-paid-until {
+  display: block;
+  color: var(--primary-dark, #1f6b5a);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.paid-until-card .notice-head strong { color: var(--primary-dark, #1f6b5a); }
+.settings-note.is-good {
+  color: var(--primary-dark, #1f6b5a);
+  font-weight: 700;
+}
+
+/* Only some flats pay */
+.flat-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0;
+}
+.flat-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.flat-picker-list .checkbox-row { margin: 4px 0; }
+
+/* Budget proposal */
+.proposal-figures {
+  margin-top: 10px;
+}
+.report-table .report-total td {
+  font-weight: 800;
+  border-top: 2px solid var(--line);
+}
+
+/* Jobs */
+.job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.job-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+}
+.job-row.is-done { background: var(--soft-green, #eaf4ee); }
+.job-row.is-done span:last-child { text-decoration: line-through; color: var(--label-muted, #61706b); }
+.job-check {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--primary, #1f6b5a);
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+}
+.job-row.is-done .job-check { background: var(--primary, #1f6b5a); }
+.job-history-row { align-items: center; gap: 10px; }
+.job-dots {
+  display: inline-flex;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+.job-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+}
+.job-dot.is-done { background: var(--primary, #1f6b5a); border-color: var(--primary, #1f6b5a); }
+.job-dot.is-missed { border-color: var(--red, #a23b3b); }
+.job-dot.is-today { border-color: var(--primary, #1f6b5a); }
+.job-dot.is-off { opacity: 0.35; }
+.weekday-picks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px 8px;
+}
+
+/* Supplies */
+.supply-row { align-items: center; gap: 8px; }
+.supply-row.is-low small { color: var(--red, #a23b3b); font-weight: 700; }
+.supply-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+.supply-qty b { min-width: 2.2em; text-align: center; }
+
+/* Bookings */
+.booking-days {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+.booking-row { align-items: center; gap: 8px; }
+.booking-row.is-mine strong { color: var(--primary-dark, #1f6b5a); }
+
+/* Residents' board */
+.board-post.is-pending { border-style: dashed; }
+.board-post .notice-date {
+  color: var(--label-muted, #61706b);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* Month checks */
+.month-lock-row { flex-wrap: wrap; }
+.month-check {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  flex-basis: 100%;
+}
+.month-check .status-pill { white-space: nowrap; }
+
+/* Water readings */
+.water-reading-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.water-reading-row {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.tool-dialog-body .two-col,
+.water-reading-row .two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+.late-reminder-controls { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Meeting pack signatures (print) */
+.print-signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 30px;
+}
+.print-signatures div { display: flex; flex-direction: column; gap: 46px; }
+.print-signatures .sign-line { border-bottom: 1px solid #333; }
+.flat-picker .checkbox-row input[type="checkbox"] { width: 22px; height: 22px; min-height: 0; margin: 0; flex: 0 0 auto; }
+.flat-picker-list .checkbox-row { margin: 2px 0; padding: 6px 0; }
+.breakdown-row > span.job-dots,
+.breakdown-row > span.supply-qty {
+  flex-direction: row;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.breakdown-row > span.job-dots { gap: 4px; }
+.breakdown-row > span.supply-qty { gap: 8px; }
+.board-post .notice-head .status-pill { white-space: nowrap; flex: 0 0 auto; }
+
+/* ── v167 part 2 ───────────────────────────────────────────────────────────── */
+body:not(.assistant-ready) .assistant-only { display: none !important; }
+
+.tool-list { display: flex; flex-direction: column; gap: 10px; }
+.tool-list .secondary-button { width: 100%; justify-content: flex-start; text-align: start; }
+
+/* Statement import */
+.import-rows { display: flex; flex-direction: column; gap: 10px; }
+.import-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.import-row.is-dup { opacity: 0.7; }
+.import-row .checkbox-row span { display: flex; flex-direction: column; gap: 2px; }
+.import-row .checkbox-row small { color: var(--label-muted, #61706b); font-weight: 400; overflow-wrap: anywhere; }
+.import-row select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+.import-dup { color: var(--gold-dark, #8a6a12); font-weight: 700; }
+
+/* Approvals */
+.approval-row { border-bottom: 1px solid var(--line-inner, #e4e9e4); padding-bottom: 8px; margin-bottom: 8px; }
+
+/* Asking the app */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-row .chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.assistant-input { display: flex; gap: 8px; align-items: flex-start; }
+.assistant-input textarea {
+  flex: 1;
+  min-height: 80px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--ink);
+}
+.mic-button { min-width: 44px; min-height: 44px; font-size: 1.1rem; }
+.mic-button.is-listening { background: var(--red-soft, #f7dede); animation: mic-pulse 1s infinite alternate; }
+@keyframes mic-pulse { from { transform: scale(1); } to { transform: scale(1.08); } }
+.assistant-answer p {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Install and notification sheet (bottom card, like an app store prompt) */
+.app-nudge {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 9000;
+  display: flex;
+  justify-content: center;
+  padding: 0 12px calc(12px + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.nudge-card {
+  width: min(460px, 100%);
+  padding: 18px 18px 20px;
+  border-radius: 26px;
+  background: #121a18;
+  color: #f2f6f4;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.35);
+  transform: translateY(120%);
+  transition: transform 0.28s ease;
+  pointer-events: auto;
+}
+.app-nudge.is-in .nudge-card { transform: translateY(0); }
+.app-nudge.is-leaving .nudge-card { transform: translateY(120%); }
+.nudge-head { display: flex; align-items: center; gap: 12px; }
+.nudge-head strong { flex: 1; font-size: 1.05rem; }
+.nudge-icon { width: 48px; height: 48px; border-radius: 13px; background: #fff; }
+.nudge-later {
+  border: 0;
+  background: none;
+  color: #f2f6f4;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+.nudge-art {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px 14px;
+  margin: 16px 0 14px;
+  padding: 16px 22px;
+  border-radius: 18px;
+  background: #2b3330;
+}
+.art-app { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.art-app i { display: block; width: 46px; height: 46px; border-radius: 12px; background: #424b47; }
+.art-app b { display: block; width: 26px; height: 5px; border-radius: 3px; background: #424b47; }
+.art-app.is-ours img { width: 46px; height: 46px; border-radius: 12px; background: #fff; }
+.art-app.is-ours small { font-size: 0.68rem; color: #f2f6f4; }
+.nudge-art-note { display: block; padding: 16px; }
+.art-note {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #3a4440;
+}
+.art-note img { width: 34px; height: 34px; border-radius: 9px; background: #fff; }
+.art-note span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.art-note strong { font-size: 0.85rem; }
+.art-note small { font-size: 0.78rem; color: #c9d4cf; }
+.nudge-card h3 { margin: 0 0 4px; font-size: 1.25rem; font-weight: 800; }
+.nudge-card p { margin: 0; color: #c9d4cf; font-size: 0.95rem; line-height: 1.4; }
+.nudge-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+.nudge-accept {
+  min-height: 48px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #14211f;
+  font: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+}

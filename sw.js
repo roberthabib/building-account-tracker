@@ -1,4 +1,4 @@
-const CACHE_NAME = "building-account-tracker-v166";
+const CACHE_NAME = "building-account-tracker-v167";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -54,6 +54,12 @@ self.addEventListener("push", (event) => {
       body: data.body || "",
       icon: "./assets/icon-192.png",
       badge: "./assets/icon-192.png",
+      vibrate: [180, 80, 180],
+      tag: data.tag || undefined,
+      renotify: Boolean(data.tag),
+      requireInteraction: false,
+      silent: false,
+      timestamp: Date.now(),
       data: { url: data.url || "./" },
     }),
   );

@@ -23,6 +23,14 @@ function redacted(me) {
     .map((x) => (x.shares ? { ...x, shares: x.shares[me] != null ? { [me]: x.shares[me] } : {} } : x));
   s.paymentDeclarations = s.paymentDeclarations.filter((d) => d.tenantId === me);
   delete s.auditLog; delete s.cashChecks;
+  ["routineTasks", "routineLog", "supplies", "visitorLog", "monthChecks", "balanceSnapshot", "equipment", "pendingExpenses"].forEach((k) => delete s[k]);
+  s.deposits = (s.deposits || []).filter((d) => d.tenantId === me);
+  s.bookings = (s.bookings || []).filter((b) => b.status !== "cancelled" || b.tenantId === me)
+    .map(({ by, ...b }) => (b.tenantId === me ? b : (({ tenantId, note, unit, ...rest }) => rest)(b)));
+  s.boardPosts = (s.boardPosts || []).filter((p) => (p.status === "approved" && Date.parse(p.createdAt) >= Date.now() - 30 * 864e5) || (p.tenantId === me && ["pending", "approved"].includes(p.status)))
+    .map((p) => (p.tenantId === me ? p : (({ tenantId, ...rest }) => rest)(p)));
+  s.transactions = s.transactions.map(({ onlyFlats, ...x }) => x);
+  s.buildingProjects = (s.buildingProjects || []).map(({ onlyFlats, ...p }) => (p.shares ? { ...p, shares: p.shares[me] != null ? { [me]: p.shares[me] } : {} } : p));
   s.paymentPlans = (s.paymentPlans || []).filter((p) => p.tenantId === me);
   s.issues = (s.issues || []).filter((i) => !i.tenantId || i.tenantId === me);
   s.announcements = (s.announcements || []).filter((n) => !n.publishAt || Date.parse(n.publishAt) <= Date.now()).map(({ seenBy, ...n }) => ({ ...n, seenByMe: (seenBy || []).includes(me) }));
@@ -119,6 +127,74 @@ http.createServer((req, res) => {
       issue.updatedAt = nowIso();
       touch(); return send(204);
     }
+    const t = (k) => (STATE[k] ||= []);
+    const meRec = () => STATE.tenants.find((x) => x.id === me);
+    if (path === "/rest/v1/rpc/concierge_tick_task") {
+      if (!isConcierge) return send(400, { message: "Concierge access only" });
+      const id = b.p_task_id + ":" + b.p_date;
+      const e = t("routineLog").find((l) => l.id === id);
+      if (e) Object.assign(e, { done: !e.done, at: nowIso(), by: "concierge" }); else t("routineLog").push({ id, taskId: b.p_task_id, date: b.p_date, done: true, at: nowIso(), by: "concierge" });
+      touch(); return send(200, e ? e.done : true);
+    }
+    if (path === "/rest/v1/rpc/concierge_adjust_supply") {
+      if (!isConcierge) return send(400, { message: "Concierge access only" });
+      const x = t("supplies").find((y) => y.id === b.p_supply_id); if (!x) return send(400, { message: "Supply not found" });
+      x.qty = Math.max(0, Number(x.qty || 0) + Number(b.p_delta || 0)); x.updatedAt = nowIso(); touch(); return send(200, x.qty);
+    }
+    if (path === "/rest/v1/rpc/concierge_log_visitor") {
+      if (!isConcierge) return send(400, { message: "Concierge access only" });
+      t("visitorLog").push({ id: "vis-" + crypto.randomBytes(3).toString("hex"), at: nowIso(), name: b.p_name, purpose: b.p_purpose || "", unit: b.p_unit || "", by: "concierge" });
+      touch(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/concierge_save_water_readings") {
+      if (!isConcierge) return send(400, { message: "Concierge access only" });
+      const rec = t("serviceReadings").find((r) => r.serviceType === "water" && String(r.forMonth).slice(0, 7) === String(b.p_month).slice(0, 7));
+      if (rec) Object.assign(rec, { lines: b.p_lines, enteredBy: "concierge", updatedAt: nowIso() });
+      else t("serviceReadings").push({ id: "wrd-" + crypto.randomBytes(3).toString("hex"), serviceType: "water", forMonth: b.p_month, lines: b.p_lines, enteredBy: "concierge", updatedAt: nowIso() });
+      touch(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/book_space") {
+      if (!me) return send(400, { message: "This device is not linked to a tenant" });
+      if (!(STATE.settings.spaces || []).some((x) => x.id === b.p_space_id)) return send(400, { message: "Space not found" });
+      if (!(b.p_from < b.p_to)) return send(400, { message: "The end time must be after the start" });
+      if (t("bookings").some((x) => x.spaceId === b.p_space_id && x.date === b.p_date && x.status !== "cancelled" && x.from < b.p_to && b.p_from < x.to)) return send(400, { message: "Already booked at that time" });
+      const id = "bk-" + crypto.randomBytes(3).toString("hex");
+      t("bookings").push({ id, spaceId: b.p_space_id, date: b.p_date, from: b.p_from, to: b.p_to, tenantId: me, unit: meRec()?.unit || "", note: b.p_note || "", status: "booked", createdAt: nowIso(), updatedAt: nowIso() });
+      touch(); return send(200, id);
+    }
+    if (path === "/rest/v1/rpc/cancel_my_booking") {
+      const x = t("bookings").find((y) => y.id === b.p_booking_id);
+      if (!me || !x || x.tenantId !== me) return send(400, { message: "Booking not found" });
+      Object.assign(x, { status: "cancelled", updatedAt: nowIso() }); touch(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/post_to_board") {
+      if (!me) return send(400, { message: "This device is not linked to a tenant" });
+      const id = "post-" + crypto.randomBytes(3).toString("hex");
+      t("boardPosts").push({ id, tenantId: me, authorName: meRec()?.name || "", authorUnit: meRec()?.unit || "", title: b.p_title, body: b.p_body || "", status: "pending", createdAt: nowIso(), updatedAt: nowIso(), ...(b.p_photo_path ? { photo: { storagePath: b.p_photo_path } } : {}) });
+      touch(); log.push("BOARD POST " + b.p_title); return send(200, id);
+    }
+    if (path === "/rest/v1/rpc/remove_my_post") {
+      const x = t("boardPosts").find((y) => y.id === b.p_post_id);
+      if (!me || !x || x.tenantId !== me) return send(400, { message: "Post not found" });
+      Object.assign(x, { status: "removed", updatedAt: nowIso() }); touch(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/update_my_details") {
+      if (!me) return send(400, { message: "This device is not linked to a tenant" });
+      if (!["en", "ar"].includes(b.p_language)) return send(400, { message: "Language must be en or ar" });
+      Object.assign(meRec(), { phone: b.p_phone || "", language: b.p_language, detailsAt: nowIso() }); touch(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/mark_month_checked") {
+      if (!isOwner) return send(400, { message: "Administrators only" });
+      t("monthChecks").push({ id: b.p_id, month: b.p_month, fingerprint: b.p_fingerprint || "", by: "helper@test", at: nowIso() }); touch(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/approve_expense") {
+      if (!isOwner) return send(400, { message: "Administrators only" });
+      const p = t("pendingExpenses").find((x) => x.id === b.p_id);
+      if (!p || p.status !== "pending") return send(400, { message: "This expense was already decided" });
+      if (b.p_approve) STATE.transactions.push(...(p.transactions || []).map((x) => ({ ...x, approvedBy: "helper@test", approvedAt: nowIso() })));
+      Object.assign(p, { status: b.p_approve ? "approved" : "rejected", decidedBy: "helper@test", updatedAt: nowIso() }); touch(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/step_down") return isOwner ? send(204) : send(400, { message: "Only the building owner can step down" });
     if (path === "/rest/v1/rpc/set_directory_optin") {
       if (!me) return send(400, { message: "This device is not linked to a tenant" });
       const t = STATE.tenants.find((x) => x.id === me); t.directory = Boolean(b.p_share); t.directoryAt = nowIso();
@@ -153,7 +229,9 @@ http.createServer((req, res) => {
           transactions: c.transactions.filter((x) => x.category === "Expenses" || x.category === "Services Expenses").map(({ shares, ...x }) => x),
           serviceReadings: c.serviceReadings, issues: c.issues || [], maintenanceTasks: c.maintenanceTasks || [], equipment: c.equipment || [], generatorServices: c.generatorServices || [],
           suppliers: (c.suppliers || []).map((x) => ({ id: x.id, name: x.name, trade: x.trade, phone: x.phone })), expenseCategories: c.expenseCategories || [],
-          announcements: (c.announcements || []).map(({ seenBy, ...n }) => n), monthLocks: c.monthLocks || [], deleted: c.deleted || {}, redaction: { role: "concierge" } });
+          announcements: (c.announcements || []).map(({ seenBy, ...n }) => n), monthLocks: c.monthLocks || [], deleted: c.deleted || {}, redaction: { role: "concierge" },
+          routineTasks: c.routineTasks || [], routineLog: c.routineLog || [], supplies: c.supplies || [], visitorLog: c.visitorLog || [],
+          bookings: (c.bookings || []).filter((b) => b.status !== "cancelled").map(({ tenantId, note, by, ...b }) => b) });
       }
       if (!me) return send(400, { message: "This device is not linked to a tenant yet" });
       return send(200, redacted(me));
@@ -188,7 +266,7 @@ http.createServer((req, res) => {
     }
     if (path.startsWith("/storage/v1/object/invoices/") && req.method === "POST") {
       const obj = decodeURIComponent(path.replace("/storage/v1/object/invoices/", ""));
-      if (isOwner || (me && (obj.startsWith("proofs/" + me + "/") || obj.startsWith("issues/" + me + "/"))) || (isConcierge && obj.startsWith("concierge/"))) { UPLOADS.push({ obj, by: tok.slice(0, 9), bytes: body.length }); return send(200, { Key: "invoices/" + obj }); }
+      if (isOwner || (me && (obj.startsWith("proofs/" + me + "/") || obj.startsWith("issues/" + me + "/") || obj.startsWith("board/" + me + "/"))) || (isConcierge && obj.startsWith("concierge/"))) { UPLOADS.push({ obj, by: tok.slice(0, 9), bytes: body.length }); return send(200, { Key: "invoices/" + obj }); }
       return send(403, { message: "new row violates row-level security policy" });
     }
     if (path.startsWith("/storage/v1/object/sign/")) {

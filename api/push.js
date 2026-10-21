@@ -75,7 +75,7 @@ module.exports = async function handler(req, res) {
   await Promise.all(
     data.subscriptions.map(async (subscription) => {
       try {
-        await webpush.sendNotification(subscription, payload, { TTL: 86400, urgency: "normal" });
+        await webpush.sendNotification(subscription, payload, { TTL: 86400, urgency: "high" });
         sent += 1;
       } catch (error) {
         // 404/410: the phone unsubscribed or the browser data was cleared.

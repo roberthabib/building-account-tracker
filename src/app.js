@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v166";
+const APP_VERSION = "v167";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,13 @@ const I18N = {
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
     "nav.help": "Help & videos",
+    "nav.staff": "Jobs & supplies",
+    "more.staffSub": "Concierge's jobs, supplies, visitors",
+    "nav.bookings": "Bookings",
+    "more.bookingsSub": "Roof, hall, guest parking",
+    "nav.board": "Residents' board",
+    "more.boardSub": "Neighbours' posts",
+    "opt.byWaterMeter": "By water meter",
     "nav.equipment": "Equipment",
     "more.equipmentSub": "Pump, lift, generator: warranties and service",
     "more.helpSub": "Short videos that show how it works",
@@ -751,6 +758,13 @@ const I18N = {
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
     "nav.help": "المساعدة والفيديوهات",
+    "nav.staff": "المهام واللوازم",
+    "more.staffSub": "مهام الناطور، اللوازم، الزوّار",
+    "nav.bookings": "الحجوزات",
+    "more.bookingsSub": "السطح، القاعة، موقف الضيوف",
+    "nav.board": "لوحة السكان",
+    "more.boardSub": "إعلانات الجيران",
+    "opt.byWaterMeter": "حسب عدّاد المياه",
     "nav.equipment": "المعدات",
     "more.equipmentSub": "المضخة، المصعد، المولّد: الكفالات والصيانة",
     "more.helpSub": "فيديوهات قصيرة تشرح طريقة الاستخدام",
@@ -1136,6 +1150,329 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Other Income": "دخل آخر",
+  "e.g. Rooftop antenna rent": "مثلاً: إيجار هوائي السطح",
+  "Who paid (optional)": "من دفع (اختياري)",
+  "Income recorded": "تم تسجيل الدخل",
+  "Other income": "دخل آخر",
+  "Antenna, parking or shop rent": "إيجار هوائي أو موقف أو محل",
+  "Money the building receives that isn't a tenant's dues: antenna rent, a parking space, a shop. It goes into the building's cash.": "مال يتلقاه المبنى ليس من مستحقات المستأجرين: إيجار هوائي، موقف، محل. يدخل في صندوق المبنى.",
+  "What for": "مقابل ماذا",
+  "Currency": "العملة",
+  "Paid into": "أُودع في",
+  "e.g. Returned when they move out": "مثلاً: يُعاد عند المغادرة",
+  "New deposit": "تأمين جديد",
+  "A deposit stays the tenant's money: it is kept apart from the building's cash and returned when they leave.": "التأمين يبقى مال المستأجر: يُحفظ بعيداً عن صندوق المبنى ويُعاد عند مغادرته.",
+  "Received on": "استُلم في",
+  "Keys": "مفاتيح",
+  "Damage": "أضرار",
+  "Why part was kept (optional)": "سبب الاحتفاظ بجزء (اختياري)",
+  "Return deposit — {name}": "إعادة التأمين — {name}",
+  "Held: {amount} since {date}.": "محفوظ: {amount} منذ {date}.",
+  "Amount given back (USD)": "المبلغ المُعاد (دولار)",
+  "If you keep part of it, the kept part becomes the building's income.": "إذا احتفظت بجزء منه، يصبح هذا الجزء دخلاً للمبنى.",
+  "Reason": "السبب",
+  "Return": "أعِد",
+  "Kept from {name}'s deposit": "محتفظ به من تأمين {name}",
+  "Returned {back}; {kept} kept as income": "أُعيد {back}؛ و{kept} احتُفظ به كدخل",
+  "Deposit returned": "تمت إعادة التأمين",
+  "since {date}": "منذ {date}",
+  "Deposits held": "التأمينات المحفوظة",
+  "{amount} held for tenants. It isn't the building's money and isn't counted in its cash.": "{amount} محفوظة للمستأجرين. ليست مال المبنى ولا تُحتسب في صندوقه.",
+  "No deposits held.": "لا تأمينات محفوظة.",
+  "+ New deposit": "+ تأمين جديد",
+  "Your deposit": "تأمينك",
+  "{amount} ({kind}) held since {date}": "{amount} ({kind}) محفوظ منذ {date}",
+  "Deposit saved": "تم حفظ التأمين",
+  "Deposit held": "تأمين محفوظ",
+  "+ Deposit": "+ تأمين",
+  "Deposits held for tenants": "تأمينات محفوظة للمستأجرين",
+  "Not the building's money — kept apart": "ليست مال المبنى — محفوظة على حدة",
+  "Deposit held: {amount}. Return it from {name}'s page.": "تأمين محفوظ: {amount}. أعِده من صفحة {name}.",
+  "…or paste the statement lines here": "…أو الصق أسطر الكشف هنا",
+  "— not a tenant payment —": "— ليست دفعة مستأجر —",
+  "Already recorded on {date}": "مسجّلة سابقاً في {date}",
+  "No incoming payments found yet.": "لم تُوجد دفعات واردة بعد.",
+  "Could not read that file: {msg}": "تعذّرت قراءة الملف: {msg}",
+  "Import a bank or Whish statement": "استيراد كشف بنك أو Whish",
+  "Download the statement from your bank or Whish as a CSV or Excel file. The app finds the money that came in and suggests who sent it; you check each line.": "نزّل الكشف من البنك أو Whish كملف CSV أو Excel. يجد التطبيق المبالغ الواردة ويقترح من أرسلها؛ وأنت تتحقق من كل سطر.",
+  "Statement file": "ملف الكشف",
+  "Record ticked payments": "سجّل الدفعات المحدّدة",
+  "Tick at least one payment": "حدّد دفعة واحدة على الأقل",
+  "Import statement": "استيراد كشف",
+  "Withdraw this expense?": "سحب هذا المصروف؟",
+  "Expenses waiting for approval": "مصاريف بانتظار الموافقة",
+  "Expenses of {amount} or more count only once a second administrator approves them.": "المصاريف من {amount} وما فوق تُحتسب فقط بعد موافقة مشرف ثانٍ.",
+  "Withdraw": "سحب",
+  "Another administrator approves it.": "يوافق عليه مشرف آخر.",
+  "Nothing waiting.": "لا شيء بالانتظار.",
+  "Above this amount, an expense counts only after a second administrator approves it (Settings → Administrators). Leave empty to turn it off.": "فوق هذا المبلغ، لا يُحتسب المصروف إلا بعد موافقة مشرف ثانٍ (الإعدادات ← المشرفون). اتركه فارغاً لإيقافه.",
+  "Needs approval from (USD)": "يحتاج موافقة من (دولار)",
+  "Approval needed from {amount}": "الموافقة مطلوبة من {amount}",
+  "Approval turned off": "تم إيقاف الموافقة",
+  "Approved — the expense now counts": "تمت الموافقة — المصروف يُحتسب الآن",
+  "Rejected": "مرفوض",
+  "{n} expense(s) waiting for your approval": "{n} مصروف(ات) بانتظار موافقتك",
+  "{n} expense(s) waiting for a second administrator": "{n} مصروف(ات) بانتظار مشرف ثانٍ",
+  "Approval for big expenses": "موافقة على المصاريف الكبيرة",
+  "Saved — it counts once a second administrator approves it": "حُفظ — يُحتسب بعد موافقة مشرف ثانٍ",
+  "Everyone's statement": "كشوفات الجميع",
+  "A statement picture for each tenant. Send each one on WhatsApp, or download them all at once.": "صورة كشف لكل مستأجر. أرسل كل واحدة على واتساب، أو نزّلها كلها دفعة واحدة.",
+  "In credit {amount}": "رصيد دائن {amount}",
+  "Download all (ZIP)": "تنزيل الكل (ZIP)",
+  "Statements downloaded": "تم تنزيل الكشوفات",
+  "e.g. P3, P4": "مثلاً: P3، P4",
+  "Parking spaces": "مواقف السيارات",
+  "Which spots belong to each flat. Tenants see theirs on their phone.": "أي المواقف لكل شقة. يرى المستأجرون مواقفهم على هواتفهم.",
+  "Parking saved": "تم حفظ المواقف",
+  "Your parking": "موقفك",
+  "Parking {spots}": "الموقف {spots}",
+  "More…": "المزيد…",
+  "The assistant failed ({status})": "فشل المساعد ({status})",
+  "Speak": "تحدّث",
+  "Couldn't hear that — type it instead": "لم أسمع جيداً — اكتبه بدلاً من ذلك",
+  "e.g. How much did we spend on the lift this year?": "مثلاً: كم صرفنا على المصعد هذه السنة؟",
+  "Ask": "اسأل",
+  "Thinking…": "أفكّر…",
+  "Who owes the most?": "من عليه أكبر مبلغ؟",
+  "How much did we spend on the generator this year?": "كم صرفنا على المولّد هذه السنة؟",
+  "What was our biggest expense last month?": "ما أكبر مصروف لنا الشهر الماضي؟",
+  "Ask the app": "اسأل التطبيق",
+  "Questions about the money, in your own words": "أسئلة عن المال، بكلماتك",
+  "Ask about the building's money in your own words. Your question and the building's figures are sent to Claude (Anthropic) to answer.": "اسأل عن مال المبنى بكلماتك. يُرسل سؤالك وأرقام المبنى إلى Claude (Anthropic) للإجابة.",
+  "I couldn't tell what to record — try again with more detail": "لم أفهم ما يجب تسجيله — حاول مجدداً بتفاصيل أكثر",
+  "Check the details, then save": "تحقق من التفاصيل ثم احفظ",
+  "e.g. Rami paid 100 dollars cash for October": "مثلاً: رامي دفع 100 دولار نقداً عن تشرين الأول",
+  "Fill in the form": "املأ النموذج",
+  "Say it": "قُلها",
+  "Speak or type, the app fills the form": "تكلّم أو اكتب، والتطبيق يملأ النموذج",
+  "Say or type what happened. The app fills in the form; you check it and save.": "قل أو اكتب ما حصل. يملأ التطبيق النموذج؛ وأنت تتحقق وتحفظ.",
+  "Not now": "ليس الآن",
+  "Your building": "مبناك",
+  "Payment received — $100.00 recorded. Thank you!": "تم استلام الدفعة — سُجّل 100.00$. شكراً!",
+  "Install the app": "ثبّت التطبيق",
+  "Full screen, one tap away": "شاشة كاملة، بلمسة واحدة",
+  "Tap the Share button ⬆ at the bottom of Safari, then \"Add to Home Screen\". On iPhone, notifications only work once it's installed.": "اضغط زر المشاركة ⬆ أسفل Safari، ثم «إضافة إلى الشاشة الرئيسية». على iPhone، لا تعمل الإشعارات إلا بعد التثبيت.",
+  "It opens from your Home screen like any app, and notifications pop up like WhatsApp.": "يفتح من شاشتك الرئيسية كأي تطبيق، وتظهر الإشعارات مثل واتساب.",
+  "Got it": "فهمت",
+  "Install": "ثبّت",
+  "Notifications": "الإشعارات",
+  "Know straight away": "اعرف فوراً",
+  "Get a notification on this phone when a tenant says they paid, reports a problem or posts on the board.": "تلقَّ إشعاراً على هذا الهاتف عندما يبلّغ مستأجر أنه دفع، أو يبلّغ عن مشكلة، أو ينشر على اللوحة.",
+  "Get a notification on this phone for receipts, notices, replies and votes — like a WhatsApp message.": "تلقَّ إشعاراً على هذا الهاتف للإيصالات والإعلانات والردود والتصويتات — مثل رسالة واتساب.",
+  "Full screen, one tap away from your Home screen": "شاشة كاملة، بلمسة من شاشتك الرئيسية",
+  "Say what the money is for": "قل مقابل ماذا هذا المال",
+  "Enter an amount": "أدخل مبلغاً",
+  "Save and share": "احفظ وشارك",
+  "meter not read yet": "العدّاد لم يُقرأ بعد",
+  "Paid until {month}": "مدفوع حتى {month}",
+  "Thank you — you have paid ahead.": "شكراً — لقد دفعت مسبقاً.",
+  "Only some flats pay": "بعض الشقق فقط تدفع",
+  "Last 12 months": "آخر 12 شهراً",
+  "Next year": "السنة القادمة",
+  "Back up to the reserve target": "إعادة الاحتياطي إلى الهدف",
+  "+{n}% for rising prices": "+{n}% لارتفاع الأسعار",
+  "Record a few months of expenses first; the proposal is based on the last 12 months.": "سجّل مصاريف بضعة أشهر أولاً؛ الاقتراح مبني على آخر 12 شهراً.",
+  "Building, per month": "المبنى، شهرياً",
+  "Today: {amount} a month": "حالياً: {amount} شهرياً",
+  "Generator and water are billed separately and are not included.": "المولّد والمياه يُحتسبان على حدة وغير مشمولين.",
+  "Use as the {year} budget": "اعتمدها موازنة {year}",
+  "Budget for {year} saved": "تم حفظ موازنة {year}",
+  "What the building spent in the last 12 months, plus a margin, gives next year's monthly amount per flat. Use it for the owners' meeting.": "ما صرفه المبنى في آخر 12 شهراً، مع هامش، يعطي المبلغ الشهري لكل شقة للسنة القادمة. استعمله لاجتماع المالكين.",
+  "Margin": "الهامش",
+  "Condition of the flat, things left, anything agreed": "حالة الشقة، أغراض متروكة، أي اتفاق",
+  "Everything is settled": "كل شيء مسوّى",
+  "Final settlement — {name}": "التسوية النهائية — {name}",
+  "Last generator reading: {n}": "آخر قراءة للمولّد: {n}",
+  "Last water reading: {n}": "آخر قراءة للمياه: {n}",
+  "Keys handed back": "المفاتيح المُسلّمة",
+  "Save and share picture": "احفظ وشارك الصورة",
+  "Final settlement": "التسوية النهائية",
+  "Still to pay": "المتبقي للدفع",
+  "To be refunded": "يُعاد له",
+  "Moved out": "غادر",
+  "Paid in total": "المدفوع إجمالاً",
+  "Last generator reading": "آخر قراءة للمولّد",
+  "Last water reading": "آخر قراءة للمياه",
+  "Settled on {date}": "سُوّيت في {date}",
+  "Remind late tenants automatically": "ذكّر المتأخرين تلقائياً",
+  "{n} days after the due day": "بعد {n} أيام من يوم الاستحقاق",
+  "When": "متى",
+  "Once a month, each tenant who still owes for a month whose due day has passed gets a polite phone notification, in their language.": "مرة في الشهر، يتلقى كل مستأجر لا يزال مديناً عن شهر فات يوم استحقاقه إشعاراً لطيفاً على هاتفه، بلغته.",
+  "Set the due day in Settings first; reminders go out that many days after it.": "حدّد يوم الاستحقاق في الإعدادات أولاً؛ تُرسل التذكيرات بعده بهذا العدد من الأيام.",
+  "{amps}A × {price}": "{amps} أمبير × {price}",
+  "{kwh} kWh × {price}": "{kwh} ك.و.س × {price}",
+  "Generator billing": "احتساب المولّد",
+  "Subscription: {price} per amp a month": "اشتراك: {price} للأمبير شهرياً",
+  "plus ${price} per kWh": "زائد ${price} للكيلوواط ساعة",
+  "from {month}": "من {month}",
+  "By meter: the real fuel cost split by each flat's kWh, maintenance by breaker size.": "حسب العدّاد: كلفة المازوت الفعلية حسب استهلاك كل شقة، والصيانة حسب حجم القاطع.",
+  "By meter — split the real costs": "حسب العدّاد — توزيع الكلفة الفعلية",
+  "Subscription — fixed price per amp": "اشتراك — سعر ثابت للأمبير",
+  "Price per amp per month (USD)": "سعر الأمبير شهرياً (دولار)",
+  "Price per kWh (USD, optional)": "سعر الكيلوواط ساعة (دولار، اختياري)",
+  "Leave empty for a pure subscription. With a price, each flat also pays for the kWh on its meter.": "اتركه فارغاً لاشتراك مقطوع. مع سعر، تدفع كل شقة أيضاً عن الكيلوواط على عدّادها.",
+  "From month": "من شهر",
+  "Months before keep the meter split.": "الأشهر السابقة تبقى حسب العدّاد.",
+  "Many buildings charge the generator as a monthly subscription per amp instead of splitting the real costs. The costs you record still show what the generator really cost.": "كثير من المباني تحتسب المولّد كاشتراك شهري للأمبير بدل توزيع الكلفة الفعلية. المصاريف التي تسجّلها تبقى تُظهر الكلفة الحقيقية.",
+  "How flats pay": "كيف تدفع الشقق",
+  "Water meters": "عدّادات المياه",
+  "Water bills marked \"By water meter\" are shared by what each flat used this month.": "فواتير المياه المحدّدة «حسب عدّاد المياه» تُوزّع حسب استهلاك كل شقة هذا الشهر.",
+  "Save readings": "احفظ القراءات",
+  "Flats have their own water meters": "لكل شقة عدّاد مياه خاص",
+  "Enter readings": "أدخل القراءات",
+  "Waiting for readings: {months}": "بانتظار القراءات: {months}",
+  "Choose \"By water meter\" when you record a water bill; it is shared once that month's readings are in.": "اختر «حسب عدّاد المياه» عند تسجيل فاتورة مياه؛ تُوزّع بعد إدخال قراءات ذلك الشهر.",
+  "e.g. Clean the stairs": "مثلاً: تنظيف الدرج",
+  "New job": "مهمة جديدة",
+  "On these days (none = every day)": "في هذه الأيام (بدون اختيار = كل يوم)",
+  "Delete the job \"{title}\"?": "حذف المهمة «{title}»؟",
+  "e.g. Light bulbs": "مثلاً: لمبات",
+  "pieces, litres, boxes": "قطع، ليترات، علب",
+  "Edit supply": "تعديل اللوازم",
+  "New supply": "لوازم جديدة",
+  "In stock": "في المخزن",
+  "Counted in": "الوحدة",
+  "Warn me at": "نبّهني عند",
+  "You get a reminder when the stock drops to this number.": "تصلك تذكرة عندما ينخفض المخزون إلى هذا العدد.",
+  "Delete \"{name}\"?": "حذف «{name}»؟",
+  "Name or company": "الاسم أو الشركة",
+  "The building": "المبنى",
+  "What for (optional)": "لأي غرض (اختياري)",
+  "Note a visitor": "تسجيل زائر",
+  "Who": "من",
+  "Why": "لماذا",
+  "For": "لـ",
+  "Today's jobs": "مهام اليوم",
+  "Nothing planned for today.": "لا شيء مخطط لليوم.",
+  "Add the concierge's regular jobs — cleaning, checks, rubbish — and they tick them off here.": "أضف المهام الدورية للناطور — تنظيف، فحوصات، نفايات — ويؤشّر عليها هنا.",
+  "No jobs set up yet.": "لا مهام بعد.",
+  "Last 7 days": "آخر 7 أيام",
+  "Every day": "كل يوم",
+  "+ Add a job": "+ إضافة مهمة",
+  "Supplies": "اللوازم",
+  "Running low": "على وشك النفاد",
+  "Keep count of bulbs, cleaning products, filters… and get a warning before they run out.": "تابع عدد اللمبات ومواد التنظيف والفلاتر… واحصل على تنبيه قبل نفادها.",
+  "No supplies listed yet.": "لا لوازم بعد.",
+  "+ Add a supply": "+ إضافة لوازم",
+  "Visitors": "الزوّار",
+  "No visitors noted in the last 30 days.": "لا زوّار مسجّلين في آخر 30 يوماً.",
+  "{n} to do": "{n} للإنجاز",
+  "All done ✓": "تم كل شيء ✓",
+  "Who came in": "من دخل",
+  "Readings, this month": "القراءات، هذا الشهر",
+  "{n} running low": "{n} على وشك النفاد",
+  "Update the count": "حدّث العدد",
+  "Space": "المكان",
+  "Birthday, guests… (optional)": "عيد ميلاد، ضيوف… (اختياري)",
+  "Book a space": "احجز مكاناً",
+  "Day": "اليوم",
+  "From": "من",
+  "To": "إلى",
+  "Book": "احجز",
+  "Cancel this booking?": "إلغاء هذا الحجز؟",
+  "One per line, e.g.\nRoof\nGuest parking": "واحد في كل سطر، مثلاً:\nالسطح\nموقف الضيوف",
+  "Shared spaces": "الأماكن المشتركة",
+  "Residents can book these from their phones. Two bookings of the same space can't overlap.": "يمكن للسكان حجزها من هواتفهم. لا يمكن أن يتداخل حجزان للمكان نفسه.",
+  "Spaces": "الأماكن",
+  "Booked": "محجوز",
+  "+ Book": "+ احجز",
+  "Add spaces": "أضف أماكن",
+  "Add the spaces residents can book — the roof, a hall, a guest parking spot.": "أضف الأماكن التي يمكن للسكان حجزها — السطح، قاعة، موقف للضيوف.",
+  "The building has no shared spaces to book.": "لا أماكن مشتركة للحجز في المبنى.",
+  "No bookings coming up.": "لا حجوزات قادمة.",
+  "e.g. Sofa for sale": "مثلاً: كنبة للبيع",
+  "Details, price, how to reach you": "التفاصيل، السعر، كيف يتواصلون معك",
+  "Send for approval": "أرسل للموافقة",
+  "Post": "انشر",
+  "Building management": "إدارة المبنى",
+  "New post": "منشور جديد",
+  "Your name and flat show with your post. The building manager approves posts before neighbours see them; they stay up for 30 days.": "يظهر اسمك وشقتك مع منشورك. يوافق مدير المبنى على المنشورات قبل أن يراها الجيران؛ وتبقى 30 يوماً.",
+  "Text": "النص",
+  "Your post is on the board": "منشورك على اللوحة",
+  "Remove this post?": "إزالة هذا المنشور؟",
+  "Waiting for approval": "بانتظار الموافقة",
+  "Approve": "وافق",
+  "Reject": "ارفض",
+  "+ Post": "+ منشور",
+  "Waiting for your approval": "بانتظار موافقتك",
+  "Nothing on the board. Selling something, lost keys, a question for the neighbours? Post it here.": "لا شيء على اللوحة. تبيع شيئاً، أضعت مفاتيح، سؤال للجيران؟ انشره هنا.",
+  "My details": "بياناتي",
+  "No phone number": "لا رقم هاتف",
+  "The building manager uses these to reach you and to send reminders in your language.": "يستعملها مدير المبنى للتواصل معك وإرسال التذكيرات بلغتك.",
+  "Language for messages": "لغة الرسائل",
+  "Open until {date}": "مفتوح حتى {date}",
+  "Owners' meeting {year}": "اجتماع المالكين {year}",
+  "Accounts, works, votes and next year's budget": "الحسابات، الأعمال، التصويتات وموازنة السنة القادمة",
+  "1. The year's accounts": "1. حسابات السنة",
+  "2. Works done": "2. الأعمال المنجزة",
+  "Work": "العمل",
+  "Cost": "الكلفة",
+  "No works recorded this year.": "لا أعمال مسجّلة هذه السنة.",
+  "3. Votes and decisions": "3. التصويتات والقرارات",
+  "Vote": "التصويت",
+  "Result": "النتيجة",
+  "No votes this year.": "لا تصويتات هذه السنة.",
+  "Decision": "القرار",
+  "4. Proposed budget for {year}": "4. الموازنة المقترحة لـ {year}",
+  "Proposed": "المقترح",
+  "Proposed per month": "المقترح شهرياً",
+  "Includes a {n}% margin for rising prices. Generator and water are billed separately.": "يتضمن هامش {n}% لارتفاع الأسعار. المولّد والمياه يُحتسبان على حدة.",
+  "5. Each flat's balance": "5. رصيد كل شقة",
+  "Signatures": "التواقيع",
+  "Building manager": "مدير المبنى",
+  "Committee member": "عضو اللجنة",
+  "Include each flat's balance": "تضمين رصيد كل شقة",
+  "One document for the yearly meeting: the year's accounts, works done, votes and decisions, and the proposed budget. Print it or save it as PDF.": "مستند واحد للاجتماع السنوي: حسابات السنة، الأعمال المنجزة، التصويتات والقرارات، والموازنة المقترحة. اطبعه أو احفظه PDF.",
+  "Make the pack": "أنشئ الملف",
+  "{month} marked as checked": "تم تأشير {month} كمُدقَّق",
+  "Changed since checked": "تغيّر بعد التدقيق",
+  "Checked by {who}": "دقّقه {who}",
+  "Mark checked": "أشّر كمُدقَّق",
+  "Keep view-only access for me": "أبقِ لي صلاحية العرض فقط",
+  "Create a full-access invite": "أنشئ دعوة بصلاحية كاملة",
+  "You're taking over the management of {building} in the Building Account Tracker. Open this link on your phone and sign in with your Google account (valid 7 days, one use):\n{link}": "ستتولى إدارة {building} في تطبيق حسابات المبنى. افتح هذا الرابط على هاتفك وسجّل الدخول بحساب Google (صالح 7 أيام، لمرة واحدة):\n{link}",
+  "Step down now": "تنحَّ الآن",
+  "Hand over the building and keep view-only access?": "تسليم المبنى مع الإبقاء على صلاحية العرض؟",
+  "Hand over the building and remove your access completely?": "تسليم المبنى وإزالة صلاحيتك بالكامل؟",
+  "Hand over management": "تسليم الإدارة",
+  "1. Invite the new manager with full access and send them the link. They sign in with their Google account.": "1. ادعُ المدير الجديد بصلاحية كاملة وأرسل له الرابط. يسجّل الدخول بحساب Google.",
+  "2. Once they appear in Administrators as Full access, step down. All the building's data stays; only who manages it changes.": "2. عندما يظهر في المشرفين بصلاحية كاملة، تنحَّ. تبقى كل بيانات المبنى؛ يتغيّر فقط من يديره.",
+  "Running low: {names}": "على وشك النفاد: {names}",
+  "{n} board post(s) waiting for your approval": "{n} منشور(ات) بانتظار موافقتك",
+  "by water meter": "حسب عدّاد المياه",
+  "Subscription: {amps}A × {price}": "اشتراك: {amps} أمبير × {price}",
+  "Metered: {kwh} kWh × ${price}": "حسب العدّاد: {kwh} ك.و.س × ${price}",
+  "The building charges the generator as a monthly subscription per amp.": "يحتسب المبنى المولّد كاشتراك شهري للأمبير.",
+  "Settlement ✓": "التسوية ✓",
+  "Settlement": "التسوية",
+  "Next year's budget": "موازنة السنة القادمة",
+  "Owners' meeting pack": "ملف اجتماع المالكين",
+  "Hand over management…": "تسليم الإدارة…",
+  "Settlement saved": "تم حفظ التسوية",
+  "Enter a price per amp": "أدخل سعر الأمبير",
+  "Generator billing saved": "تم حفظ احتساب المولّد",
+  "Enter at least one reading": "أدخل قراءة واحدة على الأقل",
+  "Water readings saved": "تم حفظ قراءات المياه",
+  "Enter who came": "أدخل من جاء",
+  "Visitor noted": "تم تسجيل الزائر",
+  "No shared spaces set up yet": "لا أماكن مشتركة بعد",
+  "Choose the day and the times": "اختر اليوم والأوقات",
+  "The end time must be after the start": "يجب أن يكون وقت الانتهاء بعد البداية",
+  "Choose today or a later day": "اختر اليوم أو يوماً لاحقاً",
+  "Already booked at that time": "محجوز في هذا الوقت",
+  "Give your post a title": "أعطِ منشورك عنواناً",
+  "Sent — it shows once the building manager approves it": "أُرسل — يظهر بعد موافقة مدير المبنى",
+  "Details saved": "تم حفظ البيانات",
+  "First let the new manager sign in with full access": "دع المدير الجديد يسجّل الدخول بصلاحية كاملة أولاً",
+  "Handed over. You now have view-only access.": "تم التسليم. لديك الآن صلاحية العرض فقط.",
+  "Choose at least one flat": "اختر شقة واحدة على الأقل",
+  "Late reminders on": "تذكيرات التأخير مفعّلة",
+  "Late reminders off": "تذكيرات التأخير متوقفة",
+  "Repair": "تصليح",
+  "Delivery": "توصيل",
+  "Guest": "ضيف",
+  "Cleaning": "تنظيف",
   "Concierge — adds expenses, readings and problems; sees no balances": "ناطور — يضيف المصاريف والقراءات والمشاكل؛ لا يرى الأرصدة",
   "Hi! Here is your access to the {building} app as the building's concierge. Open this link on your phone and tap Link this phone (valid 7 days, one use):\n{link}": "مرحباً! هذا وصولك إلى تطبيق {building} كناطور المبنى. افتح الرابط على هاتفك واضغط «ربط هذا الهاتف» (صالح 7 أيام، لمرة واحدة):\n{link}",
   "+ Add a number": "+ إضافة رقم",
@@ -2864,6 +3201,11 @@ function hydrateState(rawState) {
   hydrated.deleted.equipment ||= [];
   hydrated.equipment ||= [];
   hydrated.dieselChecks ||= [];
+  hydrated.deleted.routineTasks ||= [];
+  hydrated.deleted.supplies ||= [];
+  hydrated.deleted.deposits ||= [];
+  ["deposits", "pendingExpenses"].forEach((k) => { if (!Array.isArray(hydrated[k])) hydrated[k] = []; });
+  ["routineTasks", "routineLog", "supplies", "visitorLog", "bookings", "boardPosts", "monthChecks"].forEach((k) => { if (!Array.isArray(hydrated[k])) hydrated[k] = []; });
   hydrated.security ||= {};
   hydrated.security.salt ||= randomToken();
   hydrated.transactions ||= [];
@@ -2929,7 +3271,7 @@ function hydrateState(rawState) {
   hydrated.tenants = hydrated.tenants.filter((t) => !deletedTenants.has(t.id));
   hydrated.polls = hydrated.polls.filter((p) => !deletedPolls.has(p.id));
   hydrated.buildingProjects = hydrated.buildingProjects.filter((p) => !deletedProjects.has(p.id));
-  ["announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations", "equipment"].forEach((kind) => {
+  ["announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations", "equipment", "routineTasks", "supplies", "deposits"].forEach((kind) => {
     const gone = new Set(hydrated.deleted[kind]);
     hydrated[kind] = (hydrated[kind] || []).filter((item) => !gone.has(item.id));
   });
@@ -2989,6 +3331,7 @@ function getTotalActiveCoefficient() {
 }
 
 function getTenantExpenseShareForTransaction(tenantId, transaction) {
+  if (transaction.serviceType === "water" && transaction.waterSplit === "meter") return waterMeterShare(tenantId, transaction);
   // Prefer the share split snapshotted when the expense was recorded, so later
   // tenant/coefficient changes do not retroactively shift historical balances.
   if (transaction.shares) return roundUsd(Number(transaction.shares[tenantId] || 0));
@@ -3309,8 +3652,8 @@ function updateProjectSharePreview() {
     els.projectSharePreview.replaceChildren();
     return;
   }
-  const shares = computeSharedExpenseShares(budget, distribution);
-  const activeTenants = state.tenants.filter((t) => t.active !== false);
+  const shares = computeSharedExpenseShares(budget, distribution, null, pickedFlatIds("projectFlatPicker"));
+  const activeTenants = state.tenants.filter((t) => t.active !== false && t.id in shares);
   const rows = activeTenants.map((t) => {
     const share = shares[t.id] || 0;
     const pct = budget > 0 ? Math.round((share / budget) * 100) : 0;
@@ -3333,6 +3676,7 @@ function openCreateProjectDialog() {
   els.projectDueDateInput.value = localDateInput();
   els.projectSharePreview.classList.add("hidden");
   els.projectSharePreview.replaceChildren();
+  installFlatPicker("projectFlatPicker", els.projectDistributionInput.closest("label"), updateProjectSharePreview);
   openDialog(els.projectDialog);
   setTimeout(() => els.projectNameInput.focus(), 50);
 }
@@ -3347,7 +3691,9 @@ function submitProject(event) {
   if (!name) { showToast("Enter a project name"); return; }
   if (!totalBudget) { showToast("Enter the total budget"); return; }
   if (!dueDate) { showToast("Select a payment due date"); return; }
-  const shares = computeSharedExpenseShares(totalBudget, distribution);
+  const only = pickedFlatIds("projectFlatPicker");
+  if (only && !only.length) { showToast("Choose at least one flat"); return; }
+  const shares = computeSharedExpenseShares(totalBudget, distribution, null, only);
   const project = {
     id: `bp-${Date.now()}`,
     name,
@@ -3358,6 +3704,7 @@ function submitProject(event) {
     shares,
     status: "active",
     createdAt: new Date().toISOString(),
+    ...(only ? { onlyFlats: only } : {}),
   };
   (state.buildingProjects ||= []).push(project);
   addKnownValue(state.projects, name);
@@ -3399,7 +3746,7 @@ function renderProjects() {
   }
   const activeTenants = state.tenants.filter((t) => t.active !== false);
   els.buildingProjectList.replaceChildren(
-    ...projects.map((project) => {
+    ...projects.filter((p) => sessionMode !== "tenant" || !p.shares || typeof p.shares !== "object" || sessionTenantId in p.shares).map((project) => {
       const tenantStatuses = activeTenants
         .map((tenant) => ({ tenant, ...getProjectTenantStatus(project, tenant.id) }))
         .filter((s) => s.share > 0);
@@ -3504,6 +3851,7 @@ function getServiceMonths(serviceType) {
   (state.serviceReadings || []).forEach((r) => {
     if (r.serviceType === serviceType && r.forMonth) set.add(r.forMonth);
   });
+  if (serviceType === "generator") subscriptionMonths().forEach((m) => set.add(m));
   return [...set].sort();
 }
 
@@ -3534,6 +3882,7 @@ function getServiceReadingRecord(serviceType, month) {
 function computeServiceDistribution(serviceType, month) {
   const pools = getServiceMonthPools(serviceType, month);
   const rec = getServiceReadingRecord(serviceType, month);
+  if (serviceType === "generator" && subscriptionAppliesTo(month)) return computeGeneratorSubscription(month, pools, rec);
   if (!rec) return { pools, distributed: false, lines: {}, shares: {}, totalKwh: 0 };
   const ids = Object.keys(rec.lines || {});
   const kwhById = {};
@@ -3753,7 +4102,7 @@ function computeWaterDistribution(month) {
     shares[t.id] = roundUsd(txns.reduce((s, tx) => s + getTenantExpenseShareForTransaction(t.id, tx), 0));
   });
   const splits = [...new Set(txns.map((t) => t.waterSplit || "equal"))];
-  const splitLabel = splits.length > 1 ? tr("mixed split") : splits[0] === "coefficient" ? tr("by coefficient") : tr("equal split");
+  const splitLabel = splits.length > 1 ? tr("mixed split") : splits[0] === "coefficient" ? tr("by coefficient") : splits[0] === "meter" ? tr("by water meter") : tr("equal split");
   return { totalUsd, count: txns.length, shares, splitLabel };
 }
 
@@ -3834,7 +4183,7 @@ function buildGeneratorCard(month, tenantsById) {
     const lineEl = buildServiceLine(
       tenant ? tenant.name : tr("(removed)"),
       formatUsd(line.totalUsd),
-      tr("{amps}A · {kwh} kWh · {cons} consumption + {maint} maintenance", { amps: line.breakerAmps || 0, kwh: line.kwh || 0, cons: formatUsd(line.consumptionUsd), maint: formatUsd(line.maintenanceUsd) }),
+      dist.subscription ? subscriptionLineText(line, dist) : tr("{amps}A · {kwh} kWh · {cons} consumption + {maint} maintenance", { amps: line.breakerAmps || 0, kwh: line.kwh || 0, cons: formatUsd(line.consumptionUsd), maint: formatUsd(line.maintenanceUsd) }),
     );
     if (tenant) lineEl.append(miniButton(tr("Bill"), () => { void shareGeneratorBill(id, month); }, "gen-bill-share"));
     lineList.append(lineEl);
@@ -3899,8 +4248,8 @@ function occupantsOn(date) {
   return state.tenants.filter((t) => (t.active !== false || (t.movedOutOn && t.movedOutOn > date)) && !(t.movedInOn && t.movedInOn > date));
 }
 
-function computeSharedExpenseShares(totalUsd, distribution, date = null) {
-  const activeTenants = occupantsOn(date);
+function computeSharedExpenseShares(totalUsd, distribution, date = null, only = null) {
+  const activeTenants = occupantsOn(date).filter((t) => !only || only.includes(t.id));
   if (!activeTenants.length) return {};
   const shares = {};
   if (distribution === "coefficient") {
@@ -5500,7 +5849,7 @@ function renderPaymentsFixed() {
     ...visible.map(({ tenant, status }) => {
       const due = roundUsd(Math.max(0, status.expected - status.paid));
       const settled = due <= 0.005 && status.expected > 0;
-      const pillText = due > 0 ? (isMonthLate(selectedMonth) ? tr("Late · {amount}", { amount: formatUsd(due) }) : tr("{amount} due", { amount: formatUsd(due) })) : status.expected > 0 ? tr("Fully paid") : tr("No due");
+      const pillText = due > 0 ? (isMonthLate(selectedMonth) ? tr("Late · {amount}", { amount: formatUsd(due) }) : tr("{amount} due", { amount: formatUsd(due) })) : (paidUntilText(tenant.id) || (status.expected > 0 ? tr("Fully paid") : tr("No due")));
       const pct = status.expected > 0 ? `${Math.min(100, Math.round((status.paid / status.expected) * 100))}%` : (status.paid > 0 ? "100%" : "0%");
       const row = buildTenantPaymentRowBase({
         tenant,
@@ -5670,6 +6019,9 @@ function renderTenants() {
       const breakerLabel = tenant.breakerAmps > 0 ? ` · ${tenant.breakerAmps}A` : "";
       unitSpan.textContent = `${tr("Unit {unit}", { unit: tenant.unit })}${coeffLabel}${breakerLabel}${tenant.phone ? "" : ` · ${tr("no phone")}`}`;
       if (tenant.movedOutOn) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-moved-line", text: tr("Moved out {date}", { date: formatDateLabel(tenant.movedOutOn) }) }));
+      const untilText = paidUntilText(tenant.id);
+      if (untilText) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-paid-until", text: `✓ ${untilText}` }));
+      if (tenant.movedOutOn && canEditBuilding()) card.querySelector(".tenant-card-footer").append(mk("button", { type: "button", className: "text-link-btn settlement-button", text: tenant.settlement?.settled ? tr("Settlement ✓") : tr("Settlement"), onclick: (e) => { e.stopPropagation(); openSettlementDialog(tenant.id); } }));
       const metrics = card.querySelectorAll(".metric b");
       metrics[0].textContent = formatMonthly(totals.paidUsd);
       metrics[1].textContent = formatUsd(totals.advanceUsd);
@@ -7395,7 +7747,7 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView"];
 
 function setView(viewId) {
   if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView"].includes(viewId)) viewId = "moreView";
@@ -7536,6 +7888,7 @@ function syncTransactionFormMode() {
   renderExpenseSplitPreview();
   renderPaymentCoverage();
   syncWaterLitresField();
+  syncExpenseFlatPicker();
   document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
@@ -7715,11 +8068,14 @@ function createTransactionsFromForm() {
   // an equal or by-coefficient split chosen at entry and bill immediately. Generator
   // service expenses carry no shares — they bill via the monthly meter readings.
   if (isExpense) {
-    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), "coefficient", els.transactionDate.value || null);
+    const only = !isFixedMode() ? pickedFlatIds("expenseFlatPicker") : null;
+    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), "coefficient", els.transactionDate.value || null, only?.length ? only : null);
     baseTransaction.shares = Object.keys(shares).length ? shares : null;
+    if (only?.length) baseTransaction.onlyFlats = only;
   } else if (isWater) {
     baseTransaction.waterSplit = waterSplit;
-    const shares = computeSharedExpenseShares(toUsd(amountUsd, amountLbp), waterSplit, els.transactionDate.value || null);
+    // By water meter: shared once the month's readings are in, not now.
+    const shares = waterSplit === "meter" ? {} : computeSharedExpenseShares(toUsd(amountUsd, amountLbp), waterSplit, els.transactionDate.value || null);
     baseTransaction.shares = Object.keys(shares).length ? shares : null;
   }
 
@@ -8460,7 +8816,7 @@ function mergeDeclarations(olderArr, newerArr) {
 }
 
 function mergeDeletedLists(local, remote) {
-  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations", "monthlyExpected", "equipment"];
+  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations", "monthlyExpected", "equipment", "routineTasks", "supplies", "deposits"];
   const merged = {};
   kinds.forEach((kind) => {
     merged[kind] = [...new Set([...(local?.[kind] || []), ...(remote?.[kind] || [])])].slice(-1000);
@@ -8502,6 +8858,8 @@ function mergeStates(local, remote) {
   merged.documents = mergeByStamp(older.documents, newer.documents, merged.deleted.documents, "updatedAt");
   merged.meetings = mergeByStamp(older.meetings, newer.meetings, merged.deleted.meetings, "updatedAt");
   merged.maintenanceTasks = mergeByStamp(older.maintenanceTasks, newer.maintenanceTasks, merged.deleted.maintenanceTasks, "updatedAt");
+  mergeV167(merged, older, newer);
+  mergeV167b(merged, older, newer);
   merged.meta = {
     rev: Math.max(Number(local.meta?.rev || 0), Number(remote.meta?.rev || 0)) + 1,
     epoch: localEpoch,
@@ -9508,6 +9866,7 @@ function openEntryForm(category) {
 
 function resetTransactionForm() {
   editingExpenseId = null;
+  resetExpenseFlatPicker();
   pendingDeclarationProof = null;
   els.transactionForm.reset();
   els.transactionBackButton.classList.add("hidden"); // shown only when opened via the chooser
@@ -9562,6 +9921,7 @@ function openExpenseEditDialog(transactionId) {
 
   resetTransactionForm();
   editingExpenseId = transaction.id;
+  resetExpenseFlatPicker(transaction.onlyFlats || null);
   els.transactionDialogTitle.textContent = tr("Edit Expense");
   els.transactionSubmitButton.textContent = tr("Save");
   els.transactionCategory.value = "Expenses";
@@ -10533,6 +10893,7 @@ function handleTenantFormSubmit(event) {
     if (tenant) {
       tenant.name = name;
       tenant.unit = unit;
+      if ((tenant.phone || "") !== phone) tenant.detailsAt = new Date().toISOString();
       tenant.phone = phone;
       tenant.coefficient = coefficient;
       tenant.breakerAmps = breakerAmps;
@@ -10987,7 +11348,14 @@ function attachEvents() {
       }
       pendingDeclarationProof = null;
       if (existingTransaction) state.transactions[editingIndex] = { ...existingTransaction, ...transaction };
-      else {
+      else if (needsApproval(transactions)) {
+        queueForApproval(transactions);
+        if (!saveState()) return;
+        closeDialog(els.transactionDialog);
+        renderAll();
+        showToast("Saved — it counts once a second administrator approves it", 6000);
+        return;
+      } else {
         state.transactions.push(...transactions);
       }
       if (!saveState()) return;
@@ -12069,10 +12437,14 @@ function renderTenantDashboardExtras() {
   const myIssues = isTenant ? (state.issues || []).filter((i) => i.tenantId === sessionTenantId && i.status !== "fixed") : [];
   const blocks = [
     isTenant ? tenantHelpCard() : null,
+    isTenant ? paidUntilCard() : null,
+    isTenant ? myParkingCard() : null,
+    isTenant ? myDepositCard() : null,
     isTenant ? howToPayCard() : null,
     isTenant ? generatorScheduleCard() : null,
     isTenant ? emergencyCard() : null,
     isTenant ? directoryCard() : null,
+    isTenant ? myDetailsCard() : null,
     ...notices.map((n) => buildNoticeCard(n, { compact: true })),
     isTenant ? tenantRecentPaymentsCard() : null,
     ...myIssues.map((issue) => mk("article", { className: "notice-card" },
@@ -12321,7 +12693,8 @@ function openMoveOutDialog(tenantId) {
       note(tr("{old} has moved out and {new} is now the occupant of unit {unit}. From {month}, {new} pays the monthly charges.", { old: tenant.name, new: newTenant.name, unit: tenant.unit, month: formatMonth(moveDate) })),
       mk("div", { className: "button-row" },
         primaryButton(tr("Final statement for {name}", { name: tenant.name }), () => { void shareTenantStatementPdf(tenant.id); }),
-        secondaryButton(tr("Invite {name}", { name: newTenant.name }), () => { closeToolDialog(); openInviteDialog(newTenant.id); })));
+        secondaryButton(tr("Invite {name}", { name: newTenant.name }), () => { closeToolDialog(); openInviteDialog(newTenant.id); }),
+        secondaryButton(tr("Final settlement"), () => openSettlementDialog(tenant.id))));
   };
   openToolDialog(tr("Move out — {name}", { name: tenant.name }),
     note(tr("Records a change of occupant for unit {unit}. The old account is kept (inactive) with its full history.", { unit: tenant.unit })),
@@ -12387,7 +12760,8 @@ async function openAdminsDialog() {
     field(tr("Invite someone"), role),
     note(tr("Google only lets accounts sign in that are allowed in the app's Google settings. If they get an \"access blocked\" message, the account needs adding there first.")),
     create,
-    result);
+    result,
+    mk("div", { className: "button-row" }, secondaryButton(tr("Hand over management…"), openHandOverDialog)));
   try {
     const res = await supabaseRequest("rpc/list_admins", { method: "POST", body: "{}" });
     const admins = await res.json();
@@ -12718,7 +13092,8 @@ function renderReports() {
       return mk("div", { className: "month-lock-row" },
         mk("span", { text: formatMonth(monthIso(m)) }),
         mk("span", { className: `status-pill ${closed ? "status-paid" : "status-due"}`, text: closed ? tr("Closed") : tr("Open") }),
-        miniButton(closed ? tr("Reopen") : tr("Close"), () => setMonthClosed(m, !closed)));
+        miniButton(closed ? tr("Reopen") : tr("Close"), () => setMonthClosed(m, !closed)),
+        monthCheckBits(monthIso(m)));
     })
     : [note(tr("No months with activity yet."))]);
 
@@ -12739,7 +13114,10 @@ function renderReports() {
       note(tr("Problems the app found in your data, each with a shortcut to fix it.")),
       buildDataHealthSection()),
     reportsSection(tr("Automatic reminders"), buildAutoNoticeSection()),
+    reportsSection(tr("Approval for big expenses"), buildApprovalSettings()),
     reportsSection(tr("Budget"), buildBudgetSection()),
+    reportsSection(tr("Next year's budget"), buildBudgetProposalSection()),
+    reportsSection(tr("Owners' meeting pack"), buildMeetingPackSection()),
     reportsSection(tr("Reserve target"), buildReserveSection(), reserveForecastText() ? note(reserveForecastText()) : null),
     reportsSection(tr("Close the year"), buildCloseYearSection()),
     reportsSection(tr("Annual report"),
@@ -12887,6 +13265,7 @@ function extraAttentionItems() {
   });
   const diesel = dieselEstimate();
   if (diesel.ready && diesel.low) items.push({ kind: "danger", text: tr("Diesel is low: about {n} litres left", { n: numberFormat.format(diesel.litres) }), view: "servicesView", key: `diesel:${localDateInput()}` });
+  items.push(...v167AttentionItems(), ...v167bAttentionItems());
   [currentMonthValue()].forEach((m) => {
     const late = lateTenants(m);
     if (late.length) items.push({ kind: "danger", text: tr(late.length === 1 ? "{n} tenant is late for {month}" : "{n} tenants are late for {month}", { n: late.length, month: formatMonth(m) }), view: "paymentsView", key: `late:${monthKey(m)}` });
@@ -12901,6 +13280,7 @@ function handleExtraAttentionAction(row) {
     return true;
   }
   if (row.dataset.action === "cashCheck") { openCashCheckDialog(); return true; }
+  if (row.dataset.action === "approvals") { openApprovalsDialog(); return true; }
   if (row.dataset.action === "helpVideo") { openHelpVideo(row.dataset.arg || "tour"); return true; }
   return false;
 }
@@ -12926,6 +13306,8 @@ function renderV148() {
   renderServicesExtras();
   renderEmergencyOnMore();
   renderAppLockSetting();
+  renderV167();
+  renderV167b();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
   renderGeneratorScheduleNote();
   ensureSearchButton();
@@ -12946,6 +13328,7 @@ function attachV148Events() {
   els.inviteAllButton?.addEventListener("click", openInviteAllDialog);
   attachV165Events();
   attachV166Events();
+  attachV167bEvents();
   els.tenantList.addEventListener("click", (event) => {
     if (event.target.closest("button, a, input, select")) return;
     const card = event.target.closest(".tenant-card[data-tenant-id]");
@@ -13276,7 +13659,7 @@ function buildBalanceSnapshot() {
   state.tenants.filter((t) => t.active !== false).forEach((t) => {
     items[t.id] = roundUsd(getTenantTotals(t.id).dueUsd);
   });
-  return { at: localDateInput(), items };
+  return { at: localDateInput(), items, unpaid: unpaidByMonth() };
 }
 
 function monthlyNoticesOn() {
@@ -13291,13 +13674,14 @@ function buildAutoNoticeSection() {
     showToast(toggle.input.checked ? "Monthly balance notifications on" : "Monthly balance notifications off");
   });
   return mk("div", {}, toggle.row,
-    note(tr("Only tenants who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.")));
+    note(tr("Only tenants who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.")),
+    buildLateReminderControls());
 }
 
 function refreshBalanceSnapshot() {
   if (sessionMode !== "owner" || isViewerSession() || !hasCloudConfig()) return;
   const next = buildBalanceSnapshot();
-  if (JSON.stringify(next.items) !== JSON.stringify(state.balanceSnapshot?.items || null)) saveState();
+  if (JSON.stringify([next.items, next.unpaid]) !== JSON.stringify([state.balanceSnapshot?.items || null, state.balanceSnapshot?.unpaid || null])) saveState();
 }
 
 // ── Backup with photos (v154) ────────────────────────────────────────────────
@@ -14374,8 +14758,10 @@ function generatorBillData(tenantId, month) {
     buildingKwh: dist.totalKwh,
     buildingFuelUsd: dist.pools.fuelUsd,
     buildingMaintenanceUsd: dist.pools.maintenanceUsd,
-    pricePerKwh: dist.totalKwh > 0 ? dist.pools.fuelUsd / dist.totalKwh : 0,
+    pricePerKwh: dist.subscription ? dist.perKwh : dist.totalKwh > 0 ? dist.pools.fuelUsd / dist.totalKwh : 0,
     totalAmps,
+    subscription: Boolean(dist.subscription),
+    perAmp: dist.perAmp || 0,
   };
 }
 
@@ -14439,14 +14825,19 @@ function drawGeneratorBillCanvas(tenant, month) {
   y += 30;
   text(tr("How it is calculated"), PAD, y, { size: 38, weight: 800 });
   y += 60;
-  row(tr("Fuel: {kwh} kWh × ${price}", { kwh: numberFormat.format(d.kwh), price: d.pricePerKwh.toFixed(3) }), formatUsd(d.fuelUsd));
-  row(tr("Maintenance: {amps}A of {total}A", { amps: d.breakerAmps, total: d.totalAmps }), formatUsd(d.maintenanceUsd));
+  if (d.subscription) {
+    row(tr("Subscription: {amps}A × {price}", { amps: d.breakerAmps, price: formatUsd(d.perAmp) }), formatUsd(d.maintenanceUsd));
+    if (d.pricePerKwh > 0) row(tr("Metered: {kwh} kWh × ${price}", { kwh: numberFormat.format(d.kwh), price: d.pricePerKwh.toFixed(3) }), formatUsd(d.fuelUsd));
+  } else {
+    row(tr("Fuel: {kwh} kWh × ${price}", { kwh: numberFormat.format(d.kwh), price: d.pricePerKwh.toFixed(3) }), formatUsd(d.fuelUsd));
+    row(tr("Maintenance: {amps}A of {total}A", { amps: d.breakerAmps, total: d.totalAmps }), formatUsd(d.maintenanceUsd));
+  }
   box(PAD, y - 34, W - PAD * 2, 4, C.green);
   y += 24;
   row(tr("Total"), formatUsd(d.totalUsd), { color: C.accent, size: 40 });
 
   text(tr("Building total this month: {kwh} kWh, fuel {fuel}, maintenance {maint}.", { kwh: numberFormat.format(d.buildingKwh), fuel: formatUsd(d.buildingFuelUsd), maint: formatUsd(d.buildingMaintenanceUsd) }), PAD, H - 90, { size: 24, color: C.muted });
-  text(tr("Fuel is shared by the electricity each unit used; maintenance by breaker size."), PAD, H - 52, { size: 24, color: C.muted });
+  text(d.subscription ? tr("The building charges the generator as a monthly subscription per amp.") : tr("Fuel is shared by the electricity each unit used; maintenance by breaker size."), PAD, H - 52, { size: 24, color: C.muted });
   return canvas;
 }
 
@@ -14744,7 +15135,8 @@ function renderRecentExpenseChips() {
 // ── Expense split preview (actual-expenses mode) ────────────────────────────
 function expenseSplitPreview(amountUsd) {
   if (isFixedMode() || !(amountUsd > 0)) return [];
-  const tenants = state.tenants.filter((t) => t.active !== false && Number(t.coefficient || 0) > 0);
+  const only = pickedFlatIds("expenseFlatPicker");
+  const tenants = state.tenants.filter((t) => t.active !== false && Number(t.coefficient || 0) > 0 && (!only || only.includes(t.id)));
   const total = tenants.reduce((s, t) => s + Number(t.coefficient || 0), 0);
   if (!total) return [];
   return tenants
@@ -14828,6 +15220,7 @@ function openCashBreakdown() {
     breakdownRow(tr("Cash box"), formatUsd(byAccount.cash)),
     breakdownRow(tr("Bank & wallets"), formatUsd(byAccount.bank), tr("Bank transfers, Whish and cheques")),
     breakdownRow(tr("Total"), formatUsd(roundUsd(byAccount.cash + byAccount.bank))),
+    depositsHeldUsd() > 0 ? breakdownRow(tr("Deposits held for tenants"), formatUsd(depositsHeldUsd()), tr("Not the building's money — kept apart")) : null,
     reserveForecastText() ? note(reserveForecastText()) : null,
     sessionMode === "owner" ? mk("div", { className: "button-row" }, primaryButton(tr("Count the cash"), () => { closeToolDialog(); openCashCheckDialog(); })) : null);
 }
@@ -15000,10 +15393,14 @@ function openTenantPage(tenantId) {
       mk("a", { className: "secondary-button", href: whatsappLink(tenant.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }))
     : null;
   openToolDialog(`${tenant.name}`,
-    mk("p", { className: "tenant-page-unit", text: [tr("Unit {unit}", { unit: tenant.unit || "" }), tenant.coefficient ? tr("{n}/1000", { n: tenant.coefficient }) : "", tenant.phone || ""].filter(Boolean).join(" · ") }),
+    mk("p", { className: "tenant-page-unit", text: [tr("Unit {unit}", { unit: tenant.unit || "" }), tenant.coefficient ? tr("{n}/1000", { n: tenant.coefficient }) : "", tenant.phone || "", tenant.parking ? tr("Parking {spots}", { spots: tenant.parking }) : ""].filter(Boolean).join(" · ") }),
     mk("div", { className: `tenant-page-balance ${balance > 0.005 ? "owes" : "clear"}` },
       mk("span", { text: balance > 0.005 ? tr("Owes") : balance < -0.005 ? tr("In credit") : tr("All paid") }),
       mk("strong", { className: "tnum", text: formatUsd(Math.abs(balance)) })),
+    paidUntilText(tenant.id) ? note(`✓ ${paidUntilText(tenant.id)}`, "is-good") : null,
+    depositsHeld(tenant.id).length ? mk("h4", { className: "tenant-page-heading", text: tr("Deposit held") }) : null,
+    depositsHeld(tenant.id).length ? mk("div", {}, depositRows(depositsHeld(tenant.id))) : null,
+    owner && tenant.active !== false ? mk("div", { className: "button-row" }, miniButton(tr("+ Deposit"), () => openDepositDialog(tenant.id))) : null,
     contact,
     history.length ? mk("h4", { className: "tenant-page-heading", text: tr("Last months") }) : null,
     history.length ? miniBars(history.map((r) => ({ ...r, pct: r.due > 0 ? Math.min(1, r.paid / r.due) * 100 : 100 })), "pct",
@@ -15017,6 +15414,7 @@ function openTenantPage(tenantId) {
     mk("div", { className: "button-row" },
       primaryButton(tr("Statement picture"), () => { void shareStatementPicture(tenant.id); }),
       secondaryButton(tr("Statement PDF"), () => printTenantStatement(tenant.id)),
+      owner && tenant.movedOutOn ? secondaryButton(tr("Final settlement"), () => openSettlementDialog(tenant.id)) : null,
       owner ? secondaryButton(tr("Edit"), () => { closeToolDialog(); openEditTenantDialog(tenant.id); }) : null));
 }
 
@@ -16472,7 +16870,8 @@ function conciergeHomePanel() {
       tile(tr("Add an expense"), tr("With a photo of the invoice"), () => openEntryForm("Expenses")),
       tile(tr("Meter readings"), tr("Generator, this month"), () => openGeneratorReadingsDialog(currentMonthValue())),
       tile(tr("Report a problem"), tr("With a photo"), () => openIssueDialog()),
-      tile(tr("Problems"), tr("{n} open", { n: openIssues }), () => setView("issuesView"))),
+      tile(tr("Problems"), tr("{n} open", { n: openIssues }), () => setView("issuesView")),
+      ...conciergeExtraTiles(tile)),
     mine.length ? mk("h4", { className: "tenant-page-heading", text: tr("Added by you") }) : null,
     mine.length ? mk("div", {}, mine.map((t) => breakdownRow(t.description || tr(t.category), formatUsd(txUsd(t, t.debitUsd, t.debitLbp)), formatDateLabel(transactionDateValue(t))))) : null,
     mk("div", { className: "button-row" }, mk("button", { type: "button", className: "text-link-btn", text: tr("Unlink this phone"), onclick: unlinkTenantPhone })));
@@ -17277,6 +17676,2171 @@ function attachV166Events() {
   els.transactionService?.addEventListener("change", syncWaterLitresField);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v167 — paid until, charges for some flats, budget proposal, move-out
+// settlement, automatic late reminders, generator subscription, water meters,
+// concierge jobs / supplies / visitors, bookings, residents' board, tenants'
+// own details, owners' meeting pack, second-person month checks, handing over
+// ═══════════════════════════════════════════════════════════════════════════
+
+function canEditBuilding() {
+  return sessionMode === "owner" && !isViewerSession();
+}
+
+async function callRpc(name, body = {}) {
+  const res = await supabaseRequest(`rpc/${name}`, { method: "POST", body: JSON.stringify(body) });
+  const text = await res.text().catch(() => "");
+  try { return text ? JSON.parse(text) : null; } catch { return text || null; }
+}
+
+function rpcProblem(error) {
+  return error instanceof TypeError ? tr("Can't reach the cloud. Check your connection.") : describeSyncProblem(error);
+}
+
+// replaceChildren would print null as text; skip the empty slots.
+function fillChildren(el, ...nodes) {
+  el.replaceChildren(...nodes.flat().filter(Boolean));
+}
+
+function byUnit(a, b) {
+  return String(a.unit || "").localeCompare(String(b.unit || ""), undefined, { numeric: true }) || String(a.name || "").localeCompare(String(b.name || ""));
+}
+
+function unitLabel(tenant) {
+  return tenant ? [tenant.unit ? tr("Unit {unit}", { unit: tenant.unit }) : "", tenant.name || ""].filter(Boolean).join(" · ") : "";
+}
+
+function weekdayName(day) {
+  return new Date(2026, 0, 4 + day).toLocaleDateString(currentLang === "ar" ? "ar-LB" : "en-GB", { weekday: "short" });
+}
+
+// ── Paid until (fixed amount) ───────────────────────────────────────────────
+function paidUntil(tenantId) {
+  if (!isFixedMode()) return null;
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant || tenant.active === false) return null;
+  const months = getMonths().slice().sort();
+  if (!months.length) return null;
+  const { allocated, leftover } = fifoMonthPaid(tenantId);
+  let last = null;
+  for (const m of months) {
+    const due = getMonthlyDueForTenant(tenantId, m);
+    if (due > 0.005 && (allocated.get(m) || 0) + 0.005 < due) break;
+    last = m;
+  }
+  if (!last) return null;
+  let until = last;
+  if (last === months[months.length - 1] && leftover > 0.005) {
+    const monthly = getMonthlyDueForTenant(tenantId, last);
+    if (monthly > 0.005) until = addMonths(last, Math.floor((leftover + 0.005) / monthly));
+  }
+  return monthKey(until) > monthKey(currentMonthValue()) ? until : null;
+}
+
+function paidUntilText(tenantId) {
+  const until = paidUntil(tenantId);
+  return until ? tr("Paid until {month}", { month: formatMonth(until) }) : "";
+}
+
+function paidUntilCard() {
+  if (sessionMode !== "tenant" || !sessionTenantId) return null;
+  const text = paidUntilText(sessionTenantId);
+  if (!text) return null;
+  return mk("article", { className: "notice-card paid-until-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: `✓ ${text}` })),
+    mk("p", { className: "notice-body", text: tr("Thank you — you have paid ahead.") }));
+}
+
+// ── Charges for only some flats ─────────────────────────────────────────────
+function installFlatPicker(id, after, onChange, preset = null) {
+  document.getElementById(id)?.remove();
+  if (!after) return null;
+  const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
+  const toggle = checkboxRow(tr("Only some flats pay"), Boolean(preset?.length));
+  const list = mk("div", { className: `flat-picker-list${preset?.length ? "" : " hidden"}` }, tenants.map((t) => {
+    const c = checkboxRow(unitLabel(t), preset?.length ? preset.includes(t.id) : true);
+    c.input.dataset.tenantId = t.id;
+    c.input.addEventListener("change", () => onChange?.());
+    return c.row;
+  }));
+  toggle.input.addEventListener("change", () => { list.classList.toggle("hidden", !toggle.input.checked); onChange?.(); });
+  const box = mk("div", { id, className: "flat-picker" }, toggle.row, list);
+  after.after(box);
+  return box;
+}
+
+function pickedFlatIds(id) {
+  const box = document.getElementById(id);
+  if (!box || box.classList.contains("hidden")) return null;
+  const on = box.querySelector(":scope > .checkbox-row input");
+  if (!on?.checked) return null;
+  return [...box.querySelectorAll(".flat-picker-list input")].filter((i) => i.checked).map((i) => i.dataset.tenantId);
+}
+
+let expenseFlatPreset = null;
+function syncExpenseFlatPicker() {
+  const show = els.transactionCategory.value === "Expenses" && !isFixedMode() && sessionMode === "owner";
+  let box = document.getElementById("expenseFlatPicker");
+  if (!box && show) box = installFlatPicker("expenseFlatPicker", document.querySelector("#expenseSplitPreview") || els.expenseConversionPreview, renderExpenseSplitPreview, expenseFlatPreset);
+  box?.classList.toggle("hidden", !show);
+}
+
+function resetExpenseFlatPicker(preset = null) {
+  expenseFlatPreset = preset;
+  document.getElementById("expenseFlatPicker")?.remove();
+}
+
+// ── Next year's budget proposal ─────────────────────────────────────────────
+function budgetProposal(marginPct = 10, today = localDateInput()) {
+  const end = monthIso(monthKey(today));
+  const start = addMonths(end, -12);
+  const cats = new Map();
+  state.transactions.forEach((t) => {
+    if (t.category !== "Expenses" || t.serviceType) return;
+    const d = String(transactionDateValue(t));
+    if (d < start || d >= end) return;
+    const c = t.expenseCategory || tr("General");
+    cats.set(c, roundUsd((cats.get(c) || 0) + txUsd(t, t.debitUsd, t.debitLbp)));
+  });
+  const rows = [...cats.entries()].sort((a, b) => b[1] - a[1])
+    .map(([category, last]) => ({ category, last, next: roundUsd(last * (1 + marginPct / 100)) }));
+  const reserve = reserveStatus();
+  const reserveTopUp = reserve?.below ? roundUsd(reserve.target - reserve.cash) : 0;
+  const base = roundUsd(rows.reduce((s, r) => s + r.last, 0));
+  const yearly = roundUsd(rows.reduce((s, r) => s + r.next, 0) + reserveTopUp);
+  const monthly = roundUsd(yearly / 12);
+  const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
+  const coef = tenants.reduce((s, t) => s + Number(t.coefficient || 0), 0);
+  const perFlat = tenants.map((t) => ({
+    id: t.id, unit: t.unit || "", name: t.name,
+    usd: roundUsd(coef > 0 ? monthly * Number(t.coefficient || 0) / coef : tenants.length ? monthly / tenants.length : 0),
+  }));
+  return {
+    start, end, rows, marginPct, base, reserveTopUp, yearly, monthly, perFlat,
+    currentMonthly: isFixedMode() ? getExpectedMonthlyUsd(currentMonthValue()) : null,
+    nextYear: String(Number(String(today).slice(0, 4)) + 1),
+  };
+}
+
+function budgetProposalTable(p) {
+  return mk("div", { className: "report-table-wrap" }, mk("table", { className: "report-table" },
+    mk("thead", {}, mk("tr", {}, mk("th", { text: tr("Category") }), mk("th", { className: "num", text: tr("Last 12 months") }), mk("th", { className: "num", text: tr("Next year") }))),
+    mk("tbody", {},
+      p.rows.map((r) => mk("tr", {}, mk("td", { text: r.category }), mk("td", { className: "num", text: formatUsd(r.last) }), mk("td", { className: "num", text: formatUsd(r.next) }))),
+      p.reserveTopUp ? mk("tr", {}, mk("td", { text: tr("Back up to the reserve target") }), mk("td", { className: "num", text: "—" }), mk("td", { className: "num", text: formatUsd(p.reserveTopUp) })) : null,
+      mk("tr", { className: "report-total" }, mk("td", { text: tr("Total") }), mk("td", { className: "num", text: formatUsd(p.base) }), mk("td", { className: "num", text: formatUsd(p.yearly) })))));
+}
+
+function buildBudgetProposalSection() {
+  const margin = selectInput([0, 5, 10, 15, 20].map((n) => [String(n), tr("+{n}% for rising prices", { n })]), "10");
+  const out = mk("div");
+  const draw = () => {
+    const p = budgetProposal(Number(margin.value));
+    if (!p.rows.length) { out.replaceChildren(note(tr("Record a few months of expenses first; the proposal is based on the last 12 months."))); return; }
+    out.replaceChildren(
+      budgetProposalTable(p),
+      mk("div", { className: "proposal-figures" },
+        breakdownRow(tr("Building, per month"), formatUsd(p.monthly), p.currentMonthly ? tr("Today: {amount} a month", { amount: formatUsd(p.currentMonthly) }) : ""),
+        ...p.perFlat.map((f) => breakdownRow(f.unit ? tr("Unit {unit}", { unit: f.unit }) : f.name, formatUsd(f.usd), f.name))),
+      note(tr("Generator and water are billed separately and are not included.")),
+      mk("div", { className: "button-row" },
+        secondaryButton(tr("Use as the {year} budget", { year: p.nextYear }), () => {
+          if (!canEditBuilding()) return;
+          state.budgets ||= {};
+          state.budgets[p.nextYear] = Object.fromEntries(p.rows.map((r) => [r.category, r.next]));
+          if (!saveState()) return;
+          renderAll();
+          showToast(tr("Budget for {year} saved", { year: p.nextYear }));
+        })));
+  };
+  margin.addEventListener("change", draw);
+  draw();
+  return mk("div", {},
+    note(tr("What the building spent in the last 12 months, plus a margin, gives next year's monthly amount per flat. Use it for the owners' meeting.")),
+    field(tr("Margin"), margin),
+    out);
+}
+
+// ── Final settlement when someone moves out ─────────────────────────────────
+function lastMeterReading(tenantId, serviceType = "generator") {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (serviceType === "generator" && tenant?.meterEnd !== undefined) return Number(tenant.meterEnd);
+  const recs = (state.serviceReadings || []).filter((r) => r.serviceType === serviceType && r.lines?.[tenantId])
+    .sort((a, b) => String(b.forMonth).localeCompare(String(a.forMonth)));
+  return recs.length ? Number(recs[0].lines[tenantId].currentReading || 0) : null;
+}
+
+function settlementData(tenantId) {
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  if (!tenant) return null;
+  return {
+    tenant,
+    balance: roundUsd(getTenantBalance(tenantId)),
+    date: tenant.movedOutOn || localDateInput(),
+    meter: lastMeterReading(tenantId, "generator"),
+    water: lastMeterReading(tenantId, "water"),
+    paid: roundUsd(getTenantPaymentsTotal(tenantId)),
+    settlement: tenant.settlement || null,
+  };
+}
+
+function balanceSentence(balance, name) {
+  return Math.abs(balance) < 0.005
+    ? tr("{name} is settled in full.", { name })
+    : balance > 0
+      ? tr("{name} owes {amount}.", { name, amount: formatUsd(balance) })
+      : tr("{name} has a credit of {amount}.", { name, amount: formatUsd(-balance) });
+}
+
+function openSettlementDialog(tenantId) {
+  const d = settlementData(tenantId);
+  if (!d || !canEditBuilding()) return;
+  const keys = numberInput(d.settlement?.keys ?? "", { step: "1", inputmode: "numeric" });
+  const notes = mk("textarea", { rows: "3", maxlength: "600", placeholder: tr("Condition of the flat, things left, anything agreed") });
+  notes.value = d.settlement?.notes || "";
+  const settled = checkboxRow(tr("Everything is settled"), Boolean(d.settlement?.settled) || Math.abs(d.balance) < 0.005);
+  const save = () => {
+    d.tenant.settlement = {
+      keys: keys.value === "" ? null : Number(keys.value), notes: notes.value.trim(), settled: settled.input.checked,
+      balanceUsd: d.balance, at: new Date().toISOString(), by: auditActor(),
+    };
+    if (!saveState()) return false;
+    renderAll();
+    showToast("Settlement saved");
+    return true;
+  };
+  openToolDialog(tr("Final settlement — {name}", { name: d.tenant.name }),
+    note([tr("Moved out {date}", { date: formatDateLabel(d.date) }), balanceSentence(d.balance, d.tenant.name)].join(" · ")),
+    d.meter !== null ? note(tr("Last generator reading: {n}", { n: numberFormat.format(d.meter) })) : null,
+    d.water !== null ? note(tr("Last water reading: {n}", { n: numberFormat.format(d.water) })) : null,
+    depositsHeld(tenantId).length ? note(tr("Deposit held: {amount}. Return it from {name}'s page.", { amount: formatUsd(depositsHeld(tenantId).reduce((x, y) => x + Number(y.amountUsd || 0), 0)), name: d.tenant.name }), "is-warning") : null,
+    field(tr("Keys handed back"), keys),
+    field(tr("Notes"), notes),
+    settled.row,
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save and share"), () => { if (save()) void shareSettlementPicture(tenantId); }),
+      secondaryButton(tr("Statement PDF"), () => printTenantStatement(tenantId)),
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function drawSettlementCanvas(tenantId) {
+  const d = settlementData(tenantId);
+  if (!d) return null;
+  const rtl = currentLang === "ar";
+  const C = { green: "#163832", soft: "#cfe3db", white: "#ffffff", ink: "#14211f", muted: "#61706b", tint: "#eef4ef", line: "#e4e9e4", red: "#a23b3b", accent: "#1f6b5a" };
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const W = 1080;
+  const PAD = 64;
+  const s = d.settlement || {};
+  const noteLines = String(s.notes || "").match(/.{1,52}(\s|$)/g) || [];
+  const H = 1000 + noteLines.length * 44;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const X = (x) => (rtl ? W - x : x);
+  const box = (x, y, w, h, color, radius = 0) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    const left = rtl ? W - x - w : x;
+    if (radius && typeof ctx.roundRect === "function") ctx.roundRect(left, y, w, h, radius);
+    else ctx.rect(left, y, w, h);
+    ctx.fill();
+  };
+  const text = (value, x, y, { size = 30, weight = 400, color = C.ink, align = "start" } = {}) => {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.fillText(String(value ?? ""), X(x), y);
+  };
+  box(0, 0, W, H, C.white);
+  box(0, 0, W, 250, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Final settlement"), PAD, 160, { size: 64, weight: 800, color: C.white });
+  text(`${d.tenant.name} · ${tr("Unit {unit}", { unit: d.tenant.unit || "" })} · ${formatDateLabel(d.date)}`, PAD, 212, { size: 30, color: C.soft });
+  box(PAD, 300, W - PAD * 2, 170, C.tint, 26);
+  text(d.balance > 0.005 ? tr("Still to pay") : d.balance < -0.005 ? tr("To be refunded") : tr("Settled in full"), PAD + 36, 360, { size: 30, color: C.muted });
+  text(Math.abs(d.balance) < 0.005 ? "✓" : formatUsd(Math.abs(d.balance)), PAD + 36, 436, { size: 72, weight: 800, color: d.balance > 0.005 ? C.red : C.accent });
+  let y = 540;
+  const row = (label, value) => {
+    text(label, PAD, y, { size: 32, color: C.muted });
+    text(value, W - PAD, y, { size: 34, weight: 700, align: "end" });
+    y += 64;
+  };
+  row(tr("Moved out"), formatDateLabel(d.date));
+  row(tr("Paid in total"), formatUsd(d.paid));
+  if (d.meter !== null) row(tr("Last generator reading"), numberFormat.format(d.meter));
+  if (d.water !== null) row(tr("Last water reading"), numberFormat.format(d.water));
+  if (s.keys !== null && s.keys !== undefined) row(tr("Keys handed back"), String(s.keys));
+  if (noteLines.length) {
+    box(PAD, y - 30, W - PAD * 2, 2, C.line);
+    y += 20;
+    noteLines.forEach((l) => { text(l.trim(), PAD, y, { size: 28 }); y += 44; });
+  }
+  if (s.settled) text(tr("Settled on {date}", { date: formatDateLabel(String(s.at || "").slice(0, 10)) }), PAD, H - 60, { size: 30, weight: 700, color: C.accent });
+  return canvas;
+}
+
+async function shareSettlementPicture(tenantId) {
+  const canvas = drawSettlementCanvas(tenantId);
+  if (!canvas) return;
+  const tenant = state.tenants.find((t) => t.id === tenantId);
+  const file = new File([base64ToBytes(canvas.toDataURL("image/png").split(",")[1] || "")], `Settlement_${String(tenant?.unit || tenant?.name || "").replace(/[^\w-]+/g, "_")}.png`, { type: "image/png" });
+  try {
+    if (typeof navigator.share === "function" && (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] }))) {
+      await navigator.share({ files: [file], title: tr("Final settlement") });
+      return;
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(file, "image/png", file.name);
+}
+
+// ── Automatic late reminders ────────────────────────────────────────────────
+function unpaidByMonth() {
+  if (!isFixedMode()) return {};
+  const out = {};
+  state.tenants.filter((t) => t.active !== false).forEach((t) => {
+    const { allocated } = fifoMonthPaid(t.id);
+    const months = {};
+    getMonths().forEach((m) => {
+      const left = roundUsd(getMonthlyDueForTenant(t.id, m) - (allocated.get(m) || 0));
+      if (left > 0.005) months[monthKey(m)] = left;
+    });
+    if (Object.keys(months).length) out[t.id] = months;
+  });
+  return out;
+}
+
+function lateReminderSettings() {
+  const s = state.settings.lateReminders || {};
+  return { on: Boolean(s.on), days: Number(s.days || 5) };
+}
+
+function buildLateReminderControls() {
+  if (!isFixedMode()) return null;
+  const s = lateReminderSettings();
+  const toggle = checkboxRow(tr("Remind late tenants automatically"), s.on);
+  const days = selectInput([3, 5, 7, 10, 15].map((n) => [String(n), tr("{n} days after the due day", { n })]), String(s.days));
+  const save = () => {
+    if (!canEditBuilding()) return;
+    state.settings.lateReminders = { on: toggle.input.checked, days: Number(days.value) };
+    if (!saveState()) return;
+    showToast(toggle.input.checked ? "Late reminders on" : "Late reminders off");
+  };
+  toggle.input.addEventListener("change", save);
+  days.addEventListener("change", save);
+  const dueDay = Number(state.settings.dueDay || 0);
+  return mk("div", { className: "late-reminder-controls" },
+    toggle.row,
+    field(tr("When"), days),
+    note(dueDay
+      ? tr("Once a month, each tenant who still owes for a month whose due day has passed gets a polite phone notification, in their language.")
+      : tr("Set the due day in Settings first; reminders go out that many days after it."), dueDay ? "" : "is-warning"));
+}
+
+// ── Generator: fixed subscription per amp ───────────────────────────────────
+function generatorBilling() {
+  const b = state.settings.generatorBilling;
+  return b && b.mode === "subscription" ? b : null;
+}
+
+function subscriptionAppliesTo(month) {
+  const b = generatorBilling();
+  return Boolean(b) && (!b.since || monthKey(month) >= b.since);
+}
+
+function subscriptionMonths() {
+  const b = generatorBilling();
+  if (!b?.since) return [];
+  const out = [];
+  let m = monthIso(b.since);
+  const last = currentMonthValue();
+  while (m && monthKey(m) <= monthKey(last) && out.length < 120) { out.push(m); m = addMonths(m, 1); }
+  return out;
+}
+
+function computeGeneratorSubscription(month, pools, rec) {
+  const b = generatorBilling();
+  const perAmp = Number(b.perAmpUsd || 0);
+  const perKwh = Number(b.perKwhUsd || 0);
+  const monthStart = monthIso(monthKey(month));
+  const monthEnd = getMonthEndDate(monthStart);
+  const occupants = state.tenants.filter((t) =>
+    (t.active !== false || (t.movedOutOn && t.movedOutOn > monthStart)) && !(t.movedInOn && t.movedInOn > monthEnd));
+  const lines = {};
+  const shares = {};
+  let totalKwh = 0;
+  occupants.forEach((t) => {
+    const l = rec?.lines?.[t.id];
+    const amps = Number(l?.breakerAmps ?? t.breakerAmps ?? 0);
+    const kwh = l ? Math.max(0, roundKwh(Number(l.currentReading || 0) - Number(l.previousReading || 0))) : 0;
+    const ampUsd = roundUsd(amps * perAmp);
+    const kwhUsd = perKwh > 0 ? roundUsd(kwh * perKwh) : 0;
+    if (!amps && !kwhUsd) return;
+    totalKwh += kwh;
+    lines[t.id] = {
+      breakerAmps: amps, previousReading: Number(l?.previousReading || 0), currentReading: Number(l?.currentReading || 0),
+      kwh, consumptionUsd: kwhUsd, maintenanceUsd: ampUsd, totalUsd: roundUsd(ampUsd + kwhUsd), read: Boolean(l),
+    };
+    shares[t.id] = lines[t.id].totalUsd;
+  });
+  return { pools, distributed: true, subscription: true, perAmp, perKwh, lines, shares, totalKwh: roundKwh(totalKwh) };
+}
+
+function subscriptionLineText(line, dist) {
+  const parts = [tr("{amps}A × {price}", { amps: line.breakerAmps || 0, price: formatUsd(dist.perAmp) })];
+  if (dist.perKwh > 0) parts.push(line.read ? tr("{kwh} kWh × {price}", { kwh: line.kwh || 0, price: `$${dist.perKwh.toFixed(3)}` }) : tr("meter not read yet"));
+  return parts.join(" + ");
+}
+
+function generatorBillingCard() {
+  if (sessionMode !== "owner") return null;
+  const b = generatorBilling();
+  return mk("article", { id: "generatorBillingCard", className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Generator billing") }), canEditBuilding() ? miniButton(tr("Change"), openGeneratorBillingDialog) : null),
+    mk("p", { className: "notice-body", text: b
+      ? [tr("Subscription: {price} per amp a month", { price: formatUsd(Number(b.perAmpUsd || 0)) }), Number(b.perKwhUsd || 0) > 0 ? tr("plus ${price} per kWh", { price: Number(b.perKwhUsd).toFixed(3) }) : "", b.since ? tr("from {month}", { month: formatMonth(monthIso(b.since)) }) : ""].filter(Boolean).join(" · ")
+      : tr("By meter: the real fuel cost split by each flat's kWh, maintenance by breaker size.") }));
+}
+
+function openGeneratorBillingDialog() {
+  if (!canEditBuilding()) return;
+  const b = state.settings.generatorBilling || {};
+  const mode = selectInput([["metered", tr("By meter — split the real costs")], ["subscription", tr("Subscription — fixed price per amp")]], b.mode === "subscription" ? "subscription" : "metered");
+  const perAmp = numberInput(b.perAmpUsd ?? "", { step: "0.01", placeholder: "0.00" });
+  const perKwh = numberInput(b.perKwhUsd ?? "", { step: "0.001", placeholder: "0.000" });
+  const since = mk("input", { type: "month", value: b.since || monthKey(currentMonthValue()) });
+  const subFields = mk("div", {},
+    field(tr("Price per amp per month (USD)"), perAmp),
+    field(tr("Price per kWh (USD, optional)"), perKwh, tr("Leave empty for a pure subscription. With a price, each flat also pays for the kWh on its meter.")),
+    field(tr("From month"), since, tr("Months before keep the meter split.")));
+  const sync = () => subFields.classList.toggle("hidden", mode.value !== "subscription");
+  mode.addEventListener("change", sync);
+  sync();
+  openToolDialog(tr("Generator billing"),
+    note(tr("Many buildings charge the generator as a monthly subscription per amp instead of splitting the real costs. The costs you record still show what the generator really cost.")),
+    field(tr("How flats pay"), mode),
+    subFields,
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), () => {
+        if (mode.value === "subscription") {
+          if (!(Number(perAmp.value) > 0) && !(Number(perKwh.value) > 0)) { showToast("Enter a price per amp"); return; }
+          if (since.value && isMonthClosed(monthIso(since.value))) { showToast(closedMonthError(monthIso(since.value)).message, 5000); return; }
+          state.settings.generatorBilling = { mode: "subscription", perAmpUsd: roundUsd(Number(perAmp.value || 0)), perKwhUsd: Number(Number(perKwh.value || 0).toFixed(4)), since: since.value || monthKey(currentMonthValue()) };
+        } else {
+          state.settings.generatorBilling = { mode: "metered" };
+        }
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+        showToast("Generator billing saved");
+      }),
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Water meters per flat ───────────────────────────────────────────────────
+function waterMetersOn() {
+  return Boolean(state.settings.waterMeters);
+}
+
+function waterMeterUse(month) {
+  const rec = getServiceReadingRecord("water", month);
+  if (!rec) return null;
+  const use = {};
+  let total = 0;
+  Object.entries(rec.lines || {}).forEach(([id, l]) => {
+    const u = Math.max(0, roundKwh(Number(l.currentReading || 0) - Number(l.previousReading || 0)));
+    use[id] = u;
+    total += u;
+  });
+  return { use, total: roundKwh(total) };
+}
+
+function waterMeterShare(tenantId, transaction) {
+  const m = waterMeterUse(transaction.forMonth || monthIso(monthKey(transaction.date || "")));
+  if (!m || !(m.total > 0)) return 0;
+  const shares = allocateByWeight(txUsd(transaction, transaction.debitUsd, transaction.debitLbp), Object.entries(m.use).map(([id, weight]) => ({ id, weight })));
+  return roundUsd(shares[tenantId] || 0);
+}
+
+function previousWaterReading(tenantId, month) {
+  const recs = (state.serviceReadings || []).filter((r) => r.serviceType === "water" && monthKey(r.forMonth) < monthKey(month) && r.lines?.[tenantId])
+    .sort((a, b) => String(b.forMonth).localeCompare(String(a.forMonth)));
+  return recs.length ? Number(recs[0].lines[tenantId].currentReading || 0) : 0;
+}
+
+function openWaterReadingsDialog(month = currentMonthValue()) {
+  if (!canEditBuilding() && sessionMode !== "concierge") return;
+  const monthInput = mk("input", { type: "month", value: monthKey(month) });
+  const rows = mk("div", { className: "water-reading-rows" });
+  const fill = () => {
+    const m = monthIso(monthInput.value);
+    const rec = getServiceReadingRecord("water", m);
+    const monthStart = m;
+    const monthEnd = getMonthEndDate(m);
+    const tenants = state.tenants.filter((t) => (t.active !== false || (t.movedOutOn && t.movedOutOn > monthStart)) && !(t.movedInOn && t.movedInOn > monthEnd)).sort(byUnit);
+    rows.replaceChildren(...tenants.map((t) => {
+      const saved = rec?.lines?.[t.id];
+      const prev = numberInput(saved ? saved.previousReading : previousWaterReading(t.id, m) || "", { step: "0.1", className: "wr-prev" });
+      const cur = numberInput(saved?.currentReading ?? "", { step: "0.1", className: "wr-curr" });
+      return mk("div", { className: "water-reading-row", dataset: { tenantId: t.id } },
+        mk("strong", { text: unitLabel(t) }),
+        mk("div", { className: "two-col" }, field(tr("Previous"), prev), field(tr("Current"), cur)));
+    }));
+  };
+  monthInput.addEventListener("change", fill);
+  fill();
+  const save = async () => {
+    const m = monthIso(monthInput.value);
+    if (!m) return;
+    if (isMonthClosed(m)) { showToast(closedMonthError(m).message, 5000); return; }
+    const lines = {};
+    let lower = 0;
+    rows.querySelectorAll(".water-reading-row").forEach((r) => {
+      const prev = Number(r.querySelector(".wr-prev").value || 0);
+      const curRaw = r.querySelector(".wr-curr").value;
+      if (curRaw === "") return;
+      const cur = Number(curRaw);
+      if (cur < prev) lower += 1;
+      lines[r.dataset.tenantId] = { previousReading: prev, currentReading: cur };
+    });
+    if (!Object.keys(lines).length) { showToast("Enter at least one reading"); return; }
+    if (lower && !window.confirm(tr("{n} reading(s) are lower than last month. Save anyway?", { n: lower }))) return;
+    try {
+      if (sessionMode === "concierge") {
+        await callRpc("concierge_save_water_readings", { p_month: m, p_lines: lines });
+        syncFromSheet({ silent: true });
+      } else {
+        const existing = getServiceReadingRecord("water", m);
+        if (existing) Object.assign(existing, { lines, updatedAt: new Date().toISOString() });
+        else (state.serviceReadings ||= []).push({ id: newId("wrd"), serviceType: "water", forMonth: m, lines, updatedAt: new Date().toISOString() });
+        if (!saveState()) return;
+        renderAll();
+      }
+      closeToolDialog();
+      showToast("Water readings saved");
+    } catch (error) {
+      showToast(rpcProblem(error), 6000);
+    }
+  };
+  openToolDialog(tr("Water meters"),
+    note(tr("Water bills marked \"By water meter\" are shared by what each flat used this month.")),
+    field(tr("Month"), monthInput),
+    rows,
+    mk("div", { className: "button-row" }, primaryButton(tr("Save readings"), () => { void save(); }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function waterMeterCard() {
+  if (sessionMode !== "owner") return null;
+  const on = waterMetersOn();
+  const pending = on ? [...new Set(state.transactions.filter((t) => t.serviceType === "water" && t.waterSplit === "meter").map((t) => monthIso(monthKey(t.forMonth || t.date || ""))))]
+    .filter((m) => !waterMeterUse(m)?.total) : [];
+  const toggle = checkboxRow(tr("Flats have their own water meters"), on);
+  toggle.input.addEventListener("change", () => {
+    if (!canEditBuilding()) { toggle.input.checked = on; return; }
+    state.settings.waterMeters = toggle.input.checked;
+    if (!saveState()) return;
+    renderAll();
+  });
+  return mk("article", { id: "waterMeterCard", className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Water meters") }), on && canEditBuilding() ? miniButton(tr("Enter readings"), () => openWaterReadingsDialog()) : null),
+    canEditBuilding() ? toggle.row : null,
+    on ? note(pending.length
+      ? tr("Waiting for readings: {months}", { months: pending.map((m) => formatMonth(m)).join(", ") })
+      : tr("Choose \"By water meter\" when you record a water bill; it is shared once that month's readings are in."), pending.length ? "is-warning" : "") : null);
+}
+
+// ── Concierge: jobs, supplies, visitors ─────────────────────────────────────
+function taskDueOn(task, date) {
+  if (!task || task.active === false) return false;
+  const days = task.days || [];
+  return !days.length || days.includes(new Date(`${date}T00:00:00`).getDay());
+}
+
+function taskLog(taskId, date) {
+  return (state.routineLog || []).find((l) => l.id === `${taskId}:${date}`) || null;
+}
+
+function todaysJobs(date = localDateInput()) {
+  return (state.routineTasks || []).filter((t) => taskDueOn(t, date)).map((task) => ({ task, done: Boolean(taskLog(task.id, date)?.done) }));
+}
+
+async function toggleTask(taskId, date = localDateInput()) {
+  const entry = taskLog(taskId, date);
+  const done = !entry?.done;
+  const now = new Date().toISOString();
+  try {
+    if (sessionMode === "concierge") {
+      await callRpc("concierge_tick_task", { p_task_id: taskId, p_date: date });
+    } else if (!canEditBuilding()) {
+      return;
+    }
+    if (entry) Object.assign(entry, { done, at: now, by: sessionMode === "concierge" ? "concierge" : auditActor() });
+    else (state.routineLog ||= []).push({ id: `${taskId}:${date}`, taskId, date, done, at: now, by: sessionMode === "concierge" ? "concierge" : auditActor() });
+    if (sessionMode === "concierge") { renderAll(); syncFromSheet({ silent: true }); return; }
+    if (!saveState()) return;
+    renderAll();
+  } catch (error) {
+    showToast(rpcProblem(error), 6000);
+  }
+}
+
+function openTaskDialog(taskId = null) {
+  if (!canEditBuilding()) return;
+  const task = taskId ? (state.routineTasks || []).find((t) => t.id === taskId) : null;
+  const title = textInput(task?.title || "", { maxlength: "100", placeholder: tr("e.g. Clean the stairs") });
+  const dayBoxes = [1, 2, 3, 4, 5, 6, 0].map((d) => ({ d, box: checkboxRow(weekdayName(d), (task?.days || []).includes(d)) }));
+  const save = () => {
+    if (!title.value.trim()) { showToast("Give the job a name"); return; }
+    const days = dayBoxes.filter((x) => x.box.input.checked).map((x) => x.d);
+    const now = new Date().toISOString();
+    if (task) Object.assign(task, { title: title.value.trim(), days, updatedAt: now });
+    else (state.routineTasks ||= []).push({ id: newId("job"), title: title.value.trim(), days, active: true, createdAt: now, updatedAt: now });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(task ? tr("Edit job") : tr("New job"),
+    field(tr("Job"), title),
+    mk("div", { className: "field-label", text: tr("On these days (none = every day)") }),
+    mk("div", { className: "weekday-picks" }, dayBoxes.map((x) => x.box.row)),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), save),
+      task ? secondaryButton(tr("Delete"), () => {
+        if (!window.confirm(tr("Delete the job \"{title}\"?", { title: task.title }))) return;
+        state.routineTasks = state.routineTasks.filter((t) => t.id !== task.id);
+        (state.deleted.routineTasks ||= []).push(task.id);
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+      }) : null,
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function lowSupplies() {
+  return (state.supplies || []).filter((s) => Number(s.lowAt || 0) > 0 && Number(s.qty || 0) <= Number(s.lowAt));
+}
+
+async function adjustSupply(supplyId, delta) {
+  const item = (state.supplies || []).find((s) => s.id === supplyId);
+  if (!item) return;
+  try {
+    if (sessionMode === "concierge") await callRpc("concierge_adjust_supply", { p_supply_id: supplyId, p_delta: delta });
+    else if (!canEditBuilding()) return;
+    item.qty = Math.max(0, Number(item.qty || 0) + delta);
+    item.updatedAt = new Date().toISOString();
+    if (sessionMode === "concierge") { renderAll(); syncFromSheet({ silent: true }); return; }
+    if (!saveState()) return;
+    renderAll();
+  } catch (error) {
+    showToast(rpcProblem(error), 6000);
+  }
+}
+
+function openSupplyDialog(supplyId = null) {
+  if (!canEditBuilding()) return;
+  const item = supplyId ? (state.supplies || []).find((s) => s.id === supplyId) : null;
+  const name = textInput(item?.name || "", { maxlength: "80", placeholder: tr("e.g. Light bulbs") });
+  const qty = numberInput(item?.qty ?? "", { step: "1" });
+  const unit = textInput(item?.unit || "", { maxlength: "20", placeholder: tr("pieces, litres, boxes") });
+  const lowAt = numberInput(item?.lowAt ?? "", { step: "1" });
+  const save = () => {
+    if (!name.value.trim()) { showToast("Give it a name"); return; }
+    const fields = { name: name.value.trim(), qty: Math.max(0, Number(qty.value || 0)), unit: unit.value.trim(), lowAt: Math.max(0, Number(lowAt.value || 0)), updatedAt: new Date().toISOString() };
+    if (item) Object.assign(item, fields);
+    else (state.supplies ||= []).push({ id: newId("sup"), ...fields });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(item ? tr("Edit supply") : tr("New supply"),
+    field(tr("Name"), name),
+    mk("div", { className: "two-col" }, field(tr("In stock"), qty), field(tr("Counted in"), unit)),
+    field(tr("Warn me at"), lowAt, tr("You get a reminder when the stock drops to this number.")),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), save),
+      item ? secondaryButton(tr("Delete"), () => {
+        if (!window.confirm(tr("Delete \"{name}\"?", { name: item.name }))) return;
+        state.supplies = state.supplies.filter((s) => s.id !== item.id);
+        (state.deleted.supplies ||= []).push(item.id);
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+      }) : null,
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+const VISITOR_PURPOSES = ["Repair", "Delivery", "Guest", "Cleaning", "Other"];
+
+function openVisitorDialog() {
+  if (!canEditBuilding() && sessionMode !== "concierge") return;
+  const name = textInput("", { maxlength: "80", placeholder: tr("Name or company") });
+  const purpose = selectInput(VISITOR_PURPOSES.map((p) => [p, tr(p)]), "Repair");
+  const flat = selectInput([["", tr("The building")], ...state.tenants.filter((t) => t.active !== false).sort(byUnit).map((t) => [t.unit || t.name, t.unit ? tr("Unit {unit}", { unit: t.unit }) : t.name])], "");
+  const details = textInput("", { maxlength: "120", placeholder: tr("What for (optional)") });
+  const save = async () => {
+    if (!name.value.trim()) { showToast("Enter who came"); return; }
+    const purposeText = [tr(purpose.value), details.value.trim()].filter(Boolean).join(" — ");
+    try {
+      if (sessionMode === "concierge") {
+        await callRpc("concierge_log_visitor", { p_name: name.value.trim(), p_purpose: purposeText, p_unit: flat.value });
+        (state.visitorLog ||= []).push({ id: newId("vis"), at: new Date().toISOString(), name: name.value.trim(), purpose: purposeText, unit: flat.value, by: "concierge" });
+        closeToolDialog();
+        renderAll();
+        syncFromSheet({ silent: true });
+      } else {
+        (state.visitorLog ||= []).push({ id: newId("vis"), at: new Date().toISOString(), name: name.value.trim(), purpose: purposeText, unit: flat.value, by: auditActor() });
+        state.visitorLog = state.visitorLog.slice(-400);
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+      }
+      showToast("Visitor noted");
+    } catch (error) {
+      showToast(rpcProblem(error), 6000);
+    }
+  };
+  openToolDialog(tr("Note a visitor"),
+    field(tr("Who"), name),
+    mk("div", { className: "two-col" }, field(tr("Why"), purpose), field(tr("For"), flat)),
+    field(tr("Details"), details),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), () => { void save(); }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function jobDots(task) {
+  const dots = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const date = addDays(localDateInput(), -i);
+    const due = taskDueOn(task, date);
+    const done = Boolean(taskLog(task.id, date)?.done);
+    dots.push(mk("span", { className: `job-dot${!due ? " is-off" : done ? " is-done" : i === 0 ? " is-today" : " is-missed"}`, title: `${formatDateLabel(date)}${due ? (done ? " ✓" : "") : ""}` }));
+  }
+  return mk("span", { className: "job-dots" }, dots);
+}
+
+function renderStaff() {
+  const body = document.querySelector("#staffBody");
+  if (!body) return;
+  const owner = canEditBuilding();
+  const staffAllowed = sessionMode === "owner" || sessionMode === "concierge";
+  if (!staffAllowed) { body.replaceChildren(); return; }
+  const today = localDateInput();
+  const jobs = todaysJobs(today);
+  const tasks = (state.routineTasks || []).filter((t) => t.active !== false);
+  const supplies = (state.supplies || []).slice().sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  const since = addDays(today, -30);
+  const visitors = (state.visitorLog || []).filter((v) => String(v.at).slice(0, 10) >= since).sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 40);
+  fillChildren(body,
+    reportsSection(tr("Today's jobs"),
+      jobs.length
+        ? mk("div", { className: "job-list" }, jobs.map(({ task, done }) => {
+          const b = mk("button", { type: "button", className: `job-row${done ? " is-done" : ""}` },
+            mk("span", { className: "job-check", text: done ? "✓" : "" }), mk("span", { text: task.title }));
+          b.addEventListener("click", () => { void toggleTask(task.id, today); });
+          return b;
+        }))
+        : note(tasks.length ? tr("Nothing planned for today.") : owner ? tr("Add the concierge's regular jobs — cleaning, checks, rubbish — and they tick them off here.") : tr("No jobs set up yet."))),
+    owner && tasks.length ? reportsSection(tr("Last 7 days"),
+      mk("div", {}, tasks.map((t) => mk("div", { className: "breakdown-row job-history-row" },
+        mk("span", {}, mk("strong", { text: t.title }), mk("small", { text: t.days?.length ? t.days.map(weekdayName).join(" ") : tr("Every day") })),
+        jobDots(t), miniButton(tr("Edit"), () => openTaskDialog(t.id)))))) : null,
+    owner ? mk("div", { className: "button-row" }, secondaryButton(tr("+ Add a job"), () => openTaskDialog())) : null,
+    reportsSection(tr("Supplies"),
+      supplies.length
+        ? mk("div", {}, supplies.map((s) => {
+          const low = Number(s.lowAt || 0) > 0 && Number(s.qty || 0) <= Number(s.lowAt);
+          return mk("div", { className: `breakdown-row supply-row${low ? " is-low" : ""}` },
+            mk("span", {}, mk("strong", { text: s.name }), mk("small", { text: low ? tr("Running low") : s.unit || "" })),
+            mk("span", { className: "supply-qty" },
+              miniButton("−", () => { void adjustSupply(s.id, -1); }),
+              mk("b", { className: "tnum", text: numberFormat.format(Number(s.qty || 0)) }),
+              miniButton("+", () => { void adjustSupply(s.id, 1); })),
+            owner ? miniButton(tr("Edit"), () => openSupplyDialog(s.id)) : null);
+        }))
+        : note(owner ? tr("Keep count of bulbs, cleaning products, filters… and get a warning before they run out.") : tr("No supplies listed yet.")),
+      owner ? mk("div", { className: "button-row" }, secondaryButton(tr("+ Add a supply"), () => openSupplyDialog())) : null),
+    reportsSection(tr("Visitors"),
+      mk("div", { className: "button-row" }, primaryButton(tr("Note a visitor"), openVisitorDialog)),
+      visitors.length
+        ? mk("div", {}, visitors.map((v) => breakdownRow(v.name, new Date(v.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          [formatDateLabel(String(v.at).slice(0, 10)), v.purpose, v.unit ? tr("Unit {unit}", { unit: v.unit }) : ""].filter(Boolean).join(" · "))))
+        : note(tr("No visitors noted in the last 30 days."))));
+}
+
+function conciergeExtraTiles(tile) {
+  const jobs = todaysJobs();
+  const left = jobs.filter((j) => !j.done).length;
+  return [
+    jobs.length ? tile(tr("Today's jobs"), left ? tr("{n} to do", { n: left }) : tr("All done ✓"), () => setView("staffView")) : null,
+    tile(tr("Note a visitor"), tr("Who came in"), openVisitorDialog),
+    waterMetersOn() ? tile(tr("Water meters"), tr("Readings, this month"), () => openWaterReadingsDialog()) : null,
+    (state.supplies || []).length ? tile(tr("Supplies"), lowSupplies().length ? tr("{n} running low", { n: lowSupplies().length }) : tr("Update the count"), () => setView("staffView")) : null,
+  ].filter(Boolean);
+}
+
+// ── Booking shared spaces ───────────────────────────────────────────────────
+function bookableSpaces() {
+  return (state.settings.spaces || []).filter((s) => s?.id && s.name);
+}
+
+function spaceName(spaceId) {
+  return bookableSpaces().find((s) => s.id === spaceId)?.name || tr("Space");
+}
+
+function bookingClash(list, b) {
+  return (list || []).some((x) => x.id !== b.id && x.status !== "cancelled" && x.spaceId === b.spaceId && x.date === b.date && x.from < b.to && b.from < x.to);
+}
+
+function upcomingBookings(today = localDateInput()) {
+  return (state.bookings || []).filter((b) => b.status !== "cancelled" && b.date >= today)
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.from).localeCompare(String(b.from)));
+}
+
+function bookingIsMine(b) {
+  return sessionMode === "tenant" && b.tenantId && b.tenantId === sessionTenantId;
+}
+
+function openBookingDialog() {
+  const tenantPhone = sessionMode === "tenant" && isTenantSession();
+  if (!canEditBuilding() && !tenantPhone) return;
+  const spaces = bookableSpaces();
+  if (!spaces.length) { showToast("No shared spaces set up yet"); return; }
+  const space = selectInput(spaces.map((s) => [s.id, s.name]), spaces[0].id);
+  const date = mk("input", { type: "date", value: localDateInput(), min: localDateInput() });
+  const from = mk("input", { type: "time", value: "18:00" });
+  const to = mk("input", { type: "time", value: "22:00" });
+  const who = canEditBuilding() ? selectInput([["", tr("The building")], ...state.tenants.filter((t) => t.active !== false).sort(byUnit).map((t) => [t.id, unitLabel(t)])], "") : null;
+  const memo = textInput("", { maxlength: "120", placeholder: tr("Birthday, guests… (optional)") });
+  const save = async () => {
+    const b = { spaceId: space.value, date: date.value, from: from.value, to: to.value };
+    if (!b.date || !b.from || !b.to) { showToast("Choose the day and the times"); return; }
+    if (b.from >= b.to) { showToast("The end time must be after the start"); return; }
+    if (b.date < localDateInput()) { showToast("Choose today or a later day"); return; }
+    if (bookingClash(state.bookings, b)) { showToast("Already booked at that time"); return; }
+    try {
+      if (tenantPhone) {
+        await callRpc("book_space", { p_space_id: b.spaceId, p_date: b.date, p_from: b.from, p_to: b.to, p_note: memo.value.trim() });
+        closeToolDialog();
+        showToast("Booked");
+        syncFromSheet({ silent: true });
+        return;
+      }
+      const tenant = state.tenants.find((t) => t.id === who.value);
+      const now = new Date().toISOString();
+      (state.bookings ||= []).push({ id: newId("bk"), ...b, tenantId: tenant?.id || null, unit: tenant?.unit || "", note: memo.value.trim(), status: "booked", createdAt: now, updatedAt: now, by: auditActor() });
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+      showToast("Booked");
+    } catch (error) {
+      showToast(rpcProblem(error), 6000);
+    }
+  };
+  openToolDialog(tr("Book a space"),
+    field(tr("Space"), space),
+    field(tr("Day"), date),
+    mk("div", { className: "two-col" }, field(tr("From"), from), field(tr("To"), to)),
+    who ? field(tr("For"), who) : null,
+    field(tr("Note"), memo),
+    mk("div", { className: "button-row" }, primaryButton(tr("Book"), () => { void save(); }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+async function cancelBooking(bookingId) {
+  const b = (state.bookings || []).find((x) => x.id === bookingId);
+  if (!b || !window.confirm(tr("Cancel this booking?"))) return;
+  try {
+    if (bookingIsMine(b)) {
+      await callRpc("cancel_my_booking", { p_booking_id: bookingId });
+      b.status = "cancelled";
+      renderAll();
+      syncFromSheet({ silent: true });
+      return;
+    }
+    if (!canEditBuilding()) return;
+    Object.assign(b, { status: "cancelled", updatedAt: new Date().toISOString() });
+    if (!saveState()) return;
+    renderAll();
+  } catch (error) {
+    showToast(rpcProblem(error), 6000);
+  }
+}
+
+function openSpacesDialog() {
+  if (!canEditBuilding()) return;
+  const box = mk("textarea", { rows: "4", maxlength: "400", placeholder: tr("One per line, e.g.\nRoof\nGuest parking") });
+  box.value = bookableSpaces().map((s) => s.name).join("\n");
+  openToolDialog(tr("Shared spaces"),
+    note(tr("Residents can book these from their phones. Two bookings of the same space can't overlap.")),
+    field(tr("Spaces"), box),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), () => {
+        const old = bookableSpaces();
+        const names = [...new Set(box.value.split("\n").map((l) => l.trim()).filter(Boolean))].slice(0, 12);
+        state.settings.spaces = names.map((n) => old.find((s) => s.name === n) || { id: newId("sp"), name: n });
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+      }),
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function bookingWho(b) {
+  if (bookingIsMine(b)) return tr("You");
+  if (sessionMode === "tenant") return tr("Booked");
+  const t = b.tenantId ? state.tenants.find((x) => x.id === b.tenantId) : null;
+  return t ? unitLabel(t) : b.unit ? tr("Unit {unit}", { unit: b.unit }) : tr("The building");
+}
+
+function renderBookings() {
+  const body = document.querySelector("#bookingsBody");
+  if (!body) return;
+  const spaces = bookableSpaces();
+  const owner = canEditBuilding();
+  const canBook = owner || (sessionMode === "tenant" && isTenantSession());
+  const list = upcomingBookings();
+  const byDate = new Map();
+  list.forEach((b) => { if (!byDate.has(b.date)) byDate.set(b.date, []); byDate.get(b.date).push(b); });
+  fillChildren(body,
+    mk("div", { className: "button-row" },
+      canBook && spaces.length ? primaryButton(tr("+ Book"), openBookingDialog) : null,
+      owner ? secondaryButton(spaces.length ? tr("Spaces") : tr("Add spaces"), openSpacesDialog) : null),
+    !spaces.length
+      ? mk("div", { className: "empty-state", text: owner ? tr("Add the spaces residents can book — the roof, a hall, a guest parking spot.") : tr("The building has no shared spaces to book.") })
+      : !list.length
+        ? mk("div", { className: "empty-state", text: tr("No bookings coming up.") })
+        : mk("div", { className: "booking-days" }, [...byDate.entries()].map(([date, items]) => mk("section", { className: "panel booking-day" },
+          mk("div", { className: "panel-header" }, mk("h3", { text: formatDateLabel(date) })),
+          items.map((b) => mk("div", { className: `breakdown-row booking-row${bookingIsMine(b) ? " is-mine" : ""}` },
+            mk("span", {}, mk("strong", { text: `${spaceName(b.spaceId)} · ${b.from}–${b.to}` }), mk("small", { text: [bookingWho(b), b.note && (owner || bookingIsMine(b)) ? b.note : ""].filter(Boolean).join(" · ") })),
+            owner || bookingIsMine(b) ? miniButton(tr("Cancel"), () => { void cancelBooking(b.id); }, "danger-mini") : null))))));
+}
+
+// ── Residents' board ────────────────────────────────────────────────────────
+const BOARD_DAYS = 30;
+
+function boardPostVisible(p, today = localDateInput()) {
+  return p.status === "approved" && String(p.createdAt || "").slice(0, 10) >= addDays(today, -BOARD_DAYS);
+}
+
+function pendingBoardPosts() {
+  return (state.boardPosts || []).filter((p) => p.status === "pending");
+}
+
+function openBoardPostDialog() {
+  const tenantPhone = sessionMode === "tenant" && isTenantSession();
+  if (!canEditBuilding() && !tenantPhone) return;
+  const title = textInput("", { maxlength: "80", placeholder: tr("e.g. Sofa for sale") });
+  const body = mk("textarea", { rows: "4", maxlength: "800", placeholder: tr("Details, price, how to reach you") });
+  const photo = mk("input", { type: "file", accept: "image/*" });
+  const send = primaryButton(tenantPhone ? tr("Send for approval") : tr("Post"), async () => {
+    if (!title.value.trim()) { showToast("Give your post a title"); return; }
+    send.disabled = true;
+    try {
+      const file = photo.files?.[0] || null;
+      if (tenantPhone) {
+        const uploaded = file ? await uploadPhotoUnder(`board/${sessionTenantId}`, file) : null;
+        await callRpc("post_to_board", { p_title: title.value.trim(), p_body: body.value.trim(), p_photo_path: uploaded?.storagePath || null });
+        closeToolDialog();
+        showToast("Sent — it shows once the building manager approves it");
+        syncFromSheet({ silent: true });
+        return;
+      }
+      const uploaded = file && hasCloudConfig() && authSession ? await uploadPhotoUnder("board/building", file) : null;
+      const now = new Date().toISOString();
+      (state.boardPosts ||= []).push({ id: newId("post"), tenantId: null, authorName: tr("Building management"), authorUnit: "", title: title.value.trim(), body: body.value.trim(), ...(uploaded ? { photo: uploaded } : {}), status: "approved", createdAt: now, updatedAt: now });
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+    } catch (error) {
+      showToast(rpcProblem(error), 6000);
+    } finally {
+      send.disabled = false;
+    }
+  });
+  openToolDialog(tr("New post"),
+    tenantPhone ? note(tr("Your name and flat show with your post. The building manager approves posts before neighbours see them; they stay up for 30 days.")) : null,
+    field(tr("Title"), title),
+    field(tr("Text"), body),
+    field(tr("Photo (optional)"), photo),
+    mk("div", { className: "button-row" }, send, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function setPostStatus(postId, status) {
+  const p = (state.boardPosts || []).find((x) => x.id === postId);
+  if (!p || !canEditBuilding()) return;
+  Object.assign(p, { status, updatedAt: new Date().toISOString(), ...(status === "approved" ? { createdAt: new Date().toISOString() } : {}) });
+  if (!saveState()) return;
+  if (status === "approved" && p.tenantId) notifyTenants(p.tenantId, tr("Your post is on the board"), p.title);
+  renderAll();
+}
+
+async function removeMyPost(postId) {
+  if (!window.confirm(tr("Remove this post?"))) return;
+  try {
+    await callRpc("remove_my_post", { p_post_id: postId });
+    const p = (state.boardPosts || []).find((x) => x.id === postId);
+    if (p) p.status = "removed";
+    renderAll();
+    syncFromSheet({ silent: true });
+  } catch (error) {
+    showToast(rpcProblem(error), 6000);
+  }
+}
+
+function boardPostCard(p, { review = false } = {}) {
+  const mine = sessionMode === "tenant" && p.tenantId && p.tenantId === sessionTenantId;
+  return mk("article", { className: `notice-card board-post${p.status === "pending" ? " is-pending" : ""}` },
+    mk("div", { className: "notice-head" }, mk("strong", { text: p.title }),
+      p.status === "pending" ? mk("span", { className: "status-pill status-due", text: tr("Waiting for approval") }) : mk("span", { className: "notice-date", text: formatDateLabel(String(p.createdAt).slice(0, 10)) })),
+    p.body ? mk("p", { className: "notice-body", text: p.body }) : null,
+    mk("p", { className: "notice-until", text: [p.authorName, p.authorUnit ? tr("Unit {unit}", { unit: p.authorUnit }) : ""].filter(Boolean).join(" · ") }),
+    mk("div", { className: "notice-actions" },
+      p.photo?.storagePath ? miniButton(tr("Photo"), () => openInvoicePhoto(p.photo)) : null,
+      review ? miniButton(tr("Approve"), () => setPostStatus(p.id, "approved")) : null,
+      review ? miniButton(tr("Reject"), () => setPostStatus(p.id, "rejected"), "danger-mini") : null,
+      !review && canEditBuilding() ? miniButton(tr("Remove"), () => setPostStatus(p.id, "removed"), "danger-mini") : null,
+      mine ? miniButton(tr("Remove"), () => { void removeMyPost(p.id); }, "danger-mini") : null));
+}
+
+function renderBoard() {
+  const body = document.querySelector("#boardBody");
+  if (!body) return;
+  const owner = canEditBuilding();
+  const canPost = owner || (sessionMode === "tenant" && isTenantSession());
+  const posts = (state.boardPosts || []).slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const pending = sessionMode === "owner" ? pendingBoardPosts() : [];
+  const mineWaiting = sessionMode === "tenant" ? posts.filter((p) => p.status === "pending" && p.tenantId === sessionTenantId) : [];
+  const live = posts.filter((p) => boardPostVisible(p));
+  fillChildren(body,
+    canPost ? mk("div", { className: "button-row" }, primaryButton(tr("+ Post"), openBoardPostDialog)) : null,
+    pending.length ? reportsSection(tr("Waiting for your approval"), ...pending.map((p) => boardPostCard(p, { review: owner }))) : null,
+    ...mineWaiting.map((p) => boardPostCard(p)),
+    live.length
+      ? mk("div", { className: "notice-list" }, live.map((p) => boardPostCard(p)))
+      : mk("div", { className: "empty-state", text: tr("Nothing on the board. Selling something, lost keys, a question for the neighbours? Post it here.") }));
+}
+
+// ── Tenants keep their own phone number and language up to date ────────────
+function myDetailsCard() {
+  if (sessionMode !== "tenant" || !isTenantSession() || !sessionTenantId) return null;
+  const me = state.tenants.find((t) => t.id === sessionTenantId);
+  if (!me) return null;
+  return mk("article", { className: "notice-card my-details-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("My details") }), miniButton(tr("Change"), openMyDetailsDialog)),
+    mk("p", { className: "notice-body", text: [me.phone || tr("No phone number"), (me.language || state.settings.language) === "ar" ? "العربية" : "English"].join(" · ") }));
+}
+
+function openMyDetailsDialog() {
+  const me = state.tenants.find((t) => t.id === sessionTenantId);
+  if (!me) return;
+  const phone = mk("input", { type: "tel", value: me.phone || "", maxlength: "30", placeholder: "70 123 456" });
+  const lang = selectInput([["en", "English"], ["ar", "العربية"]], me.language || state.settings.language || "en");
+  const save = primaryButton(tr("Save"), async () => {
+    save.disabled = true;
+    try {
+      await callRpc("update_my_details", { p_phone: phone.value.trim(), p_language: lang.value });
+      Object.assign(me, { phone: phone.value.trim(), language: lang.value });
+      closeToolDialog();
+      renderAll();
+      showToast("Details saved");
+      syncFromSheet({ silent: true });
+    } catch (error) {
+      showToast(rpcProblem(error), 6000);
+    } finally {
+      save.disabled = false;
+    }
+  });
+  openToolDialog(tr("My details"),
+    note(tr("The building manager uses these to reach you and to send reminders in your language.")),
+    field(tr("Phone"), phone),
+    field(tr("Language for messages"), lang),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// Phone and language changed by the tenant (server) or the owner: latest wins.
+function mergeTenantDetails(merged, older, newer) {
+  const latest = new Map();
+  [...(older || []), ...(newer || [])].forEach((t) => {
+    if (!t?.id || !t.detailsAt) return;
+    const cur = latest.get(t.id);
+    if (!cur || String(t.detailsAt) > String(cur.detailsAt)) latest.set(t.id, t);
+  });
+  return (merged || []).map((t) => {
+    const l = latest.get(t.id);
+    if (!l) return t;
+    const out = { ...t, phone: l.phone, detailsAt: l.detailsAt };
+    if (l.language) out.language = l.language; else delete out.language;
+    return out;
+  });
+}
+
+// ── Owners' meeting pack ────────────────────────────────────────────────────
+function meetingPackData(year) {
+  const y = String(year);
+  const inYear = (d) => String(d || "").slice(0, 4) === y;
+  const works = [];
+  (state.maintenanceTasks || []).forEach((t) => (t.history || []).forEach((h) => { if (inYear(h.date)) works.push({ date: h.date, title: t.title, usd: Number(h.costUsd || 0) }); }));
+  (state.issues || []).forEach((i) => { if (i.status === "fixed" && inYear(i.updatedAt)) works.push({ date: String(i.updatedAt).slice(0, 10), title: i.title, usd: Number(i.workOrder?.costUsd || 0) }); });
+  (state.equipment || []).forEach((e) => (e.history || []).forEach((h) => { if (inYear(h.date)) works.push({ date: h.date, title: `${e.name}${h.note ? ` — ${h.note}` : ""}`, usd: Number(h.costUsd || 0) }); }));
+  works.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const votes = (state.polls || []).filter((p) => inYear(p.createdAt)).map((p) => ({ title: p.title, result: pollIsOpen(p) ? tr("Open until {date}", { date: formatDateLabel(p.closesOn) }) : pollResultLine(p) }));
+  const decisions = (state.meetings || []).filter((m) => inYear(m.date)).flatMap((m) => (m.decisions || []).map((d) => ({ date: m.date, text: d })));
+  return { annual: annualReportData(y), works, votes, decisions, proposal: budgetProposal(10, `${Number(y) + 1}-01-01` <= localDateInput() ? `${Number(y) + 1}-01-01` : localDateInput()) };
+}
+
+function printMeetingPack(year, { balances = false } = {}) {
+  const d = meetingPackData(year);
+  const a = d.annual;
+  const p = d.proposal;
+  const page = mk("article", { className: "print-page ledger-print-page annual-print meeting-pack" },
+    mk("header", { className: "print-header" },
+      mk("div", {}, mk("p", { text: state.building?.name || "" }), mk("h1", { text: tr("Owners' meeting {year}", { year: a.year }) }), mk("p", { text: tr("Accounts, works, votes and next year's budget") })),
+      mk("div", { className: "print-meta" }, mk("span", { text: `${tr("Date")}: ${localDateInput()}` }))),
+    mk("h2", { className: "print-section-title", text: tr("1. The year's accounts") }),
+    mk("section", { className: "print-summary" }, [
+      [tr("Cash on 1 January"), formatUsd(a.openingCash)],
+      [tr("Money in"), formatUsd(a.income)],
+      [tr("Money out"), formatUsd(a.spending)],
+      [tr("Cash on 31 December"), formatUsd(a.closingCash)],
+    ].map(([label, value]) => mk("div", {}, mk("span", { text: label }), mk("strong", { text: value })))),
+    printTable([tr("Category"), tr("Amount"), tr("Share")],
+      a.categories.map(([cat, usd]) => [cat, formatUsd(usd), a.spending > 0 ? `${Math.round((usd / a.spending) * 100)}%` : ""]), [1, 2]),
+    mk("h2", { className: "print-section-title", text: tr("2. Works done") }),
+    d.works.length ? printTable([tr("Date"), tr("Work"), tr("Cost")], d.works.map((w) => [formatDateLabel(w.date), w.title, w.usd ? formatUsd(w.usd) : ""]), [2]) : mk("p", { className: "print-note", text: tr("No works recorded this year.") }),
+    a.projects.length ? printTable([tr("Project"), tr("Status"), tr("Budget"), tr("Collected")], a.projects.map((x) => [x.name, tr(x.status), formatUsd(x.budget), formatUsd(x.collected)]), [2, 3]) : null,
+    mk("h2", { className: "print-section-title", text: tr("3. Votes and decisions") }),
+    d.votes.length ? printTable([tr("Vote"), tr("Result")], d.votes.map((v) => [v.title, v.result])) : mk("p", { className: "print-note", text: tr("No votes this year.") }),
+    d.decisions.length ? printTable([tr("Date"), tr("Decision")], d.decisions.map((x) => [formatDateLabel(x.date), x.text])) : null,
+    mk("h2", { className: "print-section-title", text: tr("4. Proposed budget for {year}", { year: p.nextYear }) }),
+    p.rows.length ? printTable([tr("Category"), tr("Last 12 months"), tr("Proposed")],
+      [...p.rows.map((r) => [r.category, formatUsd(r.last), formatUsd(r.next)]),
+        ...(p.reserveTopUp ? [[tr("Back up to the reserve target"), "", formatUsd(p.reserveTopUp)]] : []),
+        [tr("Total"), formatUsd(p.base), formatUsd(p.yearly)]], [1, 2]) : null,
+    p.rows.length ? printTable([tr("Unit"), tr("Owner"), tr("Proposed per month")], p.perFlat.map((f) => [f.unit, f.name, formatUsd(f.usd)]), [2]) : null,
+    p.rows.length ? mk("p", { className: "print-note", text: tr("Includes a {n}% margin for rising prices. Generator and water are billed separately.", { n: p.marginPct }) }) : null,
+    balances ? mk("h2", { className: "print-section-title", text: tr("5. Each flat's balance") }) : null,
+    balances ? printTable([tr("Unit"), tr("Tenant"), tr("Paid in the year"), tr("Balance (owes +)")], a.tenants.map((t) => [t.unit, t.name, formatUsd(t.paid), formatUsd(t.balance)]), [2, 3]) : null,
+    mk("h2", { className: "print-section-title", text: tr("Signatures") }),
+    mk("div", { className: "print-signatures" }, [tr("Building manager"), tr("Committee member")].map((who) => mk("div", {}, mk("span", { text: who }), mk("span", { className: "sign-line" })))));
+  printPreparedPage(page);
+}
+
+function buildMeetingPackSection() {
+  const years = reportYears();
+  const thisYear = String(new Date().getFullYear());
+  const year = selectInput(years.map((y) => [y, y]), years.includes(thisYear) ? thisYear : years[0]);
+  const balances = checkboxRow(tr("Include each flat's balance"), false);
+  return mk("div", {},
+    note(tr("One document for the yearly meeting: the year's accounts, works done, votes and decisions, and the proposed budget. Print it or save it as PDF.")),
+    field(tr("Year"), year),
+    balances.row,
+    mk("div", { className: "button-row" }, primaryButton(tr("Make the pack"), () => printMeetingPack(year.value, { balances: balances.input.checked }))));
+}
+
+// ── A second person checks each month ───────────────────────────────────────
+function simpleHash(text) {
+  let h = 5381;
+  for (let i = 0; i < text.length; i += 1) h = ((h << 5) + h + text.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
+function monthFingerprint(month) {
+  const key = monthKey(month);
+  const parts = state.transactions
+    .filter((t) => monthKey(String(transactionDateValue(t))) === key || monthKey(t.forMonth || "") === key)
+    .map((t) => [t.id, t.category, t.debitUsd, t.debitLbp, t.creditUsd, t.creditLbp, t.date, t.forMonth || "", t.tenantId || ""].join("|"))
+    .sort();
+  return simpleHash(parts.join("\n"));
+}
+
+function latestMonthCheck(month) {
+  const key = monthKey(month);
+  return (state.monthChecks || []).filter((c) => c.month === key).sort((a, b) => String(b.at).localeCompare(String(a.at)))[0] || null;
+}
+
+async function markMonthChecked(month) {
+  const key = monthKey(month);
+  const id = newId("chk");
+  const fingerprint = monthFingerprint(month);
+  try {
+    await callRpc("mark_month_checked", { p_id: id, p_month: key, p_fingerprint: fingerprint });
+    (state.monthChecks ||= []).push({ id, month: key, fingerprint, by: authSession?.email || tr("You"), at: new Date().toISOString() });
+    renderAll();
+    showToast(tr("{month} marked as checked", { month: formatMonth(monthIso(key)) }));
+    syncFromSheet({ silent: true });
+  } catch (error) {
+    showToast(rpcProblem(error), 6000);
+  }
+}
+
+function monthCheckBits(month) {
+  if (!usesOwnerAccounts() || !isAdminSession()) return null;
+  const check = latestMonthCheck(month);
+  const changed = check && check.fingerprint !== monthFingerprint(month);
+  return mk("span", { className: "month-check" },
+    check ? mk("span", { className: `status-pill ${changed ? "status-due" : "status-paid"}`, title: `${check.by} · ${formatDateLabel(String(check.at).slice(0, 10))}`,
+      text: changed ? tr("Changed since checked") : tr("Checked by {who}", { who: String(check.by || "").split("@")[0] }) }) : null,
+    !check || changed ? miniButton(tr("Mark checked"), () => { void markMonthChecked(month); }) : null);
+}
+
+// ── Handing the building over to someone else ───────────────────────────────
+function openHandOverDialog() {
+  if (!canEditBuilding() || !usesOwnerAccounts()) return;
+  const result = mk("div");
+  const keepView = checkboxRow(tr("Keep view-only access for me"), true);
+  const invite = primaryButton(tr("Create a full-access invite"), async () => {
+    invite.disabled = true;
+    try {
+      const code = String(await callRpc("create_admin_invite", { p_role: "owner" }));
+      const link = adminInviteLink(code);
+      const message = tr("You're taking over the management of {building} in the Building Account Tracker. Open this link on your phone and sign in with your Google account (valid 7 days, one use):\n{link}", { building: state.building?.name || "", link });
+      result.replaceChildren(note(link), mk("div", { className: "button-row" },
+        primaryButton(tr("Send on WhatsApp"), () => window.open(whatsappLink("", message), "_blank", "noopener")),
+        secondaryButton(tr("Copy link"), () => navigator.clipboard?.writeText(link).then(() => showToast("Link copied")).catch(() => showToast(link, 8000)))));
+    } catch (error) {
+      showToast(rpcProblem(error), 6000);
+    } finally {
+      invite.disabled = false;
+    }
+  });
+  const stepDown = secondaryButton(tr("Step down now"), async () => {
+    try {
+      const admins = await callRpc("list_admins");
+      if (!(admins || []).some((a) => a.role === "owner" && !a.is_me)) { showToast("First let the new manager sign in with full access", 6000); return; }
+      if (!window.confirm(keepView.input.checked ? tr("Hand over the building and keep view-only access?") : tr("Hand over the building and remove your access completely?"))) return;
+      await callRpc("step_down", { p_keep_view: keepView.input.checked });
+      closeToolDialog();
+      if (keepView.input.checked) {
+        saveAuthSession({ ...authSession, role: "viewer" });
+        renderAll();
+        showToast("Handed over. You now have view-only access.", 6000);
+      } else {
+        signOutOwner();
+      }
+    } catch (error) {
+      showToast(rpcProblem(error), 6000);
+    }
+  });
+  openToolDialog(tr("Hand over management"),
+    note(tr("1. Invite the new manager with full access and send them the link. They sign in with their Google account.")),
+    note(tr("Google only lets accounts sign in that are allowed in the app's Google settings. If they get an \"access blocked\" message, the account needs adding there first.")),
+    invite,
+    result,
+    note(tr("2. Once they appear in Administrators as Full access, step down. All the building's data stays; only who manages it changes.")),
+    keepView.row,
+    mk("div", { className: "button-row" }, stepDown, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Attention, events, merging ──────────────────────────────────────────────
+function v167AttentionItems() {
+  if (!canEditBuilding()) return [];
+  const items = [];
+  const low = lowSupplies();
+  if (low.length) items.push({ kind: "warn", text: tr("Running low: {names}", { names: low.map((s) => s.name).join(", ") }), view: "staffView", key: `supplies:${low.map((s) => s.id).join(",")}` });
+  const posts = pendingBoardPosts();
+  if (posts.length) items.push({ kind: "info", text: tr("{n} board post(s) waiting for your approval", { n: posts.length }), view: "boardView", key: `board:${posts.map((p) => p.id).join(",")}` });
+  return items;
+}
+
+function renderV167() {
+  renderStaff();
+  renderBookings();
+  renderBoard();
+  if (document.querySelector("#servicesView")) {
+    ["#generatorBillingCard", "#waterMeterCard"].forEach((sel) => document.querySelector(sel)?.remove());
+    const anchor = document.querySelector("#waterCard") || document.querySelector("#dieselCard") || document.querySelector("#generatorScheduleNote") || document.querySelector("#servicesView .section-title");
+    [waterMeterCard(), generatorBillingCard()].filter(Boolean).forEach((card) => anchor?.after(card));
+  }
+}
+
+function mergeV167(merged, older, newer) {
+  merged.routineTasks = mergeByStamp(older.routineTasks, newer.routineTasks, merged.deleted.routineTasks, "updatedAt");
+  merged.routineLog = mergeByStamp(older.routineLog, newer.routineLog, [], "at").sort((a, b) => String(a.date).localeCompare(String(b.date))).slice(-3000);
+  merged.supplies = mergeByStamp(older.supplies, newer.supplies, merged.deleted.supplies, "updatedAt");
+  merged.visitorLog = mergeById(older.visitorLog, newer.visitorLog).sort((a, b) => String(a.at).localeCompare(String(b.at))).slice(-400);
+  merged.bookings = mergeByStamp(older.bookings, newer.bookings, [], "updatedAt");
+  merged.boardPosts = mergeByStamp(older.boardPosts, newer.boardPosts, [], "updatedAt");
+  merged.monthChecks = mergeById(older.monthChecks, newer.monthChecks);
+  merged.tenants = mergeTenantDetails(merged.tenants, older.tenants, newer.tenants);
+  return merged;
+}
+
+// ── v167 (part 2): other income, deposits, statement import, approvals, all
+// statements, parking, automatic categories, asking the app, notifications
+// and installing the app ────────────────────────────────────────────────────
+
+// ── Other income (antenna, parking rent, a shop) ────────────────────────────
+function openOtherIncomeDialog() {
+  if (!canEditBuilding()) return;
+  const what = textInput("", { maxlength: "120", placeholder: tr("e.g. Rooftop antenna rent") });
+  const from = textInput("", { maxlength: "80", placeholder: tr("Who paid (optional)") });
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const amount = numberInput("", { step: "0.01" });
+  const currency = selectInput([["USD", "USD"], ["LBP", "LBP"]], "USD");
+  const account = selectInput([["cash", tr("Cash box")], ["bank", tr("Bank & wallets")]], "cash");
+  const save = () => {
+    const value = Number(amount.value || 0);
+    if (!what.value.trim()) { showToast("Say what the money is for"); return; }
+    if (!(value > 0)) { showToast("Enter an amount"); return; }
+    const day = date.value || localDateInput();
+    if (isMonthClosed(day)) { showToast(closedMonthError(day).message, 5000); return; }
+    const usd = currency.value === "USD" ? roundUsd(value) : 0;
+    const lbp = currency.value === "LBP" ? Math.round(value) : 0;
+    const tx = {
+      id: newId("inc"), category: "Other Income", description: what.value.trim(), tenantId: null, forMonth: null, project: "",
+      date: day, supplier: from.value.trim(), invoice: "", expenseCategory: "", serviceType: "", servicePart: "",
+      debitUsd: 0, debitLbp: 0, creditUsd: usd, creditLbp: lbp, balanceUsd: usd, balanceLbp: lbp,
+      account: account.value, invoiceAttachment: null, sourceRow: null,
+    };
+    state.transactions.push(tx);
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    showUndoToast(tr("Income recorded"), () => undoAddedTransactions([tx.id]));
+  };
+  openToolDialog(tr("Other income"),
+    note(tr("Money the building receives that isn't a tenant's dues: antenna rent, a parking space, a shop. It goes into the building's cash.")),
+    field(tr("What for"), what),
+    field(tr("From"), from),
+    field(tr("Date"), date),
+    mk("div", { className: "two-col" }, field(tr("Amount"), amount), field(tr("Currency"), currency)),
+    field(tr("Paid into"), account),
+    mk("div", { className: "button-row" }, primaryButton(tr("Record"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Deposits held (keys, damage) — not the building's money ─────────────────
+function depositsHeld(tenantId = null) {
+  return (state.deposits || []).filter((d) => d.status === "held" && (!tenantId || d.tenantId === tenantId));
+}
+
+function depositsHeldUsd() {
+  return roundUsd(depositsHeld().reduce((s, d) => s + Number(d.amountUsd || 0), 0));
+}
+
+const DEPOSIT_KINDS = ["Keys", "Damage", "Other"];
+
+function openDepositDialog(tenantId = "") {
+  if (!canEditBuilding()) return;
+  const who = selectInput(state.tenants.filter((t) => t.active !== false).sort(byUnit).map((t) => [t.id, unitLabel(t)]), tenantId || state.tenants.find((t) => t.active !== false)?.id);
+  const kind = selectInput(DEPOSIT_KINDS.map((k) => [k, tr(k)]), "Damage");
+  const amount = numberInput("", { step: "0.01" });
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const memo = textInput("", { maxlength: "120", placeholder: tr("e.g. Returned when they move out") });
+  openToolDialog(tr("New deposit"),
+    note(tr("A deposit stays the tenant's money: it is kept apart from the building's cash and returned when they leave.")),
+    field(tr("Tenant"), who),
+    mk("div", { className: "two-col" }, field(tr("Amount (USD)"), amount), field(tr("For"), kind)),
+    field(tr("Received on"), date),
+    field(tr("Note"), memo),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), () => {
+        if (!(Number(amount.value) > 0)) { showToast("Enter an amount"); return; }
+        const now = new Date().toISOString();
+        (state.deposits ||= []).push({ id: newId("dep"), tenantId: who.value, kind: kind.value, amountUsd: roundUsd(Number(amount.value)), receivedOn: date.value || localDateInput(), note: memo.value.trim(), status: "held", updatedAt: now });
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+        showToast("Deposit saved");
+      }),
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openReturnDepositDialog(depositId) {
+  const d = (state.deposits || []).find((x) => x.id === depositId);
+  if (!d || !canEditBuilding()) return;
+  const back = numberInput(d.amountUsd, { step: "0.01" });
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const reason = textInput("", { maxlength: "120", placeholder: tr("Why part was kept (optional)") });
+  openToolDialog(tr("Return deposit — {name}", { name: tenantName(d.tenantId) }),
+    note(tr("Held: {amount} since {date}.", { amount: formatUsd(d.amountUsd), date: formatDateLabel(d.receivedOn) })),
+    field(tr("Amount given back (USD)"), back, tr("If you keep part of it, the kept part becomes the building's income.")),
+    field(tr("Date"), date),
+    field(tr("Reason"), reason),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Return"), () => {
+        const returned = Math.min(Number(d.amountUsd), Math.max(0, Number(back.value || 0)));
+        const kept = roundUsd(Number(d.amountUsd) - returned);
+        const day = date.value || localDateInput();
+        if (kept > 0.005 && isMonthClosed(day)) { showToast(closedMonthError(day).message, 5000); return; }
+        Object.assign(d, { status: "returned", returnedOn: day, returnedUsd: roundUsd(returned), keptUsd: kept, keptReason: reason.value.trim(), updatedAt: new Date().toISOString() });
+        if (kept > 0.005) {
+          state.transactions.push({
+            id: newId("inc"), category: "Other Income", description: tr("Kept from {name}'s deposit", { name: tenantName(d.tenantId) }) + (reason.value.trim() ? ` — ${reason.value.trim()}` : ""),
+            tenantId: null, forMonth: null, project: "", date: day, supplier: tenantName(d.tenantId), invoice: "", expenseCategory: "", serviceType: "", servicePart: "",
+            debitUsd: 0, debitLbp: 0, creditUsd: kept, creditLbp: 0, balanceUsd: kept, balanceLbp: 0, account: "cash", invoiceAttachment: null, sourceRow: null, depositId: d.id,
+          });
+        }
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+        showToast(kept > 0.005 ? tr("Returned {back}; {kept} kept as income", { back: formatUsd(returned), kept: formatUsd(kept) }) : "Deposit returned");
+      }),
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function depositRows(list) {
+  return list.map((d) => mk("div", { className: "breakdown-row" },
+    mk("span", {}, mk("strong", { text: `${formatUsd(d.amountUsd)} · ${tr(d.kind || "Other")}` }),
+      mk("small", { text: [tenantName(d.tenantId), tr("since {date}", { date: formatDateLabel(d.receivedOn) }), d.note].filter(Boolean).join(" · ") })),
+    canEditBuilding() ? miniButton(tr("Return"), () => openReturnDepositDialog(d.id)) : null));
+}
+
+function openDepositsDialog() {
+  const held = depositsHeld().sort((a, b) => String(a.receivedOn).localeCompare(String(b.receivedOn)));
+  openToolDialog(tr("Deposits held"),
+    note(held.length ? tr("{amount} held for tenants. It isn't the building's money and isn't counted in its cash.", { amount: formatUsd(depositsHeldUsd()) }) : tr("No deposits held.")),
+    mk("div", {}, depositRows(held)),
+    canEditBuilding() ? mk("div", { className: "button-row" }, primaryButton(tr("+ New deposit"), () => openDepositDialog())) : null);
+}
+
+function myDepositCard() {
+  if (sessionMode !== "tenant" || !sessionTenantId) return null;
+  const mine = depositsHeld(sessionTenantId);
+  if (!mine.length) return null;
+  return mk("article", { className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Your deposit") })),
+    mk("p", { className: "notice-body", text: mine.map((d) => tr("{amount} ({kind}) held since {date}", { amount: formatUsd(d.amountUsd), kind: tr(d.kind || "Other"), date: formatDateLabel(d.receivedOn) })).join(" · ") }));
+}
+
+// ── Bank / Whish statement import ───────────────────────────────────────────
+function parseCsvText(text) {
+  const rows = [];
+  const firstLine = String(text).split(/\r?\n/).find((l) => l.trim()) || "";
+  const delim = [";", "\t", ","].map((d) => [d, firstLine.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+  let row = [];
+  let cell = "";
+  let quoted = false;
+  const s = String(text).replace(/^﻿/, "");
+  for (let i = 0; i < s.length; i += 1) {
+    const c = s[i];
+    if (quoted) {
+      if (c === '"' && s[i + 1] === '"') { cell += '"'; i += 1; } else if (c === '"') quoted = false; else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === delim) { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && s[i + 1] === "\n") i += 1;
+      row.push(cell); rows.push(row); row = []; cell = "";
+    } else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.map((r) => r.map((x) => x.trim())).filter((r) => r.some(Boolean));
+}
+
+function parseStatementAmount(value) {
+  let v = String(value ?? "").replace(/[^\d.,\-()]/g, "");
+  if (!v) return null;
+  const negative = /^\(.*\)$/.test(v) || v.startsWith("-");
+  v = v.replace(/[()\-]/g, "");
+  if (/,\d{1,2}$/.test(v) && !/\.\d{1,2}$/.test(v)) v = v.replace(/\./g, "").replace(",", ".");
+  else v = v.replace(/,/g, "");
+  const n = Number(v);
+  return Number.isFinite(n) ? (negative ? -n : n) : null;
+}
+
+function parseStatementDate(value) {
+  const v = String(value ?? "").trim();
+  if (/^\d{5}(\.\d+)?$/.test(v)) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.floor(Number(v)) * 86400000);
+    return d.toISOString().slice(0, 10);
+  }
+  let m = v.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+  m = v.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})/);
+  if (m) {
+    const year = m[3].length === 2 ? `20${m[3]}` : m[3];
+    return `${year}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  }
+  const t = Date.parse(v);
+  return Number.isFinite(t) ? new Date(t).toISOString().slice(0, 10) : "";
+}
+
+// Turns a table (first row may be headers) into incoming money: { date, amount, text }.
+function statementRowsFromTable(table) {
+  if (!table.length) return [];
+  const header = table[0].map((h) => String(h).toLowerCase());
+  const find = (words) => header.findIndex((h) => words.some((w) => h.includes(w)));
+  let dateCol = find(["date", "تاريخ", "value date"]);
+  let creditCol = find(["credit", "deposit", "money in", "received", "in (", "دائن", "وارد"]);
+  let amountCol = find(["amount", "المبلغ", "montant"]);
+  let debitCol = find(["debit", "withdraw", "money out", "مدين"]);
+  let textCol = find(["description", "details", "narrative", "reference", "remarks", "memo", "sender", "from", "البيان", "التفاصيل"]);
+  const hasHeader = dateCol >= 0 || creditCol >= 0 || amountCol >= 0;
+  const body = hasHeader ? table.slice(1) : table;
+  if (!hasHeader) {
+    const sample = body.slice(0, 10);
+    const score = (fn) => (sample[0] || []).map((_, i) => sample.filter((r) => fn(r[i])).length);
+    const dates = score((x) => /\d/.test(x || "") && Boolean(parseStatementDate(x)) && !/^\d+([.,]\d+)?$/.test(String(x || "").trim()));
+    const nums = score((x) => parseStatementAmount(x) !== null && /^[\s\d.,\-()$]+$/.test(String(x || "")));
+    dateCol = dates.indexOf(Math.max(...dates));
+    amountCol = nums.findIndex((n, i) => n === Math.max(...nums.filter((_, j) => j !== dateCol)) && i !== dateCol);
+    textCol = (sample[0] || []).findIndex((_, i) => i !== dateCol && i !== amountCol);
+  }
+  const out = [];
+  body.forEach((r, i) => {
+    let amount = null;
+    if (creditCol >= 0) amount = parseStatementAmount(r[creditCol]);
+    if ((amount === null || amount === 0) && amountCol >= 0) {
+      amount = parseStatementAmount(r[amountCol]);
+      if (debitCol >= 0 && parseStatementAmount(r[debitCol])) amount = null;
+    }
+    if (!(amount > 0)) return;
+    const date = dateCol >= 0 ? parseStatementDate(r[dateCol]) : "";
+    const text = textCol >= 0 ? r[textCol] : r.filter((_, j) => j !== dateCol && j !== creditCol && j !== amountCol).join(" ");
+    out.push({ line: i + 1, date, amount: roundUsd(amount), text: String(text || "").slice(0, 200) });
+  });
+  return out;
+}
+
+function normalizeForMatch(text) {
+  return String(text || "").toLowerCase().normalize("NFKD").replace(/[ً-ٟ]/g, "").replace(/[^\p{L}\p{N}\s]/gu, " ");
+}
+
+function matchStatementRow(row, tenants = state.tenants.filter((t) => t.active !== false)) {
+  const text = normalizeForMatch(row.text);
+  const digits = String(row.text || "").replace(/\D/g, "");
+  let best = null;
+  tenants.forEach((t) => {
+    let score = 0;
+    normalizeForMatch(t.name).split(/\s+/).filter((w) => w.length >= 3).forEach((w) => { if (text.includes(w)) score += 3; });
+    const phone = String(t.phone || "").replace(/\D/g, "").slice(-6);
+    if (phone.length === 6 && digits.includes(phone)) score += 4;
+    if (t.unit && new RegExp(`(^|\\s)${String(t.unit).toLowerCase()}(\\s|$)`).test(text)) score += 1;
+    const monthly = isFixedMode() ? getMonthlyDueForTenant(t.id, currentMonthValue()) : 0;
+    const owed = roundUsd(getTenantBalance(t.id));
+    if (monthly > 0 && Math.abs(row.amount - monthly) < 0.01) score += 1;
+    if (owed > 0 && Math.abs(row.amount - owed) < 0.01) score += 1;
+    if (score > (best?.score || 0)) best = { tenantId: t.id, score };
+  });
+  return best && best.score >= 3 ? best.tenantId : "";
+}
+
+function alreadyRecorded(row, tenantId) {
+  if (!tenantId || !row.date) return null;
+  const at = Date.parse(row.date);
+  return state.transactions.find((t) => t.category === "Payments" && t.tenantId === tenantId && !t.project
+    && Math.abs(transactionNetUsd(t) - row.amount) < 0.01 && Math.abs(Date.parse(t.date || "") - at) <= 5 * 86400000) || null;
+}
+
+async function readZipEntries(bytes) {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let eocd = -1;
+  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 66000); i -= 1) if (view.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error("Not a zip file");
+  const count = view.getUint16(eocd + 10, true);
+  let p = view.getUint32(eocd + 16, true);
+  const entries = {};
+  for (let n = 0; n < count; n += 1) {
+    const method = view.getUint16(p + 10, true);
+    const size = view.getUint32(p + 20, true);
+    const nameLen = view.getUint16(p + 28, true);
+    const extraLen = view.getUint16(p + 30, true);
+    const commentLen = view.getUint16(p + 32, true);
+    const local = view.getUint32(p + 42, true);
+    const name = new TextDecoder().decode(bytes.subarray(p + 46, p + 46 + nameLen));
+    const dataStart = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
+    entries[name] = { method, data: bytes.subarray(dataStart, dataStart + size) };
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+  const read = async (name) => {
+    const e = entries[name];
+    if (!e) return null;
+    if (e.method === 0) return new TextDecoder().decode(e.data);
+    const stream = new Blob([e.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return new TextDecoder().decode(new Uint8Array(await new Response(stream).arrayBuffer()));
+  };
+  return { names: Object.keys(entries), read };
+}
+
+async function tableFromXlsx(bytes) {
+  const zip = await readZipEntries(bytes);
+  const shared = [];
+  const sst = await zip.read("xl/sharedStrings.xml");
+  const parser = new DOMParser();
+  if (sst) parser.parseFromString(sst, "application/xml").querySelectorAll("si").forEach((si) => shared.push([...si.querySelectorAll("t")].map((t) => t.textContent).join("")));
+  const sheetName = zip.names.filter((n) => /^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort()[0];
+  const xml = sheetName ? await zip.read(sheetName) : null;
+  if (!xml) throw new Error("No sheet found");
+  const colIndex = (ref) => [...String(ref).replace(/\d+/g, "")].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+  const table = [];
+  parser.parseFromString(xml, "application/xml").querySelectorAll("sheetData > row").forEach((row) => {
+    const cells = [];
+    row.querySelectorAll("c").forEach((c) => {
+      const t = c.getAttribute("t");
+      const v = c.querySelector("v")?.textContent ?? c.querySelector("is t")?.textContent ?? "";
+      cells[colIndex(c.getAttribute("r"))] = t === "s" ? shared[Number(v)] ?? "" : v;
+    });
+    table.push(Array.from(cells, (x) => x ?? ""));
+  });
+  return table.filter((r) => r.some((x) => String(x).trim()));
+}
+
+function openStatementImportDialog() {
+  if (!canEditBuilding()) return;
+  const file = mk("input", { type: "file", accept: ".csv,.txt,.tsv,.xlsx,text/csv" });
+  const paste = mk("textarea", { rows: "4", placeholder: tr("…or paste the statement lines here") });
+  const method = selectInput([["bank", tr("Bank transfer")], ["whish", "Whish"], ["omt", "OMT"]], "bank");
+  const list = mk("div", { className: "import-rows" });
+  let rows = [];
+  const draw = () => {
+    const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
+    list.replaceChildren(...(rows.length ? rows.map((r) => {
+      const pick = selectInput([["", tr("— not a tenant payment —")], ...tenants.map((t) => [t.id, unitLabel(t)])], r.tenantId);
+      const dup = alreadyRecorded(r, r.tenantId);
+      const tick = mk("input", { type: "checkbox", checked: Boolean(r.tenantId) && !dup });
+      pick.addEventListener("change", () => { r.tenantId = pick.value; r.tick = Boolean(pick.value) && !alreadyRecorded(r, pick.value); draw(); });
+      tick.addEventListener("change", () => { r.tick = tick.checked; });
+      r.tick = tick.checked;
+      return mk("div", { className: `import-row${dup ? " is-dup" : ""}` },
+        mk("label", { className: "checkbox-row" }, tick, mk("span", {}, mk("strong", { text: `${formatUsd(r.amount)} · ${r.date ? formatDateLabel(r.date) : "?"}` }), mk("small", { text: r.text }))),
+        pick,
+        dup ? mk("small", { className: "import-dup", text: tr("Already recorded on {date}", { date: formatDateLabel(dup.date) }) }) : null);
+    }) : [note(tr("No incoming payments found yet."))]));
+  };
+  const load = (table) => {
+    rows = statementRowsFromTable(table).map((r) => ({ ...r, tenantId: matchStatementRow(r) }));
+    draw();
+  };
+  file.addEventListener("change", async () => {
+    const f = file.files?.[0];
+    if (!f) return;
+    try {
+      if (/\.xlsx$/i.test(f.name)) load(await tableFromXlsx(new Uint8Array(await f.arrayBuffer())));
+      else load(parseCsvText(await f.text()));
+    } catch (error) {
+      showToast(tr("Could not read that file: {msg}", { msg: error.message }), 6000);
+    }
+  });
+  paste.addEventListener("input", () => load(parseCsvText(paste.value)));
+  const save = () => {
+    const chosen = rows.filter((r) => r.tick && r.tenantId);
+    if (!chosen.length) { showToast("Tick at least one payment"); return; }
+    const closed = chosen.find((r) => isMonthClosed(r.date || localDateInput()));
+    if (closed) { showToast(closedMonthError(closed.date).message, 5000); return; }
+    const created = chosen.map((r, i) => {
+      const day = r.date || localDateInput();
+      const groupId = `pay-${Date.now()}-${i}`;
+      const payment = {
+        id: `${groupId}-01`, category: "Payments", description: tenantName(r.tenantId), tenantId: r.tenantId, forMonth: currentMonthValue(), project: "",
+        date: day, supplier: "", invoice: "", expenseCategory: "", serviceType: "", servicePart: "",
+        debitUsd: 0, debitLbp: 0, creditUsd: r.amount, creditLbp: 0, balanceUsd: r.amount, balanceLbp: 0,
+        invoiceAttachment: null, sourceRow: null, paymentGroupId: groupId, method: method.value, importedFrom: r.text.slice(0, 120),
+      };
+      payment.receiptRef = nextReceiptReference(day);
+      state.transactions.push(payment);
+      return payment;
+    });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    created.forEach((p) => notifyTenants(p.tenantId, tr("Payment received"), tr("{amount} recorded — thank you.", { amount: formatUsd(p.creditUsd) })));
+    showUndoToast(tr(created.length === 1 ? "{n} payment recorded with its receipt" : "{n} payments recorded with their receipts", { n: created.length }), () => undoAddedTransactions(created.map((p) => p.id)));
+  };
+  openToolDialog(tr("Import a bank or Whish statement"),
+    note(tr("Download the statement from your bank or Whish as a CSV or Excel file. The app finds the money that came in and suggests who sent it; you check each line.")),
+    field(tr("Statement file"), file),
+    paste,
+    field(tr("Paid by"), method),
+    list,
+    mk("div", { className: "button-row" }, primaryButton(tr("Record ticked payments"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Approval for big expenses ───────────────────────────────────────────────
+function approvalThreshold() {
+  return Math.max(0, Number(state.settings.approvalOverUsd || 0));
+}
+
+function needsApproval(transactions) {
+  const limit = approvalThreshold();
+  if (!limit || sessionMode !== "owner" || !usesOwnerAccounts()) return false;
+  if (!transactions.every((t) => t.category === "Expenses" || t.category === "Services Expenses")) return false;
+  return transactions.reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0) + 0.005 >= limit;
+}
+
+function queueForApproval(transactions) {
+  const now = new Date().toISOString();
+  const total = roundUsd(transactions.reduce((s, t) => s + txUsd(t, t.debitUsd, t.debitLbp), 0));
+  (state.pendingExpenses ||= []).push({
+    id: newId("apr"), transactions, amountUsd: total, description: transactions[0]?.description || "",
+    requestedBy: authSession?.email || auditActor(), requestedAt: now, status: "pending", updatedAt: now,
+  });
+}
+
+function pendingApprovals() {
+  return (state.pendingExpenses || []).filter((p) => p.status === "pending");
+}
+
+async function decideApproval(id, approve) {
+  try {
+    await callRpc("approve_expense", { p_id: id, p_approve: approve });
+    const p = (state.pendingExpenses || []).find((x) => x.id === id);
+    if (p) Object.assign(p, { status: approve ? "approved" : "rejected", updatedAt: new Date().toISOString() });
+    closeToolDialog();
+    showToast(approve ? "Approved — the expense now counts" : "Rejected");
+    syncFromSheet({ silent: true });
+    renderAll();
+  } catch (error) {
+    showToast(rpcProblem(error), 6000);
+  }
+}
+
+function cancelApprovalRequest(id) {
+  const p = (state.pendingExpenses || []).find((x) => x.id === id);
+  if (!p || !canEditBuilding() || !window.confirm(tr("Withdraw this expense?"))) return;
+  Object.assign(p, { status: "withdrawn", updatedAt: new Date().toISOString() });
+  if (!saveState()) return;
+  closeToolDialog();
+  renderAll();
+}
+
+function openApprovalsDialog() {
+  const me = authSession?.email || "";
+  const list = pendingApprovals();
+  openToolDialog(tr("Expenses waiting for approval"),
+    note(tr("Expenses of {amount} or more count only once a second administrator approves them.", { amount: formatUsd(approvalThreshold()) })),
+    list.length ? mk("div", {}, list.map((p) => {
+      const mine = p.requestedBy && p.requestedBy === me;
+      return mk("div", { className: "approval-row" },
+        breakdownRow(p.description || tr("Expense"), formatUsd(p.amountUsd),
+          [tr("by {who}", { who: String(p.requestedBy || "").split("@")[0] }), formatDateLabel(String(p.requestedAt).slice(0, 10)), p.transactions?.[0]?.supplier].filter(Boolean).join(" · ")),
+        mk("div", { className: "button-row" },
+          !mine ? primaryButton(tr("Approve"), () => { void decideApproval(p.id, true); }) : null,
+          !mine ? secondaryButton(tr("Reject"), () => { void decideApproval(p.id, false); }) : null,
+          mine && canEditBuilding() ? secondaryButton(tr("Withdraw"), () => cancelApprovalRequest(p.id)) : null,
+          mine ? mk("small", { className: "settings-note", text: tr("Another administrator approves it.") }) : null));
+    })) : note(tr("Nothing waiting.")));
+}
+
+function buildApprovalSettings() {
+  const limit = numberInput(approvalThreshold() || "", { step: "1", placeholder: "0" });
+  return mk("div", {},
+    note(tr("Above this amount, an expense counts only after a second administrator approves it (Settings → Administrators). Leave empty to turn it off.")),
+    field(tr("Needs approval from (USD)"), limit),
+    mk("div", { className: "button-row" }, secondaryButton(tr("Save"), () => {
+      state.settings.approvalOverUsd = Math.max(0, Number(limit.value || 0));
+      if (!saveState()) return;
+      renderAll();
+      showToast(state.settings.approvalOverUsd ? tr("Approval needed from {amount}", { amount: formatUsd(state.settings.approvalOverUsd) }) : "Approval turned off");
+    })));
+}
+
+// ── Every tenant's statement at once ────────────────────────────────────────
+function statementPngFile(tenant) {
+  const dataUrl = drawStatementCanvas(tenant).toDataURL("image/png");
+  return { name: `Statement_${safeFilePart(tenant.unit || tenant.name, "unit")}.png`, content: base64ToBytes(dataUrl.split(",")[1] || "") };
+}
+
+function openAllStatementsDialog() {
+  if (sessionMode !== "owner") return;
+  const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
+  openToolDialog(tr("Everyone's statement"),
+    note(tr("A statement picture for each tenant. Send each one on WhatsApp, or download them all at once.")),
+    mk("div", {}, tenants.map((t) => {
+      const bal = roundUsd(getTenantBalance(t.id));
+      return mk("div", { className: "breakdown-row" },
+        mk("span", {}, mk("strong", { text: unitLabel(t) }), mk("small", { text: bal > 0.005 ? tr("Owes {amount}", { amount: formatUsd(bal) }) : bal < -0.005 ? tr("In credit {amount}", { amount: formatUsd(-bal) }) : tr("All paid") })),
+        miniButton(tr("Send"), () => { void shareStatementPicture(t.id); }));
+    })),
+    mk("div", { className: "button-row" }, primaryButton(tr("Download all (ZIP)"), () => {
+      const zip = buildZip(tenants.map(statementPngFile));
+      downloadBlob(new Blob([zip], { type: "application/zip" }), "application/zip", `statements-${localDateInput()}.zip`);
+      showToast("Statements downloaded");
+    })));
+}
+
+// ── Parking spaces ──────────────────────────────────────────────────────────
+function openParkingDialog() {
+  if (!canEditBuilding()) return;
+  const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
+  const inputs = tenants.map((t) => ({ t, input: textInput(t.parking || "", { maxlength: "40", placeholder: tr("e.g. P3, P4") }) }));
+  openToolDialog(tr("Parking spaces"),
+    note(tr("Which spots belong to each flat. Tenants see theirs on their phone.")),
+    ...inputs.map(({ t, input }) => field(unitLabel(t), input)),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Save"), () => {
+        inputs.forEach(({ t, input }) => { const v = input.value.trim(); if (v) t.parking = v; else delete t.parking; });
+        if (!saveState()) return;
+        closeToolDialog();
+        renderAll();
+        showToast("Parking saved");
+      }),
+      secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function myParkingCard() {
+  if (sessionMode !== "tenant" || !sessionTenantId) return null;
+  const me = state.tenants.find((t) => t.id === sessionTenantId);
+  if (!me?.parking) return null;
+  return mk("article", { className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Your parking") }), mk("span", { className: "status-pill status-paid", text: me.parking })));
+}
+
+function installTenantToolButtons() {
+  const host = document.querySelector("#inviteAllButton")?.parentElement;
+  if (!host || host.querySelector(".tenant-tools-button")) return;
+  const more = mk("button", { type: "button", className: "secondary-button owner-only tenant-tools-button", text: tr("More…") });
+  more.addEventListener("click", () => openToolDialog(tr("Tenants"),
+    mk("div", { className: "tool-list" },
+      secondaryButton(tr("Everyone's statement"), () => { closeToolDialog(); openAllStatementsDialog(); }),
+      secondaryButton(tr("Deposits held"), () => { closeToolDialog(); openDepositsDialog(); }),
+      secondaryButton(tr("Parking spaces"), () => { closeToolDialog(); openParkingDialog(); }))));
+  host.prepend(more);
+}
+
+function installPaymentToolButtons() {
+  const who = document.querySelector("#whoPaidButton");
+  if (!who || document.querySelector("#importStatementButton")) return;
+  const b = mk("button", { type: "button", id: "importStatementButton", className: "secondary-button owner-only", text: tr("Import statement") });
+  b.addEventListener("click", openStatementImportDialog);
+  who.after(b);
+}
+
+// ── Expense category filled in from past expenses ───────────────────────────
+function suggestExpenseCategory(description, supplier) {
+  const past = state.transactions.filter((t) => t.category === "Expenses" && t.expenseCategory);
+  if (!past.length) return "";
+  const tally = (list) => {
+    const m = new Map();
+    list.forEach((t) => m.set(t.expenseCategory, (m.get(t.expenseCategory) || 0) + 1));
+    return [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+  };
+  const sup = String(supplier || "").trim().toLowerCase();
+  if (sup) {
+    const bySupplier = past.filter((t) => String(t.supplier || "").trim().toLowerCase() === sup);
+    if (bySupplier.length) return tally(bySupplier);
+  }
+  const words = normalizeForMatch(description).split(/\s+/).filter((w) => w.length >= 3);
+  if (!words.length) return "";
+  const scored = new Map();
+  past.forEach((t) => {
+    const tw = new Set(normalizeForMatch(t.description).split(/\s+/));
+    const hits = words.filter((w) => tw.has(w)).length;
+    if (hits) scored.set(t.expenseCategory, (scored.get(t.expenseCategory) || 0) + hits);
+  });
+  return [...scored.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+}
+
+let categoryWasSuggested = false;
+function maybeSuggestCategory() {
+  if (els.transactionCategory.value !== "Expenses" || !els.transactionExpenseCategory) return;
+  const current = els.transactionExpenseCategory.value.trim();
+  if (current && !categoryWasSuggested) return;
+  const guess = suggestExpenseCategory(els.transactionDescription.value, els.transactionSupplier?.value);
+  if (!guess || guess === current) return;
+  els.transactionExpenseCategory.value = guess;
+  categoryWasSuggested = true;
+}
+
+// ── Asking the app (Claude, once an Anthropic key is set in Vercel) ─────────
+let assistantReady = null;
+async function checkAssistant() {
+  if (assistantReady !== null || sessionMode !== "owner" || !usesOwnerAccounts()) return assistantReady;
+  try {
+    const res = await fetch("/api/assistant", { cache: "no-store" });
+    assistantReady = res.ok && (await res.json()).configured === true;
+  } catch { assistantReady = false; }
+  document.body.classList.toggle("assistant-ready", Boolean(assistantReady));
+  return assistantReady;
+}
+
+function assistantData() {
+  const name = (id) => state.tenants.find((t) => t.id === id)?.name || "";
+  return {
+    building: state.building?.name || "",
+    mode: state.settings.collectionMode,
+    lbpPerUsd: getConversionRate(),
+    today: localDateInput(),
+    tenants: state.tenants.map((t) => ({ name: t.name, unit: t.unit, active: t.active !== false, share: t.coefficient || 0, owesUsd: roundUsd(getTenantBalance(t.id)) })),
+    cashUsd: roundUsd(getAccountTotals().usd),
+    entries: state.transactions.slice().sort((a, b) => String(transactionDateValue(b)).localeCompare(String(transactionDateValue(a)))).slice(0, 2500).map((t) => ({
+      d: transactionDateValue(t), c: t.category, usd: roundUsd(transactionNetUsd(t)), what: t.description || "", who: name(t.tenantId),
+      cat: t.expenseCategory || (t.serviceType ? `${t.serviceType} ${t.servicePart || ""}`.trim() : ""), sup: t.supplier || "", m: t.forMonth || "", p: t.project || "",
+    })),
+    projects: (state.buildingProjects || []).map((p) => ({ name: p.name, budget: p.totalBudget, status: p.status })),
+  };
+}
+
+async function askAssistant(body) {
+  await ensureFreshSession();
+  const res = await fetch("/api/assistant", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${authBearer()}` }, body: JSON.stringify(body) });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(out.error || tr("The assistant failed ({status})", { status: res.status }));
+  return out;
+}
+
+function micButton(target) {
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Rec) return null;
+  const b = miniButton("🎤", () => {
+    const rec = new Rec();
+    rec.lang = currentLang === "ar" ? "ar-LB" : "en-US";
+    rec.interimResults = false;
+    rec.onresult = (e) => { target.value = [target.value, e.results[0][0].transcript].filter(Boolean).join(" "); target.dispatchEvent(new Event("input")); };
+    rec.onerror = () => showToast("Couldn't hear that — type it instead");
+    rec.onend = () => b.classList.remove("is-listening");
+    b.classList.add("is-listening");
+    rec.start();
+  }, "mic-button");
+  b.setAttribute("aria-label", tr("Speak"));
+  return b;
+}
+
+function openAskDialog() {
+  const q = mk("textarea", { rows: "3", maxlength: "500", placeholder: tr("e.g. How much did we spend on the lift this year?") });
+  const answer = mk("div", { className: "assistant-answer" });
+  const send = primaryButton(tr("Ask"), async () => {
+    if (!q.value.trim()) return;
+    send.disabled = true;
+    answer.replaceChildren(note(tr("Thinking…")));
+    try {
+      const out = await askAssistant({ mode: "ask", question: q.value.trim(), language: currentLang, data: assistantData() });
+      answer.replaceChildren(...String(out.answer || "").split(/\n+/).filter(Boolean).map((line) => mk("p", { text: line })));
+    } catch (error) {
+      answer.replaceChildren(note(error.message, "is-warning"));
+    } finally {
+      send.disabled = false;
+    }
+  });
+  const chips = ["Who owes the most?", "How much did we spend on the generator this year?", "What was our biggest expense last month?"].map((s) => {
+    const c = mk("button", { type: "button", className: "chip", text: tr(s) });
+    c.addEventListener("click", () => { q.value = tr(s); });
+    return c;
+  });
+  openToolDialog(tr("Ask the app"),
+    note(tr("Ask about the building's money in your own words. Your question and the building's figures are sent to Claude (Anthropic) to answer.")),
+    mk("div", { className: "chip-row" }, chips),
+    mk("div", { className: "assistant-input" }, q, micButton(q)),
+    mk("div", { className: "button-row" }, send, secondaryButton(tr("Close"), closeToolDialog)),
+    answer);
+}
+
+function fillEntryForm(e) {
+  const category = e.kind === "payment" ? "Payments" : e.kind === "expense" ? "Expenses" : null;
+  if (e.kind === "other_income") { openOtherIncomeDialog(); return; }
+  if (!category) { showToast("I couldn't tell what to record — try again with more detail", 6000); return; }
+  openEntryForm(category);
+  const tenant = e.unit ? state.tenants.find((t) => t.active !== false && String(t.unit).toLowerCase() === String(e.unit).toLowerCase()) : null;
+  if (tenant && category === "Payments") { els.transactionTenant.value = tenant.id; els.transactionTenant.dispatchEvent(new Event("change")); }
+  if (e.amount > 0) { els.transactionAmount.value = String(e.amount); setTransactionCurrency(e.currency === "LBP" ? "LBP" : "USD"); }
+  if (e.month && els.transactionMonth) els.transactionMonth.value = e.month;
+  if (e.method && els.transactionMethod) els.transactionMethod.value = e.method;
+  if (category === "Expenses") {
+    if (e.description) els.transactionDescription.value = e.description;
+    if (e.supplier && els.transactionSupplier) els.transactionSupplier.value = e.supplier;
+    if (e.expenseCategory && els.transactionExpenseCategory) els.transactionExpenseCategory.value = e.expenseCategory;
+  }
+  els.transactionAmount.dispatchEvent(new Event("input"));
+  showToast("Check the details, then save", 4000);
+}
+
+function openSayItDialog() {
+  const text = mk("textarea", { rows: "3", maxlength: "300", placeholder: tr("e.g. Rami paid 100 dollars cash for October") });
+  const go = primaryButton(tr("Fill in the form"), async () => {
+    if (!text.value.trim()) return;
+    go.disabled = true;
+    try {
+      const out = await askAssistant({
+        mode: "entry", text: text.value.trim(), language: currentLang, today: localDateInput(),
+        tenants: state.tenants.filter((t) => t.active !== false).map((t) => ({ name: t.name, unit: t.unit })),
+        categories: (state.expenseCategories || []).map((c) => c.name).slice(0, 60),
+      });
+      closeToolDialog();
+      fillEntryForm(out);
+    } catch (error) {
+      showToast(error.message, 6000);
+    } finally {
+      go.disabled = false;
+    }
+  });
+  openToolDialog(tr("Say it"),
+    note(tr("Say or type what happened. The app fills in the form; you check it and save.")),
+    mk("div", { className: "assistant-input" }, text, micButton(text)),
+    mk("div", { className: "button-row" }, go, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function installEntryChooserExtras() {
+  const list = document.querySelector("#entryChooser .entry-chooser-list") || document.querySelector(".entry-chooser-list");
+  if (!list || list.querySelector(".entry-extra")) return;
+  const item = (icon, title, sub, onClick, extra = "") => {
+    const b = mk("button", { type: "button", className: `entry-chooser-btn entry-extra ${extra}`.trim() },
+      mk("span", { className: "ec-icon", "aria-hidden": "true" }, lucide(icon, { size: 22 })),
+      mk("span", { className: "ec-text" }, mk("strong", { text: tr(title) }), mk("small", { text: tr(sub) })));
+    b.addEventListener("click", () => { closeDialog(els.entryChooser); onClick(); });
+    return b;
+  };
+  list.append(
+    item("plus", "Other income", "Antenna, parking or shop rent", openOtherIncomeDialog, "owner-only"),
+    item("bell", "Say it", "Speak or type, the app fills the form", openSayItDialog, "owner-only assistant-only"));
+}
+
+// ── Notifications that pop up, and installing the app ───────────────────────
+const NUDGE_KEY = "building-account-tracker:nudges";
+let deferredInstallPrompt = null;
+if (typeof window.addEventListener === "function") window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  setTimeout(maybeShowNudge, 1500);
+});
+if (typeof window.addEventListener === "function") window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  document.querySelector("#appNudge")?.remove();
+  setNudgeSeen("install", 3650);
+});
+
+function isStandalone() {
+  return Boolean(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone);
+}
+
+function isIos() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+function nudgeSeen(kind) {
+  try { return Number(JSON.parse(localStorage.getItem(NUDGE_KEY) || "{}")[kind] || 0) > Date.now(); } catch { return false; }
+}
+
+function setNudgeSeen(kind, days) {
+  try {
+    const all = JSON.parse(localStorage.getItem(NUDGE_KEY) || "{}");
+    all[kind] = Date.now() + days * 86400000;
+    localStorage.setItem(NUDGE_KEY, JSON.stringify(all));
+  } catch { /* private mode */ }
+}
+
+function canInstallNow() {
+  return !isStandalone() && (Boolean(deferredInstallPrompt) || isIos());
+}
+
+function wantsNotificationNudge() {
+  return Boolean(authSession) && hasCloudConfig() && pushSupported() && !pushIsOn()
+    && typeof Notification !== "undefined" && Notification.permission !== "denied" && (!isIos() || isStandalone());
+}
+
+function nudgeSheet(kind, { title, headline, body, button, onAccept, illustration }) {
+  document.querySelector("#appNudge")?.remove();
+  const close = (days) => { setNudgeSeen(kind, days); sheet.classList.add("is-leaving"); setTimeout(() => sheet.remove(), 220); };
+  const accept = mk("button", { type: "button", className: "nudge-accept", text: button });
+  accept.addEventListener("click", async () => { await onAccept(); close(kind === "install" ? 3650 : 30); });
+  const later = mk("button", { type: "button", className: "nudge-later", text: tr("Not now") });
+  later.addEventListener("click", () => close(kind === "install" ? 7 : 14));
+  const sheet = mk("div", { id: "appNudge", className: `app-nudge nudge-${kind}`, role: "dialog", "aria-label": title },
+    mk("div", { className: "nudge-card" },
+      mk("div", { className: "nudge-head" }, mk("img", { src: "./assets/icon-192.png", alt: "", className: "nudge-icon" }), mk("strong", { text: title }), later),
+      illustration,
+      mk("h3", { text: headline }),
+      mk("p", { text: body }),
+      onAccept ? mk("div", { className: "nudge-actions" }, accept) : null));
+  document.body.append(sheet);
+  requestAnimationFrame(() => sheet.classList.add("is-in"));
+}
+
+function homeScreenArt() {
+  const tiles = [];
+  for (let i = 0; i < 8; i += 1) {
+    tiles.push(i === 5
+      ? mk("span", { className: "art-app is-ours" }, mk("img", { src: "./assets/icon-192.png", alt: "" }), mk("small", { text: tr("Building") }))
+      : mk("span", { className: "art-app" }, mk("i"), mk("b")));
+  }
+  return mk("div", { className: "nudge-art" }, tiles);
+}
+
+function notificationArt() {
+  return mk("div", { className: "nudge-art nudge-art-note" },
+    mk("div", { className: "art-note" }, mk("img", { src: "./assets/icon-192.png", alt: "" }),
+      mk("span", {}, mk("strong", { text: state.building?.name || tr("Your building") }), mk("small", { text: tr("Payment received — $100.00 recorded. Thank you!") }))));
+}
+
+function maybeShowNudge() {
+  if (document.querySelector("#appNudge") || document.querySelector("dialog[open]")) return;
+  if (!els.loginScreen?.classList.contains("hidden")) return;
+  if (canInstallNow() && !nudgeSeen("install")) {
+    const ios = isIos() && !deferredInstallPrompt;
+    nudgeSheet("install", {
+      title: tr("Install the app"),
+      headline: tr("Full screen, one tap away"),
+      body: ios
+        ? tr("Tap the Share button ⬆ at the bottom of Safari, then \"Add to Home Screen\". On iPhone, notifications only work once it's installed.")
+        : tr("It opens from your Home screen like any app, and notifications pop up like WhatsApp."),
+      button: ios ? tr("Got it") : tr("Install"),
+      illustration: homeScreenArt(),
+      onAccept: async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice.catch(() => null);
+        deferredInstallPrompt = null;
+      },
+    });
+    return;
+  }
+  if (wantsNotificationNudge() && !nudgeSeen("notify")) {
+    nudgeSheet("notify", {
+      title: tr("Notifications"),
+      headline: tr("Know straight away"),
+      body: sessionMode === "owner"
+        ? tr("Get a notification on this phone when a tenant says they paid, reports a problem or posts on the board.")
+        : tr("Get a notification on this phone for receipts, notices, replies and votes — like a WhatsApp message."),
+      button: tr("Turn on"),
+      illustration: notificationArt(),
+      onAccept: () => enablePushNotifications(),
+    });
+  }
+}
+
+function installAppRow() {
+  const panel = document.querySelector("#displayPanel");
+  if (!panel || panel.querySelector("#installAppRow")) return;
+  if (isStandalone() || !canInstallNow()) return;
+  const b = secondaryButton(tr("Install"), () => { setNudgeSeen("install", 0); try { const all = JSON.parse(localStorage.getItem(NUDGE_KEY) || "{}"); delete all.install; localStorage.setItem(NUDGE_KEY, JSON.stringify(all)); } catch { /* ignore */ } maybeShowNudge(); });
+  panel.append(mk("div", { id: "installAppRow", className: "settings-action" },
+    mk("div", { className: "settings-action-text" }, mk("strong", { text: tr("Install the app") }), mk("span", { text: tr("Full screen, one tap away from your Home screen") })),
+    b));
+}
+
+// ── Rendering hooks and merging ─────────────────────────────────────────────
+function v167bAttentionItems() {
+  if (sessionMode !== "owner") return [];
+  const items = [];
+  const waiting = pendingApprovals();
+  const me = authSession?.email || "";
+  const forMe = waiting.filter((p) => p.requestedBy !== me);
+  if (waiting.length) items.push({ kind: forMe.length ? "warn" : "info", text: forMe.length ? tr("{n} expense(s) waiting for your approval", { n: forMe.length }) : tr("{n} expense(s) waiting for a second administrator", { n: waiting.length }), action: "approvals", key: `approvals:${waiting.map((p) => p.id).join(",")}` });
+  return items;
+}
+
+function installAskMenuItem() {
+  const menu = document.querySelector("#moreMenu");
+  if (!menu || menu.querySelector(".ask-menu-item")) return;
+  const b = mk("button", { type: "button", className: "more-menu-item owner-only assistant-only ask-menu-item" },
+    mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("search", { size: 22 })),
+    mk("span", { className: "mm-text" }, mk("strong", { text: tr("Ask the app") }), mk("span", { text: tr("Questions about the money, in your own words") })));
+  b.addEventListener("click", openAskDialog);
+  menu.prepend(b);
+}
+
+function renderV167b() {
+  installAskMenuItem();
+  installTenantToolButtons();
+  installPaymentToolButtons();
+  installEntryChooserExtras();
+  installAppRow();
+  void checkAssistant();
+  if (!renderV167b.nudged) { renderV167b.nudged = true; setTimeout(maybeShowNudge, 2500); }
+}
+
+function mergeV167b(merged, older, newer) {
+  merged.deposits = mergeByStamp(older.deposits, newer.deposits, merged.deleted.deposits, "updatedAt");
+  merged.pendingExpenses = mergeByStamp(older.pendingExpenses, newer.pendingExpenses, [], "updatedAt");
+  return merged;
+}
+
+function attachV167bEvents() {
+  els.transactionDescription?.addEventListener("input", maybeSuggestCategory);
+  els.transactionSupplier?.addEventListener("change", maybeSuggestCategory);
+  els.transactionExpenseCategory?.addEventListener("input", () => { categoryWasSuggested = false; });
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -17457,6 +20021,35 @@ export const __test = {
   yearFullyClosed,
   v158AttentionItems,
   v160AttentionItems,
+  paidUntil,
+  computeSharedExpenseShares,
+  budgetProposal,
+  unpaidByMonth,
+  computeServiceDistribution,
+  getServiceMonths,
+  getTenantExpenseShareForTransaction,
+  waterMeterShare,
+  todaysJobs,
+  lowSupplies,
+  bookingClash,
+  boardPostVisible,
+  mergeTenantDetails,
+  monthFingerprint,
+  settlementData,
+  meetingPackData,
+  v167AttentionItems,
+  parseCsvText,
+  statementRowsFromTable,
+  matchStatementRow,
+  parseStatementAmount,
+  parseStatementDate,
+  alreadyRecorded,
+  suggestExpenseCategory,
+  needsApproval,
+  depositsHeldUsd,
+  pendingApprovals,
+  v167bAttentionItems,
+  mergeStates,
   isConciergeSession,
   canReplyIssue,
   optionTally,

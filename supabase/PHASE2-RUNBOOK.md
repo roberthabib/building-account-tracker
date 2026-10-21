@@ -143,7 +143,8 @@ app's auth), then reload.
 | v148 features (`phase2f-v148-features.sql`) | ✅ applied 2026-10-20; 21 live checks (rolled back): tenant gets no history/cash counts and only own plans, issue photos own-folder only, report_issue refuses other tenants' photos, enqueue_push/notify/admin invites/keepalive_status refused for tenants, anon can only claim real jobs, share-weighted poll counts correct; VAPID keys in Vercel env — viewer admins, admin invites, problem reports + photos, plans/history/cash counts stripped from tenants, share-weighted poll counts, push notifications, keep-alive watch |
 | v153 monthly balance notices (`phase2g-monthly.sql`) | ✅ applied 2026-10-20; 6 live checks (rolled back): cron `monthly-balance-notices` 0 5 1 * *, one job queued per owing tenant with a subscription, none when switched off, `balanceSnapshot` hidden from tenants, tenants cannot run it |
 | v157 tenant links + privacy (`phase2h-v157.sql`) | ✅ applied 2026-10-20; 7 live checks (rolled back): tenants get no documents list, supplier book or unit details and cannot read documents/ files or call list_tenant_links; owner can |
-| v166 concierge, neighbours, replies, choice votes, notices (`phase2i-v166.sql`) | ⏳ written 2026-10-21, waiting to be applied — see below |
+| v166 concierge, neighbours, replies, choice votes, notices (`phase2i-v166.sql`) | ✅ applied 2026-10-21; 32/32 live checks (`phase2i-checks.sql`, rolled back) |
+| v167 late reminders, concierge jobs/supplies/visitors, water meters, bookings, board, own details, month checks, hand over, approvals, deposits (`phase2j-v167.sql`) | ⏳ written 2026-10-21, waiting to be applied — see below |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.
@@ -186,3 +187,25 @@ Undo: the earlier versions of the replaced functions are in `phase2h-v157.sql`
 invites, `cast_my_vote`); re-running those restores them. Remove the job with
 `select cron.unschedule('scheduled-notices');`. Concierge profiles can be
 removed from Settings → Administrators.
+
+---
+
+## v167 — `phase2j-v167.sql`
+
+Apply before the v167 app goes live (same steps as v166: backup, run
+`phase2j-v167.sql`, then `phase2j-checks.sql` — every row ok = true — then
+confirm no `check-%@example.invalid` users are left, then deploy).
+
+| Part | What it does |
+|---|---|
+| Late reminders | `send_late_reminders()` daily 06:00 UTC (pg_cron `late-reminders`): fixed mode, `settings.lateReminders.on`, due day + delay passed, once a month (`public.late_reminder_log`, RLS on, no access for anon/authenticated); amounts from `balanceSnapshot.unpaid`, message in the tenant's language. |
+| Concierge | `concierge_tick_task` (last 7 days only), `concierge_adjust_supply` (never below 0, push when low), `concierge_log_visitor` (last 400), `concierge_save_water_readings` (month locks respected). Concierge expenses at or above `settings.approvalOverUsd` go to `pendingExpenses`. |
+| Approvals | `approve_expense(id, approve)`: owner or viewer, never the requester (by email), only pending ones, month locks respected; approving moves the entries into `transactions` with `approvedBy`. |
+| Bookings | `book_space` (space must exist, no overlap, at most 10 upcoming per flat), `cancel_my_booking` (own only). Tenants see others' bookings without who/why. |
+| Board | `post_to_board` (pending, at most 3 waiting per flat, photo only under `board/<own id>/`), `remove_my_post` (own only). Tenants see approved posts of the last 30 days (without the other flat's id) and their own. Storage: tenants may upload into `board/<own id>/`. |
+| Own details | `update_my_details(phone, language)` sets `detailsAt`. |
+| Month checks | `mark_month_checked(id, month, fingerprint)` for owner/viewer, records their email. |
+| Hand over | `step_down(keep_view)`: only when another owner exists; becomes viewer or removes own access. |
+| get_my_state | Tenants: no jobs, supplies, visitors, month checks, approvals; only their own deposits; no `onlyFlats`. Concierge: jobs, recent log, supplies, recent visitors, upcoming bookings without who/why. |
+
+Undo: re-run `phase2i-v166.sql` for `get_my_state` and `concierge_add_expense`; `select cron.unschedule('late-reminders');`.
