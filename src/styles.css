@@ -5495,3 +5495,6 @@ body:not(.assistant-ready) .assistant-only { display: none !important; }
   font-size: 1rem;
   cursor: pointer;
 }
+
+/* v168: change the month's amount from the Expected card */
+.payment-summary-card .change-amount-btn { align-self: flex-start; padding: 0; margin-top: 4px; font-size: 0.8rem; }

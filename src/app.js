@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v167";
+const APP_VERSION = "v168";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -692,7 +692,7 @@ const I18N = {
     // WhatsApp dialog
     "wa.title": "Send Payment Reminders",
     // Month dialog
-    "month.title": "Add Month",
+    "month.title": "Monthly amount",
     "month.month": "Month",
     "month.budget": "Total Monthly Expected Building Budget USD",
     // Poll dialog
@@ -1075,7 +1075,7 @@ const I18N = {
     // WhatsApp dialog
     "wa.title": "إرسال تذكيرات الدفع",
     // Month dialog
-    "month.title": "إضافة شهر",
+    "month.title": "المبلغ الشهري",
     "month.month": "الشهر",
     "month.budget": "إجمالي ميزانية المبنى الشهرية المتوقعة بالدولار",
     // Poll dialog
@@ -5673,7 +5673,8 @@ function renderPaymentMonthSelect() {
 
 function renderPayments() {
   renderPaymentMonthSelect();
-  els.addMonthButton.classList.toggle("hidden", !isFixedMode());
+  // Months are added automatically; the amount is changed from the Expected card.
+  els.addMonthButton.classList.add("hidden");
   if (isFixedMode()) renderPaymentsFixed();
   else renderPaymentsActual();
 
@@ -5836,6 +5837,9 @@ function renderPaymentsFixed() {
       card.innerHTML = `<span></span><strong></strong>`;
       card.querySelector("span").textContent = tr(label);
       card.querySelector("strong").textContent = value;
+      if (i === 0 && sessionMode === "owner" && !isViewerSession()) {
+        card.append(mk("button", { type: "button", className: "text-link-btn change-amount-btn", text: tr("Edit"), onclick: () => els.addMonthButton.click() }));
+      }
       return card;
     }),
   );
@@ -11398,7 +11402,7 @@ function attachEvents() {
 
   els.addMonthButton.addEventListener("click", () => {
     els.newMonthInput.value = selectedMonth ? monthKey(selectedMonth) : monthKey(localDateInput());
-    els.newMonthAmountInput.value = state.settings.defaultDueUsd || "";
+    els.newMonthAmountInput.value = (selectedMonth && getExpectedMonthlyUsd(selectedMonth)) || state.settings.defaultDueUsd || "";
     openDialog(els.monthDialog);
   });
   els.closeMonthButton.addEventListener("click", () => closeDialog(els.monthDialog));
@@ -16733,7 +16737,7 @@ function renderV165SettingsFields() {
       mk("small", { className: "field-hint", text: tr("You can use {name}, {amount}, {month}, {unit} and {building}. Each tenant gets the language set in their Details.") }),
       mk("div", { className: "settings-action" },
         mk("div", { className: "settings-action-text" }, mk("strong", { text: tr("LBP rate") }), mk("span", { id: "rateHistoryText" })),
-        secondaryButton(tr("Change"), openRateDialog))));
+        secondaryButton(tr("Edit"), openRateDialog))));
   }
   const set = (id, value) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = value ?? ""; };
   set("dueDayInput", state.settings.dueDay || "");
@@ -18100,7 +18104,7 @@ function generatorBillingCard() {
   if (sessionMode !== "owner") return null;
   const b = generatorBilling();
   return mk("article", { id: "generatorBillingCard", className: "notice-card" },
-    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Generator billing") }), canEditBuilding() ? miniButton(tr("Change"), openGeneratorBillingDialog) : null),
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Generator billing") }), canEditBuilding() ? miniButton(tr("Edit"), openGeneratorBillingDialog) : null),
     mk("p", { className: "notice-body", text: b
       ? [tr("Subscription: {price} per amp a month", { price: formatUsd(Number(b.perAmpUsd || 0)) }), Number(b.perKwhUsd || 0) > 0 ? tr("plus ${price} per kWh", { price: Number(b.perKwhUsd).toFixed(3) }) : "", b.since ? tr("from {month}", { month: formatMonth(monthIso(b.since)) }) : ""].filter(Boolean).join(" · ")
       : tr("By meter: the real fuel cost split by each flat's kWh, maintenance by breaker size.") }));
@@ -18729,7 +18733,7 @@ function myDetailsCard() {
   const me = state.tenants.find((t) => t.id === sessionTenantId);
   if (!me) return null;
   return mk("article", { className: "notice-card my-details-card" },
-    mk("div", { className: "notice-head" }, mk("strong", { text: tr("My details") }), miniButton(tr("Change"), openMyDetailsDialog)),
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("My details") }), miniButton(tr("Edit"), openMyDetailsDialog)),
     mk("p", { className: "notice-body", text: [me.phone || tr("No phone number"), (me.language || state.settings.language) === "ar" ? "العربية" : "English"].join(" · ") }));
 }
 
