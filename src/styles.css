@@ -4946,3 +4946,217 @@ body.is-first-sync .kpi small {
 #reminderTemplateAr {
   font: inherit;
 }
+
+/* ═══ v166 ═══ */
+/* Concierge phone */
+.concierge-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.concierge-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 96px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.concierge-tile strong {
+  font-size: 1rem;
+}
+.concierge-tile span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.concierge-home .notice-card {
+  margin-top: 12px;
+}
+body.concierge-mode .bottom-nav .nav-button[data-view="paymentsView"],
+body.concierge-mode .bottom-nav .nav-button[data-view="tenantsView"],
+body.concierge-mode .bottom-nav .nav-button[data-view="ledgerView"],
+body.concierge-mode .more-menu-item[data-view="projectsView"],
+body.concierge-mode .more-menu-item[data-view="servicesView"],
+body.concierge-mode .more-menu-item[data-view="pollsView"],
+body.concierge-mode .more-menu-item[data-view="meetingsView"],
+body.concierge-mode #searchButton,
+body.concierge-mode #generatorBillPreview,
+body.concierge-mode #generatorPoolsSummary,
+body.concierge-mode #recentExpenseChips,
+body.concierge-mode .paidfrom-field,
+body.concierge-mode label:has(#transactionProject),
+body.concierge-mode #expenseConversionPreview,
+body.concierge-mode .push-panel,
+body.concierge-mode #recurringExpenseRow,
+body.concierge-mode #transactionPaidFrom {
+  display: none !important;
+}
+
+/* Emergency numbers editor */
+.emergency-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.emergency-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.emergency-card a.mini-button {
+  text-decoration: none;
+}
+
+/* Problem conversations and work orders */
+.issue-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+.issue-msg {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  max-width: 88%;
+}
+.issue-msg.by-owner {
+  align-self: flex-end;
+  background: var(--green-tint-bg);
+}
+.issue-msg small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-bottom: 2px;
+}
+.issue-msg p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.work-order-line {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Quotes */
+.quotes-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-inner);
+}
+.quote-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.quote-row > span {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.quote-row small {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+.quote-row.is-cheapest {
+  outline: 2px solid var(--primary);
+}
+
+/* Choice polls */
+.option-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 10px 0;
+}
+.option-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.option-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+/* Diesel */
+.notice-body.is-low {
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* App lock */
+.app-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: var(--primary-dark);
+}
+.app-lock-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px;
+  color: #fff;
+  text-align: center;
+}
+.app-lock-box strong {
+  font-size: 1.3rem;
+}
+.app-lock-box .text-link-btn {
+  color: #cfe3db;
+  background: none;
+}
+
+/* v166: tick boxes in sheets sit beside their text; the "Scheduled" pill stays on one line. */
+.tool-dialog-body > label.checkbox-row { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+.tool-dialog-body > label.checkbox-row input { width: 22px; height: 22px; min-height: 0; padding: 0; }
+.notice-scheduled { margin: 2px 0 6px; }
+.emergency-row { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; }
+.emergency-row input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding: 0 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+.option-row .vote-btn {
+  align-self: flex-start;
+  min-height: 36px;
+  padding: 6px 16px;
+  border: 1.5px solid var(--primary);
+  color: var(--primary-dark);
+  font-size: 0.82rem;
+}
+.option-row .vote-btn.selected {
+  background: var(--primary);
+  color: #ffffff;
+}

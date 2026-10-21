@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v165";
+const APP_VERSION = "v166";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,8 @@ const I18N = {
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
     "nav.help": "Help & videos",
+    "nav.equipment": "Equipment",
+    "more.equipmentSub": "Pump, lift, generator: warranties and service",
     "more.helpSub": "Short videos that show how it works",
     "help.intro": "Short videos of the app in use, with a made-up building. Tap one to watch; each is about a minute.",
     "help.close": "Close",
@@ -749,6 +751,8 @@ const I18N = {
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
     "nav.help": "المساعدة والفيديوهات",
+    "nav.equipment": "المعدات",
+    "more.equipmentSub": "المضخة، المصعد، المولّد: الكفالات والصيانة",
     "more.helpSub": "فيديوهات قصيرة تشرح طريقة الاستخدام",
     "help.intro": "فيديوهات قصيرة للتطبيق أثناء الاستخدام، على مبنى وهمي. اضغط على أي منها للمشاهدة؛ مدة كل منها دقيقة تقريباً.",
     "help.close": "إغلاق",
@@ -1132,6 +1136,136 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Concierge — adds expenses, readings and problems; sees no balances": "ناطور — يضيف المصاريف والقراءات والمشاكل؛ لا يرى الأرصدة",
+  "Hi! Here is your access to the {building} app as the building's concierge. Open this link on your phone and tap Link this phone (valid 7 days, one use):\n{link}": "مرحباً! هذا وصولك إلى تطبيق {building} كناطور المبنى. افتح الرابط على هاتفك واضغط «ربط هذا الهاتف» (صالح 7 أيام، لمرة واحدة):\n{link}",
+  "+ Add a number": "+ إضافة رقم",
+  "+ Add a quote": "+ إضافة عرض سعر",
+  "About every {n} days": "كل {n} يوماً تقريباً",
+  "About {n} litres": "حوالي {n} لتر",
+  "Add a quote — {name}": "إضافة عرض سعر — {name}",
+  "Add an expense": "إضافة مصروف",
+  "Add the litres when you record a delivery to see the price per 1,000 litres.": "أضف عدد الليترات عند تسجيل كل نقلة لترى السعر لكل 1,000 لتر.",
+  "Added by you": "ما أضفته",
+  "App lock": "قفل التطبيق",
+  "App lock is on for this phone": "قفل التطبيق مفعّل على هذا الهاتف",
+  "Ask for your fingerprint or face to open the app": "اطلب بصمتك أو وجهك لفتح التطبيق",
+  "Basement": "الطابق السفلي",
+  "Building dues are due": "موعد استحقاق دفعات المبنى",
+  "Building news": "أخبار المبنى",
+  "Calendar": "الروزنامة",
+  "Calendar file downloaded — open it to add the dates to your phone": "تم تنزيل ملف الروزنامة — افتحه لإضافة المواعيد إلى هاتفك",
+  "Can't unlock? Sign out": "لا يمكنك الفتح؟ سجّل الخروج",
+  "Cash now": "النقد الآن",
+  "Choice saved": "تم حفظ اختيارك",
+  "Choose": "اختر",
+  "Choose a quote: {name}": "اختيار عرض سعر: {name}",
+  "Chosen: {label}": "الخيار المعتمد: {label}",
+  "Coming up": "قريباً",
+  "Company or person": "شركة أو شخص",
+  "Concierge": "الناطور",
+  "Cost (USD)": "الكلفة (دولار)",
+  "Couldn't turn on the lock: {msg}": "تعذّر تفعيل القفل: {msg}",
+  "Delete this equipment?": "حذف هذه المعدات؟",
+  "Details in the building app": "التفاصيل في تطبيق المبنى",
+  "Diesel in the tank": "المازوت في الخزان",
+  "Diesel is low: about {n} litres left": "المازوت منخفض: بقي حوالي {n} لتر",
+  "Download calendar file": "تنزيل ملف الروزنامة",
+  "Edit equipment": "تعديل المعدات",
+  "Emergency numbers": "أرقام الطوارئ",
+  "Enter the amount": "أدخل المبلغ",
+  "Enter who and how much": "أدخل الاسم والمبلغ",
+  "Expense sent to the owner": "أُرسل المصروف إلى المالك",
+  "Generator, this month": "المولّد، هذا الشهر",
+  "Give it a name": "أعطه اسماً",
+  "Installed on": "تاريخ التركيب",
+  "Installed {date}": "رُكّب في {date}",
+  "Last service {date}: {note}": "آخر صيانة {date}: {note}",
+  "Leave empty to publish now. Tenants see it, and get the notification, at that time.": "اتركه فارغاً للنشر الآن. يراه المستأجرون ويصلهم الإشعار في ذلك الوقت.",
+  "Litres in the tank now": "الليترات في الخزان الآن",
+  "Litres of water delivered (optional)": "ليترات المياه المسلّمة (اختياري)",
+  "Locked. Use your fingerprint or face to open.": "مقفل. استخدم بصمتك أو وجهك للفتح.",
+  "Log service": "تسجيل صيانة",
+  "Maintenance dates, due days, warranties and votes in your phone's calendar.": "مواعيد الصيانة والاستحقاق والكفالات والتصويت في روزنامة هاتفك.",
+  "Measure": "قياس",
+  "Measure the tank once in a while. The app then estimates what's left from purchases and recent use.": "قِس الخزان من حين لآخر. يقدّر التطبيق ما تبقى من المشتريات والاستهلاك الأخير.",
+  "Measure the tank once to start the estimate.": "قِس الخزان مرة لبدء التقدير.",
+  "Monthly newsletter": "النشرة الشهرية",
+  "Neighbours": "الجيران",
+  "New equipment": "معدات جديدة",
+  "New vote: {title}": "تصويت جديد: {title}",
+  "No equipment yet. Add the pump, the lift, the generator… with their warranty dates.": "لا معدات بعد. أضف المضخة والمصعد والمولّد… مع تواريخ كفالتها.",
+  "No neighbour shares their contact yet.": "لم يشارك أي جار رقمه بعد.",
+  "Not unlocked — try again": "لم يُفتح — حاول مجدداً",
+  "Nothing special this month": "لا شيء خاص هذا الشهر",
+  "On — fingerprint or face needed to open": "مفعّل — البصمة أو الوجه مطلوب للفتح",
+  "One picture for the building's WhatsApp group: money in and out, works done, what's coming, any open vote. No one's balance is shown.": "صورة واحدة لمجموعة واتساب المبنى: الداخل والخارج، الأعمال المنجزة، ما هو قادم، وأي تصويت مفتوح. لا يظهر رصيد أحد.",
+  "Phone linked as the building's concierge.": "تم ربط الهاتف كناطور المبنى.",
+  "Photo after": "صورة بعد",
+  "Photo before": "صورة قبل",
+  "Photo of the quote (optional)": "صورة عرض السعر (اختياري)",
+  "Publish on (optional)": "النشر بتاريخ (اختياري)",
+  "Put to a vote": "طرح للتصويت",
+  "Quotes": "عروض الأسعار",
+  "Readings sent to the owner": "أُرسلت القراءات إلى المالك",
+  "Record the bill as an expense and mark the problem fixed": "سجّل الفاتورة كمصروف وعلّم المشكلة كمحلولة",
+  "Remind me below (litres)": "ذكّرني تحت (لتر)",
+  "Reply": "رد",
+  "Reply sent": "أُرسل الرد",
+  "Reply: {title}": "رد: {title}",
+  "Say what the expense was for": "اذكر سبب المصروف",
+  "Scheduled {date}": "مجدول {date}",
+  "See the after photo": "صورة بعد",
+  "See the before photo": "صورة قبل",
+  "Seen by {n} of {m} linked phones": "شاهده {n} من {m} هواتف مرتبطة",
+  "Service — {name}": "صيانة — {name}",
+  "Share my contact": "شارك رقمي",
+  "Share picture": "مشاركة الصورة",
+  "Share your name, flat and phone with the neighbours who share theirs. Only they see it, and you can stop any time.": "شارك اسمك وشقتك ورقمك مع الجيران الذين يشاركون أرقامهم. هم فقط يرونه، ويمكنك التوقف متى شئت.",
+  "Shown to tenants and the concierge with a Call button.": "تظهر للمستأجرين والناطور مع زر اتصال.",
+  "Sign out on this phone and turn the lock off? You'll sign in again afterwards.": "تسجيل الخروج من هذا الهاتف وإيقاف القفل؟ ستسجّل الدخول مجدداً بعد ذلك.",
+  "Stop sharing": "إيقاف المشاركة",
+  "Tank size (litres, optional)": "سعة الخزان (لتر، اختياري)",
+  "The bill is already in the ledger.": "الفاتورة مسجلة في السجل.",
+  "This phone can't use a fingerprint or face lock here": "لا يمكن لهذا الهاتف استخدام قفل البصمة أو الوجه هنا",
+  "Under warranty": "ضمن الكفالة",
+  "Unlink this phone": "فك ربط هذا الهاتف",
+  "Unlock": "فتح",
+  "Vote closes: {title}": "ينتهي التصويت: {title}",
+  "Vote open": "تصويت مفتوح",
+  "Vote open until {date}": "التصويت مفتوح حتى {date}",
+  "Votes close {date}": "ينتهي التصويت {date}",
+  "Warranty ends soon": "الكفالة تنتهي قريباً",
+  "Warranty ends {date}: {name}": "تنتهي الكفالة {date}: {name}",
+  "Warranty ends: {name}": "نهاية الكفالة: {name}",
+  "Warranty over": "انتهت الكفالة",
+  "Warranty until": "الكفالة حتى",
+  "Warranty until {date}": "الكفالة حتى {date}",
+  "Water deliveries": "نقلات المياه",
+  "Water pump": "مضخة المياه",
+  "What was done": "ما الذي أُنجز",
+  "What's included, delay, warranty": "ما يشمله، المدة، الكفالة",
+  "Where": "المكان",
+  "Who does the work": "من ينفّذ العمل",
+  "With a photo": "مع صورة",
+  "Work order": "أمر عمل",
+  "Work order saved": "حُفظ أمر العمل",
+  "Work order — {title}": "أمر عمل — {title}",
+  "Works done": "الأعمال المنجزة",
+  "Write a message": "اكتب رسالة",
+  "Write a reply": "اكتب رداً",
+  "Your contact is shared with the neighbours who share theirs": "رقمك مُشارك مع الجيران الذين يشاركون أرقامهم",
+  "You no longer share your contact": "لم تعد تشارك رقمك",
+  "bill recorded": "الفاتورة مسجلة",
+  "e.g. Plumber": "مثال: سمكري",
+  "e.g. Replaced the pressure switch": "مثال: تغيير مفتاح الضغط",
+  "enough for about {n} days": "يكفي حوالي {n} يوماً",
+  "measured {date}": "قيس في {date}",
+  "{amount} per 1,000 litres": "{amount} لكل 1,000 لتر",
+  "{name} expires": "انتهاء {name}",
+  "{n} earlier messages": "{n} رسائل سابقة",
+  "{n} litres": "{n} لتر",
+  "{n} open": "{n} مفتوحة",
+  "✓ My choice": "✓ اختياري",
   "now": "الآن",
   "{n}m": "{n} د",
   "{n}h": "{n} س",
@@ -2727,6 +2861,9 @@ function hydrateState(rawState) {
   hydrated.deleted.generatorServices ||= [];
   hydrated.deleted.paymentDeclarations ||= [];
   hydrated.deleted.monthlyExpected ||= [];
+  hydrated.deleted.equipment ||= [];
+  hydrated.equipment ||= [];
+  hydrated.dieselChecks ||= [];
   hydrated.security ||= {};
   hydrated.security.salt ||= randomToken();
   hydrated.transactions ||= [];
@@ -2792,7 +2929,7 @@ function hydrateState(rawState) {
   hydrated.tenants = hydrated.tenants.filter((t) => !deletedTenants.has(t.id));
   hydrated.polls = hydrated.polls.filter((p) => !deletedPolls.has(p.id));
   hydrated.buildingProjects = hydrated.buildingProjects.filter((p) => !deletedProjects.has(p.id));
-  ["announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations"].forEach((kind) => {
+  ["announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations", "equipment"].forEach((kind) => {
     const gone = new Set(hydrated.deleted[kind]);
     hydrated[kind] = (hydrated[kind] || []).filter((item) => !gone.has(item.id));
   });
@@ -3272,6 +3409,7 @@ function renderProjects() {
 
       const card = document.createElement("div");
       card.className = "project-card";
+      card.dataset.projectId = project.id;
 
       // Header row
       const header = document.createElement("div");
@@ -3527,7 +3665,7 @@ function updateGeneratorReadingsPreview() {
 }
 
 function openGeneratorReadingsDialog(month) {
-  if (sessionMode !== "owner") return;
+  if (sessionMode !== "owner" && sessionMode !== "concierge") return;
   const activeTenants = state.tenants.filter((t) => t.active !== false);
   if (!activeTenants.length) { showToast("Add tenants before entering meter readings"); return; }
   els.generatorBillForm.reset();
@@ -3557,13 +3695,14 @@ function updateGeneratorDeleteVisibility() {
 
 function submitGeneratorReadings(event) {
   event.preventDefault();
-  if (sessionMode !== "owner") return;
+  if (sessionMode !== "owner" && sessionMode !== "concierge") return;
   const month = monthIso(els.generatorBillMonth.value);
   if (!month) { showToast("Select a month"); return; }
   if (isMonthClosed(month)) { showToast(closedMonthError(month).message, 5000); return; }
   const readings = readGeneratorFormReadings();
   const lower = Object.values(readings).filter((r) => r.currentReading && r.currentReading < r.previousReading).length;
   if (lower && !window.confirm(tr("{n} reading(s) are lower than last month. Save anyway?", { n: lower }))) return;
+  if (isConciergeSession()) { void conciergeSaveReadings(month, readings); return; }
   const engineHours = Number(els.generatorEngineHours?.value || 0);
   const lines = {};
   Object.keys(readings).forEach((id) => {
@@ -3578,10 +3717,11 @@ function submitGeneratorReadings(event) {
   const existing = getServiceReadingRecord("generator", month);
   if (existing) {
     existing.lines = lines;
+    existing.updatedAt = new Date().toISOString();
     if (engineHours > 0) existing.engineHours = engineHours;
     else delete existing.engineHours;
   } else {
-    state.serviceReadings.push({ id: `rdg-${Date.now()}`, serviceType: "generator", forMonth: month, lines, ...(engineHours > 0 ? { engineHours } : {}) });
+    state.serviceReadings.push({ id: `rdg-${Date.now()}`, serviceType: "generator", forMonth: month, lines, updatedAt: new Date().toISOString(), ...(engineHours > 0 ? { engineHours } : {}) });
   }
   if (!saveState()) return;
   closeDialog(els.generatorBillDialog);
@@ -4282,8 +4422,9 @@ function hideLoginScreen() {
 function applySessionMode() {
   // A linked tenant phone holds only its own tenant's money, so building-wide
   // totals (cash, everyone's balances, all payments) can't be computed there.
-  document.body.classList.toggle("tenant-phone", sessionMode === "tenant" && isTenantSession());
-  if (sessionMode === "tenant") {
+  document.body.classList.toggle("tenant-phone", (sessionMode === "tenant" && isTenantSession()) || sessionMode === "concierge");
+  document.body.classList.toggle("concierge-mode", sessionMode === "concierge");
+  if (sessionMode === "tenant" || sessionMode === "concierge") {
     document.body.classList.add("tenant-mode");
     els.logoutButton.classList.remove("hidden");
   } else {
@@ -4677,6 +4818,7 @@ function renderDashboard() {
   updateMonthSectionHead();
   renderMonthSteppers();
   renderGettingStarted();
+  renderConciergeHome();
 }
 
 // Building costs (expenses + services) dated this calendar year.
@@ -6981,6 +7123,7 @@ function renderPolls() {
 }
 
 function buildPollCard(poll) {
+  if (poll.options?.length) return buildOptionPollCard(poll);
   const activeTenants = state.tenants.filter((t) => t.active !== false);
   const allVoterIds = ["owner", ...activeTenants.map((t) => t.id)];
   const votes = poll.votes || {};
@@ -7155,13 +7298,13 @@ function castVote(pollId, vote) {
     supabaseRequest("rpc/cast_my_vote", { method: "POST", body: JSON.stringify({ p_poll_id: pollId, p_vote: vote }) })
       .then(() => syncFromSheet({ silent: true }))
       .catch((error) => showToast(describeSyncProblem(error), 6000));
-    showToast(tr("Voted {vote}", { vote: vote.toUpperCase() }));
+    showToast(poll.options?.length ? tr("Choice saved") : tr("Voted {vote}", { vote: vote.toUpperCase() }));
     return;
   }
   poll.votes[myId] = vote;
   saveState();
   renderPolls();
-  showToast(tr("Voted {vote}", { vote: vote.toUpperCase() }));
+  showToast(poll.options?.length ? tr("Choice saved") : tr("Voted {vote}", { vote: vote.toUpperCase() }));
 }
 
 function closePoll(pollId) {
@@ -7252,7 +7395,7 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView"];
 
 function setView(viewId) {
   if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView"].includes(viewId)) viewId = "moreView";
@@ -7392,6 +7535,7 @@ function syncTransactionFormMode() {
   renderRecentExpenseChips();
   renderExpenseSplitPreview();
   renderPaymentCoverage();
+  syncWaterLitresField();
   document.querySelector(".tenant-field").classList.toggle("hidden", !(tenantMode || openingMode));
   document.querySelector(".direction-field").classList.toggle("hidden", !(category === "Advance Payments" || openingMode));
   document.querySelector(".description-field").classList.toggle("hidden", tenantMode);
@@ -7553,6 +7697,8 @@ function createTransactionsFromForm() {
     servicePart,
     ...(isServiceExpense && !isWater && servicePart !== "maintenance" && Number(els.transactionLitres?.value || 0) > 0
       ? { litres: Number(els.transactionLitres.value) } : {}),
+    ...(isServiceExpense && isWater && Number(document.querySelector("#transactionWaterLitres")?.value || 0) > 0
+      ? { litres: Number(document.querySelector("#transactionWaterLitres").value) } : {}),
     ...(tenantMode && els.transactionMethod ? { method: els.transactionMethod.value } : {}),
     ...(isExpenseLike && els.transactionPaidFrom ? { paidFrom: els.transactionPaidFrom.value } : {}),
     debitUsd: isDebit ? amountUsd : 0,
@@ -7876,7 +8022,7 @@ function sessionFromAuthResponse(body) {
 
 // Sessions saved before roles existed are owner sessions.
 function isOwnerSession() {
-  return Boolean(authSession) && authSession.role !== "tenant" && authSession.role !== "viewer";
+  return Boolean(authSession) && authSession.role !== "tenant" && authSession.role !== "viewer" && authSession.role !== "concierge";
 }
 
 function isTenantSession() {
@@ -8098,7 +8244,7 @@ async function cloudLoadState() {
   if (cloudProvider() === "supabase") {
     // Tenants never read the raw document: the server returns a copy with
     // everything belonging to other tenants removed.
-    if (isTenantSession()) {
+    if (isTenantSession() || isConciergeSession()) {
       const res = await supabaseRequest("rpc/get_my_state", { method: "POST", body: "{}" });
       return await res.json();
     }
@@ -8314,7 +8460,7 @@ function mergeDeclarations(olderArr, newerArr) {
 }
 
 function mergeDeletedLists(local, remote) {
-  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations", "monthlyExpected"];
+  const kinds = ["transactions", "tenants", "polls", "projects", "announcements", "issues", "cashChecks", "maintenanceTasks", "suppliers", "documents", "meetings", "serviceReadings", "generatorServices", "paymentDeclarations", "monthlyExpected", "equipment"];
   const merged = {};
   kinds.forEach((kind) => {
     merged[kind] = [...new Set([...(local?.[kind] || []), ...(remote?.[kind] || [])])].slice(-1000);
@@ -8335,20 +8481,22 @@ function mergeStates(local, remote) {
   const merged = clone(newer);
   merged.deleted = mergeDeletedLists(local.deleted, remote.deleted);
   merged.transactions = mergeById(older.transactions, newer.transactions, merged.deleted.transactions);
-  merged.tenants = mergeById(older.tenants, newer.tenants, merged.deleted.tenants);
+  merged.tenants = mergeDirectoryFlags(mergeById(older.tenants, newer.tenants, merged.deleted.tenants), older.tenants, newer.tenants);
   merged.buildingProjects = mergeById(older.buildingProjects, newer.buildingProjects, merged.deleted.projects);
   merged.polls = mergePolls(older.polls, newer.polls, merged.deleted.polls);
   merged.paymentDeclarations = mergeDeclarations(older.paymentDeclarations, newer.paymentDeclarations).filter((d) => !merged.deleted.paymentDeclarations.includes(d.id));
   merged.suppliers = mergeById(older.suppliers, newer.suppliers, merged.deleted.suppliers);
   merged.projects = mergeById(older.projects, newer.projects);
   merged.expenseCategories = mergeById(older.expenseCategories, newer.expenseCategories);
-  merged.serviceReadings = mergeById(older.serviceReadings, newer.serviceReadings, merged.deleted.serviceReadings);
+  merged.serviceReadings = mergeByStamp(older.serviceReadings, newer.serviceReadings, merged.deleted.serviceReadings, "updatedAt");
   merged.monthlyExpected = mergeByMonth(older.monthlyExpected, newer.monthlyExpected).filter((e) => !merged.deleted.monthlyExpected.includes(e.month));
   merged.recurringExpenses = mergeById(older.recurringExpenses, newer.recurringExpenses);
   merged.auditLog = mergeById(older.auditLog, newer.auditLog).sort((a, b) => String(a.at).localeCompare(String(b.at))).slice(-AUDIT_LIMIT);
   merged.monthLocks = mergeByStamp(older.monthLocks, newer.monthLocks, [], "at");
   merged.cashChecks = mergeById(older.cashChecks, newer.cashChecks, merged.deleted.cashChecks);
-  merged.announcements = mergeById(older.announcements, newer.announcements, merged.deleted.announcements);
+  merged.announcements = mergeAnnouncementsV166(older.announcements, newer.announcements, merged.deleted.announcements);
+  merged.equipment = mergeByStamp(older.equipment, newer.equipment, merged.deleted.equipment, "updatedAt");
+  merged.dieselChecks = mergeById(older.dieselChecks, newer.dieselChecks);
   merged.issues = mergeByStamp(older.issues, newer.issues, merged.deleted.issues, "updatedAt");
   merged.generatorServices = mergeById(older.generatorServices, newer.generatorServices, merged.deleted.generatorServices);
   merged.documents = mergeByStamp(older.documents, newer.documents, merged.deleted.documents, "updatedAt");
@@ -9051,6 +9199,7 @@ async function joinWithInviteCode(rawCode) {
     });
     const claimBody = await claim.json().catch(() => null);
     if (!claim.ok) {
+      if (await claimConciergeCode(session, code).catch(() => false)) return;
       authRequest("logout", {}, session.access_token).catch(() => {});
       throw new Error(claimBody?.message || "That code is not valid");
     }
@@ -10782,6 +10931,7 @@ function attachEvents() {
     if (btn) setTransactionCurrency(btn.dataset.currency);
   });
   els.transactionForm.addEventListener("submit", async (event) => {
+    if (isConciergeSession()) { event.preventDefault(); void conciergeSubmitExpense(); return; }
     event.preventDefault();
     setTransactionFormBusy(true);
     try {
@@ -10931,6 +11081,7 @@ function attachEvents() {
     const payInput = document.querySelector("#paymentInstructionsInput");
     if (payInput) state.settings.paymentInstructions = payInput.value.trim();
     readV165SettingsFields();
+    readEmergencyEditor();
     saveState();
     renderAll();
     updateExpenseConversionPreview();
@@ -11301,7 +11452,7 @@ function isViewerSession() {
 }
 
 function isAdminSession() {
-  return Boolean(authSession) && authSession.role !== "tenant";
+  return Boolean(authSession) && authSession.role !== "tenant" && authSession.role !== "concierge";
 }
 
 // ── The before/after diff behind month locks and the change history ────────
@@ -11920,6 +12071,8 @@ function renderTenantDashboardExtras() {
     isTenant ? tenantHelpCard() : null,
     isTenant ? howToPayCard() : null,
     isTenant ? generatorScheduleCard() : null,
+    isTenant ? emergencyCard() : null,
+    isTenant ? directoryCard() : null,
     ...notices.map((n) => buildNoticeCard(n, { compact: true })),
     isTenant ? tenantRecentPaymentsCard() : null,
     ...myIssues.map((issue) => mk("article", { className: "notice-card" },
@@ -11936,13 +12089,15 @@ function openNoticeDialog() {
   const body = mk("textarea", { rows: "4", placeholder: tr("Details for the residents"), maxlength: "1500" });
   const until = mk("input", { type: "date" });
   const push = checkboxRow(tr("Also send a phone notification to tenants"), true);
+  const publishAt = mk("input", { type: "datetime-local" });
   const save = () => {
     if (!title.value.trim()) { showToast("Give the notice a title"); return; }
     const notice = { id: newId("ntc"), title: title.value.trim(), body: body.value.trim(), until: until.value || "", createdAt: new Date().toISOString(), by: auditActor() };
+    if (publishAt.value && Date.parse(publishAt.value) > Date.now()) { notice.publishAt = new Date(publishAt.value).toISOString(); notice.sendPush = push.input.checked; }
     (state.announcements ||= []).push(notice);
     if (!saveState()) return;
     renderAll();
-    if (push.input.checked) notifyTenants(null, `📢 ${notice.title}`, notice.body || notice.title);
+    if (push.input.checked && !noticeIsScheduled(notice)) notifyTenants(null, `📢 ${notice.title}`, notice.body || notice.title);
     openToolDialog(tr("Notice posted"),
       note(tr("Tenants see it on their phones. Post it to the building's WhatsApp group too?")),
       mk("div", { className: "button-row" },
@@ -11953,6 +12108,7 @@ function openNoticeDialog() {
     field(tr("Title"), title),
     field(tr("Message"), body),
     field(tr("Show until (optional)"), until, tr("Without a date it shows for 60 days.")),
+    field(tr("Publish on (optional)"), publishAt, tr("Leave empty to publish now. Tenants see it, and get the notification, at that time.")),
     canNotify() ? push.row : null,
     mk("div", { className: "button-row" }, primaryButton(tr("Post notice"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
 }
@@ -11990,7 +12146,8 @@ async function uploadPhotoUnder(prefix, file) {
 
 function openIssueDialog() {
   const tenantPhone = isTenantSession() && sessionMode === "tenant";
-  if (sessionMode !== "owner" && !tenantPhone) { showToast("Link this phone with an invite code to report problems"); return; }
+  const conciergePhone = isConciergeSession() && sessionMode === "concierge";
+  if (sessionMode !== "owner" && !tenantPhone && !conciergePhone) { showToast("Link this phone with an invite code to report problems"); return; }
   const title = textInput("", { placeholder: tr("Leak under the stairs"), maxlength: "200" });
   const details = mk("textarea", { rows: "4", placeholder: tr("Where, since when, how bad"), maxlength: "2000" });
   const photo = mk("input", { type: "file", accept: "image/*" });
@@ -11999,6 +12156,14 @@ function openIssueDialog() {
     submit.disabled = true;
     try {
       const file = photo.files?.[0] || null;
+      if (conciergePhone) {
+        const uploaded = file ? await uploadPhotoUnder("concierge/issues", file) : null;
+        await supabaseRequest("rpc/concierge_report_issue", { method: "POST", body: JSON.stringify({ p_title: title.value.trim(), p_details: details.value.trim(), ...(uploaded ? { p_photo_path: uploaded.storagePath } : {}) }) });
+        closeToolDialog();
+        showToast("Sent to the building owner");
+        syncFromSheet({ silent: true });
+        return;
+      }
       if (tenantPhone) {
         const uploaded = file ? await uploadPhotoUnder(`issues/${sessionTenantId}`, file) : null;
         await supabaseRequest("rpc/report_issue", { method: "POST", body: JSON.stringify({ p_title: title.value.trim(), p_details: details.value.trim(), ...(uploaded ? { p_photo_path: uploaded.storagePath } : {}) }) });
@@ -12065,7 +12230,7 @@ function openIssueManageDialog(id) {
 
 function renderIssues() {
   if (!els.issuesList) return;
-  const canReport = sessionMode === "owner" || (sessionMode === "tenant" && isTenantSession());
+  const canReport = sessionMode === "owner" || sessionMode === "concierge" || (sessionMode === "tenant" && isTenantSession());
   if (els.newIssueButton) els.newIssueButton.classList.toggle("hidden", !canReport);
   const order = { open: 0, in_progress: 1, fixed: 2 };
   const issues = (state.issues || []).slice().sort((a, b) => (order[a.status] ?? 0) - (order[b.status] ?? 0) || String(b.createdAt).localeCompare(String(a.createdAt)));
@@ -12191,18 +12356,22 @@ function adminInviteLink(code) {
 async function openAdminsDialog() {
   if (!isOwnerSession()) { showToast("Sign in with Google as the owner to manage administrators"); return; }
   const list = mk("div", { className: "history-list compact" }, note(tr("Loading…")));
-  const role = selectInput([["viewer", tr("View only — sees everything, changes nothing")], ["owner", tr("Full access — can change everything")]], "viewer");
+  const role = selectInput([["viewer", tr("View only — sees everything, changes nothing")], ["owner", tr("Full access — can change everything")], ["concierge", tr("Concierge — adds expenses, readings and problems; sees no balances")]], "viewer");
   const result = mk("div");
   const create = primaryButton(tr("Create invite link"), async () => {
     create.disabled = true;
     try {
       const res = await supabaseRequest("rpc/create_admin_invite", { method: "POST", body: JSON.stringify({ p_role: role.value }) });
       const code = await res.json();
-      const link = adminInviteLink(code);
-      const message = tr("You're invited to help manage {building} in the Building Account Tracker. Open this link on your phone and sign in with your Google account (valid 7 days, one use):\n{link}", { building: state.building?.name || "", link });
+      const concierge = role.value === "concierge";
+      const link = concierge ? joinLink(code) : adminInviteLink(code);
+      const message = concierge
+        ? tr("Hi! Here is your access to the {building} app as the building's concierge. Open this link on your phone and tap Link this phone (valid 7 days, one use):\n{link}", { building: state.building?.name || "", link })
+        : tr("You're invited to help manage {building} in the Building Account Tracker. Open this link on your phone and sign in with your Google account (valid 7 days, one use):\n{link}", { building: state.building?.name || "", link });
       result.replaceChildren(
         mk("p", { className: "invite-code", text: code }),
         note(link),
+        concierge ? qrBlock(link, tr("Or let them scan this with the phone camera.")) : null,
         mk("div", { className: "button-row" },
           primaryButton(tr("Send on WhatsApp"), () => window.open(whatsappLink("", message), "_blank", "noopener")),
           secondaryButton(tr("Copy link"), () => navigator.clipboard?.writeText(link).then(() => showToast("Link copied")).catch(() => showToast(link, 8000)))));
@@ -12223,7 +12392,7 @@ async function openAdminsDialog() {
     const res = await supabaseRequest("rpc/list_admins", { method: "POST", body: "{}" });
     const admins = await res.json();
     list.replaceChildren(...admins.map((a) => mk("div", { className: "history-row" },
-      mk("div", { className: "history-head" }, mk("strong", { text: a.email || a.user_id }), mk("span", { text: a.role === "viewer" ? tr("View only") : tr("Full access") })),
+      mk("div", { className: "history-head" }, mk("strong", { text: a.email || a.user_id }), mk("span", { text: a.role === "viewer" ? tr("View only") : a.role === "concierge" ? tr("Concierge") : tr("Full access") })),
       a.is_me ? mk("div", { className: "history-by", text: tr("You") }) : miniButton(tr("Remove"), async () => {
         if (!window.confirm(tr("Remove {email}'s access to the building?", { email: a.email }))) return;
         try {
@@ -12593,6 +12762,8 @@ function renderReports() {
     reportsSection(tr("For the accountant"), buildAccountantSection()),
     reportsSection(tr("Money in and out"), buildMoneyFlowChart()),
     reportsSection(tr("Invoice photos missing"), buildMissingInvoiceSection()),
+    reportsSection(tr("Monthly newsletter"), buildNewsletterSection()),
+    reportsSection(tr("Calendar"), note(tr("Maintenance dates, due days, warranties and votes in your phone's calendar.")), mk("div", { className: "button-row" }, primaryButton(tr("Download calendar file"), downloadCalendar))),
   );
 }
 
@@ -12710,6 +12881,12 @@ function extraAttentionItems() {
   items.push(...v155AttentionItems());
   items.push(...v158AttentionItems());
   items.push(...v160AttentionItems());
+  (state.equipment || []).forEach((e) => {
+    const w = equipmentWarrantyStatus(e);
+    if (w === "soon") items.push({ kind: "warn", text: tr("Warranty ends {date}: {name}", { date: formatDateLabel(e.warrantyUntil), name: e.name }), view: "equipmentView", key: `warranty:${e.id}:${e.warrantyUntil}` });
+  });
+  const diesel = dieselEstimate();
+  if (diesel.ready && diesel.low) items.push({ kind: "danger", text: tr("Diesel is low: about {n} litres left", { n: numberFormat.format(diesel.litres) }), view: "servicesView", key: `diesel:${localDateInput()}` });
   [currentMonthValue()].forEach((m) => {
     const late = lateTenants(m);
     if (late.length) items.push({ kind: "danger", text: tr(late.length === 1 ? "{n} tenant is late for {month}" : "{n} tenants are late for {month}", { n: late.length, month: formatMonth(m) }), view: "paymentsView", key: `late:${monthKey(m)}` });
@@ -12741,6 +12918,14 @@ function renderV148() {
   renderDisplayPanel();
   renderPaymentInstructionsField();
   renderV165SettingsFields();
+  renderEmergencyEditor();
+  renderEquipment();
+  decorateIssueCards();
+  decorateProjectCards();
+  decorateNoticeCards();
+  renderServicesExtras();
+  renderEmergencyOnMore();
+  renderAppLockSetting();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
   renderGeneratorScheduleNote();
   ensureSearchButton();
@@ -12760,6 +12945,7 @@ function attachV148Events() {
   els.newMaintenanceButton?.addEventListener("click", () => openMaintenanceTaskDialog());
   els.inviteAllButton?.addEventListener("click", openInviteAllDialog);
   attachV165Events();
+  attachV166Events();
   els.tenantList.addEventListener("click", (event) => {
     if (event.target.closest("button, a, input, select")) return;
     const card = event.target.closest(".tenant-card[data-tenant-id]");
@@ -13523,6 +13709,8 @@ async function refreshTenantLinks() {
     const rows = await res.json();
     tenantLinkInfo = Object.fromEntries((rows || []).map((r) => [r.tenant_id, { phones: Number(r.phones || 0), notifications: Number(r.notifications || 0) }]));
     renderTenants();
+    renderNotices();
+    decorateNoticeCards();
   } catch { /* SQL not applied yet, or offline: show nothing */ }
 }
 
@@ -15734,7 +15922,7 @@ function addMeterPhotoButtons(month) {
         const tenant = state.tenants.find((t) => t.id === row.dataset.tenantId);
         const record = { id: `meter-${row.dataset.tenantId}`, invoice: `meter-${safeFilePart(tenant?.unit || "unit", "unit")}`, description: "meter", date: `${monthKey(month)}-28` };
         const prepared = await prepareInvoiceUpload(record, file);
-        const attachment = await uploadInvoiceToSupabase(record, prepared);
+        const attachment = isConciergeSession() ? await uploadPhotoUnder("concierge/meters", file) : await uploadInvoiceToSupabase(record, prepared);
         row.dataset.photo = JSON.stringify(attachment);
         button.textContent = tr("Photo ✓");
       } catch (error) {
@@ -15902,6 +16090,10 @@ function downloadAllMyReceipts() {
 // ── Vote results go to tenants' phones ──────────────────────────────────────
 const POLL_RESULTS_FROM = "2026-10-21";
 function pollResultLine(poll) {
+  if (poll.options?.length) {
+    const best = optionTally(poll).rows.slice().sort((a, b) => b.value - a.value)[0];
+    return best && best.value > 0 ? tr("Chosen: {label}", { label: best.label }) : tr("No votes were cast.");
+  }
   const t = pollTally(poll);
   const voted = t.yes + t.no + t.abstain;
   if (!voted) return tr("No votes were cast.");
@@ -16181,6 +16373,910 @@ function attachV165Events() {
   els.transactionTenant?.addEventListener("change", renderPaymentCoverage);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v166 — concierge, emergency numbers, directory, problem conversations and
+// work orders, quotes, equipment, diesel and water, notices seen/scheduled,
+// newsletter, calendar, app lock
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Concierge (caretaker) phone ─────────────────────────────────────────────
+function isConciergeSession() {
+  return Boolean(authSession) && authSession.role === "concierge";
+}
+
+function enterAsConcierge() {
+  sessionMode = "concierge";
+  sessionTenantId = null;
+  applySessionMode();
+  hideLoginScreen();
+  setView("dashboardView");
+  renderAll();
+  syncFromSheet({ silent: true });
+}
+
+// A concierge code goes through the administrator invite (server side it
+// allows an anonymous phone for the concierge role only).
+async function claimConciergeCode(session, code) {
+  const c = cloudConfig();
+  const res = await fetch(`${c.supabaseUrl}/rest/v1/rpc/claim_admin_invite`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ p_code: code }),
+    signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
+  });
+  const role = await res.json().catch(() => null);
+  if (!res.ok || role !== "concierge") return false;
+  saveAuthSession({ ...session, email: "", role: "concierge", tenantId: null });
+  const stateRes = await supabaseRequest("rpc/get_my_state", { method: "POST", body: "{}" });
+  state = hydrateState(await stateRes.json());
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  applyLanguage(state.settings.language);
+  closeDialog(els.connectDialog);
+  els.connectCodeInput.value = "";
+  enterAsConcierge();
+  showToast("Phone linked as the building's concierge.");
+  return true;
+}
+
+async function conciergeSubmitExpense() {
+  const description = els.transactionDescription.value.trim();
+  const { amountUsd, amountLbp } = readFormAmount();
+  if (!description) { showToast("Say what the expense was for"); return; }
+  if (!(amountUsd > 0 || amountLbp > 0)) { showToast("Enter the amount"); return; }
+  setTransactionFormBusy(true);
+  try {
+    const file = selectedInvoiceFile();
+    const uploaded = file ? await uploadPhotoUnder(`concierge/${localDateInput().slice(0, 4)}`, file) : null;
+    await supabaseRequest("rpc/concierge_add_expense", { method: "POST", body: JSON.stringify({ p_entry: {
+      description, date: els.transactionDate.value || localDateInput(), amountUsd: amountLbp > 0 ? 0 : amountUsd, amountLbp,
+      supplier: els.transactionSupplier.value.trim(), expenseCategory: els.transactionExpenseCategory.value.trim(),
+      invoice: els.transactionInvoice.value.trim(), ...(uploaded ? { photoPath: uploaded.storagePath } : {}),
+    } }) });
+    closeDialog(els.transactionDialog);
+    showToast("Expense sent to the owner");
+    syncFromSheet({ silent: true });
+  } catch (error) {
+    showToast(error instanceof TypeError ? "Can't reach the cloud. Check your connection." : describeSyncProblem(error), 6000);
+  } finally {
+    setTransactionFormBusy(false);
+  }
+}
+
+async function conciergeSaveReadings(month, readings) {
+  const lines = {};
+  Object.entries(readings).forEach(([id, r]) => {
+    lines[id] = { previousReading: r.previousReading, currentReading: r.currentReading, breakerAmps: r.breakerAmps, ...(r.photo?.storagePath ? { photoPath: r.photo.storagePath } : {}) };
+  });
+  try {
+    await supabaseRequest("rpc/concierge_save_readings", { method: "POST", body: JSON.stringify({ p_month: month, p_lines: lines }) });
+    closeDialog(els.generatorBillDialog);
+    showToast("Readings sent to the owner");
+    syncFromSheet({ silent: true });
+  } catch (error) {
+    showToast(describeSyncProblem(error), 6000);
+  }
+}
+
+function conciergeHomePanel() {
+  const mine = state.transactions.filter((t) => t.enteredBy === "concierge")
+    .sort((a, b) => String(transactionDateValue(b)).localeCompare(String(transactionDateValue(a)))).slice(0, 8);
+  const openIssues = (state.issues || []).filter((i) => i.status !== "fixed").length;
+  const tile = (label, sub, onClick) => {
+    const b = mk("button", { type: "button", className: "concierge-tile" }, mk("strong", { text: label }), mk("span", { text: sub }));
+    b.addEventListener("click", onClick);
+    return b;
+  };
+  return mk("section", { id: "conciergeHome", className: "panel concierge-home" },
+    mk("div", { className: "panel-header" }, mk("h3", { text: tr("Concierge") })),
+    mk("div", { className: "concierge-tiles" },
+      tile(tr("Add an expense"), tr("With a photo of the invoice"), () => openEntryForm("Expenses")),
+      tile(tr("Meter readings"), tr("Generator, this month"), () => openGeneratorReadingsDialog(currentMonthValue())),
+      tile(tr("Report a problem"), tr("With a photo"), () => openIssueDialog()),
+      tile(tr("Problems"), tr("{n} open", { n: openIssues }), () => setView("issuesView"))),
+    mine.length ? mk("h4", { className: "tenant-page-heading", text: tr("Added by you") }) : null,
+    mine.length ? mk("div", {}, mine.map((t) => breakdownRow(t.description || tr(t.category), formatUsd(txUsd(t, t.debitUsd, t.debitLbp)), formatDateLabel(transactionDateValue(t))))) : null,
+    mk("div", { className: "button-row" }, mk("button", { type: "button", className: "text-link-btn", text: tr("Unlink this phone"), onclick: unlinkTenantPhone })));
+}
+
+function renderConciergeHome() {
+  document.querySelector("#conciergeHome")?.remove();
+  if (sessionMode !== "concierge" || !els.attentionPanel) return;
+  const title = document.querySelector("#dashboardTitle");
+  if (title) title.textContent = state.building?.name || tr("Concierge");
+  els.attentionPanel.before(conciergeHomePanel());
+  const extras = [emergencyCard(), generatorScheduleCard()].filter(Boolean);
+  if (extras.length) document.querySelector("#conciergeHome").append(...extras);
+}
+
+// ── Emergency numbers ───────────────────────────────────────────────────────
+function emergencyContacts() {
+  return (state.settings.emergencyContacts || []).filter((c) => c && (c.label || c.phone));
+}
+
+function emergencyCard() {
+  const list = emergencyContacts();
+  if (!list.length) return null;
+  return mk("article", { className: "notice-card emergency-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Emergency numbers") })),
+    mk("div", {}, list.map((c) => mk("div", { className: "breakdown-row" },
+      mk("span", {}, mk("strong", { text: c.label || "" }), mk("small", { text: c.phone || "" })),
+      c.phone ? mk("a", { className: "mini-button", href: `tel:${String(c.phone).replace(/[^\d+]/g, "")}`, text: tr("Call") }) : null))));
+}
+
+function renderEmergencyOnMore() {
+  document.querySelector("#emergencyMore")?.remove();
+  const card = emergencyCard();
+  const anchor = document.querySelector("#displayPanel");
+  if (!card || !anchor) return;
+  card.id = "emergencyMore";
+  anchor.before(card);
+}
+
+function emergencyEditor() {
+  const rows = mk("div", { id: "emergencyRows", className: "emergency-rows" });
+  const addRow = (c = {}) => {
+    const label = textInput(c.label || "", { placeholder: tr("e.g. Plumber"), maxlength: "60", className: "em-label" });
+    const phone = mk("input", { type: "tel", value: c.phone || "", placeholder: "70 000 000", maxlength: "30", className: "em-phone" });
+    const remove = miniButton("×", () => { row.remove(); if (rows.parentElement) rows.parentElement.dataset.dirty = "1"; }, "danger-mini");
+    const row = mk("div", { className: "emergency-row" }, label, phone, remove);
+    rows.append(row);
+  };
+  (state.settings.emergencyContacts || []).forEach(addRow);
+  if (!rows.childElementCount) addRow();
+  return mk("div", { id: "emergencyEditor", oninput: (e) => { e.currentTarget.dataset.dirty = "1"; } },
+    mk("p", { className: "settings-section-header", text: tr("Emergency numbers") }),
+    note(tr("Shown to tenants and the concierge with a Call button.")),
+    rows,
+    mk("div", { className: "button-row" }, secondaryButton(tr("+ Add a number"), () => { addRow(); document.querySelector("#emergencyEditor").dataset.dirty = "1"; })));
+}
+
+// Shows the saved numbers (they can arrive from the cloud after Settings first drew), unless the owner is editing.
+function renderEmergencyEditor() {
+  const anchor = document.querySelector("#v165SettingsFields");
+  const current = document.querySelector("#emergencyEditor");
+  if (current?.dataset.dirty) return;
+  if (current) current.replaceWith(emergencyEditor());
+  else if (anchor) anchor.after(emergencyEditor());
+}
+
+function readEmergencyEditor() {
+  const rows = [...document.querySelectorAll("#emergencyRows .emergency-row")];
+  if (!rows.length && !document.querySelector("#emergencyRows")) return;
+  state.settings.emergencyContacts = rows
+    .map((r) => ({ label: r.querySelector(".em-label").value.trim(), phone: r.querySelector(".em-phone").value.trim() }))
+    .filter((c) => c.label || c.phone)
+    .slice(0, 12);
+  delete document.querySelector("#emergencyEditor").dataset.dirty;
+}
+
+// ── Resident directory (opt-in) ─────────────────────────────────────────────
+function directoryCard() {
+  if (sessionMode !== "tenant" || !isTenantSession()) return null;
+  const me = state.tenants.find((t) => t.id === sessionTenantId);
+  const sharing = Boolean(me?.directory);
+  const toggle = async (share) => {
+    try {
+      await supabaseRequest("rpc/set_directory_optin", { method: "POST", body: JSON.stringify({ p_share: share }) });
+      showToast(share ? "Your contact is shared with the neighbours who share theirs" : "You no longer share your contact");
+      syncFromSheet({ silent: true });
+    } catch (error) {
+      showToast(describeSyncProblem(error), 6000);
+    }
+  };
+  if (!sharing) {
+    return mk("article", { className: "notice-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: tr("Neighbours") })),
+      mk("p", { className: "notice-body", text: tr("Share your name, flat and phone with the neighbours who share theirs. Only they see it, and you can stop any time.") }),
+      mk("div", { className: "button-row" }, primaryButton(tr("Share my contact"), () => { void toggle(true); })));
+  }
+  const list = Array.isArray(state.directory) ? state.directory : [];
+  return mk("article", { className: "notice-card" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Neighbours") }), miniButton(tr("Stop sharing"), () => { void toggle(false); })),
+    list.length
+      ? mk("div", {}, list.map((n) => mk("div", { className: "breakdown-row" },
+        mk("span", {}, mk("strong", { text: n.name || "" }), mk("small", { text: tr("Unit {unit}", { unit: n.unit || "" }) })),
+        n.phone ? mk("a", { className: "mini-button", href: whatsappLink(n.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }) : null)))
+      : mk("p", { className: "notice-body", text: tr("No neighbour shares their contact yet.") }));
+}
+
+// ── Problems: conversations and work orders ─────────────────────────────────
+function canReplyIssue(issue) {
+  if (sessionMode === "owner") return !isViewerSession();
+  if (sessionMode === "concierge") return true;
+  return sessionMode === "tenant" && isTenantSession() && issue.tenantId === sessionTenantId;
+}
+
+function messageAuthor(m, issue) {
+  if (m.by === "owner") return tr("Owner");
+  if (m.by === "concierge") return tr("Concierge");
+  return issue.tenantId ? tenantName(issue.tenantId) || tr("Tenant") : tr("Tenant");
+}
+
+function issueThread(issue) {
+  const messages = issue.messages || [];
+  const wo = issue.workOrder;
+  if (!messages.length && !wo) return null;
+  return mk("div", { className: "issue-thread" },
+    wo ? mk("p", { className: "work-order-line", text: [tr("Work order"), wo.supplier, wo.when ? formatDateLabel(wo.when) : "", wo.costUsd ? formatUsd(wo.costUsd) : "", wo.expenseId ? tr("bill recorded") : ""].filter(Boolean).join(" · ") }) : null,
+    ...messages.slice(-4).map((m) => mk("div", { className: `issue-msg by-${m.by}` },
+      mk("small", { text: `${messageAuthor(m, issue)} · ${formatDateLabel(String(m.at || "").slice(0, 10))}` }),
+      m.text ? mk("p", { text: m.text }) : null,
+      m.photo?.storagePath ? miniButton(tr("Photo"), () => openInvoicePhoto(m.photo)) : null)),
+    messages.length > 4 ? mk("small", { className: "settings-note", text: tr("{n} earlier messages", { n: messages.length - 4 }) }) : null);
+}
+
+function openIssueReply(issueId) {
+  const issue = (state.issues || []).find((i) => i.id === issueId);
+  if (!issue || !canReplyIssue(issue)) return;
+  const text = mk("textarea", { rows: "3", maxlength: "1000", placeholder: tr("Write a reply") });
+  const photo = mk("input", { type: "file", accept: "image/*" });
+  const send = primaryButton(tr("Send"), async () => {
+    const value = text.value.trim();
+    const file = photo.files?.[0] || null;
+    if (!value && !file) { showToast("Write a message"); return; }
+    send.disabled = true;
+    try {
+      if (sessionMode === "owner") {
+        const uploaded = file && hasCloudConfig() && authSession ? await uploadPhotoUnder("issues/building", file) : null;
+        const now = new Date().toISOString();
+        issue.messages = [...(issue.messages || []), { id: newId("msg"), by: "owner", text: value, at: now, ...(uploaded ? { photo: uploaded } : {}) }];
+        issue.updatedAt = now;
+        if (!saveState()) return;
+        if (issue.tenantId) notifyTenants(issue.tenantId, tr("Reply: {title}", { title: issue.title }), value || tr("Photo"));
+        renderAll();
+      } else {
+        const prefix = sessionMode === "concierge" ? "concierge/issues" : `issues/${sessionTenantId}`;
+        const uploaded = file ? await uploadPhotoUnder(prefix, file) : null;
+        await supabaseRequest("rpc/reply_issue", { method: "POST", body: JSON.stringify({ p_issue_id: issue.id, p_text: value, ...(uploaded ? { p_photo_path: uploaded.storagePath } : {}) }) });
+        // Show it straight away; the next load brings the server's copy.
+        issue.messages = [...(issue.messages || []), { id: newId("msg"), by: sessionMode, text: value, at: new Date().toISOString(), ...(uploaded ? { photo: uploaded } : {}) }];
+        renderAll();
+        syncFromSheet({ silent: true });
+      }
+      closeToolDialog();
+      showToast("Reply sent");
+    } catch (error) {
+      showToast(error instanceof TypeError ? "Can't reach the cloud. Check your connection." : describeSyncProblem(error), 6000);
+    } finally {
+      send.disabled = false;
+    }
+  });
+  openToolDialog(issue.title, issueThread(issue), field(tr("Reply"), text), field(tr("Photo (optional)"), photo),
+    mk("div", { className: "button-row" }, send, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openWorkOrderDialog(issueId) {
+  const issue = (state.issues || []).find((i) => i.id === issueId);
+  if (!issue || sessionMode !== "owner") return;
+  const wo = issue.workOrder || {};
+  const supplier = textInput(wo.supplier || "", { list: "supplierList", placeholder: tr("Who does the work") });
+  const when = mk("input", { type: "date", value: wo.when || "" });
+  const cost = numberInput(wo.costUsd || "");
+  const before = mk("input", { type: "file", accept: "image/*" });
+  const after = mk("input", { type: "file", accept: "image/*" });
+  const asExpense = checkboxRow(tr("Record the bill as an expense and mark the problem fixed"), !wo.expenseId);
+  const save = async () => {
+    const amount = roundUsd(Number(cost.value || 0));
+    try {
+      const upload = async (input) => (input.files?.[0] && hasCloudConfig() && authSession ? uploadPhotoUnder("workorders", input.files[0]) : null);
+      const beforePhoto = await upload(before);
+      const afterPhoto = await upload(after);
+      issue.workOrder = {
+        ...wo, supplier: supplier.value.trim(), when: when.value || "", costUsd: amount,
+        ...(beforePhoto ? { beforePhoto } : {}), ...(afterPhoto ? { afterPhoto } : {}),
+      };
+      if (asExpense.input.checked && amount > 0 && !wo.expenseId) {
+        const day = localDateInput();
+        if (isMonthClosed(day)) { showToast(closedMonthError(day).message, 5000); return; }
+        const shares = computeSharedExpenseShares(amount, "coefficient", day);
+        const id = newId("tx");
+        state.transactions.push({
+          id, category: "Expenses", description: issue.title, tenantId: null, forMonth: null, project: "", date: day,
+          supplier: issue.workOrder.supplier, invoice: "", expenseCategory: tr("Repairs"), serviceType: "", servicePart: "",
+          debitUsd: amount, debitLbp: 0, creditUsd: 0, creditLbp: 0, balanceUsd: -amount, balanceLbp: 0,
+          invoiceAttachment: afterPhoto || null, sourceRow: null, shares: Object.keys(shares).length ? shares : null, paidFrom: "cash", issueId: issue.id,
+        });
+        issue.workOrder.expenseId = id;
+        issue.status = "fixed";
+      }
+      issue.updatedAt = new Date().toISOString();
+      if (!saveState()) return;
+      if (issue.tenantId && issue.status === "fixed") notifyTenants(issue.tenantId, tr("Problem update: {title}", { title: issue.title }), tr("Fixed"));
+      closeToolDialog();
+      renderAll();
+      showToast("Work order saved");
+    } catch (error) {
+      showToast(describeSyncProblem(error), 6000);
+    }
+  };
+  openToolDialog(tr("Work order — {title}", { title: issue.title }),
+    field(tr("Supplier"), supplier), field(tr("Date"), when), field(tr("Cost (USD)"), cost),
+    field(tr("Photo before"), before), field(tr("Photo after"), after),
+    wo.beforePhoto ? miniButton(tr("See the before photo"), () => openInvoicePhoto(wo.beforePhoto)) : null,
+    wo.afterPhoto ? miniButton(tr("See the after photo"), () => openInvoicePhoto(wo.afterPhoto)) : null,
+    wo.expenseId ? note(tr("The bill is already in the ledger.")) : asExpense.row,
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), () => { void save(); }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// Adds the thread and the Reply / Work order buttons to the rendered cards.
+function decorateIssueCards() {
+  if (!els.issuesList) return;
+  const cards = [...els.issuesList.querySelectorAll(".issue-card")];
+  const order = { open: 0, in_progress: 1, fixed: 2 };
+  const issues = (state.issues || []).slice().sort((a, b) => (order[a.status] ?? 0) - (order[b.status] ?? 0) || String(b.createdAt).localeCompare(String(a.createdAt)));
+  cards.forEach((card, i) => {
+    const issue = issues[i];
+    if (!issue || card.dataset.decorated) return;
+    card.dataset.decorated = "1";
+    const thread = issueThread(issue);
+    let actions = card.querySelector(".notice-actions");
+    if (thread) card.insertBefore(thread, actions || null);
+    if (!actions) { actions = mk("div", { className: "notice-actions" }); card.append(actions); }
+    if (canReplyIssue(issue)) actions.prepend(miniButton(tr("Reply"), () => openIssueReply(issue.id)));
+    if (sessionMode === "owner" && !isViewerSession()) actions.append(miniButton(tr("Work order"), () => openWorkOrderDialog(issue.id)));
+  });
+}
+
+// ── Quotes for a project, put to a vote ─────────────────────────────────────
+function openQuoteDialog(projectId) {
+  const project = (state.buildingProjects || []).find((p) => p.id === projectId);
+  if (!project || sessionMode !== "owner") return;
+  const supplier = textInput("", { list: "supplierList", placeholder: tr("Company or person") });
+  const amount = numberInput("");
+  const notes = mk("textarea", { rows: "2", maxlength: "300", placeholder: tr("What's included, delay, warranty") });
+  const photo = mk("input", { type: "file", accept: "image/*" });
+  const save = async () => {
+    if (!supplier.value.trim() || !(Number(amount.value) > 0)) { showToast("Enter who and how much"); return; }
+    try {
+      const uploaded = photo.files?.[0] && hasCloudConfig() && authSession ? await uploadPhotoUnder("quotes", photo.files[0]) : null;
+      project.quotes = [...(project.quotes || []), { id: newId("q"), supplier: supplier.value.trim(), amountUsd: roundUsd(Number(amount.value)), notes: notes.value.trim(), ...(uploaded ? { photo: uploaded } : {}) }];
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+    } catch (error) {
+      showToast(describeSyncProblem(error), 6000);
+    }
+  };
+  openToolDialog(tr("Add a quote — {name}", { name: project.name }),
+    field(tr("Supplier"), supplier), field(tr("Amount (USD)"), amount), field(tr("Notes"), notes), field(tr("Photo of the quote (optional)"), photo),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), () => { void save(); }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function putQuotesToVote(projectId) {
+  const project = (state.buildingProjects || []).find((p) => p.id === projectId);
+  if (!project || (project.quotes || []).length < 2) return;
+  const closes = addDays(localDateInput(), 14);
+  const poll = {
+    id: newId("poll"), title: tr("Choose a quote: {name}", { name: project.name }), description: project.description || "",
+    createdBy: "owner", createdAt: new Date().toISOString(), status: "open", votes: {}, weighting: "share", closesOn: closes,
+    options: project.quotes.map((q) => ({ id: q.id, label: `${q.supplier} — ${formatUsd(q.amountUsd)}` })), projectId: project.id,
+  };
+  (state.polls ||= []).push(poll);
+  project.pollId = poll.id;
+  if (!saveState()) return;
+  notifyTenants(null, tr("New vote: {title}", { title: poll.title }), tr("Votes close {date}", { date: formatDateLabel(closes) }));
+  renderAll();
+  showToast(tr("Vote open until {date}", { date: formatDateLabel(closes) }));
+}
+
+function decorateProjectCards() {
+  document.querySelectorAll(".project-card[data-project-id]").forEach((card) => {
+    if (card.querySelector(".quotes-block")) return;
+    const project = (state.buildingProjects || []).find((p) => p.id === card.dataset.projectId);
+    if (!project) return;
+    const quotes = project.quotes || [];
+    const owner = sessionMode === "owner" && !isViewerSession();
+    if (!quotes.length && !owner) return;
+    const cheapest = quotes.length ? Math.min(...quotes.map((q) => q.amountUsd)) : 0;
+    const poll = project.pollId ? (state.polls || []).find((p) => p.id === project.pollId) : null;
+    const block = mk("div", { className: "quotes-block" },
+      mk("strong", { text: tr("Quotes") }),
+      ...quotes.map((q) => mk("div", { className: `quote-row${q.amountUsd === cheapest && quotes.length > 1 ? " is-cheapest" : ""}` },
+        mk("span", {}, mk("strong", { text: q.supplier }), q.notes ? mk("small", { text: q.notes }) : null),
+        mk("b", { className: "tnum", text: formatUsd(q.amountUsd) }),
+        q.photo ? miniButton(tr("Photo"), () => openInvoicePhoto(q.photo)) : null)),
+      poll ? mk("small", { className: "settings-note", text: pollIsOpen(poll) ? tr("Vote open until {date}", { date: formatDateLabel(poll.closesOn) }) : pollResultLine(poll) }) : null,
+      owner ? mk("div", { className: "button-row" },
+        secondaryButton(tr("+ Add a quote"), () => openQuoteDialog(project.id)),
+        quotes.length >= 2 && !poll ? primaryButton(tr("Put to a vote"), () => putQuotesToVote(project.id)) : null) : null);
+    card.append(block);
+  });
+}
+
+// Choice polls (from quotes): tally per option.
+function optionTally(poll) {
+  const options = poll.options || [];
+  const counts = poll.voteCounts;
+  const active = state.tenants.filter((t) => t.active !== false);
+  const share = poll.weighting === "share";
+  const weight = (id) => (share ? Number(active.find((t) => t.id === id)?.coefficient || 0) : 1);
+  const rows = options.map((o) => {
+    let value;
+    if (counts && (counts.optionShares || counts.optionCounts)) value = Number((share ? counts.optionShares : counts.optionCounts)?.[o.id] || 0);
+    else value = Object.entries(poll.votes || {}).filter(([id, v]) => v === o.id && id !== "owner").reduce((s, [id]) => s + weight(id), 0);
+    return { ...o, value };
+  });
+  const total = share
+    ? (counts?.totalShare !== undefined ? Number(counts.totalShare) : active.reduce((s, t) => s + Number(t.coefficient || 0), 0))
+    : (counts?.units !== undefined ? Number(counts.units) : active.length);
+  return { rows, total, share };
+}
+
+function buildOptionPollCard(poll) {
+  const t = optionTally(poll);
+  const isOpen = pollIsOpen(poll);
+  const myId = sessionMode === "owner" ? "owner" : sessionTenantId;
+  const myVote = (poll.votes || {})[myId];
+  const card = mk("article", { className: "poll-card" },
+    mk("div", { className: "poll-card-header" }, mk("h3", { className: "poll-card-title", text: poll.title }),
+      mk("span", { className: `poll-status-badge ${isOpen ? "open" : "closed"}`, text: isOpen ? tr("Open") : tr("Closed") })),
+    poll.closesOn ? mk("p", { className: "poll-meta", text: isOpen ? tr("Voting closes {date}", { date: formatDateLabel(poll.closesOn) }) : tr("Voting closed {date}", { date: formatDateLabel(poll.closesOn) }) }) : null,
+    mk("div", { className: "option-bars" }, t.rows.map((r) => {
+      const pct = t.total > 0 ? Math.round((r.value / t.total) * 100) : 0;
+      return mk("div", { className: "option-row" },
+        mk("div", { className: "option-head" }, mk("span", { text: r.label }), mk("b", { text: t.share ? `${r.value}/${t.total}` : String(r.value) })),
+        mk("div", { className: "mh-bar" }, mk("span", { className: "mh-bar-fill is-done", style: `width:${pct}%` })),
+        isOpen && myId && !(t.share && myId === "owner")
+          ? mk("button", { type: "button", className: `vote-btn${myVote === r.id ? " selected" : ""}`, text: myVote === r.id ? tr("✓ My choice") : tr("Choose"), dataset: { pollId: poll.id, vote: r.id } })
+          : null);
+    })),
+    !isOpen ? mk("p", { className: "poll-meta", text: pollResultLine(poll) }) : null);
+  if (sessionMode === "owner" && !isViewerSession()) {
+    card.append(mk("div", { className: "poll-actions-row" },
+      isOpen ? mk("button", { type: "button", className: "secondary-button poll-close-btn", text: tr("Close Poll"), dataset: { pollId: poll.id } }) : null,
+      mk("button", { type: "button", className: "danger-button poll-delete-btn", text: tr("Delete"), dataset: { pollId: poll.id } })));
+  }
+  return card;
+}
+
+// ── Building equipment ──────────────────────────────────────────────────────
+function equipmentWarrantyStatus(item, today = localDateInput()) {
+  if (!item.warrantyUntil) return null;
+  if (item.warrantyUntil < today) return "expired";
+  return item.warrantyUntil <= addDays(today, 60) ? "soon" : "ok";
+}
+
+function renderEquipment() {
+  const list = document.querySelector("#equipmentList");
+  if (!list) return;
+  const button = document.querySelector("#newEquipmentButton");
+  if (button) button.classList.toggle("hidden", sessionMode !== "owner" || isViewerSession());
+  const items = (state.equipment || []).slice().sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  if (!items.length) {
+    list.replaceChildren(mk("div", { className: "empty-state", text: tr("No equipment yet. Add the pump, the lift, the generator… with their warranty dates.") }));
+    return;
+  }
+  list.replaceChildren(...items.map((item) => {
+    const w = equipmentWarrantyStatus(item);
+    const last = (item.history || []).at(-1);
+    return mk("article", { className: "notice-card" },
+      mk("div", { className: "notice-head" }, mk("strong", { text: item.name }),
+        w ? mk("span", { className: `status-pill ${w === "ok" ? "status-paid" : "status-due"}`, text: w === "expired" ? tr("Warranty over") : w === "soon" ? tr("Warranty ends soon") : tr("Under warranty") }) : null),
+      mk("p", { className: "notice-body", text: [item.location, item.installedOn ? tr("Installed {date}", { date: formatDateLabel(item.installedOn) }) : "", item.warrantyUntil ? tr("Warranty until {date}", { date: formatDateLabel(item.warrantyUntil) }) : "", item.supplier].filter(Boolean).join(" · ") }),
+      item.notes ? mk("p", { className: "notice-body", text: item.notes }) : null,
+      last ? mk("p", { className: "notice-until", text: tr("Last service {date}: {note}", { date: formatDateLabel(last.date), note: last.note || formatUsd(last.costUsd || 0) }) }) : null,
+      sessionMode === "owner" && !isViewerSession() ? mk("div", { className: "notice-actions" },
+        miniButton(tr("Log service"), () => openEquipmentServiceDialog(item.id)),
+        miniButton(tr("Edit"), () => openEquipmentDialog(item.id)),
+        miniButton(tr("Delete"), () => deleteEquipment(item.id), "danger-mini")) : null);
+  }));
+}
+
+function openEquipmentDialog(id = null) {
+  const item = id ? (state.equipment || []).find((e) => e.id === id) : null;
+  const name = textInput(item?.name || "", { placeholder: tr("Water pump"), maxlength: "80" });
+  const location = textInput(item?.location || "", { placeholder: tr("Basement"), maxlength: "80" });
+  const installed = mk("input", { type: "date", value: item?.installedOn || "" });
+  const warranty = mk("input", { type: "date", value: item?.warrantyUntil || "" });
+  const supplier = textInput(item?.supplier || "", { list: "supplierList", maxlength: "80" });
+  const notes = mk("textarea", { rows: "2", maxlength: "500" });
+  notes.value = item?.notes || "";
+  const save = () => {
+    if (!name.value.trim()) { showToast("Give it a name"); return; }
+    const fields = { name: name.value.trim(), location: location.value.trim(), installedOn: installed.value || "", warrantyUntil: warranty.value || "", supplier: supplier.value.trim(), notes: notes.value.trim(), updatedAt: new Date().toISOString() };
+    if (item) Object.assign(item, fields); else (state.equipment ||= []).push({ id: newId("eq"), history: [], ...fields });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+  };
+  openToolDialog(item ? tr("Edit equipment") : tr("New equipment"),
+    field(tr("Name"), name), field(tr("Where"), location), field(tr("Installed on"), installed), field(tr("Warranty until"), warranty),
+    field(tr("Supplier"), supplier), field(tr("Notes"), notes),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openEquipmentServiceDialog(id) {
+  const item = (state.equipment || []).find((e) => e.id === id);
+  if (!item) return;
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const cost = numberInput("");
+  const memo = textInput("", { placeholder: tr("e.g. Replaced the pressure switch"), maxlength: "200" });
+  openToolDialog(tr("Service — {name}", { name: item.name }),
+    field(tr("Date"), date), field(tr("Cost (USD, optional)"), cost), field(tr("What was done"), memo),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), () => {
+      item.history = [...(item.history || []), { date: date.value || localDateInput(), costUsd: roundUsd(Number(cost.value || 0)), note: memo.value.trim() }].slice(-40);
+      item.updatedAt = new Date().toISOString();
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+    }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function deleteEquipment(id) {
+  if (!window.confirm(tr("Delete this equipment?"))) return;
+  state.equipment = (state.equipment || []).filter((e) => e.id !== id);
+  recordDeletedId("equipment", id);
+  if (!saveState()) return;
+  renderAll();
+}
+
+// ── Diesel in the tank (estimate) ───────────────────────────────────────────
+function dieselEstimate(today = localDateInput()) {
+  const checks = (state.dieselChecks || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const last = checks.at(-1);
+  const purchases = state.transactions
+    .filter((t) => t.category === "Services Expenses" && t.serviceType === "generator" && t.servicePart !== "maintenance" && Number(t.litres || 0) > 0)
+    .map((t) => ({ date: String(transactionDateValue(t)), litres: Number(t.litres) }));
+  const from90 = addDays(today, -90);
+  const recent = purchases.filter((p) => p.date > from90 && p.date <= today);
+  const perDay = recent.length >= 2 ? recent.reduce((s, p) => s + p.litres, 0) / 90 : null;
+  if (!last) return { ready: false, perDay };
+  const bought = purchases.filter((p) => p.date > last.date && p.date <= today).reduce((s, p) => s + p.litres, 0);
+  const days = Math.max(0, Math.round((Date.parse(today) - Date.parse(last.date)) / 86400000));
+  const capacity = Number(state.settings.dieselTankLitres || 0);
+  let litres = Number(last.litres) + bought - (perDay ? perDay * days : 0);
+  litres = Math.max(0, capacity > 0 ? Math.min(capacity, litres) : litres);
+  const reorder = Number(state.settings.dieselReorderLitres || 0);
+  return { ready: true, litres: Math.round(litres), perDay, daysLeft: perDay ? Math.floor(litres / perDay) : null, low: reorder > 0 && litres <= reorder, lastCheck: last, capacity, reorder };
+}
+
+function openDieselCheckDialog() {
+  const litres = numberInput("", { step: "1" });
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const capacity = numberInput(state.settings.dieselTankLitres || "", { step: "1" });
+  const reorder = numberInput(state.settings.dieselReorderLitres || "", { step: "1" });
+  openToolDialog(tr("Diesel in the tank"),
+    note(tr("Measure the tank once in a while. The app then estimates what's left from purchases and recent use.")),
+    field(tr("Litres in the tank now"), litres), field(tr("Date"), date),
+    field(tr("Tank size (litres, optional)"), capacity), field(tr("Remind me below (litres)"), reorder),
+    mk("div", { className: "button-row" }, primaryButton(tr("Save"), () => {
+      if (litres.value !== "") (state.dieselChecks ||= []).push({ id: newId("dsl"), date: date.value || localDateInput(), litres: Math.round(Number(litres.value)), updatedAt: new Date().toISOString() });
+      state.settings.dieselTankLitres = Math.round(Number(capacity.value || 0)) || 0;
+      state.settings.dieselReorderLitres = Math.round(Number(reorder.value || 0)) || 0;
+      if (!saveState()) return;
+      closeToolDialog();
+      renderAll();
+    }), secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function dieselCard() {
+  const generatorUsed = state.transactions.some((t) => t.serviceType === "generator");
+  if (!generatorUsed || sessionMode !== "owner") return null;
+  const d = dieselEstimate();
+  return mk("article", { className: "notice-card", id: "dieselCard" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Diesel in the tank") }), miniButton(tr("Measure"), openDieselCheckDialog)),
+    d.ready
+      ? mk("p", { className: `notice-body${d.low ? " is-low" : ""}`, text: [
+        tr("About {n} litres", { n: numberFormat.format(d.litres) }),
+        d.daysLeft !== null ? tr("enough for about {n} days", { n: d.daysLeft }) : "",
+        tr("measured {date}", { date: formatDateLabel(d.lastCheck.date) }),
+      ].filter(Boolean).join(" · ") })
+      : mk("p", { className: "notice-body", text: tr("Measure the tank once to start the estimate.") }));
+}
+
+// ── Water deliveries ────────────────────────────────────────────────────────
+function waterDeliveries() {
+  const rows = state.transactions
+    .filter((t) => t.category === "Services Expenses" && t.serviceType === "water")
+    .map((t) => ({ date: String(transactionDateValue(t)), litres: Number(t.litres || 0), usd: roundUsd(txUsd(t, t.debitUsd, t.debitLbp)) }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const gaps = rows.slice(1).map((r, i) => (Date.parse(r.date) - Date.parse(rows[i].date)) / 86400000).filter((g) => g >= 0);
+  const avgGap = gaps.length ? Math.round(gaps.reduce((s, g) => s + g, 0) / gaps.length) : null;
+  const withLitres = rows.filter((r) => r.litres > 0);
+  const per1000 = withLitres.length ? roundUsd(withLitres.reduce((s, r) => s + r.usd, 0) / (withLitres.reduce((s, r) => s + r.litres, 0) / 1000)) : null;
+  return { rows, avgGap, per1000 };
+}
+
+function waterCard() {
+  const w = waterDeliveries();
+  if (!w.rows.length || sessionMode !== "owner") return null;
+  return mk("article", { className: "notice-card", id: "waterCard" },
+    mk("div", { className: "notice-head" }, mk("strong", { text: tr("Water deliveries") })),
+    mk("p", { className: "notice-body", text: [
+      w.avgGap !== null ? tr("About every {n} days", { n: w.avgGap }) : "",
+      w.per1000 !== null ? tr("{amount} per 1,000 litres", { amount: formatUsd(w.per1000) }) : "",
+    ].filter(Boolean).join(" · ") || tr("Add the litres when you record a delivery to see the price per 1,000 litres.") }),
+    mk("div", {}, w.rows.slice(-5).reverse().map((r) => breakdownRow(formatDateLabel(r.date), formatUsd(r.usd), r.litres ? tr("{n} litres", { n: numberFormat.format(r.litres) }) : ""))));
+}
+
+function renderServicesExtras() {
+  const view = document.querySelector("#servicesView");
+  if (!view) return;
+  ["#dieselCard", "#waterCard"].forEach((sel) => document.querySelector(sel)?.remove());
+  const anchor = document.querySelector("#generatorScheduleNote") || view.querySelector(".section-title");
+  const cards = [waterCard(), dieselCard()].filter(Boolean);
+  cards.forEach((card) => anchor.after(card));
+}
+
+function ensureWaterLitresField() {
+  const wrap = document.querySelector(".litres-wrap");
+  if (!wrap || document.querySelector("#waterLitresWrap")) return;
+  const input = mk("input", { id: "transactionWaterLitres", type: "number", min: "0", step: "100", inputmode: "decimal" });
+  wrap.after(mk("label", { id: "waterLitresWrap", className: "hidden" }, mk("span", { text: tr("Litres of water delivered (optional)") }), input));
+}
+
+function syncWaterLitresField() {
+  ensureWaterLitresField();
+  const show = els.transactionCategory.value === "Services Expenses" && els.transactionService?.value === "water";
+  document.querySelector("#waterLitresWrap")?.classList.toggle("hidden", !show);
+  if (!show) { const i = document.querySelector("#transactionWaterLitres"); if (i) i.value = ""; }
+}
+
+// ── Notices: seen by, scheduled ─────────────────────────────────────────────
+const noticesMarkedSeen = new Set();
+function markNoticesSeen(notices) {
+  if (sessionMode !== "tenant" || !isTenantSession()) return;
+  notices.filter((n) => n.seenByMe === false && !noticesMarkedSeen.has(n.id)).forEach((n) => {
+    noticesMarkedSeen.add(n.id);
+    n.seenByMe = true;
+    supabaseRequest("rpc/mark_notice_seen", { method: "POST", body: JSON.stringify({ p_notice_id: n.id }) }).catch(() => noticesMarkedSeen.delete(n.id));
+  });
+}
+
+function noticeIsScheduled(n, now = new Date()) {
+  return Boolean(n.publishAt) && Date.parse(n.publishAt) > now.getTime();
+}
+
+function decorateNoticeCards() {
+  const list = els.noticesList;
+  if (!list) return;
+  const all = (state.announcements || []).slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const cards = [...list.querySelectorAll(".notice-card")];
+  if (sessionMode === "tenant") { markNoticesSeen(all); return; }
+  if (sessionMode !== "owner") return;
+  const linked = Object.values(tenantLinkInfo || {}).filter((i) => i?.phones).length;
+  cards.forEach((card, i) => {
+    const n = all[i];
+    if (!n || card.dataset.decorated) return;
+    card.dataset.decorated = "1";
+    const head = card.querySelector(".notice-head");
+    if (noticeIsScheduled(n)) head?.after(mk("p", { className: "notice-scheduled" }, mk("span", { className: "status-pill status-due", text: tr("Scheduled {date}", { date: formatDateLabel(String(n.publishAt).slice(0, 10)) }) })));
+    else if (linked) card.append(mk("p", { className: "notice-until", text: tr("Seen by {n} of {m} linked phones", { n: (n.seenBy || []).length, m: linked }) }));
+  });
+}
+
+// ── Monthly newsletter picture ──────────────────────────────────────────────
+function newsletterData(month) {
+  const key = monthKey(month);
+  const flow = moneyFlowByMonth(24).find((r) => r.month === key) || { in: 0, out: 0 };
+  const done = [];
+  (state.maintenanceTasks || []).forEach((t) => (t.history || []).forEach((h) => { if (monthKey(h.date) === key) done.push(t.title); }));
+  (state.issues || []).forEach((i) => { if (i.status === "fixed" && monthKey(String(i.updatedAt || "").slice(0, 10)) === key) done.push(i.title); });
+  const next30 = addDays(localDateInput(), 30);
+  const coming = (state.maintenanceTasks || []).filter((t) => t.nextDue && t.nextDue >= localDateInput() && t.nextDue <= next30).map((t) => `${t.title} — ${formatDateLabel(t.nextDue)}`);
+  const vote = (state.polls || []).filter((p) => pollIsOpen(p)).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))[0];
+  return { month, in: flow.in, out: flow.out, cash: getPositionTotals().cashUsd, done: done.slice(0, 5), coming: coming.slice(0, 4), vote: vote ? vote.title : "" };
+}
+
+function drawNewsletterCanvas(month) {
+  const d = newsletterData(month);
+  const rtl = currentLang === "ar";
+  const W = 1080;
+  const PAD = 64;
+  const lines = 2 + d.done.length + d.coming.length + (d.vote ? 2 : 0);
+  const H = 760 + lines * 58;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const X = (x) => (rtl ? W - x : x);
+  const text = (value, x, y, size = 30, weight = 400, color = "#14211f", align = "start") => {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.fillText(String(value ?? ""), X(x), y);
+  };
+  const box = (x, y, w, h, color) => { ctx.fillStyle = color; ctx.beginPath(); const left = rtl ? W - x - w : x; if (typeof ctx.roundRect === "function") ctx.roundRect(left, y, w, h, 24); else ctx.rect(left, y, w, h); ctx.fill(); };
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#163832";
+  ctx.fillRect(0, 0, W, 250);
+  text(state.building?.name || "", PAD, 82, 34, 700, "#cfe3db");
+  text(tr("Building news"), PAD, 160, 64, 800, "#ffffff");
+  text(formatMonth(month), PAD, 212, 30, 400, "#cfe3db");
+  const cardW = (W - PAD * 2 - 40) / 3;
+  [[tr("Money in"), d.in, "#1f6b5a"], [tr("Money out"), d.out, "#a23b3b"], [tr("Cash now"), d.cash, "#14211f"]].forEach(([label, value, color], i) => {
+    const x = PAD + i * (cardW + 20);
+    box(x, 300, cardW, 150, "#eef4ef");
+    text(label, x + 28, 352, 26, 600, "#61706b");
+    text(formatUsd(value), x + 28, 420, 44, 800, color);
+  });
+  let y = 530;
+  const section = (title, items) => {
+    if (!items.length) return;
+    text(title, PAD, y, 36, 800);
+    y += 58;
+    items.forEach((item) => { text(`•  ${item}`, PAD, y, 30, 400, "#2a3b37"); y += 54; });
+    y += 20;
+  };
+  section(tr("Works done"), d.done.length ? d.done : [tr("Nothing special this month")]);
+  section(tr("Coming up"), d.coming);
+  if (d.vote) section(tr("Vote open"), [d.vote]);
+  text(tr("Details in the building app"), PAD, H - 50, 24, 400, "#61706b");
+  return canvas;
+}
+
+async function shareNewsletter(month) {
+  const canvas = drawNewsletterCanvas(month);
+  const file = new File([base64ToBytes(canvas.toDataURL("image/png").split(",")[1] || "")], `Newsletter_${monthKey(month)}.png`, { type: "image/png" });
+  try {
+    if (typeof navigator.share === "function" && (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] }))) {
+      await navigator.share({ files: [file], title: tr("Building news") });
+      return;
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(file, "image/png", file.name);
+}
+
+function buildNewsletterSection() {
+  const months = getMonths().slice().reverse().slice(0, 12);
+  const select = selectInput(months.map((m) => [m, formatMonth(m)]), months.includes(getLastCompletedMonth()) ? getLastCompletedMonth() : months[0]);
+  return mk("div", {},
+    note(tr("One picture for the building's WhatsApp group: money in and out, works done, what's coming, any open vote. No one's balance is shown.")),
+    field(tr("Month"), select),
+    mk("div", { className: "button-row" }, primaryButton(tr("Share picture"), () => { void shareNewsletter(select.value); })));
+}
+
+// ── Calendar file (maintenance, due days, warranties, votes) ────────────────
+function icsDate(date) { return String(date).replace(/-/g, ""); }
+function icsEscape(text) { return String(text || "").replace(/[\\;,]/g, (c) => `\\${c}`).replace(/\n/g, "\\n"); }
+
+function buildCalendarIcs(today = localDateInput()) {
+  const events = [];
+  const add = (uid, date, summary, extra = []) => events.push([
+    "BEGIN:VEVENT", `UID:${uid}@building-account`, `DTSTAMP:${icsDate(today)}T000000Z`, `DTSTART;VALUE=DATE:${icsDate(date)}`,
+    `SUMMARY:${icsEscape(summary)}`, ...extra, "END:VEVENT"].join("\r\n"));
+  (state.maintenanceTasks || []).forEach((t) => { if (t.nextDue) add(`mnt-${t.id}`, t.nextDue, t.title); });
+  (state.documents || []).forEach((d) => { if (d.expiresOn) add(`doc-${d.id}`, d.expiresOn, tr("{name} expires", { name: d.title })); });
+  (state.equipment || []).forEach((e) => { if (e.warrantyUntil) add(`eq-${e.id}`, e.warrantyUntil, tr("Warranty ends: {name}", { name: e.name })); });
+  (state.polls || []).forEach((p) => { if (p.closesOn && p.closesOn >= today) add(`poll-${p.id}`, p.closesOn, tr("Vote closes: {title}", { title: p.title })); });
+  const day = Number(state.settings.dueDay || 0);
+  if (day && isFixedMode()) add("dues", monthDueDate(currentMonthValue()) || today, tr("Building dues are due"), [`RRULE:FREQ=MONTHLY;BYMONTHDAY=${Math.min(28, day)}`]);
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Building Account Tracker//EN", "CALSCALE:GREGORIAN", ...events, "END:VCALENDAR", ""].join("\r\n");
+}
+
+function downloadCalendar() {
+  downloadBlob(buildCalendarIcs(), "text/calendar", `${safeFilePart(state.building?.name || "building", "building").toLowerCase()}-calendar.ics`);
+  showToast("Calendar file downloaded — open it to add the dates to your phone");
+}
+
+// ── App lock with fingerprint or face (this phone) ──────────────────────────
+const APP_LOCK_KEY = "building-account-tracker:app-lock";
+let appLockHiddenAt = 0;
+
+function appLockSettings() {
+  try { return JSON.parse(localStorage.getItem(APP_LOCK_KEY) || "null"); } catch { return null; }
+}
+
+const b64url = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const fromB64url = (s) => Uint8Array.from(atob(String(s).replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
+
+async function enableAppLock() {
+  if (!window.PublicKeyCredential || !navigator.credentials?.create) { showToast("This phone can't use a fingerprint or face lock here", 5000); return false; }
+  try {
+    const credential = await navigator.credentials.create({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      rp: { name: "Building Account" },
+      user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "building-account", displayName: state.building?.name || "Building Account" },
+      pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+      authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "discouraged" },
+      timeout: 60000,
+    } });
+    if (!credential) return false;
+    localStorage.setItem(APP_LOCK_KEY, JSON.stringify({ id: b64url(credential.rawId), since: new Date().toISOString() }));
+    showToast("App lock is on for this phone");
+    return true;
+  } catch (error) {
+    showToast(error?.name === "NotAllowedError" ? "App lock not turned on" : tr("Couldn't turn on the lock: {msg}", { msg: error.message || error.name }), 5000);
+    return false;
+  }
+}
+
+function disableAppLock() {
+  try { localStorage.removeItem(APP_LOCK_KEY); } catch { /* */ }
+  document.querySelector("#appLock")?.remove();
+}
+
+function showAppLock() {
+  const lock = appLockSettings();
+  if (!lock || !authSession || document.querySelector("#appLock")) return;
+  const unlock = async () => {
+    try {
+      const ok = await navigator.credentials.get({ publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials: [{ type: "public-key", id: fromB64url(lock.id) }],
+        userVerification: "required",
+        timeout: 60000,
+      } });
+      if (ok) document.querySelector("#appLock")?.remove();
+    } catch {
+      showToast("Not unlocked — try again");
+    }
+  };
+  const overlay = mk("div", { id: "appLock", className: "app-lock", role: "dialog", "aria-modal": "true" },
+    mk("div", { className: "app-lock-box" },
+      mk("strong", { text: state.building?.name || tr("Building Account") }),
+      mk("p", { text: tr("Locked. Use your fingerprint or face to open.") }),
+      primaryButton(tr("Unlock"), () => { void unlock(); }),
+      mk("button", { type: "button", className: "text-link-btn", text: tr("Can't unlock? Sign out"), onclick: () => {
+        if (!window.confirm(tr("Sign out on this phone and turn the lock off? You'll sign in again afterwards."))) return;
+        disableAppLock();
+        saveAuthSession(null);
+        location.reload();
+      } })));
+  document.body.append(overlay);
+  void unlock();
+}
+
+function attachAppLockEvents() {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") appLockHiddenAt = Date.now();
+    else if (appLockHiddenAt && Date.now() - appLockHiddenAt > 5 * 60000) showAppLock();
+  });
+}
+
+function renderAppLockSetting() {
+  const panel = document.querySelector("#displayPanel");
+  if (!panel || panel.querySelector("#appLockRow")) return;
+  const lock = appLockSettings();
+  const button = secondaryButton(lock ? tr("Turn off") : tr("Turn on"), async () => {
+    if (appLockSettings()) disableAppLock(); else await enableAppLock();
+    panel.querySelector("#appLockRow")?.remove();
+    renderAppLockSetting();
+  });
+  panel.append(mk("div", { id: "appLockRow", className: "settings-action" },
+    mk("div", { className: "settings-action-text" }, mk("strong", { text: tr("App lock") }),
+      mk("span", { text: lock ? tr("On — fingerprint or face needed to open") : tr("Ask for your fingerprint or face to open the app") })),
+    button));
+}
+
+// ── Merging what other phones change through the server ─────────────────────
+function mergeAnnouncementsV166(olderArr, newerArr, deletedIds = []) {
+  const map = new Map();
+  [...(olderArr || []), ...(newerArr || [])].forEach((n) => {
+    if (!n?.id) return;
+    const prev = map.get(n.id);
+    if (!prev) { map.set(n.id, n); return; }
+    map.set(n.id, { ...prev, ...n, seenBy: [...new Set([...(prev.seenBy || []), ...(n.seenBy || [])])], pushedAt: n.pushedAt || prev.pushedAt || undefined });
+  });
+  deletedIds.forEach((id) => map.delete(id));
+  return [...map.values()].map((n) => { const out = { ...n }; if (!out.pushedAt) delete out.pushedAt; if (!out.seenBy?.length) delete out.seenBy; return out; });
+}
+
+// Tenants share their contact through the server; keep the latest choice.
+function mergeDirectoryFlags(merged, older, newer) {
+  const byId = new Map([...(older || []), ...(newer || [])].filter((t) => t?.id && t.directoryAt).map((t) => [t.id, t]));
+  [...(older || []), ...(newer || [])].forEach((t) => {
+    if (!t?.directoryAt) return;
+    const cur = byId.get(t.id);
+    if (String(t.directoryAt) > String(cur.directoryAt)) byId.set(t.id, t);
+  });
+  return (merged || []).map((t) => {
+    const latest = byId.get(t.id);
+    return latest ? { ...t, directory: latest.directory, directoryAt: latest.directoryAt } : t;
+  });
+}
+
+function attachV166Events() {
+  attachAppLockEvents();
+  document.querySelector("#newEquipmentButton")?.addEventListener("click", () => openEquipmentDialog());
+  els.transactionService?.addEventListener("change", syncWaterLitresField);
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -16199,14 +17295,14 @@ async function syncFromSheet({ silent = false } = {}) {
   // screen, PIN tenant): fetch nothing, so an unlinked phone never downloads
   // the building.
   if (usesOwnerAccounts() && !authSession && sessionMode !== "owner") return;
-  if (isTenantSession()) {
-    // A tenant phone never has local edits: just take the server's copy.
+  if (isTenantSession() || isConciergeSession()) {
+    // A tenant (or concierge) phone never has local edits: take the server's copy.
     try {
       const remote = await cloudLoadState();
       if (!remote) return;
       state = hydrateState(remote);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      if (sessionMode === "tenant") renderAll();
+      if (sessionMode === "tenant" || sessionMode === "concierge") renderAll();
       setSyncChip("saved");
     } catch (error) {
       reportSyncProblem(error);
@@ -16278,6 +17374,8 @@ async function boot() {
   // in-progress means the chip can only say "Saved" after a real round trip.
   setSyncChip(hasCloudConfig() ? "saving" : "local");
   showLoginScreen();
+  if (isConciergeSession()) enterAsConcierge();
+  showAppLock();
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
@@ -16359,6 +17457,19 @@ export const __test = {
   yearFullyClosed,
   v158AttentionItems,
   v160AttentionItems,
+  isConciergeSession,
+  canReplyIssue,
+  optionTally,
+  equipmentWarrantyStatus,
+  dieselEstimate,
+  waterDeliveries,
+  newsletterData,
+  buildCalendarIcs,
+  mergeAnnouncementsV166,
+  mergeDirectoryFlags,
+  noticeIsScheduled,
+  pollResultLine,
+  emergencyContacts,
   qrMatrix,
   fifoMonthPaid,
   paymentCoverage,

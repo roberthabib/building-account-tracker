@@ -14,3 +14,7 @@ _tmp_*.pdf
 # the anon key grants read/write to the building's data. Deployed via
 # .vercelignore, never committed.
 src/cloud-config.js
+
+# playwright-cli session artifacts (snapshots, screenshots, console logs)
+.playwright-cli/
+.playwright-mcp/

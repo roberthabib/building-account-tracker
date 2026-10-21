@@ -336,6 +336,9 @@
             <button class="more-menu-item owner-only" type="button" data-view="settingsView" data-nav-icon="gear">
               <span class="mm-text"><strong data-i18n="nav.settings">Settings</strong><span data-i18n="more.settingsSub">Building, currency, sync &amp; access</span></span>
             </button>
+            <button class="more-menu-item owner-only" type="button" data-view="equipmentView" data-nav-icon="wrench">
+              <span class="mm-text"><strong data-i18n="nav.equipment">Equipment</strong><span data-i18n="more.equipmentSub">Pump, lift, generator: warranties and service</span></span>
+            </button>
             <button class="more-menu-item" type="button" data-view="helpView" data-nav-icon="playCircle">
               <span class="mm-text"><strong data-i18n="nav.help">Help &amp; videos</strong><span data-i18n="more.helpSub">Short videos that show how it works</span></span>
             </button>
@@ -433,6 +436,18 @@
             <button class="primary-button" id="newMeetingButton" type="button" data-i18n="maint.new">+ Add</button>
           </div>
           <div class="notice-list" id="meetingsList"></div>
+        </section>
+
+        <section class="view sub-view" id="equipmentView" aria-labelledby="equipmentViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="equipmentViewTitle" data-i18n="nav.equipment">Equipment</h2>
+            </div>
+            <button class="primary-button" id="newEquipmentButton" type="button" data-i18n="maint.new">+ Add</button>
+          </div>
+          <div class="notice-list" id="equipmentList"></div>
         </section>
 
         <section class="view sub-view" id="helpView" aria-labelledby="helpViewTitle">
