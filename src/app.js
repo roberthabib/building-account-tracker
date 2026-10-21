@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v169";
+const APP_VERSION = "v170";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -1154,6 +1154,10 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Open full size": "فتح بالحجم الكامل",
+  "Loading the photo…": "جارٍ تحميل الصورة…",
+  "The photo couldn't be shown.": "تعذّر عرض الصورة.",
+  "See the invoice": "عرض الفاتورة",
   "Was due {date}": "كان مستحقاً في {date}",
   "Hello {name}": "مرحباً {name}",
   "To pay: {amount}": "للدفع: {amount}",
@@ -7251,6 +7255,15 @@ function renderLedger() {
       transaction.expenseCategory ? tr(transaction.expenseCategory) : "",
       transaction.forMonth ? tr("Month: {month}", { month: formatMonth(transaction.forMonth) }) : "",
     ].filter(Boolean).join(" · ");
+    if (hasInvoicePhoto(transaction.invoiceAttachment)) {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "ledger-photo-chip";
+      chip.setAttribute("aria-label", tr("See the invoice"));
+      chip.append(lucide("camera", { size: 18 }));
+      chip.addEventListener("click", (e) => { e.stopPropagation(); openInvoicePhoto(transaction.invoiceAttachment); });
+      item.querySelector(".ledger-amount").before(chip);
+    }
 
     const detailItems = [
       transaction.supplier ? tr("Supplier: {v}", { v: transaction.supplier }) : "",
@@ -9522,7 +9535,50 @@ async function invoicePhotoLink(attachment) {
   return signed.startsWith("http") ? signed : `${c.supabaseUrl}/storage/v1${signed}`;
 }
 
+function isImageAttachment(attachment) {
+  const name = String(attachment?.fileName || attachment?.storagePath || "").toLowerCase();
+  if (String(attachment?.mimeType || "").startsWith("image/")) return true;
+  if (/.(pdf|docx?|xlsx?|zip)$/.test(name)) return false;
+  return true;
+}
+
+function photoViewer() {
+  let dlg = document.querySelector("#photoViewer");
+  if (dlg) return dlg;
+  dlg = mk("dialog", { id: "photoViewer", className: "photo-viewer" },
+    mk("div", { className: "photo-viewer-bar" },
+      mk("a", { className: "photo-viewer-open", target: "_blank", rel: "noopener", text: tr("Open full size") }),
+      mk("button", { type: "button", className: "icon-button small photo-viewer-close", "aria-label": tr("Close"), text: "×", onclick: () => dlg.close() })),
+    mk("div", { className: "photo-viewer-stage" }, mk("p", { className: "photo-viewer-status" }), mk("img", { className: "photo-viewer-img", alt: "" })));
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+  document.body.append(dlg);
+  return dlg;
+}
+
 async function openInvoicePhoto(attachment) {
+  if (isImageAttachment(attachment) && typeof HTMLDialogElement !== "undefined") {
+    const dlg = photoViewer();
+    const img = dlg.querySelector(".photo-viewer-img");
+    const status = dlg.querySelector(".photo-viewer-status");
+    const open = dlg.querySelector(".photo-viewer-open");
+    img.removeAttribute("src");
+    img.classList.add("hidden");
+    open.classList.add("hidden");
+    status.textContent = tr("Loading the photo…");
+    status.classList.remove("hidden");
+    if (!dlg.open) dlg.showModal();
+    try {
+      const url = await invoicePhotoLink(attachment);
+      img.onload = () => { status.classList.add("hidden"); img.classList.remove("hidden"); };
+      img.onerror = () => { status.textContent = tr("The photo couldn't be shown."); open.classList.remove("hidden"); };
+      img.src = url;
+      open.href = url;
+      open.classList.remove("hidden");
+    } catch (error) {
+      status.textContent = describeSyncProblem(error);
+    }
+    return;
+  }
   // Open the window first (inside the tap) so phones don't block it as a popup.
   const win = window.open("", "_blank");
   try {

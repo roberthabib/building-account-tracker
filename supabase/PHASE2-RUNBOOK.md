@@ -144,7 +144,8 @@ app's auth), then reload.
 | v153 monthly balance notices (`phase2g-monthly.sql`) | ✅ applied 2026-10-20; 6 live checks (rolled back): cron `monthly-balance-notices` 0 5 1 * *, one job queued per owing tenant with a subscription, none when switched off, `balanceSnapshot` hidden from tenants, tenants cannot run it |
 | v157 tenant links + privacy (`phase2h-v157.sql`) | ✅ applied 2026-10-20; 7 live checks (rolled back): tenants get no documents list, supplier book or unit details and cannot read documents/ files or call list_tenant_links; owner can |
 | v166 concierge, neighbours, replies, choice votes, notices (`phase2i-v166.sql`) | ✅ applied 2026-10-21; 32/32 live checks (`phase2i-checks.sql`, rolled back) |
-| v167 late reminders, concierge jobs/supplies/visitors, water meters, bookings, board, own details, month checks, hand over, approvals, deposits (`phase2j-v167.sql`) | ⏳ written 2026-10-21, waiting to be applied — see below |
+| v167 late reminders, concierge jobs/supplies/visitors, water meters, bookings, board, own details, month checks, hand over, approvals, deposits (`phase2j-v167.sql`) | ✅ applied 2026-10-21; 57/57 live checks (`phase2j-checks.sql`, rolled back) |
+| v170 tenants see the concierge's invoice photos (`phase2k-v170.sql`) | ⏳ written 2026-10-21 — run it, then `phase2k-checks.sql` (6 rows ok) |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.

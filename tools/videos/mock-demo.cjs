@@ -269,6 +269,11 @@ http.createServer((req, res) => {
       if (isOwner || (me && (obj.startsWith("proofs/" + me + "/") || obj.startsWith("issues/" + me + "/") || obj.startsWith("board/" + me + "/"))) || (isConcierge && obj.startsWith("concierge/"))) { UPLOADS.push({ obj, by: tok.slice(0, 9), bytes: body.length }); return send(200, { Key: "invoices/" + obj }); }
       return send(403, { message: "new row violates row-level security policy" });
     }
+    if (req.method === "GET" && path.startsWith("/storage/v1/object/sign/")) {
+      // A made-up invoice picture for previews.
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800"><rect width="600" height="800" fill="#fff"/><text x="40" y="80" font-family="Arial" font-size="36" font-weight="700">Clean Team s.a.r.l.</text><text x="40" y="130" font-family="Arial" font-size="22" fill="#555">Invoice INV-0412 · Cedar Residence</text><line x1="40" y1="170" x2="560" y2="170" stroke="#ccc"/><text x="40" y="230" font-family="Arial" font-size="24">Building cleaning — October</text><text x="560" y="230" font-family="Arial" font-size="24" text-anchor="end">$240.00</text><line x1="40" y1="300" x2="560" y2="300" stroke="#333" stroke-width="2"/><text x="40" y="350" font-family="Arial" font-size="28" font-weight="700">Total</text><text x="560" y="350" font-family="Arial" font-size="28" font-weight="700" text-anchor="end">$240.00</text><text x="40" y="740" font-family="Arial" font-size="18" fill="#888">Made-up invoice for the demo building</text></svg>';
+      return res.writeHead(200, { ...cors, "Content-Type": "image/svg+xml" }).end(svg);
+    }
     if (path.startsWith("/storage/v1/object/sign/")) {
       if (!isOwner && !me && !isConcierge) return send(400, { message: "not allowed" });
       return send(200, { signedURL: `/object/sign/${path.split("/object/sign/")[1]}?token=signed-for-${tok.slice(0, 9)}` });
