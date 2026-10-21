@@ -65,7 +65,7 @@ insert into r (name, ok) select 'concierge: the expense is marked as entered by 
            where x->>'description' = 'phase2i check' and x->>'enteredBy' = 'concierge');
 insert into r (name, ok) select 'concierge: refused in a closed month',
   coalesce((select pg_temp.fails(format('select public.concierge_add_expense(%L::jsonb)',
-             jsonb_build_object('description', 'x', 'date', (l->>'id') || '-10', 'amountUsd', 1))))
+             jsonb_build_object('description', 'x', 'date', (l->>'id') || '-10', 'amountUsd', 1)))
               from public.building_state, jsonb_array_elements(coalesce(state->'monthLocks', '[]'::jsonb)) l
              where id = 'building' and coalesce((l->>'closed')::boolean, false) limit 1), true);
 insert into r (name, ok) select 'concierge: refused a photo outside concierge/',
