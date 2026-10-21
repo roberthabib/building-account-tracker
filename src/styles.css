@@ -4322,3 +4322,406 @@ a.mini-button {
   font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
 }
+
+/* ═══ v164 ═══ */
+/* Undo in the toast */
+#toast.has-action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+}
+.toast-undo {
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  color: #9fe0c8;
+  font: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+
+/* Recent expenses as one-tap chips; the per-flat split */
+.recent-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -4px 0 10px;
+}
+.recent-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.split-preview {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* Dashboard cards open their details */
+.kpi-tappable {
+  cursor: pointer;
+}
+.kpi-tappable:active {
+  transform: scale(0.98);
+}
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 2px;
+  border-top: 1px solid var(--line-inner);
+}
+.breakdown-row:first-child {
+  border-top: 0;
+}
+.breakdown-row > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.breakdown-row small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.breakdown-row b {
+  white-space: nowrap;
+}
+.breakdown-row.is-tappable {
+  cursor: pointer;
+}
+
+/* Month picker: ‹ October 2026 › */
+.month-stepper-host {
+  overflow: visible;
+}
+.month-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+.month-stepper .month-step {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.month-stepper .month-step:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.month-step-label {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+#monthChips.month-stepper-host {
+  display: block;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Payments header: one compact row */
+.payment-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.payment-actions-bar .secondary-button {
+  flex: 0 1 auto;
+  min-height: 36px;
+  border-radius: 999px;
+  padding: 0 14px;
+  font-size: 0.8rem;
+}
+#dueOnlyToggle.is-active {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #fff;
+}
+#dueOnlyToggle.is-active::before {
+  content: "✓ ";
+}
+
+/* Ledger: month totals stay in view, quick filters */
+.ledger-month-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 4px;
+  margin: 10px 0 4px;
+  background: var(--bg);
+}
+.ledger-month-sums {
+  display: flex;
+  gap: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.78rem;
+}
+.ledger-month-sums .positive {
+  color: var(--primary);
+}
+.ledger-month-sums .negative {
+  color: var(--red);
+}
+.quick-filters {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 0 10px;
+}
+.quick-filter {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+.quick-filter.is-active {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #fff;
+}
+
+/* Tenant page */
+.tenant-card[data-tenant-id] .tenant-id {
+  cursor: pointer;
+}
+.tenant-card[data-tenant-id] .tenant-id-text strong::after {
+  content: " ›";
+  color: var(--label-muted);
+}
+.tenant-page-unit {
+  margin: -6px 0 12px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.tenant-page-balance {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  margin-bottom: 12px;
+}
+.tenant-page-balance span {
+  color: var(--muted);
+  font-weight: 700;
+}
+.tenant-page-balance strong {
+  font-size: 1.6rem;
+}
+.tenant-page-balance.owes strong {
+  color: var(--red);
+}
+.tenant-page-balance.clear strong {
+  color: var(--primary);
+}
+.tenant-page-heading {
+  margin: 18px 0 8px;
+  font-size: 0.9rem;
+}
+.mini-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mini-bar-row {
+  display: grid;
+  grid-template-columns: 58px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+.mini-bar-label {
+  color: var(--muted);
+}
+.mini-bar-track {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--line-inner);
+  overflow: hidden;
+}
+.mini-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--primary);
+}
+
+/* Needs Attention count on the Dashboard tab */
+.bottom-nav .nav-button {
+  position: relative;
+}
+.nav-badge {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: calc(50% - 22px);
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* How to pay (tenant) */
+.how-to-pay-text {
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+/* Coefficient warning on the Tenants screen */
+.coef-banner {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--red-tint-bg);
+  color: var(--red-tint-text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Larger text */
+html.text-large {
+  font-size: 112.5%;
+}
+html.text-xlarge {
+  font-size: 125%;
+}
+
+/* Tenant page buttons that are links */
+.button-row a.secondary-button {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+#paymentInstructionsInput {
+  font: inherit;
+}
+
+/* Dark colours */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1513;
+  --surface: #17211e;
+  --surface-soft: #1a2522;
+  --surface-2: #1f2d29;
+  --surface-2-soft: #1f2d29;
+  --ink: #e4ece9;
+  --muted: #a3b2ad;
+  --label-muted: #82918c;
+  --line: #2b3a35;
+  --line-inner: #24322e;
+  --primary: #4fb895;
+  --primary-dark: #1d5446;
+  --accent-green: #45c08a;
+  --blue: #8db0e6;
+  --amber: #e3a457;
+  --red: #e88383;
+  --red-tint-bg: #3b2424;
+  --red-tint-text: #f1aaaa;
+  --green-tint-bg: #1c3a31;
+  --green-tint-text: #a3e3cb;
+  --avatar-bg: #22342f;
+  --avatar-text: #93d6bf;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-hero: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] body { background: var(--bg); color: var(--ink); }
+html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea { background: var(--surface-soft); color: var(--ink); border-color: var(--line); }
+html[data-theme="dark"] dialog, html[data-theme="dark"] .tool-dialog-body, html[data-theme="dark"] .entry-chooser { background: var(--surface); color: var(--ink); }
+html[data-theme="dark"] .secondary-button, html[data-theme="dark"] .mini-button:not(.whatsapp-btn), html[data-theme="dark"] .month-strip-btn, html[data-theme="dark"] .text-link-btn, html[data-theme="dark"] .icon-button { background: var(--surface-2); color: var(--ink); border-color: var(--line); }
+html[data-theme="dark"] .bottom-nav, html[data-theme="dark"] .panel, html[data-theme="dark"] .payment-section, html[data-theme="dark"] .tenant-card, html[data-theme="dark"] .kpi:not(.kpi-hero), html[data-theme="dark"] .notice-card, html[data-theme="dark"] .ledger-item, html[data-theme="dark"] .help-video-card { background: var(--surface); border-color: var(--line); }
+html[data-theme="dark"] .status-pill.status-due { background: var(--red-tint-bg); color: var(--red-tint-text); }
+html[data-theme="dark"] .status-pill.status-paid { background: var(--green-tint-bg); color: var(--green-tint-text); }
+html[data-theme="dark"] .attention-icon { background: var(--surface-2) !important; }
+html[data-theme="dark"] .tpr-bar, html[data-theme="dark"] .mh-bar, html[data-theme="dark"] .progress-track { background: var(--line); }
+html[data-theme="dark"] .segmented button.active, html[data-theme="dark"] .segmented button.is-active { color: #fff; }
+html[data-theme="dark"] #toast { background: #e4ece9; color: #14211f; }
+html[data-theme="dark"] #toast .toast-undo { color: #1f6b5a; }
+@media (prefers-color-scheme: dark) {
+  html[data-theme="auto"] {
+  color-scheme: dark;
+  --bg: #0e1513;
+  --surface: #17211e;
+  --surface-soft: #1a2522;
+  --surface-2: #1f2d29;
+  --surface-2-soft: #1f2d29;
+  --ink: #e4ece9;
+  --muted: #a3b2ad;
+  --label-muted: #82918c;
+  --line: #2b3a35;
+  --line-inner: #24322e;
+  --primary: #4fb895;
+  --primary-dark: #1d5446;
+  --accent-green: #45c08a;
+  --blue: #8db0e6;
+  --amber: #e3a457;
+  --red: #e88383;
+  --red-tint-bg: #3b2424;
+  --red-tint-text: #f1aaaa;
+  --green-tint-bg: #1c3a31;
+  --green-tint-text: #a3e3cb;
+  --avatar-bg: #22342f;
+  --avatar-text: #93d6bf;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-hero: 0 6px 16px rgba(0, 0, 0, 0.45);
+  }
+  
+  html[data-theme="auto"] body { background: var(--bg); color: var(--ink); }
+  html[data-theme="auto"] input, html[data-theme="auto"] select, html[data-theme="auto"] textarea { background: var(--surface-soft); color: var(--ink); border-color: var(--line); }
+  html[data-theme="auto"] dialog, html[data-theme="auto"] .tool-dialog-body, html[data-theme="auto"] .entry-chooser { background: var(--surface); color: var(--ink); }
+  html[data-theme="auto"] .secondary-button, html[data-theme="auto"] .mini-button:not(.whatsapp-btn), html[data-theme="auto"] .month-strip-btn, html[data-theme="auto"] .text-link-btn, html[data-theme="auto"] .icon-button { background: var(--surface-2); color: var(--ink); border-color: var(--line); }
+  html[data-theme="auto"] .bottom-nav, html[data-theme="auto"] .panel, html[data-theme="auto"] .payment-section, html[data-theme="auto"] .tenant-card, html[data-theme="auto"] .kpi:not(.kpi-hero), html[data-theme="auto"] .notice-card, html[data-theme="auto"] .ledger-item, html[data-theme="auto"] .help-video-card { background: var(--surface); border-color: var(--line); }
+  html[data-theme="auto"] .status-pill.status-due { background: var(--red-tint-bg); color: var(--red-tint-text); }
+  html[data-theme="auto"] .status-pill.status-paid { background: var(--green-tint-bg); color: var(--green-tint-text); }
+  html[data-theme="auto"] .attention-icon { background: var(--surface-2) !important; }
+  html[data-theme="auto"] .tpr-bar, html[data-theme="auto"] .mh-bar, html[data-theme="auto"] .progress-track { background: var(--line); }
+  html[data-theme="auto"] .segmented button.active, html[data-theme="auto"] .segmented button.is-active { color: #fff; }
+  html[data-theme="auto"] #toast { background: #e4ece9; color: #14211f; }
+  html[data-theme="auto"] #toast .toast-undo { color: #1f6b5a; }
+}
