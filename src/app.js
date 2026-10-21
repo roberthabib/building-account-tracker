@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v168";
+const APP_VERSION = "v169";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,8 @@ const I18N = {
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
     "nav.help": "Help & videos",
+    "nav.myFlat": "My flat",
+    "more.myFlatSub": "Parking, deposit, my details, neighbours",
     "nav.staff": "Jobs & supplies",
     "more.staffSub": "Concierge's jobs, supplies, visitors",
     "nav.bookings": "Bookings",
@@ -434,11 +436,11 @@ const I18N = {
     "recurring.title": "Monthly expenses",
     "recurring.note": "Check the amounts, then add them. Untick anything that didn't happen this month.",
     "recurring.add": "Add ticked expenses",
-    "declare.title": "Tell the owner you've paid",
+    "declare.title": "Tell the building manager you've paid",
     "declare.amount": "Amount paid (USD)",
     "declare.proof": "Proof of payment (optional)",
-    "declare.proofNote": "A photo of the bank transfer, OMT or Whish receipt helps the owner confirm it quickly.",
-    "declare.submit": "Notify the owner",
+    "declare.proofNote": "A photo of the bank transfer, OMT or Whish receipt helps the building manager confirm it quickly.",
+    "declare.submit": "Notify the building manager",
     "set.fullExportTitle": "Export everything to Excel",
     "set.fullExportDesc": "One workbook with every tenant, transaction, month, reading, project and poll — formatted and ready to print or share.",
     "common.restore": "Restore",
@@ -450,7 +452,7 @@ const I18N = {
     "common.back": "← Back",
     "common.dismiss": "Dismiss",
     // Login
-    "login.owner": "Owner",
+    "login.owner": "Manager",
     "login.tenant": "Tenant",
     "login.appName": "Building Account",
     "login.passwordPh": "Password",
@@ -466,7 +468,7 @@ const I18N = {
     "login.emailMode": "Use email and password instead",
     // Connect dialog
     "connect.title": "Link your phone",
-    "connect.note": "Enter the invite code the building owner sent you. It links this phone to your own account: you'll see your balance, payments and the building expenses — never other tenants.",
+    "connect.note": "Enter the invite code the building manager sent you. It links this phone to your own account: you'll see your balance, payments and the building expenses — never other tenants.",
     "connect.placeholder": "Invite code, e.g. 7KQ2M9XB",
     "connect.submit": "Link this phone",
     "login.unlink": "Unlink this phone",
@@ -565,7 +567,7 @@ const I18N = {
     "set.eyebrow": "Setup",
     "set.title": "Settings",
     "set.accessControl": "Access Control",
-    "set.ownerPassword": "Owner password",
+    "set.ownerPassword": "Manager password",
     "set.ownerPasswordPh": "Leave blank for no password",
     "set.ownerPasswordSetPh": "Password set — type to change",
     "set.removePassword": "Remove current password",
@@ -581,7 +583,7 @@ const I18N = {
     "set.lbpRate": "LBP per USD conversion rate",
     "set.lbpRateNote": "A new rate applies to new entries. Past entries keep the rate they were recorded at.",
     "set.cloudDb": "Cloud database",
-    "set.ownerAccount": "Owner account",
+    "set.ownerAccount": "Manager account",
     "set.signOut": "Sign out",
     "set.cloudDbBuiltIn": "Connected to the building's cloud database. Data and invoice photos sync automatically — nothing to set up on this device.",
     "set.supabaseUrl": "Supabase project URL",
@@ -707,7 +709,7 @@ const I18N = {
     "wiz.welcomeSub": "Let's quickly set up your building. You can update these details any time in Settings.",
     "wiz.buildingName": "Building Name",
     "wiz.buildingNamePh": "e.g. Naccache 1727",
-    "wiz.ownerPassword": "Owner Password",
+    "wiz.ownerPassword": "Manager Password",
     "wiz.optional": "(optional)",
     "wiz.language": "Language",
     "wiz.financialTitle": "Financial Settings",
@@ -758,6 +760,8 @@ const I18N = {
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
     "nav.help": "المساعدة والفيديوهات",
+    "nav.myFlat": "شقتي",
+    "more.myFlatSub": "الموقف، التأمين، بياناتي، الجيران",
     "nav.staff": "المهام واللوازم",
     "more.staffSub": "مهام الناطور، اللوازم، الزوّار",
     "nav.bookings": "الحجوزات",
@@ -817,11 +821,11 @@ const I18N = {
     "recurring.title": "المصاريف الشهرية",
     "recurring.note": "تحقق من المبالغ ثم أضفها. أزل العلامة عن أي مصروف لم يحدث هذا الشهر.",
     "recurring.add": "إضافة المصاريف المحددة",
-    "declare.title": "أبلغ المالك أنك دفعت",
+    "declare.title": "أبلغ المدير أنك دفعت",
     "declare.amount": "المبلغ المدفوع ($)",
     "declare.proof": "إثبات الدفع (اختياري)",
-    "declare.proofNote": "صورة التحويل المصرفي أو إيصال OMT أو Whish تساعد المالك على التأكيد بسرعة.",
-    "declare.submit": "إبلاغ المالك",
+    "declare.proofNote": "صورة التحويل المصرفي أو إيصال OMT أو Whish تساعد المدير على التأكيد بسرعة.",
+    "declare.submit": "إبلاغ المدير",
     "set.fullExportTitle": "تصدير كل البيانات إلى Excel",
     "set.fullExportDesc": "ملف واحد يضم كل المستأجرين والقيود والأشهر والقراءات والمشاريع والاستطلاعات — منسّق وجاهز للطباعة أو المشاركة.",
     "common.restore": "استعادة",
@@ -833,7 +837,7 @@ const I18N = {
     "common.back": "رجوع →",
     "common.dismiss": "إخفاء",
     // Login
-    "login.owner": "المالك",
+    "login.owner": "المدير",
     "login.tenant": "المستأجر",
     "login.appName": "حساب المبنى",
     "login.passwordPh": "كلمة السر",
@@ -849,7 +853,7 @@ const I18N = {
     "login.emailMode": "استخدام البريد الإلكتروني وكلمة السر بدلاً من ذلك",
     // Connect dialog
     "connect.title": "ربط هاتفك",
-    "connect.note": "أدخل رمز الدعوة الذي أرسله لك مالك المبنى. يربط هذا الهاتف بحسابك فقط: سترى رصيدك ودفعاتك ومصاريف المبنى — ولن ترى المستأجرين الآخرين أبداً.",
+    "connect.note": "أدخل رمز الدعوة الذي أرسله لك مدير المبنى. يربط هذا الهاتف بحسابك فقط: سترى رصيدك ودفعاتك ومصاريف المبنى — ولن ترى المستأجرين الآخرين أبداً.",
     "connect.placeholder": "رمز الدعوة، مثل 7KQ2M9XB",
     "connect.submit": "ربط هذا الهاتف",
     "login.unlink": "إلغاء ربط هذا الهاتف",
@@ -948,7 +952,7 @@ const I18N = {
     "set.eyebrow": "الإعداد",
     "set.title": "الإعدادات",
     "set.accessControl": "التحكم بالوصول",
-    "set.ownerPassword": "كلمة سر المالك",
+    "set.ownerPassword": "كلمة سر المدير",
     "set.ownerPasswordPh": "اتركه فارغاً لعدم وجود كلمة سر",
     "set.ownerPasswordSetPh": "كلمة السر مضبوطة — اكتب لتغييرها",
     "set.removePassword": "إزالة كلمة السر الحالية",
@@ -964,7 +968,7 @@ const I18N = {
     "set.lbpRate": "سعر صرف الليرة مقابل الدولار",
     "set.lbpRateNote": "يُطبَّق السعر الجديد على القيود الجديدة. تحتفظ القيود السابقة بالسعر الذي سُجّلت به.",
     "set.cloudDb": "قاعدة البيانات السحابية",
-    "set.ownerAccount": "حساب المالك",
+    "set.ownerAccount": "حساب المدير",
     "set.signOut": "تسجيل الخروج",
     "set.cloudDbBuiltIn": "متصل بقاعدة بيانات المبنى السحابية. تُزامَن البيانات وصور الفواتير تلقائياً — لا حاجة لأي إعداد على هذا الجهاز.",
     "set.supabaseUrl": "رابط مشروع Supabase",
@@ -1090,7 +1094,7 @@ const I18N = {
     "wiz.welcomeSub": "لنُعدّ مبناك بسرعة. يمكنك تحديث هذه التفاصيل في أي وقت من الإعدادات.",
     "wiz.buildingName": "اسم المبنى",
     "wiz.buildingNamePh": "مثال: Naccache 1727",
-    "wiz.ownerPassword": "كلمة سر المالك",
+    "wiz.ownerPassword": "كلمة سر المدير",
     "wiz.optional": "(اختياري)",
     "wiz.language": "اللغة",
     "wiz.financialTitle": "الإعدادات المالية",
@@ -1150,6 +1154,35 @@ function normalizeLang(lang) {
 // strings are auto-translated inside showToast(); labels use tr(). Parameterized
 // entries use {name} placeholders. Unknown strings pass through unchanged.
 const DYN_AR = {
+  "Was due {date}": "كان مستحقاً في {date}",
+  "Hello {name}": "مرحباً {name}",
+  "To pay: {amount}": "للدفع: {amount}",
+  "Ask the building manager how to pay — bank transfer, Whish or cash.": "اسأل مدير المبنى عن طريقة الدفع — تحويل مصرفي، Whish أو نقداً.",
+  "I've paid": "دفعت",
+  "See the details": "عرض التفاصيل",
+  "Hide the details": "إخفاء التفاصيل",
+  "Late — to pay": "متأخر — للدفع",
+  "To pay": "للدفع",
+  "Due by {date}": "مستحق قبل {date}",
+  "Thank you — nothing to pay.": "شكراً — لا شيء للدفع.",
+  "No payments recorded yet.": "لا دفعات مسجّلة بعد.",
+  "Watch the 1-minute tour": "شاهد الجولة في دقيقة",
+  "How the app works for you": "كيف يعمل التطبيق لك",
+  "Vote: {title}": "تصويت: {title}",
+  "Closes {date}": "يُغلق {date}",
+  "New reply from the building": "رد جديد من إدارة المبنى",
+  "Being fixed": "قيد التصليح",
+  "Reported": "تم الإبلاغ",
+  "{space} booked": "{space} محجوز",
+  "Notices": "الإعلانات",
+  "Emergency": "الطوارئ",
+  "Bookings": "الحجوزات",
+  "Residents' board": "لوحة السكان",
+  "My flat": "شقتي",
+  "Nothing new — you're all set ✓": "لا جديد — كل شيء على ما يرام ✓",
+  "Shortcuts": "اختصارات",
+  "Parking": "الموقف",
+  "Generator breaker": "قاطع المولّد",
   "Other Income": "دخل آخر",
   "e.g. Rooftop antenna rent": "مثلاً: إيجار هوائي السطح",
   "Who paid (optional)": "من دفع (اختياري)",
@@ -1511,7 +1544,7 @@ const DYN_AR = {
   "Emergency numbers": "أرقام الطوارئ",
   "Enter the amount": "أدخل المبلغ",
   "Enter who and how much": "أدخل الاسم والمبلغ",
-  "Expense sent to the owner": "أُرسل المصروف إلى المالك",
+  "Expense sent to the building manager": "أُرسل المصروف إلى المدير",
   "Generator, this month": "المولّد، هذا الشهر",
   "Give it a name": "أعطه اسماً",
   "Installed on": "تاريخ التركيب",
@@ -1543,7 +1576,7 @@ const DYN_AR = {
   "Publish on (optional)": "النشر بتاريخ (اختياري)",
   "Put to a vote": "طرح للتصويت",
   "Quotes": "عروض الأسعار",
-  "Readings sent to the owner": "أُرسلت القراءات إلى المالك",
+  "Readings sent to the building manager": "أُرسلت القراءات إلى المدير",
   "Record the bill as an expense and mark the problem fixed": "سجّل الفاتورة كمصروف وعلّم المشكلة كمحلولة",
   "Remind me below (litres)": "ذكّرني تحت (لتر)",
   "Reply": "رد",
@@ -1658,7 +1691,7 @@ const DYN_AR = {
   "Same as the app": "مثل التطبيق",
   "Scan to see your balance and the news": "امسح الرمز لترى رصيدك وأخبار المبنى",
   "Search": "بحث",
-  "Sign in with Google as the owner to keep meter photos": "سجّل الدخول عبر Google كمالك لحفظ صور العدادات",
+  "Sign in with Google as the building manager to keep meter photos": "سجّل الدخول عبر Google كمدير لحفظ صور العدادات",
   "Spending is ahead of income by {amount} a month on average. At this pace the cash runs out in about {n} months.": "المصاريف تفوق المداخيل بـ{amount} شهرياً في المتوسط. بهذا المعدل ينفد النقد خلال {n} أشهر تقريباً.",
   "Tenant, supplier, receipt no., notice…": "مستأجر، مورّد، رقم إيصال، إعلان…",
   "Type at least two letters.": "اكتب حرفين على الأقل.",
@@ -1668,7 +1701,7 @@ const DYN_AR = {
   "YES {y} · NO {n}": "نعم {y} · لا {n}",
   "YES {y}% · NO {n}% of the shares": "نعم {y}% · لا {n}% من الحصص",
   "You can use {name}, {amount}, {month}, {unit} and {building}. Each tenant gets the language set in their Details.": "يمكنك استخدام {name} و{amount} و{month} و{unit} و{building}. يتلقى كل مستأجر الرسالة باللغة المحددة في تفاصيله.",
-  "You have {amount} outstanding. Please contact the building owner to settle your balance.": "عليك {amount} مستحقة. يرجى التواصل مع مالك المبنى لتسوية رصيدك.",
+  "You have {amount} outstanding. Please contact the building manager to settle your balance.": "عليك {amount} مستحقة. يرجى التواصل مع مدير المبنى لتسوية رصيدك.",
   "comes in more than goes out": "يدخل أكثر مما يخرج",
   "e.g. 10": "مثال: 10",
   "e.g. On 6:00–1:00, off 1:00–6:00": "مثال: يعمل 6:00–1:00، ينطفئ 1:00–6:00",
@@ -1784,7 +1817,7 @@ const DYN_AR = {
   "Join with your invite code": "الانضمام برمز الدعوة",
   "For tenants, the first time": "للمستأجرين، في المرة الأولى",
   "Your balance and payments": "رصيدك ودفعاتك",
-  "See what you owe and tell the owner you paid": "اعرف ما عليك وأبلغ المالك أنك دفعت",
+  "See what you owe and tell the building manager you paid": "اعرف ما عليك وأبلغ المدير أنك دفعت",
   "Votes, problems and notifications": "التصويت والمشاكل والإشعارات",
   "Take part in the building": "شارك في شؤون المبنى",
   "For you": "لك",
@@ -1859,7 +1892,7 @@ const DYN_AR = {
   "Reserve target (USD)": "الاحتياطي المطلوب (دولار)",
   "Cash is {cash}, below the target of {target}.": "النقد {cash}، أقل من الهدف {target}.",
   "Cash is {cash}, above the target of {target} ✓": "النقد {cash}، فوق الهدف {target} ✓",
-  "Annual owners' meeting": "الاجتماع السنوي للمالكين",
+  "Annual owners' meeting": "الاجتماع السنوي للمديرين",
   "Who attended (units or names)": "من حضر (الوحدات أو الأسماء)",
   "What was discussed": "ما تمت مناقشته",
   "One decision per line": "قرار واحد في كل سطر",
@@ -1871,7 +1904,7 @@ const DYN_AR = {
   "YES {yes} · NO {no} · ABSTAIN {abstain}": "نعم {yes} · لا {no} · امتناع {abstain}",
   "by ownership share": "حسب حصة الملكية",
   "{building} · {date}": "{building} · {date}",
-  "No meetings yet. Write down what was decided at each owners' meeting and share the minutes as a PDF.": "لا اجتماعات بعد. دوّن ما تقرر في كل اجتماع للمالكين وشارك المحضر كملف PDF.",
+  "No meetings yet. Write down what was decided at each owners' meeting and share the minutes as a PDF.": "لا اجتماعات بعد. دوّن ما تقرر في كل اجتماع للمديرين وشارك المحضر كملف PDF.",
   "No meeting minutes yet.": "لا محاضر اجتماعات بعد.",
   "Close {year}? Every month of {year} is locked. Nothing is erased: balances carry into the new year as they are, and you can still reopen a month in Reports.": "إقفال سنة {year}؟ تُقفل كل أشهر {year}. لا يُمحى شيء: تنتقل الأرصدة إلى السنة الجديدة كما هي، ويمكنك إعادة فتح أي شهر من التقارير.",
   "{year} is closed": "تم إقفال سنة {year}",
@@ -2006,7 +2039,7 @@ const DYN_AR = {
   "Download a backup with photos — last one {date}": "نزّل نسخة احتياطية مع الصور — آخر نسخة {date}",
   "Download your first backup with photos": "نزّل أول نسخة احتياطية مع الصور",
   "Maintenance job": "عمل صيانة",
-  "Sign in with Google as the owner to include the photos": "سجّل الدخول عبر Google كمالك لتضمين الصور",
+  "Sign in with Google as the building manager to include the photos": "سجّل الدخول عبر Google كمدير لتضمين الصور",
   "{done} of {total}…": "{done} من {total}…",
   "Backup downloaded — {n} photos could not be included (listed in README.txt)": "تم تنزيل النسخة — تعذّر تضمين {n} صور (مذكورة في README.txt)",
   "Backup with {n} photos downloaded": "تم تنزيل النسخة الاحتياطية مع {n} صور",
@@ -2040,7 +2073,7 @@ const DYN_AR = {
   "In the building": "في المبنى",
   "Problems": "المشاكل",
   "{opened} reported, {fixed} fixed": "{opened} مُبلّغ عنها، {fixed} تم إصلاحها",
-  "Figures are from the building's account app. For any question, contact the building owner.": "الأرقام من تطبيق حسابات المبنى. لأي سؤال تواصل مع مالك المبنى.",
+  "Figures are from the building's account app. For any question, contact the building manager.": "الأرقام من تطبيق حسابات المبنى. لأي سؤال تواصل مع مدير المبنى.",
   "{building} · {month}": "{building} · {month}",
   "{building} — monthly report, {month}": "{building} — التقرير الشهري، {month}",
   "Monthly report shared": "تمت مشاركة التقرير الشهري",
@@ -2068,7 +2101,7 @@ const DYN_AR = {
   "In credit": "رصيد دائن",
   "Paid up": "مسدَّد",
   "Balances include monthly charges, generator and water up to today.": "تشمل الأرصدة الرسوم الشهرية والمولد والمياه حتى اليوم.",
-  "For any question about your balance, contact the building owner.": "لأي سؤال عن رصيدك، تواصل مع مالك المبنى.",
+  "For any question about your balance, contact the building manager.": "لأي سؤال عن رصيدك، تواصل مع مدير المبنى.",
   "You have view-only access. Changes aren't saved.": "لديك صلاحية الاطلاع فقط. لا تُحفظ التغييرات.",
   "{month} is closed. Reopen it in Reports before changing it.": "شهر {month} مُقفل. أعد فتحه من التقارير قبل تعديله.",
   "Reopen {month}? Its figures can then be changed again.": "إعادة فتح شهر {month}؟ يمكن بعدها تعديل أرقامه من جديد.",
@@ -2174,10 +2207,10 @@ const DYN_AR = {
   "Leak under the stairs": "تسرّب تحت الدرج",
   "Where, since when, how bad": "أين، منذ متى، ومدى خطورته",
   "Describe the problem in a few words": "صف المشكلة ببضع كلمات",
-  "Sent to the building owner": "أُرسل إلى مالك المبنى",
+  "Sent to the building manager": "أُرسل إلى مدير المبنى",
   "Problem recorded": "تم تسجيل المشكلة",
   "Report a problem": "الإبلاغ عن مشكلة",
-  "The owner gets your report and you can follow its status here.": "يصل بلاغك إلى المالك ويمكنك متابعة حالته هنا.",
+  "The building manager gets your report and you can follow its status here.": "يصل بلاغك إلى المدير ويمكنك متابعة حالته هنا.",
   "A building problem everyone can see, like a broken lift.": "مشكلة في المبنى يراها الجميع، كتعطّل المصعد.",
   "What's wrong?": "ما المشكلة؟",
   "Details": "التفاصيل",
@@ -2216,7 +2249,7 @@ const DYN_AR = {
   "Generator meter at handover (optional)": "عدّاد المولد عند التسليم (اختياري)",
   "The balance": "الرصيد",
   "Record handover": "تسجيل التسليم",
-  "Sign in with Google as the owner to manage administrators": "سجّل الدخول عبر Google كمالك لإدارة المسؤولين",
+  "Sign in with Google as the building manager to manage administrators": "سجّل الدخول عبر Google كمدير لإدارة المسؤولين",
   "View only — sees everything, changes nothing": "اطلاع فقط — يرى كل شيء ولا يغيّر شيئاً",
   "Full access — can change everything": "صلاحية كاملة — يمكنه تغيير كل شيء",
   "Create invite link": "إنشاء رابط دعوة",
@@ -2236,14 +2269,14 @@ const DYN_AR = {
   "Access removed": "تمت إزالة الوصول",
   "The database update for administrators hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بالمسؤولين.",
   "This phone or browser can't receive notifications. On an iPhone, add the app to the Home Screen first.": "لا يمكن لهذا الهاتف أو المتصفح استقبال الإشعارات. على iPhone أضف التطبيق إلى الشاشة الرئيسية أولاً.",
-  "Sign in first (Google for the owner, an invite code for tenants)": "سجّل الدخول أولاً (Google للمالك، رمز دعوة للمستأجرين)",
+  "Sign in first (Google for the building manager, an invite code for tenants)": "سجّل الدخول أولاً (Google للمدير، رمز دعوة للمستأجرين)",
   "Notifications are blocked for this site in the phone's settings": "الإشعارات محظورة لهذا الموقع في إعدادات الهاتف",
   "Notifications aren't set up on the server yet": "الإشعارات غير مفعّلة على الخادم بعد",
   "Notifications are on for this phone": "الإشعارات مفعّلة على هذا الهاتف",
   "Notifications are off for this phone": "الإشعارات متوقفة على هذا الهاتف",
   "Not available in this browser. On an iPhone, add the app to the Home Screen first.": "غير متاحة في هذا المتصفح. على iPhone أضف التطبيق إلى الشاشة الرئيسية أولاً.",
   "On for this phone.": "مفعّلة على هذا الهاتف.",
-  "Get a notification when the owner posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المالك إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
+  "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
   "Turn on": "تفعيل",
@@ -2333,7 +2366,7 @@ const DYN_AR = {
   "{n} expenses added": "أُضيفت {n} مصاريف",
   "Stop repeating \"{name}\"? Expenses already recorded stay.": "إيقاف تكرار \"{name}\"؟ المصاريف المسجّلة سابقاً تبقى.",
   "For {month}": "عن شهر {month}",
-  "Photos need the cloud. Send the photo to the owner on WhatsApp instead.": "الصور تحتاج إلى السحابة. أرسل الصورة إلى المالك عبر واتساب بدلاً من ذلك.",
+  "Photos need the cloud. Send the photo to the building manager on WhatsApp instead.": "الصور تحتاج إلى السحابة. أرسل الصورة إلى المدير عبر واتساب بدلاً من ذلك.",
   "Enter the amount you paid": "أدخل المبلغ الذي دفعته",
   "View proof": "عرض الإثبات",
   "Invite": "دعوة",
@@ -2375,19 +2408,19 @@ const DYN_AR = {
   "This phone is linked to a tenant": "هذا الهاتف مرتبط بمستأجر",
   "Enter the invite code first": "أدخل رمز الدعوة أولاً",
   "This app isn't connected to the cloud database": "هذا التطبيق غير متصل بقاعدة البيانات السحابية",
-  "This phone is signed in as the building owner. Link it to a tenant instead? The owner will be signed out here.": "هذا الهاتف مسجّل الدخول كمالك المبنى. هل تريد ربطه بمستأجر بدلاً من ذلك؟ سيتم تسجيل خروج المالك من هذا الهاتف.",
+  "This phone is signed in as the building manager. Link it to a tenant instead? The building manager will be signed out here.": "هذا الهاتف مسجّل الدخول كمدير المبنى. هل تريد ربطه بمستأجر بدلاً من ذلك؟ سيتم تسجيل خروج المدير من هذا الهاتف.",
   "Could not create this phone's account": "تعذّر إنشاء حساب لهذا الهاتف",
   "That code is not valid": "هذا الرمز غير صالح",
   "That code has already been used": "هذا الرمز مستخدم مسبقاً",
   "That code has expired": "انتهت صلاحية هذا الرمز",
   "Phone linked. You'll only see your own account.": "تم ربط الهاتف. سترى حسابك فقط.",
-  "Unlink this phone? Its copy of your account is removed. You'll need a new invite code from the owner to link it again.": "إلغاء ربط هذا الهاتف؟ ستُحذف نسخة حسابك منه، وستحتاج إلى رمز دعوة جديد من المالك لربطه مجدداً.",
-  "Sign in with Google first: only the signed-in owner can create invite codes": "سجّل الدخول عبر Google أولاً: فقط المالك المسجّل يمكنه إنشاء رموز الدعوة",
+  "Unlink this phone? Its copy of your account is removed. You'll need a new invite code from the building manager to link it again.": "إلغاء ربط هذا الهاتف؟ ستُحذف نسخة حسابك منه، وستحتاج إلى رمز دعوة جديد من المدير لربطه مجدداً.",
+  "Sign in with Google first: only the signed-in building manager can create invite codes": "سجّل الدخول عبر Google أولاً: فقط المدير المسجّل يمكنه إنشاء رموز الدعوة",
   "Send this to {name}. On their phone: open {url}, tap \"I'm a tenant with an invite code\" and enter the code. It works once, within 30 days.": "أرسل هذا إلى {name}. على هاتفه: افتح {url}، واضغط \"أنا مستأجر ولديّ رمز دعوة\" وأدخل الرمز. يعمل مرة واحدة خلال 30 يوماً.",
   "Your invite code for {building}": "رمز الدعوة الخاص بك لـ {building}",
   "Invite copied — paste it in WhatsApp or a message": "تم نسخ الدعوة — الصقها في واتساب أو رسالة",
   "Copy this invite:": "انسخ هذه الدعوة:",
-  "Sign in with Google first: only the signed-in owner can restore backups": "سجّل الدخول عبر Google أولاً: فقط المالك المسجّل يمكنه استعادة النسخ الاحتياطية",
+  "Sign in with Google first: only the signed-in building manager can restore backups": "سجّل الدخول عبر Google أولاً: فقط المدير المسجّل يمكنه استعادة النسخ الاحتياطية",
   "Loading…": "جارٍ التحميل…",
   "No backups yet. The first one is taken tonight.": "لا توجد نسخ احتياطية بعد. تُؤخذ الأولى الليلة.",
   "{tenants} tenants · {transactions} transactions": "{tenants} مستأجرين · {transactions} قيود",
@@ -2395,10 +2428,10 @@ const DYN_AR = {
   "That backup is empty": "هذه النسخة الاحتياطية فارغة",
   "Restored the backup from {day}": "تمت استعادة نسخة {day}",
   "In app": "في التطبيق",
-  "Only the building owner can create claim codes": "فقط مالك المبنى يمكنه إنشاء رموز الدعوة",
+  "Only the building manager can create claim codes": "فقط مدير المبنى يمكنه إنشاء رموز الدعوة",
   "This poll is closed": "هذا الاستطلاع مغلق",
   "Full database export · {date}": "تصدير كامل لقاعدة البيانات · {date}",
-  "Only the building owner can export the full database": "فقط مالك المبنى يمكنه تصدير قاعدة البيانات كاملة",
+  "Only the building manager can export the full database": "فقط مدير المبنى يمكنه تصدير قاعدة البيانات كاملة",
   "Full Excel export downloaded": "تم تنزيل ملف Excel الكامل",
   "{building} · exported {date}": "{building} · صُدّر في {date}",
   "Total": "المجموع",
@@ -2488,16 +2521,16 @@ const DYN_AR = {
   "Sync failed.": "فشلت المزامنة.",
   "Signed in as {email}": "تم تسجيل الدخول باسم {email}",
   "Wrong email or password": "البريد الإلكتروني أو كلمة السر غير صحيحة",
-  "This account is not the building owner": "هذا الحساب ليس حساب مالك المبنى",
+  "This account is not the building manager": "هذا الحساب ليس حساب مدير المبنى",
   "Can't reach the cloud. Check your connection.": "تعذّر الوصول إلى السحابة. تحقّق من الاتصال.",
   "Enter your email and password": "أدخل بريدك الإلكتروني وكلمة السر",
-  "Your owner sign-in expired. Sign in again from the login screen.": "انتهت صلاحية تسجيل دخول المالك. سجّل الدخول مجدداً من شاشة الدخول.",
-  "Enter this device's owner password": "أدخل كلمة سر المالك على هذا الجهاز",
-  "No password set — press Enter to access as owner": "لا توجد كلمة سر — اضغط دخول للوصول كمالك",
+  "Your manager sign-in expired. Sign in again from the login screen.": "انتهت صلاحية تسجيل دخول المدير. سجّل الدخول مجدداً من شاشة الدخول.",
+  "Enter this device's manager password": "أدخل كلمة سر المدير على هذا الجهاز",
+  "No password set — press Enter to access as manager": "لا توجد كلمة سر — اضغط دخول للوصول كمدير",
   "Incorrect password": "كلمة السر غير صحيحة",
   "Incorrect PIN": "الرمز غير صحيح",
   "Signed out": "تم تسجيل الخروج",
-  "{email} is not the building owner's account": "{email} ليس حساب مالك المبنى",
+  "{email} is not the building manager's account": "{email} ليس حساب مدير المبنى",
   "Google sign-in didn't finish on this device. Please try again.": "لم يكتمل تسجيل الدخول عبر Google على هذا الجهاز. حاول مجدداً.",
   "Google sign-in was cancelled or failed: {reason}": "أُلغي تسجيل الدخول عبر Google أو فشل: {reason}",
   // Toasts
@@ -2514,7 +2547,7 @@ const DYN_AR = {
   "Please enter the tenant name.": "الرجاء إدخال اسم المستأجر.",
   "Please enter the unit number.": "الرجاء إدخال رقم الشقة.",
   "Setup complete! Welcome to Building Account Tracker.": "اكتمل الإعداد! أهلاً بك في متتبّع حساب المبنى.",
-  "Owner notified of your payment": "تم إبلاغ المالك بدفعتك",
+  "Building manager notified of your payment": "تم إبلاغ المدير بدفعتك",
   "Tenant not found": "لم يُعثر على المستأجر",
   "No tenant payment receipt found": "لا يوجد إيصال دفع للمستأجر",
   "Receipt is available for tenant payments only": "الإيصال متاح لدفعات المستأجرين فقط",
@@ -2564,7 +2597,7 @@ const DYN_AR = {
   "Expense added. Invoice uploaded": "تمت إضافة المصروف. رُفعت الفاتورة",
   "Transaction added": "تمت إضافة العملية",
   "Month saved": "تم حفظ الشهر",
-  "Owner password removed": "تم حذف كلمة سر المالك",
+  "Manager password removed": "تم حذف كلمة سر المدير",
   "Settings saved": "تم حفظ الإعدادات",
   "All data cleared. Starting fresh.": "تم مسح كل البيانات. بداية جديدة.",
   "Poll created": "تم إنشاء التصويت",
@@ -2581,8 +2614,8 @@ const DYN_AR = {
     'حذف المشروع "{name}"؟ ستبقى دفعات هذا المشروع في السجل.',
   "Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.":
     "إزالة قراءات العداد لشهر {month}؟ ستُلغى أعباء المولّد لذلك الشهر حتى تُعيد إدخال القراءات.",
-  "Notify the owner that you've paid {amount} for {month}?":
-    "إبلاغ المالك بأنك دفعت {amount} عن {month}؟",
+  "Notify the building manager that you've paid {amount} for {month}?":
+    "إبلاغ المدير بأنك دفعت {amount} عن {month}؟",
   "Delete this poll? This cannot be undone.": "حذف هذا التصويت؟ لا يمكن التراجع.",
   "Restore this backup ({summary})? It replaces the data on this device. Your current data will be downloaded first as a safety copy.":
     "استعادة هذه النسخة ({summary})؟ ستستبدل بيانات هذا الجهاز. ستُنزَّل بياناتك الحالية أولاً كنسخة أمان.",
@@ -2604,8 +2637,8 @@ const DYN_AR = {
     "حذف قيد السجل؟\n\n{label}\n\nيزيل هذا القيد من التطبيق ومن مزامنة Google Sheet.",
   "Remove {name}'s PIN? They will no longer be able to log in.":
     "إزالة رمز {name}؟ لن يتمكن بعد ذلك من تسجيل الدخول.",
-  "Remove the owner password? Anyone opening the app can then enter as owner.":
-    "إزالة كلمة سر المالك؟ يمكن لأي شخص يفتح التطبيق الدخول كمالك.",
+  "Remove the building manager password? Anyone opening the app can then enter as manager.":
+    "إزالة كلمة سر المدير؟ يمكن لأي شخص يفتح التطبيق الدخول كمدير.",
   "Delete {name}? Their {count} transaction(s) will be kept but unlinked from this tenant.":
     "حذف {name}؟ ستبقى {count} عملية له لكن ستُفصل عن هذا المستأجر.",
   "Delete {name}?": "حذف {name}؟",
@@ -2710,7 +2743,7 @@ const DYN_AR = {
   "Set phone to send reminder": "أضف رقم هاتف لإرسال تذكير",
   "WhatsApp": "واتساب",
   "Add phone": "أضف هاتفاً",
-  "Owner notified ✓": "تم إبلاغ المالك ✓",
+  "Building manager notified ✓": "تم إبلاغ المدير ✓",
   "I've Paid": "لقد دفعت",
   "Add Payment": "إضافة دفعة",
   "Unit {unit}": "شقة {unit}",
@@ -3209,7 +3242,7 @@ function hydrateState(rawState) {
   hydrated.security ||= {};
   hydrated.security.salt ||= randomToken();
   hydrated.transactions ||= [];
-  // Migrate plaintext owner password / tenant PINs to salted hashes (v112).
+  // Migrate plaintext manager password / tenant PINs to salted hashes (v112).
   if (hydrated.settings.ownerPassword) {
     hydrated.settings.ownerPasswordHash = hashSecret(hydrated.settings.ownerPassword, hydrated.security.salt);
   }
@@ -3342,7 +3375,7 @@ function getTenantExpenseShareForTransaction(tenantId, transaction) {
   const totalUsd = txUsd(transaction, transaction.debitUsd, transaction.debitLbp);
   if (!totalUsd) return 0;
   // A tenant's phone only holds its own tenant row; the server sends the
-  // building-wide totals so the split matches what the owner sees.
+  // building-wide totals so the split matches what the building manager sees.
   const red = state.redaction;
   if (red && Number(red.activeTenantCount) > 0) {
     const me = activeTenants.find((t) => t.id === tenantId);
@@ -3839,7 +3872,7 @@ function renderProjects() {
 
 // ── Services tab (generator) ─────────────────────────────────────────────────
 // Generator costs are logged progressively as "Services Expenses" transactions
-// (fuel + maintenance). Each month's pools are summed live; once the owner enters
+// (fuel + maintenance). Each month's pools are summed live; once the building manager enters
 // that month's meter readings, fuel is split by metered kWh and maintenance by
 // breaker amps. The split is computed live, so a late expense is reflected
 // automatically without re-running anything.
@@ -4703,11 +4736,11 @@ function showLoginScreen() {
   focusOwnerLoginField();
 }
 
-// How the owner tab signs in when Supabase accounts are on:
+// How the building manager tab signs in when Supabase accounts are on:
 //   "google" — Continue with Google (the default)
 //   "email"  — email + password for the same kind of account
 //   "device" — temporary (Phase 2): the old per-device password, so a failed
-//              account sign-in can't lock the owner out before step 7 removes it
+//              account sign-in can't lock the building manager out before step 7 removes it
 let ownerLoginMode = "google";
 
 // Owner states: already signed in on this device (just press Enter), one of
@@ -4732,8 +4765,8 @@ function renderOwnerLoginForm() {
   const hint = mode === "google" && pendingAdminInvite()
     ? tr("You've been invited to help manage this building. Continue with Google to accept.")
     : mode !== "device" ? "" : hasPassword
-      ? (accounts ? tr("Enter this device's owner password") : "")
-      : tr("No password set — press Enter to access as owner");
+      ? (accounts ? tr("Enter this device's manager password") : "")
+      : tr("No password set — press Enter to access as manager");
   els.loginHint.textContent = hint;
   els.loginHint.classList.toggle("hidden", !hint);
 }
@@ -4791,7 +4824,7 @@ async function attemptLogin() {
   if (isOwnerTab && usesOwnerAccounts() && ownerLoginMode !== "device") {
     if (isAdminSession()) {
       enterAsOwner();
-      // Boot synced before the owner was known; pull again as the owner.
+      // Boot synced before the building manager was known; pull again as the building manager.
       syncFromSheet({ silent: true });
       return;
     }
@@ -4884,8 +4917,8 @@ function checkDueBanner() {
   const projectsDue = getTenantProjectOutstanding(sessionTenantId);
   const totalDue = roundUsd(Math.max(0, balance) + projectsDue);
   if (totalDue > 0) {
-    els.dueBannerText.textContent = tr("You have {amount} outstanding. Please contact the building owner to settle your balance.", { amount: formatUsd(totalDue) });
-    els.dueBanner.classList.remove("hidden");
+    els.dueBannerText.textContent = tr("You have {amount} outstanding. Please contact the building manager to settle your balance.", { amount: formatUsd(totalDue) });
+    els.dueBanner.classList.toggle("hidden", isTenantHome());
   } else {
     els.dueBanner.classList.add("hidden");
   }
@@ -5168,6 +5201,7 @@ function renderDashboard() {
   renderMonthSteppers();
   renderGettingStarted();
   renderConciergeHome();
+  renderTenantHome();
 }
 
 // Building costs (expenses + services) dated this calendar year.
@@ -5497,14 +5531,14 @@ async function declarePayment(tenantId, month, amount, proof = null) {
   };
   if (isTenantSession()) {
     await supabaseRequest("rpc/declare_my_payment", { method: "POST", body: JSON.stringify({ p_month: month, p_amount: Number(amount), ...(proof?.storagePath ? { p_proof_path: proof.storagePath } : {}) }) });
-    showToast("Owner notified of your payment");
+    showToast("Building manager notified of your payment");
     syncFromSheet({ silent: true });
     return;
   }
   (state.paymentDeclarations ||= []).push(decl);
   saveState();
   renderPayments();
-  showToast("Owner notified of your payment");
+  showToast("Building manager notified of your payment");
 }
 
 function acknowledgeDeclaration(id, { record = false } = {}) {
@@ -5760,7 +5794,7 @@ function appendTenantPaymentExtras(row, tenant, { month, reminderDue = 0, whatsa
     paidBtn.type = "button";
     paidBtn.className = "paid-declaration-btn";
     if (hasPending) {
-      paidBtn.textContent = tr("Owner notified ✓");
+      paidBtn.textContent = tr("Building manager notified ✓");
       paidBtn.disabled = true;
     } else {
       paidBtn.textContent = tr("I've Paid");
@@ -7496,7 +7530,7 @@ function buildPollCard(poll) {
   const myVote = votes[myId];
   const isOpen = pollIsOpen(poll);
   const isOwner = sessionMode === "owner";
-  const creatorName = poll.createdBy === "owner" ? tr("Owner") : tenantName(poll.createdBy);
+  const creatorName = poll.createdBy === "owner" ? tr("Building manager") : tenantName(poll.createdBy);
 
   const card = document.createElement("article");
   card.className = "poll-card";
@@ -7571,7 +7605,7 @@ function buildPollCard(poll) {
   voterIds.forEach((voterId) => {
     const voterVote = votes[voterId];
     const coefficient = activeTenants.find((t) => t.id === voterId)?.coefficient || 0;
-    const voterName = voterId === "owner" ? tr("Owner") : `${tenantName(voterId)}${shareMode ? ` (${coefficient}/1000)` : ""}`;
+    const voterName = voterId === "owner" ? tr("Building manager") : `${tenantName(voterId)}${shareMode ? ` (${coefficient}/1000)` : ""}`;
     const li = document.createElement("li");
     li.className = "poll-result-row";
     const nameEl = document.createElement("span");
@@ -7751,7 +7785,7 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView", "myFlatView"];
 
 function setView(viewId) {
   if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView"].includes(viewId)) viewId = "moreView";
@@ -8333,7 +8367,7 @@ const SUPABASE_STATE_ROW_ID = "building";
 // The owner signs in once per device with their Supabase account. The session
 // (access + refresh token) is kept in its own localStorage key, so later
 // launches just press Enter. While it exists, every Supabase request carries it
-// instead of the shared publishable key, so the database sees the owner rather
+// instead of the shared publishable key, so the database sees the building manager rather
 // than "anyone holding the key". Tokens never go into `state`, which is synced
 // to the cloud and downloaded as backups.
 const AUTH_KEY = "building-account-tracker:auth";
@@ -8425,7 +8459,7 @@ async function ensureFreshSession({ force = false } = {}) {
         // The login screen may already be showing "Signed in as …" (boot draws
         // it before syncing); swap it back to the email + password form.
         renderOwnerLoginForm();
-        showToast("Your owner sign-in expired. Sign in again from the login screen.");
+        showToast("Your manager sign-in expired. Sign in again from the login screen.");
       }
     } catch {
       // offline — keep the session
@@ -8547,8 +8581,8 @@ async function adoptOwnerSession(session) {
     authRequest("logout", {}, session.access_token).catch(() => {});
     // Name the account: with Google it's easy to have picked the wrong one.
     throw new Error(session.email
-      ? tr("{email} is not the building owner's account", { email: session.email })
-      : "This account is not the building owner");
+      ? tr("{email} is not the building manager's account", { email: session.email })
+      : "This account is not the building manager");
   }
   saveAuthSession({ ...session, role, tenantId: null });
 }
@@ -8653,7 +8687,7 @@ function renderCloudStatus(message = "") {
 
 const SYNC_CHIP_TEXT = { saving: "Saving…", saved: "Saved", error: "Sync error", offline: "Offline", local: "Local" };
 
-// Why the last sync failed, in words the owner can act on. "Sync error" alone
+// Why the last sync failed, in words the building manager can act on. "Sync error" alone
 // gave no clue whether to wait, sign in, or resume the database. Shown when the
 // chip is tapped; cleared by the next successful sync.
 let lastSyncProblem = "";
@@ -9244,7 +9278,7 @@ function drawGroupBalancesCanvas() {
   const footTop = rowsBottom + 120;
   box(PAD, footTop, W - PAD * 2, 2, C.line);
   text(tr("Balances include monthly charges, generator and water up to today."), PAD, footTop + 50, { size: 24, color: C.muted, max: W - PAD * 2 });
-  text(tr("For any question about your balance, contact the building owner."), PAD, footTop + 90, { size: 24, color: C.muted, max: W - PAD * 2 });
+  text(tr("For any question about your balance, contact the building manager."), PAD, footTop + 90, { size: 24, color: C.muted, max: W - PAD * 2 });
   return canvas;
 }
 
@@ -9292,7 +9326,7 @@ function sendInviteOnWhatsApp() {
 
 // ── Recurring monthly expenses ──────────────────────────────────────────────
 // A template remembers a regular expense (salary, cleaning, internet). Each
-// month it waits as a draft until the owner confirms it; the transaction it
+// month it waits as a draft until the building manager confirms it; the transaction it
 // creates carries recurringId, which is how a month counts as done.
 function pendingRecurringExpenses(month) {
   const key = monthKey(month);
@@ -9423,7 +9457,7 @@ function stopRecurringExpense(id) {
 
 // ── "I've paid", with an optional proof photo ───────────────────────────────
 let declareContext = null;
-// Proof attached to the payment the owner is about to record from a declaration.
+// Proof attached to the payment the building manager is about to record from a declaration.
 let pendingDeclarationProof = null;
 
 function openDeclareDialog(tenantId, month, amount) {
@@ -9436,7 +9470,7 @@ function openDeclareDialog(tenantId, month, amount) {
 
 async function uploadPaymentProof(tenantId, file) {
   if (cloudProvider() !== "supabase" || !authSession) {
-    throw new Error("Photos need the cloud. Send the photo to the owner on WhatsApp instead.");
+    throw new Error("Photos need the cloud. Send the photo to the building manager on WhatsApp instead.");
   }
   const prepared = await prepareInvoiceUpload({ id: "proof", invoice: "payment-proof", description: "payment proof", date: localDateInput() }, file);
   // Tenant phones may only write inside proofs/<their tenant id>/ (storage policy).
@@ -9544,7 +9578,7 @@ async function joinWithInviteCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase();
   if (!code) { showToast("Enter the invite code first"); return; }
   if (cloudProvider() !== "supabase") { showToast("This app isn't connected to the cloud database"); return; }
-  if (isOwnerSession() && !window.confirm(tr("This phone is signed in as the building owner. Link it to a tenant instead? The owner will be signed out here."))) return;
+  if (isOwnerSession() && !window.confirm(tr("This phone is signed in as the building manager. Link it to a tenant instead? The building manager will be signed out here."))) return;
   const c = cloudConfig();
   els.connectSubmitButton.disabled = true;
   try {
@@ -9585,7 +9619,7 @@ async function joinWithInviteCode(rawCode) {
 }
 
 function unlinkTenantPhone() {
-  if (!window.confirm(tr("Unlink this phone? Its copy of your account is removed. You'll need a new invite code from the owner to link it again."))) return;
+  if (!window.confirm(tr("Unlink this phone? Its copy of your account is removed. You'll need a new invite code from the building manager to link it again."))) return;
   const token = authSession?.access_token;
   saveAuthSession(null);
   if (token) authRequest("logout", {}, token).catch(() => {});
@@ -9599,7 +9633,7 @@ function openInviteDialog(preselectTenantId = null) {
   // Called directly from a tenant card, or as a click handler (gets an event).
   const preselect = typeof preselectTenantId === "string" ? preselectTenantId : null;
   if (!isOwnerSession()) {
-    showToast("Sign in with Google first: only the signed-in owner can create invite codes", 6000);
+    showToast("Sign in with Google first: only the signed-in building manager can create invite codes", 6000);
     return;
   }
   const active = state.tenants.filter((t) => t.active !== false);
@@ -9674,7 +9708,7 @@ async function shareInviteCode() {
 // ── Daily cloud backups (owner) ─────────────────────────────────────────────
 async function openBackupsDialog() {
   if (!isOwnerSession()) {
-    showToast("Sign in with Google first: only the signed-in owner can restore backups", 6000);
+    showToast("Sign in with Google first: only the signed-in building manager can restore backups", 6000);
     return;
   }
   els.backupsList.replaceChildren();
@@ -10665,7 +10699,7 @@ function handleFullExcelExport() {
   // Owner only: the button is hidden for tenants, and this guard stops it
   // being triggered any other way.
   if (sessionMode !== "owner") {
-    showToast("Only the building owner can export the full database");
+    showToast("Only the building manager can export the full database");
     return;
   }
   const slug = String((state.building && state.building.name) || "building").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "building";
@@ -11429,11 +11463,11 @@ function attachEvents() {
   els.collectionModeInput.addEventListener("change", () => applyCollectionModeVisibility(els.collectionModeInput.value));
   if (els.languageInput) els.languageInput.addEventListener("change", () => setLanguage(els.languageInput.value));
   els.removeOwnerPasswordButton.addEventListener("click", () => {
-    if (!window.confirm(tr("Remove the owner password? Anyone opening the app can then enter as owner."))) return;
+    if (!window.confirm(tr("Remove the building manager password? Anyone opening the app can then enter as manager."))) return;
     state.settings.ownerPasswordHash = "";
     saveState();
     renderSettings();
-    showToast("Owner password removed");
+    showToast("Manager password removed");
   });
   els.saveSettingsButton.addEventListener("click", () => {
     state.building.name = els.buildingNameInput.value.trim() || state.building.name;
@@ -12436,6 +12470,7 @@ function renderNotices() {
 
 function renderTenantDashboardExtras() {
   if (!els.tenantNoticesPanel) return;
+  if (isTenantHome()) { els.tenantNoticesPanel.classList.add("hidden"); return; }
   const isTenant = sessionMode === "tenant" && sessionTenantId;
   const notices = isTenant ? activeNotices().slice(0, 3) : [];
   const myIssues = isTenant ? (state.issues || []).filter((i) => i.tenantId === sessionTenantId && i.status !== "fixed") : [];
@@ -12506,7 +12541,7 @@ function issueStatusPill(status) {
 }
 
 async function uploadPhotoUnder(prefix, file) {
-  if (cloudProvider() !== "supabase" || !authSession) throw new Error("Photos need the cloud. Send the photo to the owner on WhatsApp instead.");
+  if (cloudProvider() !== "supabase" || !authSession) throw new Error("Photos need the cloud. Send the photo to the building manager on WhatsApp instead.");
   const prepared = await prepareInvoiceUpload({ id: "photo", invoice: "photo", description: "photo", date: localDateInput() }, file);
   const path = `${prefix}/${Date.now()}-${randomToken()}.jpg`;
   const c = cloudConfig();
@@ -12536,7 +12571,7 @@ function openIssueDialog() {
         const uploaded = file ? await uploadPhotoUnder("concierge/issues", file) : null;
         await supabaseRequest("rpc/concierge_report_issue", { method: "POST", body: JSON.stringify({ p_title: title.value.trim(), p_details: details.value.trim(), ...(uploaded ? { p_photo_path: uploaded.storagePath } : {}) }) });
         closeToolDialog();
-        showToast("Sent to the building owner");
+        showToast("Sent to the building manager");
         syncFromSheet({ silent: true });
         return;
       }
@@ -12544,7 +12579,7 @@ function openIssueDialog() {
         const uploaded = file ? await uploadPhotoUnder(`issues/${sessionTenantId}`, file) : null;
         await supabaseRequest("rpc/report_issue", { method: "POST", body: JSON.stringify({ p_title: title.value.trim(), p_details: details.value.trim(), ...(uploaded ? { p_photo_path: uploaded.storagePath } : {}) }) });
         closeToolDialog();
-        showToast("Sent to the building owner");
+        showToast("Sent to the building manager");
         syncFromSheet({ silent: true });
       } else {
         const uploaded = file && hasCloudConfig() && authSession ? await uploadPhotoUnder("issues/building", file) : null;
@@ -12562,7 +12597,7 @@ function openIssueDialog() {
     }
   });
   openToolDialog(tr("Report a problem"),
-    note(tenantPhone ? tr("The owner gets your report and you can follow its status here.") : tr("A building problem everyone can see, like a broken lift.")),
+    note(tenantPhone ? tr("The building manager gets your report and you can follow its status here.") : tr("A building problem everyone can see, like a broken lift.")),
     field(tr("What's wrong?"), title),
     field(tr("Details"), details),
     field(tr("Photo (optional)"), photo),
@@ -12619,7 +12654,7 @@ function renderIssues() {
     const card = mk("article", { className: "notice-card issue-card" },
       mk("div", { className: "notice-head" }, mk("strong", { text: issue.title }), issueStatusPill(issue.status)),
       issue.details ? mk("p", { className: "notice-body", text: issue.details }) : null,
-      issue.ownerNote ? mk("p", { className: "notice-body owner-note", text: `${tr("Owner")}: ${issue.ownerNote}` }) : null,
+      issue.ownerNote ? mk("p", { className: "notice-body owner-note", text: `${tr("Building manager")}: ${issue.ownerNote}` }) : null,
       mk("p", { className: "notice-until", text: `${who} · ${formatDateLabel(String(issue.createdAt || "").slice(0, 10))}` }));
     const actions = mk("div", { className: "notice-actions" });
     if (issue.photo?.storagePath) actions.append(miniButton(tr("Photo"), () => openInvoicePhoto(issue.photo)));
@@ -12718,7 +12753,7 @@ function pendingAdminInvite() {
   try { return localStorage.getItem(ADMIN_INVITE_KEY) || ""; } catch { return ""; }
 }
 
-// ?admin=CODE in the link the owner sent: remember it until Google sign-in.
+// ?admin=CODE in the link the building manager sent: remember it until Google sign-in.
 function captureAdminInvite() {
   const code = new URLSearchParams(location.search).get("admin");
   if (!code) return;
@@ -12731,7 +12766,7 @@ function adminInviteLink(code) {
 }
 
 async function openAdminsDialog() {
-  if (!isOwnerSession()) { showToast("Sign in with Google as the owner to manage administrators"); return; }
+  if (!isOwnerSession()) { showToast("Sign in with Google as the building manager to manage administrators"); return; }
   const list = mk("div", { className: "history-list compact" }, note(tr("Loading…")));
   const role = selectInput([["viewer", tr("View only — sees everything, changes nothing")], ["owner", tr("Full access — can change everything")], ["concierge", tr("Concierge — adds expenses, readings and problems; sees no balances")]], "viewer");
   const result = mk("div");
@@ -12809,7 +12844,7 @@ function urlBase64ToBytes(base64) {
 
 async function enablePushNotifications() {
   if (!pushSupported()) { showToast("This phone or browser can't receive notifications. On an iPhone, add the app to the Home Screen first.", 7000); return; }
-  if (!authSession) { showToast("Sign in first (Google for the owner, an invite code for tenants)", 6000); return; }
+  if (!authSession) { showToast("Sign in first (Google for the building manager, an invite code for tenants)", 6000); return; }
   try {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") { showToast("Notifications are blocked for this site in the phone's settings", 6000); return; }
@@ -12852,7 +12887,7 @@ function renderPushStatus() {
     : on
       ? tr("On for this phone.")
       : sessionMode === "tenant"
-        ? tr("Get a notification when the owner posts a notice, records your payment or updates a problem you reported.")
+        ? tr("Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.")
         : tr("Get a notification when a tenant says they paid or reports a problem.");
   els.pushToggleButton.textContent = on ? tr("Turn off") : tr("Turn on");
   els.pushToggleButton.disabled = !pushSupported();
@@ -13312,6 +13347,7 @@ function renderV148() {
   renderAppLockSetting();
   renderV167();
   renderV167b();
+  renderMyFlat();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
   renderGeneratorScheduleNote();
   ensureSearchButton();
@@ -13626,7 +13662,7 @@ function buildMonthlyReportPdf(month) {
     if (d.issuesOpened || d.issuesFixed) line(tr("Problems"), tr("{opened} reported, {fixed} fixed", { opened: d.issuesOpened, fixed: d.issuesFixed }));
   }
 
-  text("Figures are from the building's account app. For any question, contact the building owner.", left, 61, 8.5, false, C.muted);
+  text("Figures are from the building's account app. For any question, contact the building manager.", left, 61, 8.5, false, C.muted);
   cmds.push(`q ${pdfColor(C.soft)} RG 0.6 w ${left} 48 m ${right} 48 l S Q`);
   text(tr("{building} · {month}", { building: state.building?.name || "", month: formatMonth(d.month) }), left, 34, 8, false, C.muted);
   return buildMultiPagePdf([`${cmds.join("\n")}\n`]);
@@ -13755,7 +13791,7 @@ async function downloadBackupWithPhotos() {
   if (sessionMode !== "owner") return;
   if (photoBackupBusy) return;
   if (cloudProvider() !== "supabase" || !authSession) {
-    showToast("Sign in with Google as the owner to include the photos", 6000);
+    showToast("Sign in with Google as the building manager to include the photos", 6000);
     return;
   }
   photoBackupBusy = true;
@@ -14110,7 +14146,7 @@ function tenantLinkLine(tenant) {
 }
 
 function openInviteAllDialog() {
-  if (!isOwnerSession()) { showToast("Sign in with Google first: only the signed-in owner can create invite codes", 6000); return; }
+  if (!isOwnerSession()) { showToast("Sign in with Google first: only the signed-in building manager can create invite codes", 6000); return; }
   const active = state.tenants.filter((t) => t.active !== false)
     .slice().sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || ""), undefined, { numeric: true }));
   const rows = active.map((tenant) => {
@@ -14938,7 +14974,7 @@ const HELP_VIDEOS = [
   { id: "maintenance", role: "owner", title: "Maintenance calendar", sub: "Never miss an inspection or a cleaning", seconds: { en: 53, ar: 50 } },
   { id: "residents", role: "owner", title: "Notices, votes and problems", sub: "Keep the residents in the loop", seconds: { en: 46, ar: 44 } },
   { id: "join", role: "tenant", title: "Join with your invite code", sub: "For tenants, the first time", seconds: { en: 41, ar: 39 } },
-  { id: "tenant-home", role: "tenant", title: "Your balance and payments", sub: "See what you owe and tell the owner you paid", seconds: { en: 40, ar: 36 } },
+  { id: "tenant-home", role: "tenant", title: "Your balance and payments", sub: "See what you owe and tell the building manager you paid", seconds: { en: 40, ar: 36 } },
   { id: "tenant-more", role: "tenant", title: "Votes, problems and notifications", sub: "Take part in the building", seconds: { en: 51, ar: 48 } },
 ];
 const HELP_WATCHED_KEY = "building-account-tracker:videos-watched";
@@ -16317,7 +16353,7 @@ function addMeterPhotoButtons(month) {
     input.addEventListener("change", async () => {
       const file = input.files?.[0];
       if (!file) return;
-      if (cloudProvider() !== "supabase" || !authSession) { showToast("Sign in with Google as the owner to keep meter photos", 5000); return; }
+      if (cloudProvider() !== "supabase" || !authSession) { showToast("Sign in with Google as the building manager to keep meter photos", 5000); return; }
       button.disabled = true;
       button.textContent = tr("Uploading…");
       try {
@@ -16351,7 +16387,7 @@ function qrBlock(text, caption) {
 }
 
 async function openInviteQr(tenant) {
-  if (!isOwnerSession()) { showToast("Sign in with Google first: only the signed-in owner can create invite codes", 6000); return; }
+  if (!isOwnerSession()) { showToast("Sign in with Google first: only the signed-in building manager can create invite codes", 6000); return; }
   try {
     const res = await supabaseRequest("rpc/create_claim_code", { method: "POST", body: JSON.stringify({ p_tenant_id: tenant.id }) });
     const code = String(await res.json());
@@ -16835,7 +16871,7 @@ async function conciergeSubmitExpense() {
       invoice: els.transactionInvoice.value.trim(), ...(uploaded ? { photoPath: uploaded.storagePath } : {}),
     } }) });
     closeDialog(els.transactionDialog);
-    showToast("Expense sent to the owner");
+    showToast("Expense sent to the building manager");
     syncFromSheet({ silent: true });
   } catch (error) {
     showToast(error instanceof TypeError ? "Can't reach the cloud. Check your connection." : describeSyncProblem(error), 6000);
@@ -16852,7 +16888,7 @@ async function conciergeSaveReadings(month, readings) {
   try {
     await supabaseRequest("rpc/concierge_save_readings", { method: "POST", body: JSON.stringify({ p_month: month, p_lines: lines }) });
     closeDialog(els.generatorBillDialog);
-    showToast("Readings sent to the owner");
+    showToast("Readings sent to the building manager");
     syncFromSheet({ silent: true });
   } catch (error) {
     showToast(describeSyncProblem(error), 6000);
@@ -16933,7 +16969,7 @@ function emergencyEditor() {
     mk("div", { className: "button-row" }, secondaryButton(tr("+ Add a number"), () => { addRow(); document.querySelector("#emergencyEditor").dataset.dirty = "1"; })));
 }
 
-// Shows the saved numbers (they can arrive from the cloud after Settings first drew), unless the owner is editing.
+// Shows the saved numbers (they can arrive from the cloud after Settings first drew), unless the building manager is editing.
 function renderEmergencyEditor() {
   const anchor = document.querySelector("#v165SettingsFields");
   const current = document.querySelector("#emergencyEditor");
@@ -16990,7 +17026,7 @@ function canReplyIssue(issue) {
 }
 
 function messageAuthor(m, issue) {
-  if (m.by === "owner") return tr("Owner");
+  if (m.by === "owner") return tr("Building manager");
   if (m.by === "concierge") return tr("Concierge");
   return issue.tenantId ? tenantName(issue.tenantId) || tr("Tenant") : tr("Tenant");
 }
@@ -18764,7 +18800,7 @@ function openMyDetailsDialog() {
     mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
 }
 
-// Phone and language changed by the tenant (server) or the owner: latest wins.
+// Phone and language changed by the tenant (server) or the building manager: latest wins.
 function mergeTenantDetails(merged, older, newer) {
   const latest = new Map();
   [...(older || []), ...(newer || [])].forEach((t) => {
@@ -18823,7 +18859,7 @@ function printMeetingPack(year, { balances = false } = {}) {
       [...p.rows.map((r) => [r.category, formatUsd(r.last), formatUsd(r.next)]),
         ...(p.reserveTopUp ? [[tr("Back up to the reserve target"), "", formatUsd(p.reserveTopUp)]] : []),
         [tr("Total"), formatUsd(p.base), formatUsd(p.yearly)]], [1, 2]) : null,
-    p.rows.length ? printTable([tr("Unit"), tr("Owner"), tr("Proposed per month")], p.perFlat.map((f) => [f.unit, f.name, formatUsd(f.usd)]), [2]) : null,
+    p.rows.length ? printTable([tr("Unit"), tr("Tenant"), tr("Proposed per month")], p.perFlat.map((f) => [f.unit, f.name, formatUsd(f.usd)]), [2]) : null,
     p.rows.length ? mk("p", { className: "print-note", text: tr("Includes a {n}% margin for rising prices. Generator and water are billed separately.", { n: p.marginPct }) }) : null,
     balances ? mk("h2", { className: "print-section-title", text: tr("5. Each flat's balance") }) : null,
     balances ? printTable([tr("Unit"), tr("Tenant"), tr("Paid in the year"), tr("Balance (owes +)")], a.tenants.map((t) => [t.unit, t.name, formatUsd(t.paid), formatUsd(t.balance)]), [2, 3]) : null,
@@ -19845,11 +19881,174 @@ function attachV167bEvents() {
   els.transactionExpenseCategory?.addEventListener("input", () => { categoryWasSuggested = false; });
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v169 — tenant home: one balance card, "For you", shortcuts; My flat page
+// ═══════════════════════════════════════════════════════════════════════════
+
+function isTenantHome() {
+  return sessionMode === "tenant" && Boolean(sessionTenantId);
+}
+
+function tenantTotalDue(tenantId = sessionTenantId) {
+  return roundUsd(Math.max(0, getTenantBalance(tenantId)) + getTenantProjectOutstanding(tenantId));
+}
+
+function oldestUnpaidMonth(tenantId = sessionTenantId) {
+  if (!isFixedMode()) return currentMonthValue();
+  const { allocated } = fifoMonthPaid(tenantId);
+  const months = getMonths().slice().sort();
+  return months.find((m) => roundUsd(getMonthlyDueForTenant(tenantId, m) - (allocated.get(m) || 0)) > 0.005) || currentMonthValue();
+}
+
+function openHowToPay() {
+  const instructions = String(state.settings.paymentInstructions || "").trim();
+  const due = tenantTotalDue();
+  openToolDialog(tr("How to pay"),
+    due > 0.005 ? mk("p", { className: "th-sheet-amount", text: tr("To pay: {amount}", { amount: formatUsd(due) }) }) : null,
+    instructions
+      ? mk("div", { className: "th-pay-box" }, mk("p", { className: "how-to-pay-text", text: instructions }),
+        miniButton(tr("Copy"), async () => {
+          try { await navigator.clipboard.writeText(instructions); showToast("Copied"); } catch { showToast("Couldn't copy — select the text instead"); }
+        }))
+      : note(tr("Ask the building manager how to pay — bank transfer, Whish or cash.")),
+    due > 0.005 ? mk("div", { className: "button-row" }, primaryButton(tr("I've paid"), () => { closeToolDialog(); openDeclareDialog(sessionTenantId, oldestUnpaidMonth(), due); })) : null);
+}
+
+function tenantHeroCard() {
+  const me = state.tenants.find((t) => t.id === sessionTenantId);
+  const balance = roundUsd(getTenantBalance(sessionTenantId));
+  const due = tenantTotalDue();
+  const until = paidUntilText(sessionTenantId);
+  const late = isFixedMode() && due > 0.005 && isMonthLate(oldestUnpaidMonth());
+  const dueDate = isFixedMode() && due > 0.005 ? monthDueDate(oldestUnpaidMonth()) : "";
+  const status = due > 0.005 ? "owes" : balance < -0.005 ? "credit" : "clear";
+  const details = mk("div", { className: "th-details hidden" });
+  const toggle = mk("button", { type: "button", className: "th-details-toggle", text: tr("See the details") });
+  toggle.addEventListener("click", () => {
+    const open = details.classList.toggle("hidden") === false;
+    if (open) { renderTenantDuesSummary(); els.tenantDuesPanel?.classList.add("hidden"); details.replaceChildren(els.tenantDuesList); }
+    toggle.textContent = open ? tr("Hide the details") : tr("See the details");
+  });
+  return mk("section", { className: `th-hero is-${status}` },
+    mk("p", { className: "th-who", text: [me?.name, me?.unit ? tr("Unit {unit}", { unit: me.unit }) : ""].filter(Boolean).join(" · ") }),
+    mk("p", { className: "th-label", text: status === "owes" ? (late ? tr("Late — to pay") : tr("To pay")) : status === "credit" ? tr("In credit") : tr("All paid") }),
+    mk("p", { className: "th-amount tnum", text: status === "clear" ? "✓" : formatUsd(status === "owes" ? due : -balance) }),
+    mk("p", { className: "th-sub", text: until || (dueDate ? tr(late ? "Was due {date}" : "Due by {date}", { date: formatDateLabel(dueDate) }) : status === "clear" ? tr("Thank you — nothing to pay.") : "") }),
+    mk("div", { className: "th-actions" },
+      status === "owes"
+        ? [primaryButton(tr("How to pay"), openHowToPay), secondaryButton(tr("I've paid"), () => openDeclareDialog(sessionTenantId, oldestUnpaidMonth(), due))]
+        : [secondaryButton(tr("Statement"), () => { void shareStatementPicture(sessionTenantId); }), secondaryButton(tr("Receipts"), openMyReceipts)]),
+    toggle,
+    details);
+}
+
+function openMyReceipts() {
+  const card = tenantRecentPaymentsCard();
+  openToolDialog(tr("Receipts"), card || note(tr("No payments recorded yet.")));
+}
+
+function openNoticeSheet(notice) {
+  openToolDialog(notice.title, buildNoticeCard(notice), mk("div", { className: "button-row" }, secondaryButton(tr("Close"), closeToolDialog)));
+  if (typeof markNoticesSeen === "function") markNoticesSeen([notice]);
+  notice.seenByMe = true;
+}
+
+function forYouRow(icon, title, sub, onClick, tone = "") {
+  const b = mk("button", { type: "button", className: `th-row ${tone}`.trim() },
+    mk("span", { className: "th-row-icon", "aria-hidden": "true" }, lucide(icon, { size: 20 })),
+    mk("span", { className: "th-row-text" }, mk("strong", { text: title }), sub ? mk("small", { text: sub }) : null),
+    mk("span", { className: "th-row-chev", "aria-hidden": "true" }, lucide(currentLang === "ar" ? "chevronLeft" : "chevronRight", { size: 18 })));
+  b.addEventListener("click", onClick);
+  return b;
+}
+
+function tenantForYouItems() {
+  const items = [];
+  const help = tenantHelpCard();
+  if (help) items.push(forYouRow("playCircle", tr("Watch the 1-minute tour"), tr("How the app works for you"), () => openHelpVideo("tenant-home")));
+  activeNotices().filter((n) => !n.seenByMe).slice(0, 3).forEach((n) => items.push(forYouRow("megaphone", n.title, formatDateLabel(String(n.createdAt || "").slice(0, 10)), () => openNoticeSheet(n), "is-new")));
+  (state.polls || []).filter((p) => pollIsOpen(p) && !(p.votes || {})[sessionTenantId]).forEach((p) =>
+    items.push(forYouRow("vote", tr("Vote: {title}", { title: p.title }), p.closesOn ? tr("Closes {date}", { date: formatDateLabel(p.closesOn) }) : "", () => setView("pollsView"), "is-new")));
+  (state.issues || []).filter((i) => i.tenantId === sessionTenantId && i.status !== "fixed").forEach((i) => {
+    const last = (i.messages || []).slice(-1)[0];
+    const reply = last && last.by !== "tenant";
+    items.push(forYouRow("wrench", i.title, reply ? tr("New reply from the building") : tr(i.status === "in_progress" ? "Being fixed" : "Reported"), () => setView("issuesView"), reply ? "is-new" : ""));
+  });
+  upcomingBookings().filter((b) => bookingIsMine(b)).slice(0, 2).forEach((b) =>
+    items.push(forYouRow("calendar", tr("{space} booked", { space: spaceName(b.spaceId) }), `${formatDateLabel(b.date)} · ${b.from}–${b.to}`, () => setView("bookingsView"))));
+  return items;
+}
+
+function tenantShortcuts() {
+  const tile = (icon, label, onClick, badge = 0) => {
+    const b = mk("button", { type: "button", className: "th-tile" },
+      mk("span", { className: "th-tile-icon", "aria-hidden": "true" }, lucide(icon, { size: 22 })),
+      mk("span", { className: "th-tile-label", text: label }),
+      badge ? mk("span", { className: "th-badge", text: String(badge) }) : null);
+    b.addEventListener("click", onClick);
+    return b;
+  };
+  const emergency = emergencyCard();
+  const generator = generatorScheduleCard();
+  return mk("div", { className: "th-tiles" },
+    tile("megaphone", tr("Notices"), () => setView("noticesView"), activeNotices().filter((n) => !n.seenByMe).length),
+    emergency ? tile("bell", tr("Emergency"), () => openToolDialog(tr("Emergency numbers"), emergency)) : null,
+    generator ? tile("zap", tr("Generator hours"), () => openToolDialog(tr("Generator hours"), generator)) : null,
+    tile("wrench", tr("Report a problem"), () => openIssueDialog()),
+    bookableSpaces().length ? tile("calendar", tr("Bookings"), () => setView("bookingsView")) : null,
+    tile("users", tr("Residents' board"), () => setView("boardView")),
+    tile("receipt", tr("Receipts"), openMyReceipts),
+    tile("home", tr("My flat"), () => setView("myFlatView")));
+}
+
+function renderTenantHome() {
+  document.querySelector("#tenantHome")?.remove();
+  const on = isTenantHome();
+  document.body.classList.toggle("tenant-home-on", on);
+  if (!on) return;
+  els.dueBanner?.classList.add("hidden");
+  els.tenantDuesPanel?.classList.add("hidden");
+  const me = state.tenants.find((t) => t.id === sessionTenantId);
+  const title = document.querySelector("#dashboardTitle");
+  if (title && me?.name) title.textContent = tr("Hello {name}", { name: String(me.name).trim().split(/\s+/)[0] });
+  els.tenantNoticesPanel?.classList.add("hidden");
+  const items = tenantForYouItems();
+  const home = mk("div", { id: "tenantHome", className: "tenant-home" },
+    tenantHeroCard(),
+    mk("section", { className: "th-section" },
+      mk("h3", { className: "th-heading", text: tr("For you") }),
+      items.length ? mk("div", { className: "th-rows" }, items) : mk("p", { className: "th-empty", text: tr("Nothing new — you're all set ✓") })),
+    mk("section", { className: "th-section" }, mk("h3", { className: "th-heading", text: tr("Shortcuts") }), tenantShortcuts()));
+  const anchor = els.tenantDuesPanel || document.querySelector("#dashboardView .section-title");
+  anchor.before(home);
+}
+
+// ── My flat (More, tenants): parking, deposit, contact details, neighbours ──
+function renderMyFlat() {
+  const body = document.querySelector("#myFlatBody");
+  if (!body) return;
+  if (!isTenantHome()) { body.replaceChildren(); return; }
+  const me = state.tenants.find((t) => t.id === sessionTenantId);
+  const usage = typeof tenantGeneratorUsage === "function" ? tenantGeneratorUsage(sessionTenantId) : [];
+  fillChildren(body,
+    mk("section", { className: "panel my-flat-panel" },
+      mk("div", { className: "panel-header" }, mk("h3", { text: [me?.unit ? tr("Unit {unit}", { unit: me.unit }) : "", me?.name].filter(Boolean).join(" · ") })),
+      breakdownRow(tr("Parking"), me?.parking || "—"),
+      depositsHeld(sessionTenantId).length
+        ? breakdownRow(tr("Deposit held"), formatUsd(depositsHeld(sessionTenantId).reduce((s, d) => s + Number(d.amountUsd || 0), 0)), depositsHeld(sessionTenantId).map((d) => tr("since {date}", { date: formatDateLabel(d.receivedOn) })).join(" · "))
+        : null,
+      me?.breakerAmps ? breakdownRow(tr("Generator breaker"), `${me.breakerAmps}A`) : null),
+    myDetailsCard(),
+    directoryCard(),
+    usage.length ? mk("article", { className: "notice-card" }, mk("div", { className: "notice-head" }, mk("strong", { text: tr("Generator use (kWh)") })),
+      miniBars(usage, "kwh", (u) => shortMonth(u.month), (u) => numberFormat.format(u.kwh))) : null);
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
 // Then adopting it silently deletes real data (and the now-empty device pushes
-// that emptiness back, so the loss spreads). Refuse it and let the owner decide.
+// that emptiness back, so the loss spreads). Refuse it and let the building manager decide.
 function remoteWouldWipeLocalData(remote) {
   const size = (s) => (s?.tenants?.length || 0) + (s?.transactions?.length || 0);
   return size(state) > 0 && size(remote) === 0;
@@ -19948,7 +20147,7 @@ async function boot() {
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
   // Returning from Google? Finish signing in before the first sync, so that
-  // sync already runs as the owner.
+  // sync already runs as the building manager.
   captureAdminInvite();
   captureLaunchParams();
   runLaunchAction();
@@ -20053,6 +20252,8 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  oldestUnpaidMonth,
+  tenantTotalDue,
   mergeStates,
   isConciergeSession,
   canReplyIssue,

@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="login-tabs">
-          <button class="login-tab active" id="loginOwnerTab" type="button" data-i18n="login.owner">Owner</button>
+          <button class="login-tab active" id="loginOwnerTab" type="button" data-i18n="login.owner">Manager</button>
           <button class="login-tab" id="loginTenantTab" type="button" data-i18n="login.tenant">Tenant</button>
         </div>
         <div id="loginOwnerForm">
@@ -46,8 +46,8 @@
         <p class="login-hint hidden" id="loginHint"></p>
         <button class="login-link-btn hidden" id="loginSwitchAccountBtn" type="button" data-i18n="login.switchAccount">Use a different account</button>
         <button class="login-link-btn hidden" id="loginEmailModeBtn" type="button" data-i18n="login.emailMode">Use email and password instead</button>
-        <!-- Temporary (Phase 2): the old per-device owner password, so a failed
-             sign-in can't lock the owner out before step 7. Removed at step 7. -->
+        <!-- Temporary (Phase 2): the old per-device manager password, so a failed
+             sign-in can't lock the building manager out before step 7. Removed at step 7. -->
         <button class="login-link-btn hidden" id="loginDeviceFallbackBtn" type="button" data-i18n="login.deviceFallback">Can't sign in? Use this device's password</button>
         <button class="login-link-btn hidden" id="loginBackToAccountBtn" type="button" data-i18n="login.backToAccount">Back to Google sign-in</button>
         <button class="login-link-btn hidden" id="loginUnlinkBtn" type="button" data-i18n="login.unlink">Unlink this phone</button>
@@ -60,7 +60,7 @@
         <h2 data-i18n="connect.title">Connect to a building</h2>
         <button class="icon-button small" id="closeConnectDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
-      <p class="settings-note" data-i18n="connect.note">Paste the access code the building owner shared with you, then press Connect. This links this device to the building and downloads its data.</p>
+      <p class="settings-note" data-i18n="connect.note">Paste the access code the building manager shared with you, then press Connect. This links this device to the building and downloads its data.</p>
       <textarea id="connectCodeInput" class="login-input" rows="3" placeholder="Paste access code here" data-i18n-ph="connect.placeholder"></textarea>
       <div class="button-row">
         <button class="primary-button" id="connectSubmitButton" type="button" data-i18n="connect.submit">Connect</button>
@@ -303,6 +303,9 @@
             </div>
           </div>
           <div class="more-menu" id="moreMenu">
+            <button class="more-menu-item tenant-phone-only" type="button" data-view="myFlatView" data-nav-icon="home">
+              <span class="mm-text"><strong data-i18n="nav.myFlat">My flat</strong><span data-i18n="more.myFlatSub">Parking, deposit, my details, neighbours</span></span>
+            </button>
             <button class="more-menu-item" type="button" data-view="projectsView" data-nav-icon="folder">
               <span class="mm-text"><strong data-i18n="nav.projects">Projects</strong><span data-i18n="more.projectsSub">Building works &amp; collection</span></span>
             </button>
@@ -492,6 +495,17 @@
           <div id="boardBody"></div>
         </section>
 
+        <section class="view sub-view" id="myFlatView" aria-labelledby="myFlatViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="myFlatViewTitle" data-i18n="nav.myFlat">My flat</h2>
+            </div>
+          </div>
+          <div id="myFlatBody"></div>
+        </section>
+
         <section class="view sub-view" id="helpView" aria-labelledby="helpViewTitle">
           <div class="section-title sub-header">
             <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
@@ -550,7 +564,7 @@
           <section class="panel">
             <p class="settings-section-header" data-i18n="set.accessControl">Access Control</p>
             <label>
-              <span data-i18n="set.ownerPassword">Owner password</span>
+              <span data-i18n="set.ownerPassword">Manager password</span>
               <input id="ownerPasswordInput" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
             </label>
             <button class="mini-button hidden" id="removeOwnerPasswordButton" type="button" data-i18n="set.removePassword">Remove current password</button>
@@ -595,7 +609,7 @@
               <button class="primary-button" id="saveSettingsButton" type="button" data-i18n="common.save">Save</button>
             </div>
             <div class="settings-action hidden" id="ownerAccountAction">
-              <div class="settings-action-text"><strong data-i18n="set.ownerAccount">Owner account</strong><span id="ownerAccountText"></span></div>
+              <div class="settings-action-text"><strong data-i18n="set.ownerAccount">Manager account</strong><span id="ownerAccountText"></span></div>
               <button class="secondary-button" id="ownerSignOutButton" type="button" data-i18n="set.signOut">Sign out</button>
             </div>
             <div class="settings-action" id="shareAccessAction">
@@ -983,16 +997,16 @@
 
     <dialog id="declareDialog">
       <div class="dialog-header">
-        <h2 data-i18n="declare.title">Tell the owner you've paid</h2>
+        <h2 data-i18n="declare.title">Tell the building manager you've paid</h2>
         <button class="icon-button small" id="closeDeclareDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
       <p class="settings-note" id="declareMonthNote"></p>
       <label><span data-i18n="declare.amount">Amount paid (USD)</span><input id="declareAmountInput" type="number" min="0.01" step="0.01" inputmode="decimal" /></label>
       <span class="field-label" data-i18n="declare.proof">Proof of payment (optional)</span>
-      <p class="settings-note" data-i18n="declare.proofNote">A photo of the bank transfer, OMT or Whish receipt helps the owner confirm it quickly.</p>
+      <p class="settings-note" data-i18n="declare.proofNote">A photo of the bank transfer, OMT or Whish receipt helps the building manager confirm it quickly.</p>
       <input id="declareProofInput" type="file" accept="image/*" />
       <div class="button-row">
-        <button class="primary-button" id="declareSubmitButton" type="button" data-i18n="declare.submit">Notify the owner</button>
+        <button class="primary-button" id="declareSubmitButton" type="button" data-i18n="declare.submit">Notify the building manager</button>
         <button class="secondary-button" id="declareCancelButton" type="button" data-i18n="common.cancel">Cancel</button>
       </div>
     </dialog>
@@ -1088,7 +1102,7 @@
           <input id="wizardBuildingName" class="wizard-input" type="text" placeholder="e.g. Naccache 1727" data-i18n-ph="wiz.buildingNamePh" />
         </label>
         <label class="wizard-field">
-          <span data-i18n="wiz.ownerPassword">Owner Password</span> <span class="wizard-opt" data-i18n="wiz.optional">(optional)</span>
+          <span data-i18n="wiz.ownerPassword">Manager password</span> <span class="wizard-opt" data-i18n="wiz.optional">(optional)</span>
           <input id="wizardOwnerPassword" class="wizard-input" type="password" placeholder="Leave blank for no password" data-i18n-ph="set.ownerPasswordPh" autocomplete="new-password" />
         </label>
         <div class="wizard-footer wizard-footer-right">
