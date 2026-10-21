@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v171";
+const APP_VERSION = "v172";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2283,6 +2283,7 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "The building's server didn't accept this phone. If it keeps happening, ask the building manager for a new invite code.": "لم يقبل خادم المبنى هذا الهاتف. إذا تكرّر ذلك، اطلب من مدير المبنى رمز دعوة جديداً.",
   "Send a test": "إرسال تجربة",
   "Not popping up?": "لا تظهر الإشعارات؟",
   "This phone isn't registered for notifications any more. Tap Turn on again.": "هذا الهاتف لم يعد مسجّلاً للإشعارات. اضغط «تفعيل» من جديد.",
@@ -8728,6 +8729,9 @@ function describeSyncProblem(error) {
   }
   if (error?.code === "empty-cloud") return error.message;
   const status = Number(error?.status || 0);
+  if ((status === 401 || status === 403) && (isTenantSession() || isConciergeSession())) {
+    return "The building's server didn't accept this phone. If it keeps happening, ask the building manager for a new invite code.";
+  }
   if (status === 401 || status === 403) {
     return authSession
       ? "The cloud refused access. Sign out from Settings and sign in again with Google."
@@ -8962,6 +8966,14 @@ function queueCloudSave() {
 
 async function saveCloudState({ silent = false } = {}) {
   if (cloudSaveInFlight) return;
+  // Tenant and concierge phones never upload the building: tapping the chip
+  // or coming back online just fetches the server's copy again (this used to
+  // fall into the manager's "sign in with Google" error).
+  if (isTenantSession() || isConciergeSession()) {
+    await syncFromSheet({ silent: true });
+    if (!silent && lastSyncProblem) showToast(lastSyncProblem, 6000);
+    return;
+  }
   if (!canPushDocument()) {
     reportSyncProblem(Object.assign(new Error("not signed in"), { status: 401 }));
     if (!silent) showToast(lastSyncProblem, 6000);
