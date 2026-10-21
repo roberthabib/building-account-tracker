@@ -72,6 +72,7 @@ module.exports = async function handler(req, res) {
   const payload = JSON.stringify({ title: data.title, body: data.body, url: "/" });
   let sent = 0;
   let gone = 0;
+  const failed = [];
   await Promise.all(
     data.subscriptions.map(async (subscription) => {
       try {
@@ -82,9 +83,13 @@ module.exports = async function handler(req, res) {
         if (error.statusCode === 404 || error.statusCode === 410) {
           gone += 1;
           await rpc("forget_push_endpoint", { p_job: job, p_endpoint: subscription.endpoint }).catch(() => {});
+        } else {
+          failed.push({ status: error.statusCode || null, message: String(error.body || error.message).slice(0, 160) });
         }
       }
     }),
   );
-  return sendJson(res, 200, { ok: true, sent, gone });
+  // Shows up in the Vercel logs (vercel logs), so a silent failure can be traced.
+  console.log(JSON.stringify({ job, phones: data.subscriptions.length, sent, gone, failed }));
+  return sendJson(res, 200, { ok: true, sent, gone, failed: failed.length });
 };

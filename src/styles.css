@@ -5675,3 +5675,37 @@ body.tenant-phone:not(.concierge-mode) .bottom-nav .nav-button[data-view="tenant
 .photo-viewer-stage { display: grid; place-items: center; min-height: 240px; padding: 0 10px 14px; }
 .photo-viewer-img { max-width: 100%; max-height: calc(100dvh - 90px); border-radius: 10px; background: #ffffff; }
 .photo-viewer-status { margin: 0; color: #cfe3db; }
+
+/* v171 — notification test + pop-up help */
+.push-extras {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0 2px;
+}
+
+.push-help-link {
+  background: none;
+  border: 0;
+  padding: 6px 2px;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.push-help-head {
+  margin: 14px 0 4px;
+  font-size: 0.95rem;
+}
+
+.push-help-steps {
+  margin: 0;
+  padding-inline-start: 22px;
+  display: grid;
+  gap: 8px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}

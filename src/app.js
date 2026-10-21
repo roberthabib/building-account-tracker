@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v170";
+const APP_VERSION = "v171";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2283,6 +2283,23 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Send a test": "إرسال تجربة",
+  "Not popping up?": "لا تظهر الإشعارات؟",
+  "This phone isn't registered for notifications any more. Tap Turn on again.": "هذا الهاتف لم يعد مسجّلاً للإشعارات. اضغط «تفعيل» من جديد.",
+  "A test notification is coming in 5 seconds. Leave the app now to see how it appears.": "سيصل إشعار تجريبي خلال 5 ثوانٍ. اخرج من التطبيق الآن لترى كيف يظهر.",
+  "This phone's notification registration was out of date. Tap Turn on again, then send another test.": "كان تسجيل الإشعارات على هذا الهاتف قديماً. اضغط «تفعيل» من جديد ثم أرسل تجربة أخرى.",
+  "The test couldn't be sent ({reason})": "تعذّر إرسال التجربة ({reason})",
+  "Notifications not popping up?": "الإشعارات لا تظهر على الشاشة؟",
+  "Your phone decides whether a notification pops up on the screen or only waits in the list at the top. WhatsApp turns pop-ups on for itself; for this app you turn them on once.": "الهاتف هو الذي يقرّر إن كان الإشعار يظهر على الشاشة أو يبقى فقط في القائمة أعلى الشاشة. واتساب يفعّل الظهور لنفسه، أما لهذا التطبيق فتفعّله أنت مرة واحدة.",
+  "Android": "أندرويد",
+  "Touch and hold the app's icon on your Home Screen, then tap App info (ⓘ).": "اضغط مطوّلاً على أيقونة التطبيق في الشاشة الرئيسية، ثم اختر «معلومات التطبيق» (ⓘ).",
+  "Tap Notifications. Make sure they are allowed.": "اضغط «الإشعارات» وتأكّد أنها مسموحة.",
+  "Tap each notification type and choose Alert (not Silent), then turn on Pop on screen (on Samsung: Show as pop-up).": "اضغط على كل نوع من الإشعارات واختر «تنبيه» (وليس «صامت»)، ثم فعّل «الظهور على الشاشة» (في سامسونج: «إظهار كنافذة منبثقة»).",
+  "Back in App info, open Battery and choose Unrestricted, so notifications also arrive while the phone is asleep.": "ارجع إلى «معلومات التطبيق»، افتح «البطارية» واختر «غير مقيّد»، لتصل الإشعارات حتى والهاتف في وضع السكون.",
+  "Using the app inside Chrome instead of from the Home Screen? Do the same in Settings → Apps → Chrome → Notifications, under Sites, for this app's address.": "تستعمل التطبيق داخل كروم بدل الشاشة الرئيسية؟ قم بالشيء نفسه في الإعدادات ← التطبيقات ← Chrome ← الإشعارات، تحت «المواقع»، لعنوان هذا التطبيق.",
+  "iPhone": "آيفون",
+  "Notifications only work when the app was added to the Home Screen. Then Settings → Notifications → the app → turn on Banners and choose Persistent if you like.": "الإشعارات تعمل فقط إذا أُضيف التطبيق إلى الشاشة الرئيسية. ثم الإعدادات ← الإشعارات ← التطبيق ← فعّل «اللافتات» واختر «دائمة» إن أردت.",
+  "Also check that Do Not Disturb or a Focus mode is off.": "وتأكّد أيضاً أن وضع «عدم الإزعاج» أو «التركيز» غير مفعّل.",
   "Turn on": "تفعيل",
   "General": "عام",
   "No expenses recorded yet.": "لا مصاريف مسجّلة بعد.",
@@ -12947,6 +12964,7 @@ function renderPushStatus() {
         : tr("Get a notification when a tenant says they paid or reports a problem.");
   els.pushToggleButton.textContent = on ? tr("Turn off") : tr("Turn on");
   els.pushToggleButton.disabled = !pushSupported();
+  renderPushExtras(on && pushSupported());
 }
 
 // Owner → tenant phones. Best effort: a failure never blocks the owner's work.
@@ -20100,6 +20118,82 @@ function renderMyFlat() {
       miniBars(usage, "kwh", (u) => shortMonth(u.month), (u) => numberFormat.format(u.kwh))) : null);
 }
 
+// ── v171 — notification test + pop-up help ──────────────────────────────────
+// Android decides whether a notification pops up on screen (WhatsApp turns
+// that on for itself); for a web app the person turns it on once in the
+// phone's settings. "Send a test" goes through the real push service after
+// 5 seconds, so they can leave the app and see what a notice looks like.
+function renderPushExtras(on) {
+  const panel = els.pushToggleButton?.closest(".push-panel");
+  if (!panel) return;
+  let row = panel.querySelector(".push-extras");
+  if (!on) { row?.remove(); return; }
+  if (!row) {
+    row = mk("div", { className: "push-extras" });
+    panel.append(row);
+  }
+  row.replaceChildren(
+    secondaryButton(tr("Send a test"), () => sendTestPush()),
+    mk("button", { type: "button", className: "link-button push-help-link", text: tr("Not popping up?"), onclick: () => openPushHelp() }),
+  );
+}
+
+async function sendTestPush() {
+  if (!pushSupported() || !authSession) return;
+  if (Notification.permission !== "granted") { showToast("Notifications are blocked for this site in the phone's settings", 6000); return; }
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    if (!subscription) {
+      try { localStorage.removeItem(PUSH_STATE_KEY); } catch { /* ignore */ }
+      renderPushStatus();
+      showToast("This phone isn't registered for notifications any more. Tap Turn on again.", 6000);
+      return;
+    }
+    const json = subscription.toJSON();
+    await ensureFreshSession();
+    // Re-register too, in case the server lost this phone.
+    await supabaseRequest("rpc/save_push_subscription", { method: "POST", body: JSON.stringify({ p_endpoint: json.endpoint, p_p256dh: json.keys.p256dh, p_auth: json.keys.auth }) }).catch(() => {});
+    showToast("A test notification is coming in 5 seconds. Leave the app now to see how it appears.", 5000);
+    const res = await fetch("/api/push-test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${authBearer()}` },
+      body: JSON.stringify({ subscription: json, lang: currentLang }),
+    });
+    const out = await res.json().catch(() => ({}));
+    if (out.ok) return;
+    if ([403, 404, 410].includes(out.status)) {
+      await subscription.unsubscribe().catch(() => {});
+      try { localStorage.removeItem(PUSH_STATE_KEY); } catch { /* ignore */ }
+      renderPushStatus();
+      showToast("This phone's notification registration was out of date. Tap Turn on again, then send another test.", 8000);
+      return;
+    }
+    showToast(tr("The test couldn't be sent ({reason})", { reason: out.error || out.status || res.status }), 7000);
+  } catch (error) {
+    showToast(error.status ? describeSyncProblem(error) : error.message, 6000);
+  }
+}
+
+function openPushHelp() {
+  const steps = (items) => mk("ol", { className: "push-help-steps" }, items.map((text) => mk("li", { text })));
+  openToolDialog(tr("Notifications not popping up?"),
+    note(tr("Your phone decides whether a notification pops up on the screen or only waits in the list at the top. WhatsApp turns pop-ups on for itself; for this app you turn them on once.")),
+    mk("h3", { className: "push-help-head", text: tr("Android") }),
+    steps([
+      tr("Touch and hold the app's icon on your Home Screen, then tap App info (ⓘ)."),
+      tr("Tap Notifications. Make sure they are allowed."),
+      tr("Tap each notification type and choose Alert (not Silent), then turn on Pop on screen (on Samsung: Show as pop-up)."),
+      tr("Back in App info, open Battery and choose Unrestricted, so notifications also arrive while the phone is asleep."),
+    ]),
+    note(tr("Using the app inside Chrome instead of from the Home Screen? Do the same in Settings → Apps → Chrome → Notifications, under Sites, for this app's address.")),
+    mk("h3", { className: "push-help-head", text: tr("iPhone") }),
+    note(tr("Notifications only work when the app was added to the Home Screen. Then Settings → Notifications → the app → turn on Banners and choose Persistent if you like.")),
+    note(tr("Also check that Do Not Disturb or a Focus mode is off.")),
+    mk("div", { className: "push-extras" }, primaryButton(tr("Send a test"), () => { closeToolDialog(); sendTestPush(); })),
+  );
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -20308,6 +20402,8 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  renderPushExtras,
+  openPushHelp,
   oldestUnpaidMonth,
   tenantTotalDue,
   mergeStates,
