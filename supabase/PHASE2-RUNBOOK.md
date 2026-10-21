@@ -143,6 +143,46 @@ app's auth), then reload.
 | v148 features (`phase2f-v148-features.sql`) | ✅ applied 2026-10-20; 21 live checks (rolled back): tenant gets no history/cash counts and only own plans, issue photos own-folder only, report_issue refuses other tenants' photos, enqueue_push/notify/admin invites/keepalive_status refused for tenants, anon can only claim real jobs, share-weighted poll counts correct; VAPID keys in Vercel env — viewer admins, admin invites, problem reports + photos, plans/history/cash counts stripped from tenants, share-weighted poll counts, push notifications, keep-alive watch |
 | v153 monthly balance notices (`phase2g-monthly.sql`) | ✅ applied 2026-10-20; 6 live checks (rolled back): cron `monthly-balance-notices` 0 5 1 * *, one job queued per owing tenant with a subscription, none when switched off, `balanceSnapshot` hidden from tenants, tenants cannot run it |
 | v157 tenant links + privacy (`phase2h-v157.sql`) | ✅ applied 2026-10-20; 7 live checks (rolled back): tenants get no documents list, supplier book or unit details and cannot read documents/ files or call list_tenant_links; owner can |
+| v166 concierge, neighbours, replies, choice votes, notices (`phase2i-v166.sql`) | ⏳ written 2026-10-21, waiting to be applied — see below |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.
+
+---
+
+## v166 — `phase2i-v166.sql` (concierge and the new resident features)
+
+**Apply this before the v166 app goes live.** The v166 app calls functions that
+only exist after it; without them a concierge cannot be invited, and tenant
+replies, the neighbours list, "seen by" and quote votes fail.
+
+What it adds:
+
+| Part | What it does |
+|---|---|
+| Concierge role | `profiles` / `admin_invites` accept `concierge`; `is_concierge()`. An anonymous phone may claim an invite only when its role is concierge (owners and viewers still need Google). `list_admins` / `remove_admin` include them. |
+| Concierge slice of `get_my_state` | Expenses and service expenses without per-flat shares; tenants without phones, PINs, shares or details; readings, problems, maintenance, equipment, generator services, supplier names/trades/phones, published notices, month locks. No payments, dues, declarations, cash counts, history, polls, projects, documents or balance snapshot. |
+| Concierge writes | `concierge_add_expense` (checks text, date, amount range, closed months; photo must be under `concierge/`; shares by coefficient; marked `enteredBy: concierge`; push to admins), `concierge_save_readings`, `concierge_report_issue`. |
+| Photos | Concierge may upload under `concierge/` and read `concierge/` and `issues/`; tenants cannot read `concierge/`. |
+| Problems | `reply_issue` — a tenant on their own problems, the concierge on any. |
+| Neighbours | `set_directory_optin`; tenants who share get `directory` (name, unit, phone of the others who share); nobody else's phone otherwise. |
+| Notices | `mark_notice_seen` → `seenBy` (owner only sees the list; tenants get `seenByMe`); unpublished (`publishAt` in the future) notices hidden from tenants and the concierge; `send_due_notices()` every 15 minutes (pg_cron `scheduled-notices`) sends the phone notification once (`pushedAt`). |
+| Votes with choices | `cast_my_vote` accepts one of the poll's option ids (or abstain); `get_my_state` adds `optionCounts` / `optionShares`. |
+| Tenants | `equipment` and `messageTemplates` stripped from their copy. |
+
+Steps:
+
+1. Download a fresh backup from the app (Settings → Download backup).
+2. Supabase → SQL Editor → New query → paste `phase2i-v166.sql` → Run. Safe to re-run.
+3. New query → paste `phase2i-checks.sql` → Run. It acts as a made-up concierge
+   and tenant inside a transaction that is rolled back; every row must say
+   `ok = true`. If asked about a table without RLS, that is its temporary
+   results table: Run without RLS.
+4. Confirm nothing was left: `select count(*) from auth.users where email like 'check-%@example.invalid';` → 0.
+5. Deploy the v166 app.
+
+Undo: the earlier versions of the replaced functions are in `phase2h-v157.sql`
+(`get_my_state`, storage read rule) and `phase2f-v148-features.sql` (admin
+invites, `cast_my_vote`); re-running those restores them. Remove the job with
+`select cron.unschedule('scheduled-notices');`. Concierge profiles can be
+removed from Settings → Administrators.
