@@ -65,6 +65,9 @@ update public.building_state set state =
       jsonb_build_object('id', 'apr-viewer-own', 'transactions', '[]'::jsonb, 'amountUsd', 60, 'requestedBy', 'check-viewer@example.invalid', 'status', 'pending')), true)
  where id = 'building';
 
+-- A real flat, looked up now: once acting as a phone, the building row is hidden.
+select set_config('check.flat', (select t->>'id' from public.building_state, jsonb_array_elements(state->'tenants') t where id = 'building' limit 1), true);
+
 -- ── As the concierge ────────────────────────────────────────────────────────
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-a000-0000000000d1","role":"authenticated","is_anonymous":true}', true);
 set local role authenticated;
@@ -78,7 +81,7 @@ select public.concierge_log_visitor('check plumber', 'Repair', '1A');
 insert into r (name, ok) select 'concierge: notes a visitor',
   exists (select 1 from jsonb_array_elements(public.get_my_state()->'visitorLog') v where v->>'name' = 'check plumber');
 select public.concierge_save_water_readings(to_char(current_date + 40, 'YYYY-MM') || '-01',
-  jsonb_build_object((select t->>'id' from public.building_state, jsonb_array_elements(state->'tenants') t where id = 'building' limit 1),
+  jsonb_build_object(current_setting('check.flat'),
                      jsonb_build_object('previousReading', 10, 'currentReading', 14)));
 insert into r (name, ok) select 'concierge: saves water meter readings',
   exists (select 1 from jsonb_array_elements(public.get_my_state()->'serviceReadings') x
