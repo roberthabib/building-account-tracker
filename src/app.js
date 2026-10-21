@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v172";
+const APP_VERSION = "v173";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2283,6 +2283,21 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Connect to the internet to switch buildings": "اتصل بالإنترنت للتبديل بين المباني",
+  "This building's latest changes couldn't be saved yet. Try again in a moment.": "تعذّر حفظ آخر تغييرات هذا المبنى بعد. حاول مجدداً بعد قليل.",
+  "e.g. Cedar Residence": "مثلاً: بناية الأرز",
+  "Add the building": "إضافة المبنى",
+  "Give the building a name": "أعطِ المبنى اسماً",
+  "{name} added. Let's set it up.": "تمت إضافة {name}. لنقم بإعداده.",
+  "The database update for more than one building hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بإدارة أكثر من مبنى.",
+  "Your buildings": "مبانيك",
+  "Add a building": "إضافة مبنى",
+  "It starts empty, with its own tenants, notices, concierge and helpers. Nothing is shared with your other buildings.": "يبدأ فارغاً، بمستأجريه وإعلاناته وناطوره ومساعديه الخاصين. لا يُشارَك شيء مع مبانيك الأخرى.",
+  "Building name": "اسم المبنى",
+  "New building": "مبنى جديد",
+  "Switch building": "تبديل المبنى",
+  "Switch building or add another one": "بدّل المبنى أو أضف مبنى آخر",
+  "Switch to another building": "الانتقال إلى مبنى آخر",
   "The building's server didn't accept this phone. If it keeps happening, ask the building manager for a new invite code.": "لم يقبل خادم المبنى هذا الهاتف. إذا تكرّر ذلك، اطلب من مدير المبنى رمز دعوة جديداً.",
   "Send a test": "إرسال تجربة",
   "Not popping up?": "لا تظهر الإشعارات؟",
@@ -8273,7 +8288,7 @@ function base64ToBytes(base64) {
 // Drive link.
 async function uploadInvoiceToSupabase(transaction, prepared) {
   const c = cloudConfig();
-  const path = `${(transaction.date || localDateInput()).slice(0, 4)}/${randomToken()}-${prepared.fileName}`;
+  const path = buildingPath(`${(transaction.date || localDateInput()).slice(0, 4)}/${randomToken()}-${prepared.fileName}`);
   await ensureFreshSession();
   const res = await fetch(
     `${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`,
@@ -8390,9 +8405,8 @@ function hasCloudConfig() {
   return cloudProvider() !== null;
 }
 
-// The whole app state lives in one row keyed by this id (one Supabase project
-// per building). Multi-building support would make this per-building later.
-const SUPABASE_STATE_ROW_ID = "building";
+// The whole app state of a building lives in one row; "building" is the
+// first one, others have generated ids (v173, see currentBuildingId).
 
 // ── Owner sign-in (Supabase Auth, Phase 2 step 5) ───────────────────────────
 // The owner signs in once per device with their Supabase account. The session
@@ -8645,6 +8659,7 @@ async function supabaseRequest(path, options = {}, retried = false) {
       apikey: c.supabaseKey,
       Authorization: `Bearer ${authBearer()}`,
       "Content-Type": "application/json",
+      ...buildingHeader(),
       ...(options.headers || {}),
     },
   });
@@ -8674,7 +8689,7 @@ async function cloudLoadState() {
       return await res.json();
     }
     const res = await supabaseRequest(
-      `building_state?id=eq.${SUPABASE_STATE_ROW_ID}&select=state`,
+      `building_state?id=eq.${encodeURIComponent(currentBuildingId())}&select=state`,
       { method: "GET" },
     );
     const rows = await res.json();
@@ -8691,7 +8706,7 @@ async function cloudSaveState(payload) {
       method: "POST",
       headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify({
-        id: SUPABASE_STATE_ROW_ID,
+        id: currentBuildingId(),
         state: payload,
         rev: Number(payload?.meta?.rev || 0),
         updated_at: new Date().toISOString(),
@@ -9516,7 +9531,7 @@ async function uploadPaymentProof(tenantId, file) {
   }
   const prepared = await prepareInvoiceUpload({ id: "proof", invoice: "payment-proof", description: "payment proof", date: localDateInput() }, file);
   // Tenant phones may only write inside proofs/<their tenant id>/ (storage policy).
-  const path = `proofs/${tenantId}/${Date.now()}-${randomToken()}.jpg`;
+  const path = buildingPath(`proofs/${tenantId}/${Date.now()}-${randomToken()}.jpg`);
   const c = cloudConfig();
   await ensureFreshSession();
   const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
@@ -9685,6 +9700,7 @@ async function joinWithInviteCode(rawCode) {
       throw new Error(claimBody?.message || "That code is not valid");
     }
     saveAuthSession({ ...session, email: "", role: "tenant", tenantId: String(claimBody) });
+    await adoptNewestBuilding();
     // 3. this phone's copy of the data = the server's filtered copy, nothing else
     const res = await supabaseRequest("rpc/get_my_state", { method: "POST", body: "{}" });
     state = hydrateState(await res.json());
@@ -9710,6 +9726,7 @@ function unlinkTenantPhone() {
   if (token) authRequest("logout", {}, token).catch(() => {});
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(SYNC_META_KEY);
+  try { localStorage.removeItem(BUILDING_KEY); } catch { /* ignore */ }
   location.reload();
 }
 
@@ -12628,7 +12645,7 @@ function issueStatusPill(status) {
 async function uploadPhotoUnder(prefix, file) {
   if (cloudProvider() !== "supabase" || !authSession) throw new Error("Photos need the cloud. Send the photo to the building manager on WhatsApp instead.");
   const prepared = await prepareInvoiceUpload({ id: "photo", invoice: "photo", description: "photo", date: localDateInput() }, file);
-  const path = `${prefix}/${Date.now()}-${randomToken()}.jpg`;
+  const path = buildingPath(`${prefix}/${Date.now()}-${randomToken()}.jpg`);
   const c = cloudConfig();
   await ensureFreshSession();
   const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
@@ -13433,6 +13450,7 @@ function renderV148() {
   renderAppLockSetting();
   renderV167();
   renderV167b();
+  renderV173();
   renderMyFlat();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
   renderGeneratorScheduleNote();
@@ -14488,7 +14506,7 @@ async function uploadDocumentFile(file, id) {
   if (cloudProvider() !== "supabase" || !authSession) throw new Error("Sign in with Google to upload documents");
   if (file.size > 15 * 1024 * 1024) throw new Error("That file is too big (15 MB at most)");
   const ext = (/\.[a-z0-9]{1,5}$/i.exec(file.name)?.[0] || "").toLowerCase();
-  const path = `documents/${id}-${safeFilePart(file.name.replace(/\.[^.]+$/, ""), "document").slice(0, 60)}${ext}`;
+  const path = buildingPath(`documents/${id}-${safeFilePart(file.name.replace(/\.[^.]+$/, ""), "document").slice(0, 60)}${ext}`);
   const c = cloudConfig();
   await ensureFreshSession();
   const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
@@ -16096,9 +16114,14 @@ let pendingLaunchAction = "";
 let pendingJoinCode = "";
 function captureLaunchParams() {
   const query = new URLSearchParams(location.search);
+  const building = query.get("building");
+  if (building && /^[a-z0-9]{1,40}$/.test(building)) pendingBuildingSwitch = building;
   const action = query.get("do");
   const join = query.get("join");
-  if (!action && !join) return;
+  if (!action && !join) {
+    if (building) history.replaceState(null, "", location.pathname);
+    return;
+  }
   if (action === "payment" || action === "expense") pendingLaunchAction = action;
   if (join && /^[A-Za-z0-9]{6,12}$/.test(join)) pendingJoinCode = join.toUpperCase();
   history.replaceState(null, "", location.pathname);
@@ -16931,6 +16954,7 @@ async function claimConciergeCode(session, code) {
   const role = await res.json().catch(() => null);
   if (!res.ok || role !== "concierge") return false;
   saveAuthSession({ ...session, email: "", role: "concierge", tenantId: null });
+  await adoptNewestBuilding();
   const stateRes = await supabaseRequest("rpc/get_my_state", { method: "POST", body: "{}" });
   state = hydrateState(await stateRes.json());
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -20206,6 +20230,242 @@ function openPushHelp() {
   );
 }
 
+// ── v173 — more than one building ────────────────────────────────────────────
+// The building manager can run several buildings; tenants, the concierge and
+// helpers belong to one. The chosen building is kept per phone and sent with
+// every database request (x-building); the database only accepts buildings
+// the person belongs to (supabase/phase2l-v173.sql). Photos of buildings
+// other than the first live under b/<id>/. Switching saves this building's
+// changes, fetches the other building's data and reloads.
+const BUILDING_KEY = "building-account-tracker:building";
+let myBuildingsCache = null;
+let pendingBuildingSwitch = "";
+
+function storedBuildingId() {
+  try { return localStorage.getItem(BUILDING_KEY) || ""; } catch { return ""; }
+}
+
+function currentBuildingId() {
+  return storedBuildingId() || "building";
+}
+
+function setBuildingId(id) {
+  try {
+    if (id) localStorage.setItem(BUILDING_KEY, id);
+    else localStorage.removeItem(BUILDING_KEY);
+  } catch { /* private mode */ }
+}
+
+// Sent only once a building was chosen: phones that never chose one keep
+// working exactly as before (the database then picks their first building).
+function buildingHeader() {
+  const id = storedBuildingId();
+  return id ? { "x-building": id } : {};
+}
+
+function buildingPath(rest) {
+  const id = currentBuildingId();
+  return id === "building" ? rest : `b/${id}/${rest}`;
+}
+
+async function loadMyBuildings() {
+  if (cloudProvider() !== "supabase" || !authSession) return null;
+  try {
+    const res = await supabaseRequest("rpc/my_buildings", { method: "POST", body: "{}" });
+    myBuildingsCache = await res.json();
+  } catch {
+    myBuildingsCache = null; // database not updated yet, or offline
+  }
+  return myBuildingsCache;
+}
+
+// After an invite code was used: the newest membership is the one just made.
+async function adoptNewestBuilding() {
+  const list = await loadMyBuildings();
+  if (!Array.isArray(list) || !list.length) return;
+  const newest = list.reduce((a, b) => (Date.parse(b.since) > Date.parse(a.since) ? b : a));
+  setBuildingId(newest.id);
+}
+
+// Returns true when the page is about to reload into another building.
+async function checkBuildingChoice() {
+  const list = await loadMyBuildings();
+  if (!Array.isArray(list) || !list.length) return false;
+  const stored = storedBuildingId();
+  const mine = (id) => list.find((b) => b.id === id);
+  if (pendingBuildingSwitch && pendingBuildingSwitch !== currentBuildingId() && mine(pendingBuildingSwitch)) {
+    const target = pendingBuildingSwitch;
+    pendingBuildingSwitch = "";
+    return switchBuilding(target, { quiet: true });
+  }
+  pendingBuildingSwitch = "";
+  if (stored && !mine(stored)) {
+    // No longer part of that building: back to the first one.
+    setBuildingId(list[0].id);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SYNC_META_KEY);
+    location.reload();
+    return true;
+  }
+  if (!stored) setBuildingId(list[0].id);
+  syncAdminRole(mine(currentBuildingId()));
+  renderBuildingSwitcher();
+  decorateSetupWizard();
+  return false;
+}
+
+// One Google account can have full access in one building and view-only in
+// another; the phone's session follows the building on screen.
+function syncAdminRole(row) {
+  if (!row || !authSession || !["owner", "viewer"].includes(authSession.role) || !["owner", "viewer"].includes(row.role)) return;
+  if (authSession.role !== row.role) saveAuthSession({ ...authSession, role: row.role });
+}
+
+async function switchBuilding(id, { quiet = false } = {}) {
+  if (!id || id === currentBuildingId()) { closeToolDialog(); return false; }
+  if (navigator.onLine === false) { showToast("Connect to the internet to switch buildings"); return false; }
+  if (canPushDocument() && localHasUnsyncedChanges()) {
+    await saveCloudState({ silent: true });
+    if (localHasUnsyncedChanges()) {
+      showToast("This building's latest changes couldn't be saved yet. Try again in a moment.", 6000);
+      return false;
+    }
+  }
+  const previous = storedBuildingId();
+  const previousSession = authSession;
+  setBuildingId(id);
+  syncAdminRole((myBuildingsCache || []).find((b) => b.id === id));
+  try {
+    const remote = await cloudLoadState();
+    if (remote) {
+      const next = hydrateState(remote);
+      // A brand-new building starts in the language the manager is using.
+      if (!remote.settings?.language && canPushDocument()) {
+        next.settings.language = currentLang;
+        await cloudSaveState(next);
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      saveSyncMeta({ lastSyncedToken: remote.meta?.token || "", lastPushedRev: Number(remote.meta?.rev || 0) });
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SYNC_META_KEY);
+    }
+  } catch (error) {
+    setBuildingId(previous);
+    if (previousSession) saveAuthSession(previousSession);
+    if (!quiet) showToast(describeSyncProblem(error), 6000);
+    return false;
+  }
+  location.reload();
+  return true;
+}
+
+function buildingRoleLabel(row) {
+  if (row.role === "owner") return tr("Building manager");
+  if (row.role === "viewer") return tr("View only");
+  if (row.role === "concierge") return tr("Concierge");
+  return tr("Tenant");
+}
+
+async function openBuildingsDialog() {
+  const list = mk("div", { className: "building-list" }, note(tr("Loading…")));
+  const canAdd = isOwnerSession();
+  const nameInput = textInput("", { placeholder: tr("e.g. Cedar Residence"), maxlength: "80" });
+  const addButton = primaryButton(tr("Add the building"), async () => {
+    const name = nameInput.value.trim();
+    if (!name) { showToast("Give the building a name"); return; }
+    addButton.disabled = true;
+    try {
+      const res = await supabaseRequest("rpc/create_building", { method: "POST", body: JSON.stringify({ p_name: name }) });
+      const id = await res.json();
+      await loadMyBuildings();
+      showToast(tr("{name} added. Let's set it up.", { name }));
+      await switchBuilding(id);
+    } catch (error) {
+      showToast(error.status === 404 ? tr("The database update for more than one building hasn't been applied yet.") : (error.status ? tr(error.message) : describeSyncProblem(error)), 6000);
+    } finally {
+      addButton.disabled = false;
+    }
+  });
+  openToolDialog(tr("Your buildings"),
+    list,
+    canAdd ? mk("div", { className: "building-add" },
+      mk("h3", { className: "building-add-head", text: tr("Add a building") }),
+      note(tr("It starts empty, with its own tenants, notices, concierge and helpers. Nothing is shared with your other buildings.")),
+      field(tr("Building name"), nameInput),
+      addButton) : null);
+  const rows = await loadMyBuildings();
+  if (!Array.isArray(rows)) {
+    list.replaceChildren(note(tr("The database update for more than one building hasn't been applied yet.")));
+    return;
+  }
+  const current = currentBuildingId();
+  list.replaceChildren(...rows.map((row) => {
+    const here = row.id === current;
+    const name = row.name || (row.id === current ? state.building?.name : "") || tr("New building");
+    return mk("button", { type: "button", className: `building-row${here ? " is-current" : ""}`, "aria-current": here ? "true" : null, onclick: () => (here ? closeToolDialog() : switchBuilding(row.id)) },
+      mk("span", { className: "building-row-icon", "aria-hidden": "true" }, lucide("home", { size: 20 })),
+      mk("span", { className: "building-row-text" }, mk("strong", { text: name }), mk("span", { text: buildingRoleLabel(row) })),
+      here ? mk("span", { className: "building-row-check", "aria-hidden": "true" }, lucide("check", { size: 20 })) : mk("span", { className: "building-row-go", "aria-hidden": "true" }, lucide("chevronRight", { size: 18 })));
+  }));
+  renderBuildingSwitcher();
+}
+
+// The building name at the top becomes a switch when there is something to
+// switch to (or, for the manager, a building to add).
+function renderBuildingSwitcher() {
+  const heading = els.buildingNameHeading;
+  if (!heading) return;
+  const many = Array.isArray(myBuildingsCache) && myBuildingsCache.length > 1;
+  const on = Array.isArray(myBuildingsCache) && (many || isOwnerSession());
+  heading.classList.toggle("building-switch", on);
+  if (on) {
+    heading.setAttribute("role", "button");
+    heading.setAttribute("tabindex", "0");
+    heading.setAttribute("aria-label", tr("Switch building"));
+    if (!heading.dataset.switchWired) {
+      heading.dataset.switchWired = "1";
+      heading.addEventListener("click", () => { if (heading.classList.contains("building-switch")) openBuildingsDialog(); });
+      heading.addEventListener("keydown", (event) => { if ((event.key === "Enter" || event.key === " ") && heading.classList.contains("building-switch")) { event.preventDefault(); openBuildingsDialog(); } });
+    }
+  } else {
+    heading.removeAttribute("role");
+    heading.removeAttribute("tabindex");
+    heading.removeAttribute("aria-label");
+  }
+}
+
+// A new building opens on its setup screen; with more than one building the
+// manager can leave it and come back later.
+function decorateSetupWizard() {
+  const dialog = els.setupWizardDialog;
+  if (!dialog) return;
+  const many = Array.isArray(myBuildingsCache) && myBuildingsCache.length > 1;
+  let link = dialog.querySelector(".wizard-switch");
+  if (!many) { link?.remove(); return; }
+  if (!link) {
+    link = mk("button", { type: "button", className: "link-button wizard-switch", onclick: () => { closeDialog(dialog); openBuildingsDialog(); } });
+    dialog.append(link);
+  }
+  link.textContent = tr("Switch to another building");
+}
+
+function installBuildingsMenuItem() {
+  const menu = document.querySelector("#moreMenu");
+  if (!menu || menu.querySelector(".buildings-menu-item")) return;
+  const b = mk("button", { type: "button", className: "more-menu-item owner-only buildings-menu-item" },
+    mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("home", { size: 22 })),
+    mk("span", { className: "mm-text" }, mk("strong", { text: tr("Your buildings") }), mk("span", { text: tr("Switch building or add another one") })));
+  b.addEventListener("click", openBuildingsDialog);
+  menu.append(b);
+}
+
+function renderV173() {
+  installBuildingsMenuItem();
+  renderBuildingSwitcher();
+  decorateSetupWizard();
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -20314,6 +20574,7 @@ async function boot() {
   captureLaunchParams();
   runLaunchAction();
   if (usesOwnerAccounts()) await completeGoogleSignIn();
+  if (await checkBuildingChoice()) return;
 
   setFirstSyncLoading(true);
   await syncFromSheet();
@@ -20414,6 +20675,9 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  buildingPath,
+  currentBuildingId,
+  buildingHeader,
   renderPushExtras,
   openPushHelp,
   oldestUnpaidMonth,

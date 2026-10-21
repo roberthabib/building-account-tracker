@@ -11,6 +11,7 @@ const conciergeTokens = new Set(); // tokens linked as concierge
 const adminCodes = new Map();      // invite code -> role
 const log = [];
 const UPLOADS = [];
+const EXTRA = new Map();           // other buildings (v173): id -> { name, state, since }
 let anonGen = 1;
 
 function touch() {
@@ -64,7 +65,7 @@ http.createServer((req, res) => {
     if (path === "/__state") return send(200, STATE);
     if (path === "/__put" && req.method === "POST") { STATE = b; touch(); return send(200, { ok: true }); }
     if (path === "/__uploads") return send(200, UPLOADS);
-    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
+    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); EXTRA.clear(); anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
     if (path === "/__reset_log") { log.length = 0; return send(200, []); }
     log.push(`${req.method} ${path.replace(/^\/(rest|auth|storage)\/v1\//, "")} as ${tok.slice(0, 9)}`);
     const isOwner = tok.startsWith("demo-owner");
@@ -256,13 +257,31 @@ http.createServer((req, res) => {
       if (!isOwner) return send(400, { message: "Only the building owner can restore backups" });
       return send(200, BACKUPS.find((x) => x.day === b.p_day).state);
     }
+    if (path === "/rest/v1/rpc/my_buildings") {
+      if (isOwner) return send(200, [{ id: "building", name: STATE.building.name, role: "owner", tenant_id: null, since: "2026-01-01T00:00:00Z" },
+        ...[...EXTRA].map(([id, x]) => ({ id, name: x.state.building?.name || x.name, role: "owner", tenant_id: null, since: x.since }))]);
+      if (me) return send(200, [{ id: "building", name: STATE.building.name, role: "tenant", tenant_id: me, since: "2026-01-01T00:00:00Z" }]);
+      if (isConcierge) return send(200, [{ id: "building", name: STATE.building.name, role: "concierge", tenant_id: null, since: "2026-01-01T00:00:00Z" }]);
+      return send(200, []);
+    }
+    if (path === "/rest/v1/rpc/create_building") {
+      if (!isOwner) return send(400, { message: "Only a building manager can add a building" });
+      const id = "b" + crypto.randomBytes(6).toString("hex").slice(0, 11);
+      EXTRA.set(id, { name: b.p_name, since: nowIso(), state: { building: { name: b.p_name }, setupComplete: false } });
+      return send(200, id);
+    }
     if (path === "/rest/v1/building_state" && req.method === "GET") {
       if (!isOwner) return send(403, { message: "permission denied" }); // step-7 behaviour
-      return send(200, [{ state: STATE }]);
+      const id = (url.searchParams.get("id") || "eq.building").replace(/^eq\./, "");
+      if (id === "building") return send(200, [{ state: STATE }]);
+      return send(200, EXTRA.has(id) ? [{ state: EXTRA.get(id).state }] : []);
     }
     if (path === "/rest/v1/building_state" && req.method === "POST") {
       if (!isOwner) return send(403, { message: "permission denied" });
-      STATE = b.state; return send(201);
+      if (!b.id || b.id === "building") STATE = b.state;
+      else if (EXTRA.has(b.id)) EXTRA.get(b.id).state = b.state;
+      else return send(403, { message: "permission denied" });
+      return send(201);
     }
     if (path.startsWith("/storage/v1/object/invoices/") && req.method === "POST") {
       const obj = decodeURIComponent(path.replace("/storage/v1/object/invoices/", ""));

@@ -5709,3 +5709,125 @@ body.tenant-phone:not(.concierge-mode) .bottom-nav .nav-button[data-view="tenant
   font-size: 0.9rem;
   line-height: 1.45;
 }
+
+/* v173 — more than one building */
+.eyebrow.building-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-inline-start: -4px;
+  padding: 2px 4px;
+}
+
+.eyebrow.building-switch::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  flex: 0 0 auto;
+}
+
+.eyebrow.building-switch:focus-visible {
+  outline: 2px solid var(--primary);
+}
+
+.building-list {
+  display: grid;
+  gap: 8px;
+}
+
+.building-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface, #fff);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.building-row.is-current {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary) inset;
+}
+
+.building-row-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--avatar-bg, #e6efec);
+  color: var(--primary);
+  flex: 0 0 auto;
+}
+
+.building-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.building-row-text strong {
+  font-size: 0.98rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.building-row-text span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.building-row-check {
+  color: var(--primary);
+  flex: 0 0 auto;
+}
+
+.building-row-go {
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+body.rtl .building-row-go {
+  transform: scaleX(-1);
+}
+
+.building-add {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+}
+
+.building-add-head {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.wizard-switch {
+  display: block;
+  margin: 14px auto 0;
+  background: none;
+  border: 0;
+  padding: 8px;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+}

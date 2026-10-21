@@ -69,7 +69,9 @@ module.exports = async function handler(req, res) {
   if (!data || !Array.isArray(data.subscriptions)) return sendJson(res, 200, { ok: true, sent: 0 });
 
   webpush.setVapidDetails(process.env.VAPID_SUBJECT || "https://building-account-tracker.vercel.app", publicKey, privateKey);
-  const payload = JSON.stringify({ title: data.title, body: data.body, url: "/" });
+  // A notification about a building other than the first opens that building.
+  const building = typeof data.building === "string" && /^[a-z0-9]{1,40}$/.test(data.building) && data.building !== "building" ? data.building : "";
+  const payload = JSON.stringify({ title: data.title, body: data.body, url: building ? `/?building=${building}` : "/" });
   let sent = 0;
   let gone = 0;
   const failed = [];

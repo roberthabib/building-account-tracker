@@ -1,4 +1,4 @@
-const CACHE_NAME = "building-account-tracker-v172";
+const CACHE_NAME = "building-account-tracker-v173";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -71,6 +71,7 @@ self.addEventListener("notificationclick", (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
       const open = windows.find((w) => w.url.startsWith(self.location.origin));
+      if (open && new URL(target).search && "navigate" in open) return open.navigate(target).then((w) => (w || open).focus()).catch(() => open.focus());
       if (open) return open.focus();
       return self.clients.openWindow(target);
     }),
