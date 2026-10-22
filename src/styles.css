@@ -5831,3 +5831,258 @@ body.rtl .building-row-go {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* v174 — trusted technicians */
+.tech-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.tech-tab {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.tech-tab.is-active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(20, 33, 31, 0.12);
+}
+
+.tech-tab-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #c2410c;
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 20px;
+  text-align: center;
+}
+
+.tech-list {
+  display: grid;
+  gap: 10px;
+}
+
+.tech-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.tech-card.is-new {
+  border-color: #c2410c;
+}
+
+.tech-card.is-done,
+.tech-card.is-cancelled {
+  opacity: 0.7;
+}
+
+.tech-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tech-trade {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.tech-where {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.tech-details {
+  margin: 8px 0 0;
+  color: var(--ink);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.tech-when {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.status-pill.tech-status-new {
+  background: #fff1e6;
+  color: #9a3412;
+}
+
+.status-pill.tech-status-sent {
+  background: #e6f0fb;
+  color: #1e4f8a;
+}
+
+.status-pill.tech-status-done {
+  background: var(--surface-2);
+  color: var(--primary);
+}
+
+.mini-button.is-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+a.mini-button {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.tech-person {
+  align-items: center;
+  gap: 10px;
+}
+
+.tech-person-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tech-person-main small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.tech-person-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tech-person.is-inactive strong {
+  color: var(--muted);
+}
+
+.tech-due {
+  font-variant-numeric: tabular-nums;
+}
+
+.tech-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tech-summary-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.tech-summary-cell span {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.tech-summary-cell strong {
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tech-job.is-cancelled {
+  opacity: 0.6;
+}
+
+.tech-job-money {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tech-pick-list {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.tech-pick {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.tech-pick.is-picked {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary) inset;
+}
+
+.tech-message {
+  width: 100%;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.tech-fee-row,
+.tech-rating-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 10px;
+}
+
+.tech-my-head {
+  margin: 20px 0 6px;
+  font-size: 1rem;
+}
+
+.tech-mine-status {
+  font-weight: 700;
+  color: var(--primary) !important;
+}
+
+.tech-mine.is-cancelled,
+.tech-mine.is-done {
+  opacity: 0.7;
+}
+
+.more-menu-item .th-badge {
+  margin-inline-start: auto;
+}

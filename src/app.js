@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v173";
+const APP_VERSION = "v174";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,8 @@ const I18N = {
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
     "nav.help": "Help & videos",
+    "nav.tech": "Technicians",
+    "more.techSub": "Residents' requests, your technicians, fees",
     "nav.myFlat": "My flat",
     "more.myFlatSub": "Parking, deposit, my details, neighbours",
     "nav.staff": "Jobs & supplies",
@@ -760,6 +762,8 @@ const I18N = {
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
     "nav.help": "المساعدة والفيديوهات",
+    "nav.tech": "الفنّيون",
+    "more.techSub": "طلبات السكان، فنّيوك، العمولات",
     "nav.myFlat": "شقتي",
     "more.myFlatSub": "الموقف، التأمين، بياناتي، الجيران",
     "nav.staff": "المهام واللوازم",
@@ -2283,6 +2287,113 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Choose…": "اختر…",
+  "The database update for technicians hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بالفنّيين.",
+  "Your technicians notebook was changed on another device. It was reloaded: please do that again.": "تغيّر دفتر الفنّيين على جهاز آخر. أُعيد تحميله: أعد الخطوة من فضلك.",
+  "No fee agreed": "لا عمولة متّفق عليها",
+  "{amount} per job": "{amount} عن كل عمل",
+  "{pct}% of each job": "{pct}% من كل عمل",
+  "Not rated yet": "بدون تقييم بعد",
+  "Only the building manager uses this page.": "هذه الصفحة لمدير المبنى فقط.",
+  "Try again": "حاول مجدداً",
+  "Requests": "الطلبات",
+  "Technicians": "الفنّيون",
+  "Fees": "العمولات",
+  "Waiting for you": "بانتظارك",
+  "Sent to {name}": "أُرسل إلى {name}",
+  "Cancelled": "ملغى",
+  "Residents' requests": "طلبات السكان",
+  "No requests yet. Residents ask from their phone with \"Need a technician?\", and you'll get a notification.": "لا طلبات بعد. يطلب السكان من هاتفهم عبر «تحتاج فنّياً؟» ويصلك إشعار.",
+  "Send a building problem instead": "إرسال مشكلة في المبنى بدلاً من ذلك",
+  "Call resident": "اتصل بالساكن",
+  "Send to a technician": "أرسل إلى فنّي",
+  "Other technician": "فنّي آخر",
+  "Add a technician": "إضافة فنّي",
+  "Add the technicians you trust: their trade, phone, prices and the fee you agreed.": "أضف الفنّيين الذين تثق بهم: اختصاصهم وهاتفهم وأسعارهم والعمولة المتّفق عليها.",
+  "{n} job(s)": "{n} عمل",
+  "Not sending work": "لا يُرسَل إليه عمل",
+  "Fees due to you": "العمولات المستحقّة لك",
+  "Jobs done this month": "أعمال هذا الشهر",
+  "Fees this month": "عمولات هذا الشهر",
+  "Who owes you": "من عليه عمولات",
+  "{n} job(s) not settled": "{n} عمل غير مسدّد",
+  "Mark paid": "تسجيل كمدفوع",
+  "Nothing owed right now.": "لا شيء مستحق حالياً.",
+  "Jobs (last 3 months)": "الأعمال (آخر 3 أشهر)",
+  "Add a job": "إضافة عمل",
+  "Technician": "فنّي",
+  "{value} · fee {fee}{paid}": "{value} · العمولة {fee}{paid}",
+  "Jobs you send appear here.": "تظهر هنا الأعمال التي ترسلها.",
+  "e.g. Samir Haddad": "مثلاً: سمير حدّاد",
+  "e.g. Visit $15, tap replacement $25 + parts": "مثلاً: الكشف 15$، تبديل حنفية 25$ + القطع",
+  "% of each job": "نسبة % من كل عمل",
+  "Fixed amount per job": "مبلغ ثابت عن كل عمل",
+  "Area, availability, anything to remember": "المنطقة، الأوقات، أي ملاحظة",
+  "Send work to this technician": "إرسال أعمال لهذا الفنّي",
+  "Enter the technician's name": "أدخل اسم الفنّي",
+  "Edit technician": "تعديل الفنّي",
+  "Trade": "الاختصاص",
+  "Phone (WhatsApp)": "الهاتف (واتساب)",
+  "Prices you agreed": "الأسعار المتّفق عليها",
+  "Your fee": "عمولتك",
+  "Only you see this notebook. It isn't part of any building's accounts.": "هذا الدفتر لك وحدك، وليس جزءاً من حسابات أي مبنى.",
+  "unit {unit}": "الوحدة {unit}",
+  "Hello {name}, a job for you:": "مرحباً {name}، لديك عمل:",
+  "Where: {where}": "المكان: {where}",
+  "Resident: {resident}": "الساكن: {resident}",
+  "Photo: {link}": "الصورة: {link}",
+  "Please contact them and let me know when it's done. Thank you.": "الرجاء التواصل معه وإعلامي عند الانتهاء. شكراً.",
+  "Add a phone number for this technician first": "أضف رقم هاتف لهذا الفنّي أولاً",
+  "Send to a technician — {trade}": "أرسل إلى فنّي — {trade}",
+  "You haven't added technicians yet.": "لم تُضف فنّيين بعد.",
+  "Job saved": "تم حفظ العمل",
+  "Job done — {name}": "انتهى العمل — {name}",
+  "What the resident paid (USD)": "ما دفعه الساكن (دولار)",
+  "Ask the resident or the technician.": "اسأل الساكن أو الفنّي.",
+  "Your fee (USD)": "عمولتك (دولار)",
+  "On time": "في الموعد",
+  "Fair price": "سعر عادل",
+  "Quality": "الجودة",
+  "Cancel this request? The resident will see it as cancelled.": "إلغاء هذا الطلب؟ سيظهر للساكن أنه أُلغي.",
+  "Add a technician first": "أضف فنّياً أولاً",
+  "Somewhere else": "مكان آخر",
+  "e.g. 3B": "مثلاً: 3B",
+  "e.g. Replaced the water heater": "مثلاً: تبديل سخّان المياه",
+  "Next": "التالي",
+  "Say what the job was": "اذكر ما هو العمل",
+  "For work a technician did that didn't come through the app, so the fee is counted.": "لعمل قام به فنّي ولم يمرّ عبر التطبيق، كي تُحتسب العمولة.",
+  "Flat": "الشقة",
+  "Hello {name}, here are the jobs not settled yet:": "مرحباً {name}، هذه الأعمال التي لم تُسدَّد عمولتها بعد:",
+  "Total: {amount}. Thank you!": "المجموع: {amount}. شكراً!",
+  "{name} paid you {amount}? This settles {n} job(s).": "هل دفع لك {name} مبلغ {amount}؟ هذا يسدّد {n} عمل.",
+  "Marked as paid": "سُجّل كمدفوع",
+  "{n} resident(s) asked for a technician": "{n} من السكان طلبوا فنّياً",
+  "Waiting for the building manager": "بانتظار مدير المبنى",
+  "{name} will contact you": "{name} سيتواصل معك",
+  "A technician": "فنّي",
+  "Link this phone with an invite code first": "اربط هذا الهاتف برمز دعوة أولاً",
+  "What needs fixing, where in the flat, when you're home": "ما الذي يحتاج إصلاحاً، وأين في الشقة، ومتى تكون في البيت",
+  "Choose what kind of technician you need": "اختر نوع الفنّي الذي تحتاجه",
+  "Say what needs fixing": "اذكر ما الذي يحتاج إصلاحاً",
+  "Sent. The building manager will find you a technician.": "تم الإرسال. سيجد لك مدير المبنى فنّياً.",
+  "Need a technician?": "تحتاج فنّياً؟",
+  "For repairs inside your flat. The building manager sends you a trusted technician who will call you. You agree the price with them and pay them directly.": "لتصليحات داخل شقتك. يرسل لك مدير المبنى فنّياً موثوقاً يتصل بك. تتّفق معه على السعر وتدفع له مباشرة.",
+  "What kind?": "أي نوع؟",
+  "What needs fixing?": "ما الذي يحتاج إصلاحاً؟",
+  "Your requests": "طلباتك",
+  "Cancel this request?": "إلغاء هذا الطلب؟",
+  "Request cancelled": "أُلغي الطلب",
+  "No requests yet.": "لا طلبات بعد.",
+  "Plumber": "سبّاك",
+  "Electrician": "كهربائي",
+  "Lift technician": "فنّي مصعد",
+  "Generator mechanic": "ميكانيكي مولّدات",
+  "Air conditioning": "تكييف",
+  "Painting & waterproofing": "دهان وعزل",
+  "Carpenter & locksmith": "نجّار وأقفال",
+  "You already have 5 requests waiting. The building manager will answer them first.": "لديك 5 طلبات بالانتظار. سيجيب مدير المبنى عليها أولاً.",
+  "That request can no longer be cancelled": "لم يعد بالإمكان إلغاء هذا الطلب",
+  "Photo must be one of your own uploads": "يجب أن تكون الصورة من الصور التي رفعتها أنت",
   "Connect to the internet to switch buildings": "اتصل بالإنترنت للتبديل بين المباني",
   "This building's latest changes couldn't be saved yet. Try again in a moment.": "تعذّر حفظ آخر تغييرات هذا المبنى بعد. حاول مجدداً بعد قليل.",
   "e.g. Cedar Residence": "مثلاً: بناية الأرز",
@@ -2971,6 +3082,7 @@ const LUCIDE_ICONS = {
   megaphone: [["path", { d: "m3 11 18-5v12L3 14v-3z" }], ["path", { d: "M11.6 16.8a3 3 0 1 1-5.8-1.6" }]],
   play: [["path", { d: "M7 4.5v15a1 1 0 0 0 1.5.86l12.4-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" }]],
   playCircle: [["circle", { cx: 12, cy: 12, r: 10 }], ["path", { d: "M10 8.5v7a.5.5 0 0 0 .77.42l5.4-3.5a.5.5 0 0 0 0-.84l-5.4-3.5A.5.5 0 0 0 10 8.5z" }]],
+  hammer: [["path", { d: "m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9" }], ["path", { d: "m18 15 4-4" }], ["path", { d: "m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5" }]],
   wrench: [["path", { d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" }]],
   barChart: [["path", { d: "M3 3v18h18" }], ["path", { d: "M18 17V9" }], ["path", { d: "M13 17V5" }], ["path", { d: "M8 17v-3" }]],
   bell: [["path", { d: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" }], ["path", { d: "M10.3 21a1.94 1.94 0 0 0 3.4 0" }]],
@@ -4831,6 +4943,7 @@ function enterAsOwner() {
   refreshKeepaliveStatus();
   refreshTenantLinks();
   checkInvoiceReading();
+  void refreshTechRequests();
 }
 
 function hideLoginScreen() {
@@ -7831,10 +7944,10 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView", "myFlatView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView", "myFlatView", "techView"];
 
 function setView(viewId) {
-  if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView"].includes(viewId)) viewId = "moreView";
+  if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "techView"].includes(viewId)) viewId = "moreView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
   // Re-run the enter animation each time a view is shown.
   const active = document.getElementById(viewId);
@@ -7845,6 +7958,7 @@ function setView(viewId) {
   });
   // Scroll back to top when switching views.
   window.scrollTo({ top: 0 });
+  if (viewId === "techView") void openTechView();
 }
 
 // Inject a Lucide icon into each element carrying data-nav-icon (nav buttons,
@@ -13407,7 +13521,7 @@ function extraAttentionItems() {
   });
   const diesel = dieselEstimate();
   if (diesel.ready && diesel.low) items.push({ kind: "danger", text: tr("Diesel is low: about {n} litres left", { n: numberFormat.format(diesel.litres) }), view: "servicesView", key: `diesel:${localDateInput()}` });
-  items.push(...v167AttentionItems(), ...v167bAttentionItems());
+  items.push(...v167AttentionItems(), ...v167bAttentionItems(), ...v174AttentionItems());
   [currentMonthValue()].forEach((m) => {
     const late = lateTenants(m);
     if (late.length) items.push({ kind: "danger", text: tr(late.length === 1 ? "{n} tenant is late for {month}" : "{n} tenants are late for {month}", { n: late.length, month: formatMonth(m) }), view: "paymentsView", key: `late:${monthKey(m)}` });
@@ -13423,6 +13537,7 @@ function handleExtraAttentionAction(row) {
   }
   if (row.dataset.action === "cashCheck") { openCashCheckDialog(); return true; }
   if (row.dataset.action === "approvals") { openApprovalsDialog(); return true; }
+  if (row.dataset.action === "techRequests") { setView("techView"); return true; }
   if (row.dataset.action === "helpVideo") { openHelpVideo(row.dataset.arg || "tour"); return true; }
   return false;
 }
@@ -13451,6 +13566,7 @@ function renderV148() {
   renderV167();
   renderV167b();
   renderV173();
+  renderV174();
   renderMyFlat();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
   renderGeneratorScheduleNote();
@@ -17263,6 +17379,7 @@ function decorateIssueCards() {
     if (!actions) { actions = mk("div", { className: "notice-actions" }); card.append(actions); }
     if (canReplyIssue(issue)) actions.prepend(miniButton(tr("Reply"), () => openIssueReply(issue.id)));
     if (sessionMode === "owner" && !isViewerSession()) actions.append(miniButton(tr("Work order"), () => openWorkOrderDialog(issue.id)));
+    if (isTechManager() && issue.status !== "fixed") actions.append(miniButton(tr("Technician"), () => { void openSendToTechnician(problemContext(issue)); }));
   });
 }
 
@@ -20105,6 +20222,7 @@ function tenantShortcuts() {
     emergency ? tile("bell", tr("Emergency"), () => openToolDialog(tr("Emergency numbers"), emergency)) : null,
     generator ? tile("zap", tr("Generator hours"), () => openToolDialog(tr("Generator hours"), generator)) : null,
     tile("wrench", tr("Report a problem"), () => openIssueDialog()),
+    tile("hammer", tr("Need a technician?"), () => { void openTechRequestDialog(); }),
     bookableSpaces().length ? tile("calendar", tr("Bookings"), () => setView("bookingsView")) : null,
     tile("users", tr("Residents' board"), () => setView("boardView")),
     tile("receipt", tr("Receipts"), openMyReceipts),
@@ -20466,6 +20584,633 @@ function renderV173() {
   decorateSetupWizard();
 }
 
+// ── v174 — trusted technicians ───────────────────────────────────────────────
+// Residents ask for a technician for a repair in their own flat ("Need a
+// technician?" tile → rpc request_technician, photos under requests/<flat>/).
+// The building manager sees the requests of every building they run (More →
+// Technicians), passes each to a technician from their own notebook on
+// WhatsApp, rates the work and keeps track of the fees technicians owe them.
+// The notebook (technicians, jobs, fees) belongs to the manager's account
+// (rpc get_manager_book / save_manager_book), never to a building, so it never
+// shows in a building's accounts. Server side: supabase/phase2m-v174.sql.
+const TRADES = [
+  ["plumber", "Plumber"], ["electrician", "Electrician"], ["lift", "Lift technician"], ["generator", "Generator mechanic"],
+  ["ac", "Air conditioning"], ["painting", "Painting & waterproofing"], ["carpentry", "Carpenter & locksmith"], ["cleaning", "Cleaning"], ["other", "Other"],
+];
+let techBook = null;
+let techRequests = null;
+let techTab = "requests";
+let techLoading = false;
+let techProblem = "";
+
+function tradeLabel(id) {
+  const row = TRADES.find(([value]) => value === id);
+  return tr(row ? row[1] : "Technician");
+}
+
+function tradeSelect(value = "", { placeholder = false } = {}) {
+  const options = TRADES.map(([v, label]) => [v, tr(label)]);
+  return selectInput(placeholder ? [["", tr("Choose…")], ...options] : options, value);
+}
+
+function techMissingDb(error) {
+  return error?.status === 404 ? tr("The database update for technicians hasn't been applied yet.") : null;
+}
+
+function isTechManager() {
+  return sessionMode === "owner" && isOwnerSession() && !isViewerSession();
+}
+
+// ── The manager's notebook ──
+function emptyTechBook() {
+  return { technicians: [], jobs: [] };
+}
+
+async function loadTechBook() {
+  const res = await supabaseRequest("rpc/get_manager_book", { method: "POST", body: "{}" });
+  const body = await res.json();
+  const data = { ...emptyTechBook(), ...(body?.data || {}) };
+  data.technicians = Array.isArray(data.technicians) ? data.technicians : [];
+  data.jobs = Array.isArray(data.jobs) ? data.jobs : [];
+  techBook = { data, rev: Number(body?.rev || 0) };
+  return techBook;
+}
+
+async function loadTechRequests() {
+  const res = await supabaseRequest("rpc/list_service_requests", { method: "POST", body: JSON.stringify({ p_days: 120 }) });
+  techRequests = await res.json();
+  return techRequests;
+}
+
+// Changes the notebook and saves it; on failure the change is undone (or the
+// notebook reloaded when another phone changed it in the meantime).
+async function changeTechBook(change) {
+  if (!techBook) await loadTechBook();
+  const before = JSON.stringify(techBook.data);
+  change(techBook.data);
+  try {
+    const res = await supabaseRequest("rpc/save_manager_book", { method: "POST", body: JSON.stringify({ p_data: techBook.data, p_rev: techBook.rev }) });
+    techBook.rev = Number(await res.json());
+    renderTechView();
+    return true;
+  } catch (error) {
+    if (/changed-elsewhere/.test(error.message || "")) {
+      await loadTechBook().catch(() => {});
+      showToast("Your technicians notebook was changed on another device. It was reloaded: please do that again.", 7000);
+    } else {
+      techBook.data = JSON.parse(before);
+      showToast(techMissingDb(error) || describeSyncProblem(error), 6000);
+    }
+    renderTechView();
+    return false;
+  }
+}
+
+function technicianById(id) {
+  return (techBook?.data.technicians || []).find((t) => t.id === id) || null;
+}
+
+function jobFee(technician, valueUsd) {
+  const value = Number(valueUsd) || 0;
+  if (!technician) return 0;
+  if (technician.feeKind === "fixed") return roundUsd(Number(technician.feeValue) || 0);
+  return roundUsd(value * (Number(technician.feeValue) || 0) / 100);
+}
+
+function technicianStats(technicianId, jobs = techBook?.data.jobs || []) {
+  const done = jobs.filter((j) => j.technicianId === technicianId && j.status === "done");
+  const rated = done.filter((j) => j.rating && [j.rating.onTime, j.rating.price, j.rating.quality].every((x) => Number(x) > 0));
+  const rating = rated.length
+    ? rated.reduce((sum, j) => sum + (Number(j.rating.onTime) + Number(j.rating.price) + Number(j.rating.quality)) / 3, 0) / rated.length
+    : null;
+  const unpaid = done.filter((j) => !j.paidOn && Number(j.feeUsd) > 0);
+  return {
+    jobs: done.length,
+    rating: rating === null ? null : Math.round(rating * 10) / 10,
+    unpaidUsd: roundUsd(unpaid.reduce((sum, j) => sum + Number(j.feeUsd || 0), 0)),
+    unpaid,
+  };
+}
+
+function feeTermsText(technician) {
+  if (!technician || !(Number(technician.feeValue) > 0)) return tr("No fee agreed");
+  return technician.feeKind === "fixed"
+    ? tr("{amount} per job", { amount: formatUsd(Number(technician.feeValue)) })
+    : tr("{pct}% of each job", { pct: Number(technician.feeValue) });
+}
+
+function stars(rating) {
+  return rating === null || rating === undefined ? tr("Not rated yet") : `★ ${rating.toFixed(1)}`;
+}
+
+// ── The page: More → Technicians ──
+async function openTechView() {
+  if (!isTechManager()) { renderTechView(); return; }
+  techLoading = true;
+  techProblem = "";
+  renderTechView();
+  try {
+    await Promise.all([loadTechBook(), loadTechRequests()]);
+  } catch (error) {
+    techProblem = techMissingDb(error) || describeSyncProblem(error);
+  }
+  techLoading = false;
+  renderTechView();
+  renderTechBadge();
+}
+
+function techTabButton(id, label, count = 0) {
+  return mk("button", { type: "button", className: `tech-tab${techTab === id ? " is-active" : ""}`, "aria-pressed": techTab === id ? "true" : "false", onclick: () => { techTab = id; renderTechView(); } },
+    label, count ? mk("span", { className: "tech-tab-count", text: String(count) }) : null);
+}
+
+function renderTechView() {
+  const body = document.querySelector("#techBody");
+  if (!body) return;
+  if (!isTechManager()) { fillChildren(body, note(tr("Only the building manager uses this page."))); return; }
+  if (techLoading && !techBook) { fillChildren(body, note(tr("Loading…"))); return; }
+  if (techProblem) { fillChildren(body, note(techProblem, "is-warning"), mk("div", { className: "button-row" }, secondaryButton(tr("Try again"), () => openTechView()))); return; }
+  if (!techBook) { fillChildren(body); return; }
+  const waiting = (techRequests || []).filter((r) => r.status === "new").length;
+  const dueUsd = roundUsd(techBook.data.technicians.reduce((sum, t) => sum + technicianStats(t.id).unpaidUsd, 0));
+  fillChildren(body,
+    mk("div", { className: "tech-tabs", role: "group" },
+      techTabButton("requests", tr("Requests"), waiting),
+      techTabButton("people", tr("Technicians")),
+      techTabButton("fees", tr("Fees"))),
+    techTab === "requests" ? renderTechRequests()
+      : techTab === "people" ? renderTechPeople()
+        : renderTechFees(dueUsd));
+}
+
+function requestStatusText(request) {
+  if (request.status === "new") return tr("Waiting for you");
+  if (request.status === "sent") return tr("Sent to {name}", { name: request.technicianName || "" });
+  if (request.status === "done") return tr("Done");
+  return tr("Cancelled");
+}
+
+function renderTechRequests() {
+  const list = (techRequests || []).slice().sort((a, b) => {
+    const rank = { new: 0, sent: 1, done: 2, cancelled: 3 };
+    return (rank[a.status] ?? 4) - (rank[b.status] ?? 4) || String(b.createdAt).localeCompare(String(a.createdAt));
+  });
+  if (!list.length) {
+    return reportsSection(tr("Residents' requests"),
+      note(tr("No requests yet. Residents ask from their phone with \"Need a technician?\", and you'll get a notification.")),
+      mk("div", { className: "button-row" }, secondaryButton(tr("Send a building problem instead"), () => setView("issuesView"))));
+  }
+  return mk("div", { className: "tech-list" }, list.map((request) => {
+    const where = [request.buildingName, request.unit ? tr("Unit {unit}", { unit: request.unit }) : "", request.tenantName].filter(Boolean).join(" · ");
+    const actions = mk("div", { className: "notice-actions" },
+      request.photoPath ? miniButton(tr("Photo"), () => openInvoicePhoto({ storagePath: request.photoPath, mimeType: "image/jpeg" })) : null,
+      request.phone ? mk("a", { className: "mini-button", href: `tel:${request.phone}`, text: tr("Call resident") }) : null,
+      request.status === "new" ? mk("button", { type: "button", className: "mini-button is-primary", text: tr("Send to a technician"), onclick: () => openSendToTechnician(requestContext(request)) }) : null,
+      request.status === "sent" ? mk("button", { type: "button", className: "mini-button is-primary", text: tr("Mark done"), onclick: () => openJobDoneDialog(jobForRequest(request), request) }) : null,
+      request.status === "sent" ? miniButton(tr("Other technician"), () => openSendToTechnician(requestContext(request))) : null,
+      ["new", "sent"].includes(request.status) ? miniButton(tr("Cancel"), () => cancelServiceRequest(request)) : null);
+    return mk("article", { className: `tech-card is-${request.status}` },
+      mk("div", { className: "tech-card-head" },
+        mk("span", { className: "tech-trade", text: tradeLabel(request.trade) }),
+        mk("span", { className: `status-pill tech-status-${request.status}`, text: requestStatusText(request) })),
+      mk("p", { className: "tech-where", text: where }),
+      mk("p", { className: "tech-details", text: request.details }),
+      mk("p", { className: "tech-when", text: formatDateTime(request.createdAt) }),
+      actions);
+  }));
+}
+
+function renderTechPeople() {
+  const people = techBook.data.technicians.slice().sort((a, b) => (a.active === false) - (b.active === false) || String(a.name).localeCompare(String(b.name)));
+  const byTrade = TRADES.map(([trade]) => [trade, people.filter((t) => t.trade === trade)]).filter(([, list]) => list.length);
+  return mk("div", {},
+    mk("div", { className: "button-row" }, primaryButton(tr("Add a technician"), () => openTechnicianEditor())),
+    byTrade.length ? null : note(tr("Add the technicians you trust: their trade, phone, prices and the fee you agreed.")),
+    byTrade.map(([trade, list]) => reportsSection(tradeLabel(trade), mk("div", {}, list.map((t) => {
+      const s = technicianStats(t.id);
+      return mk("div", { className: `breakdown-row tech-person${t.active === false ? " is-inactive" : ""}` },
+        mk("span", { className: "tech-person-main" },
+          mk("strong", { text: t.name }),
+          mk("small", { text: [stars(s.rating), tr("{n} job(s)", { n: s.jobs }), feeTermsText(t)].join(" · ") }),
+          t.active === false ? mk("small", { text: tr("Not sending work") }) : null),
+        mk("span", { className: "tech-person-actions" },
+          t.phone ? mk("a", { className: "mini-button", href: `tel:${t.phone}`, text: tr("Call") }) : null,
+          miniButton(tr("Edit"), () => openTechnicianEditor(t.id))));
+    })))));
+}
+
+function renderTechFees(dueUsd) {
+  const people = techBook.data.technicians.map((t) => ({ t, s: technicianStats(t.id) })).filter(({ s }) => s.unpaidUsd > 0);
+  const since = addDays(localDateInput(), -90);
+  const jobs = techBook.data.jobs.filter((j) => String(j.date || "") >= since).sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.createdAt).localeCompare(String(a.createdAt)));
+  const month = localDateInput().slice(0, 7);
+  const monthJobs = techBook.data.jobs.filter((j) => j.status === "done" && String(j.date || "").slice(0, 7) === month);
+  return mk("div", {},
+    mk("div", { className: "tech-summary" },
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Fees due to you") }), mk("strong", { text: formatUsd(dueUsd) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Jobs done this month") }), mk("strong", { text: String(monthJobs.length) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Fees this month") }), mk("strong", { text: formatUsd(roundUsd(monthJobs.reduce((sum, j) => sum + Number(j.feeUsd || 0), 0))) }))),
+    reportsSection(tr("Who owes you"),
+      people.length
+        ? mk("div", {}, people.map(({ t, s }) => mk("div", { className: "breakdown-row tech-person" },
+          mk("span", { className: "tech-person-main" }, mk("strong", { text: t.name }), mk("small", { text: tr("{n} job(s) not settled", { n: s.unpaid.length }) })),
+          mk("span", { className: "tech-person-actions" },
+            mk("strong", { className: "tech-due", text: formatUsd(s.unpaidUsd) }),
+            miniButton(tr("Statement"), () => sendTechStatement(t)),
+            miniButton(tr("Mark paid"), () => markTechPaid(t))))))
+        : note(tr("Nothing owed right now."))),
+    reportsSection(tr("Jobs (last 3 months)"),
+      mk("div", { className: "button-row" }, secondaryButton(tr("Add a job"), () => openManualJobDialog())),
+      jobs.length
+        ? mk("div", {}, jobs.map((j) => {
+          const t = technicianById(j.technicianId);
+          return mk("div", { className: `breakdown-row tech-job is-${j.status}` },
+            mk("span", { className: "tech-person-main" },
+              mk("strong", { text: j.title || tradeLabel(j.trade) }),
+              mk("small", { text: [formatDateLabel(j.date), t?.name || tr("Technician"), [j.buildingName, j.flat].filter(Boolean).join(" · ")].filter(Boolean).join(" — ") })),
+            mk("span", { className: "tech-person-actions" },
+              j.status === "done"
+                ? mk("small", { className: "tech-job-money", text: tr("{value} · fee {fee}{paid}", { value: formatUsd(Number(j.valueUsd || 0)), fee: formatUsd(Number(j.feeUsd || 0)), paid: j.paidOn ? " ✓" : "" }) })
+                : j.status === "sent" ? miniButton(tr("Mark done"), () => openJobDoneDialog(j)) : mk("small", { text: tr("Cancelled") })));
+        }))
+        : note(tr("Jobs you send appear here."))));
+}
+
+function formatDateTime(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return `${formatDateLabel(localDateInput(d))} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+// ── Technician editor ──
+function openTechnicianEditor(id = null, { trade = "", onSaved = null } = {}) {
+  const existing = id ? technicianById(id) : null;
+  const name = textInput(existing?.name || "", { maxlength: "80", placeholder: tr("e.g. Samir Haddad") });
+  const tradeInput = tradeSelect(existing?.trade || trade || "plumber");
+  const phone = textInput(existing?.phone || "", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
+  const prices = mk("textarea", { rows: "3", maxlength: "1000", placeholder: tr("e.g. Visit $15, tap replacement $25 + parts") });
+  prices.value = existing?.prices || "";
+  const feeKind = selectInput([["percent", tr("% of each job")], ["fixed", tr("Fixed amount per job")]], existing?.feeKind || "percent");
+  const feeValue = numberInput(existing?.feeValue ?? 10);
+  const notes = mk("textarea", { rows: "2", maxlength: "500", placeholder: tr("Area, availability, anything to remember") });
+  notes.value = existing?.notes || "";
+  const active = checkboxRow(tr("Send work to this technician"), existing ? existing.active !== false : true);
+  const save = primaryButton(tr("Save"), async () => {
+    if (!name.value.trim()) { showToast("Enter the technician's name"); return; }
+    save.disabled = true;
+    const now = new Date().toISOString();
+    const record = {
+      id: existing?.id || newId("tech"), name: name.value.trim(), trade: tradeInput.value, phone: phone.value.trim(),
+      prices: prices.value.trim(), feeKind: feeKind.value, feeValue: Math.max(0, Number(feeValue.value) || 0),
+      notes: notes.value.trim(), active: active.input.checked, createdAt: existing?.createdAt || now, updatedAt: now,
+    };
+    const ok = await changeTechBook((data) => {
+      data.technicians = existing ? data.technicians.map((t) => (t.id === record.id ? record : t)) : [...data.technicians, record];
+    });
+    save.disabled = false;
+    if (!ok) return;
+    closeToolDialog();
+    showToast(existing ? "Technician updated" : "Technician added");
+    if (onSaved) onSaved(record);
+  });
+  openToolDialog(existing ? tr("Edit technician") : tr("Add a technician"),
+    field(tr("Name"), name),
+    field(tr("Trade"), tradeInput),
+    field(tr("Phone (WhatsApp)"), phone),
+    field(tr("Prices you agreed"), prices),
+    mk("div", { className: "tech-fee-row" }, field(tr("Your fee"), feeKind), field(tr("Amount"), feeValue)),
+    note(tr("Only you see this notebook. It isn't part of any building's accounts.")),
+    field(tr("Notes"), notes),
+    active.row,
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Sending a job ──
+function requestContext(request) {
+  return {
+    source: "request", requestId: request.id, trade: request.trade, title: request.details,
+    buildingId: request.buildingId, buildingName: request.buildingName, flat: request.unit || "",
+    residentName: request.tenantName || "", residentPhone: request.phone || "", photoPath: request.photoPath || "",
+  };
+}
+
+function problemContext(issue) {
+  const tenant = issue.tenantId ? state.tenants.find((t) => t.id === issue.tenantId) : null;
+  return {
+    source: "problem", issueId: issue.id, trade: "", title: [issue.title, issue.details].filter(Boolean).join(" — "),
+    buildingId: currentBuildingId(), buildingName: state.building?.name || "", flat: tenant?.unit || "",
+    residentName: tenant?.name || "", residentPhone: tenant?.phone || "", photoPath: issue.photo?.storagePath || "",
+  };
+}
+
+function jobForRequest(request) {
+  return (techBook?.data.jobs || []).filter((j) => j.requestId === request.id && j.status === "sent").pop()
+    || { id: null, requestId: request.id, trade: request.trade, title: request.details, buildingId: request.buildingId, buildingName: request.buildingName, flat: request.unit || "", technicianId: "", status: "sent" };
+}
+
+// A link to a private photo that stays valid long enough for a technician.
+async function longPhotoLink(storagePath) {
+  if (!storagePath || cloudProvider() !== "supabase") return "";
+  const c = cloudConfig();
+  await ensureFreshSession();
+  const res = await fetch(`${c.supabaseUrl}/storage/v1/object/sign/${SUPABASE_INVOICE_BUCKET}/${encodeURI(storagePath)}`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ expiresIn: 3 * 24 * 3600 }),
+  });
+  if (!res.ok) return "";
+  const body = await res.json();
+  const signed = body.signedURL || body.signedUrl || "";
+  return signed.startsWith("http") ? signed : `${c.supabaseUrl}/storage/v1${signed}`;
+}
+
+function technicianMessage(technician, ctx, photoLink) {
+  const where = [ctx.buildingName, ctx.flat ? tr("unit {unit}", { unit: ctx.flat }) : ""].filter(Boolean).join(", ");
+  const resident = [ctx.residentName, ctx.residentPhone].filter(Boolean).join(" ");
+  return [
+    tr("Hello {name}, a job for you:", { name: technician.name }),
+    `${ctx.trade ? `${tradeLabel(ctx.trade)}: ` : ""}${ctx.title}`,
+    where ? tr("Where: {where}", { where }) : "",
+    resident ? tr("Resident: {resident}", { resident }) : "",
+    photoLink ? tr("Photo: {link}", { link: photoLink }) : "",
+    tr("Please contact them and let me know when it's done. Thank you."),
+  ].filter(Boolean).join("\n");
+}
+
+async function openSendToTechnician(ctx) {
+  if (!techBook) {
+    try { await loadTechBook(); } catch (error) { showToast(techMissingDb(error) || describeSyncProblem(error), 6000); return; }
+  }
+  const active = techBook.data.technicians.filter((t) => t.active !== false);
+  const sameTrade = ctx.trade ? active.filter((t) => t.trade === ctx.trade) : [];
+  const others = active.filter((t) => !sameTrade.includes(t));
+  const ordered = [...sameTrade, ...others].sort((a, b) => (sameTrade.includes(b) - sameTrade.includes(a)) || ((technicianStats(b.id).rating ?? 0) - (technicianStats(a.id).rating ?? 0)));
+  const message = mk("textarea", { rows: "7", className: "tech-message" });
+  const send = primaryButton(tr("Send on WhatsApp"), () => { void confirmSend(); });
+  send.disabled = true;
+  let picked = null;
+  let photoLink = "";
+  const pick = async (technician, row) => {
+    picked = technician;
+    list.querySelectorAll(".tech-pick").forEach((b) => b.classList.toggle("is-picked", b === row));
+    send.disabled = !technician.phone;
+    if (!technician.phone) showToast("Add a phone number for this technician first");
+    message.value = technicianMessage(technician, ctx, photoLink);
+    if (ctx.photoPath && !photoLink) {
+      photoLink = await longPhotoLink(ctx.photoPath).catch(() => "");
+      if (picked === technician) message.value = technicianMessage(technician, ctx, photoLink);
+    }
+  };
+  const list = mk("div", { className: "tech-pick-list" }, ordered.map((t) => {
+    const s = technicianStats(t.id);
+    const row = mk("button", { type: "button", className: "tech-pick" },
+      mk("span", { className: "tech-person-main" },
+        mk("strong", { text: t.name }),
+        mk("small", { text: [tradeLabel(t.trade), stars(s.rating), tr("{n} job(s)", { n: s.jobs })].join(" · ") })));
+    row.addEventListener("click", () => { void pick(t, row); });
+    return row;
+  }));
+  const confirmSend = async () => {
+    if (!picked) return;
+    // Open WhatsApp inside the tap, then record the job.
+    window.open(whatsappLink(picked.phone, message.value), "_blank", "noopener");
+    const now = new Date().toISOString();
+    const job = {
+      id: newId("job"), technicianId: picked.id, source: ctx.source, requestId: ctx.requestId || null, issueId: ctx.issueId || null,
+      trade: ctx.trade || picked.trade, title: ctx.title, buildingId: ctx.buildingId, buildingName: ctx.buildingName, flat: ctx.flat,
+      date: localDateInput(), status: "sent", valueUsd: 0, feeUsd: 0, paidOn: "", rating: null, createdAt: now, updatedAt: now,
+    };
+    send.disabled = true;
+    const ok = await changeTechBook((data) => {
+      // Re-sending a request to someone else cancels the earlier job.
+      if (ctx.requestId) data.jobs.forEach((j) => { if (j.requestId === ctx.requestId && j.status === "sent") { j.status = "cancelled"; j.updatedAt = now; } });
+      data.jobs.push(job);
+    });
+    if (ok && ctx.requestId) {
+      try {
+        await supabaseRequest("rpc/update_service_request", { method: "POST", body: JSON.stringify({ p_id: ctx.requestId, p_status: "sent", p_technician_name: picked.name, p_technician_phone: picked.phone }) });
+        await loadTechRequests();
+      } catch (error) {
+        showToast(describeSyncProblem(error), 6000);
+      }
+    }
+    closeToolDialog();
+    renderTechView();
+    renderTechBadge();
+    if (ok) showToast(ctx.requestId ? "Sent. The resident is told who will call them." : "Sent to the technician");
+  };
+  openToolDialog(ctx.trade ? tr("Send to a technician — {trade}", { trade: tradeLabel(ctx.trade) }) : tr("Send to a technician"),
+    mk("p", { className: "tech-details", text: ctx.title }),
+    ordered.length ? list : note(tr("You haven't added technicians yet.")),
+    mk("div", { className: "button-row" }, secondaryButton(tr("Add a technician"), () => openTechnicianEditor(null, { trade: ctx.trade, onSaved: () => openSendToTechnician(ctx) }))),
+    ordered.length ? field(tr("Message"), message) : null,
+    ordered.length ? mk("div", { className: "button-row" }, send, secondaryButton(tr("Cancel"), closeToolDialog)) : null);
+}
+
+function ratingSelect(value) {
+  return selectInput([["", "—"], ["5", "★★★★★"], ["4", "★★★★"], ["3", "★★★"], ["2", "★★"], ["1", "★"]], value ? String(value) : "");
+}
+
+function openJobDoneDialog(job, request = null) {
+  if (!job) return;
+  const technician = technicianById(job.technicianId);
+  const value = numberInput(job.valueUsd || "");
+  const fee = numberInput(job.feeUsd || "");
+  const updateFee = () => { fee.value = String(jobFee(technician, value.value)); };
+  value.addEventListener("input", updateFee);
+  const onTime = ratingSelect(job.rating?.onTime);
+  const price = ratingSelect(job.rating?.price);
+  const quality = ratingSelect(job.rating?.quality);
+  const notes = mk("textarea", { rows: "2", maxlength: "500" });
+  notes.value = job.note || "";
+  const save = primaryButton(tr("Save"), async () => {
+    save.disabled = true;
+    const now = new Date().toISOString();
+    const done = {
+      ...job, id: job.id || newId("job"), status: "done", valueUsd: roundUsd(Number(value.value) || 0), feeUsd: roundUsd(Number(fee.value) || 0),
+      doneOn: localDateInput(), rating: { onTime: Number(onTime.value) || 0, price: Number(price.value) || 0, quality: Number(quality.value) || 0 },
+      note: notes.value.trim(), updatedAt: now, createdAt: job.createdAt || now, date: job.date || localDateInput(),
+    };
+    const ok = await changeTechBook((data) => {
+      data.jobs = data.jobs.some((j) => j.id === done.id) ? data.jobs.map((j) => (j.id === done.id ? done : j)) : [...data.jobs, done];
+    });
+    if (ok && (job.requestId || request?.id)) {
+      await supabaseRequest("rpc/update_service_request", { method: "POST", body: JSON.stringify({ p_id: job.requestId || request.id, p_status: "done" }) })
+        .then(() => loadTechRequests()).catch((error) => showToast(describeSyncProblem(error), 6000));
+    }
+    save.disabled = false;
+    if (!ok) return;
+    closeToolDialog();
+    renderTechView();
+    renderTechBadge();
+    showToast("Job saved");
+  });
+  openToolDialog(tr("Job done — {name}", { name: technician?.name || tr("Technician") }),
+    mk("p", { className: "tech-details", text: job.title || "" }),
+    field(tr("What the resident paid (USD)"), value, tr("Ask the resident or the technician.")),
+    field(tr("Your fee (USD)"), fee, technician ? feeTermsText(technician) : ""),
+    mk("div", { className: "tech-rating-row" }, field(tr("On time"), onTime), field(tr("Fair price"), price), field(tr("Quality"), quality)),
+    field(tr("Notes"), notes),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+  if (!job.feeUsd && job.valueUsd) updateFee();
+}
+
+async function cancelServiceRequest(request) {
+  if (!window.confirm(tr("Cancel this request? The resident will see it as cancelled."))) return;
+  try {
+    await supabaseRequest("rpc/update_service_request", { method: "POST", body: JSON.stringify({ p_id: request.id, p_status: "cancelled" }) });
+    const now = new Date().toISOString();
+    if ((techBook?.data.jobs || []).some((j) => j.requestId === request.id && j.status === "sent")) {
+      await changeTechBook((data) => data.jobs.forEach((j) => { if (j.requestId === request.id && j.status === "sent") { j.status = "cancelled"; j.updatedAt = now; } }));
+    }
+    await loadTechRequests();
+    renderTechView();
+    renderTechBadge();
+  } catch (error) {
+    showToast(describeSyncProblem(error), 6000);
+  }
+}
+
+function openManualJobDialog() {
+  const people = techBook.data.technicians.filter((t) => t.active !== false);
+  if (!people.length) { showToast("Add a technician first"); return; }
+  const technician = selectInput(people.map((t) => [t.id, `${t.name} — ${tradeLabel(t.trade)}`]), people[0].id);
+  const buildingNames = [...new Set([...(myBuildingsCache || []).map((b) => b.name).filter(Boolean), state.building?.name || ""].filter(Boolean))];
+  const building = selectInput([...buildingNames.map((n) => [n, n]), ["", tr("Somewhere else")]], state.building?.name || buildingNames[0] || "");
+  const flat = textInput("", { maxlength: "40", placeholder: tr("e.g. 3B") });
+  const title = textInput("", { maxlength: "200", placeholder: tr("e.g. Replaced the water heater") });
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const value = numberInput("");
+  const save = primaryButton(tr("Next"), () => {
+    if (!title.value.trim()) { showToast("Say what the job was"); return; }
+    const t = technicianById(technician.value);
+    const job = {
+      id: null, technicianId: t.id, source: "manual", trade: t.trade, title: title.value.trim(), buildingId: "",
+      buildingName: building.value, flat: flat.value.trim(), date: date.value || localDateInput(), status: "sent",
+      valueUsd: roundUsd(Number(value.value) || 0), feeUsd: jobFee(t, value.value),
+    };
+    openJobDoneDialog(job);
+  });
+  openToolDialog(tr("Add a job"),
+    note(tr("For work a technician did that didn't come through the app, so the fee is counted.")),
+    field(tr("Technician"), technician), field(tr("Building"), building), field(tr("Flat"), flat), field(tr("Job"), title),
+    field(tr("Date"), date), field(tr("What the resident paid (USD)"), value),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function techStatementText(technician) {
+  const { unpaid, unpaidUsd } = technicianStats(technician.id);
+  const lines = unpaid.slice().sort((a, b) => String(a.date).localeCompare(String(b.date))).map((j) =>
+    `• ${formatDateLabel(j.date)} — ${[j.buildingName, j.flat].filter(Boolean).join(" ")} — ${j.title || tradeLabel(j.trade)}: ${formatUsd(Number(j.valueUsd || 0))} → ${formatUsd(Number(j.feeUsd || 0))}`);
+  return [tr("Hello {name}, here are the jobs not settled yet:", { name: technician.name }), ...lines, tr("Total: {amount}. Thank you!", { amount: formatUsd(unpaidUsd) })].join("\n");
+}
+
+function sendTechStatement(technician) {
+  if (!technician.phone) { showToast("Add a phone number for this technician first"); return; }
+  window.open(whatsappLink(technician.phone, techStatementText(technician)), "_blank", "noopener");
+}
+
+async function markTechPaid(technician) {
+  const { unpaid, unpaidUsd } = technicianStats(technician.id);
+  if (!unpaid.length) return;
+  if (!window.confirm(tr("{name} paid you {amount}? This settles {n} job(s).", { name: technician.name, amount: formatUsd(unpaidUsd), n: unpaid.length }))) return;
+  const ids = new Set(unpaid.map((j) => j.id));
+  const today = localDateInput();
+  if (await changeTechBook((data) => data.jobs.forEach((j) => { if (ids.has(j.id)) { j.paidOn = today; j.updatedAt = new Date().toISOString(); } }))) showToast("Marked as paid");
+}
+
+// ── Badge + attention row for new requests ──
+async function refreshTechRequests() {
+  if (!isTechManager() || cloudProvider() !== "supabase") return;
+  try { await loadTechRequests(); } catch { techRequests = null; }
+  renderTechBadge();
+  if (v174AttentionItems().length) renderAttention();
+}
+
+function renderTechBadge() {
+  const item = document.querySelector('.more-menu-item[data-view="techView"]');
+  if (!item) return;
+  const n = (techRequests || []).filter((r) => r.status === "new").length;
+  let badge = item.querySelector(".th-badge");
+  if (!n) { badge?.remove(); return; }
+  if (!badge) { badge = mk("span", { className: "th-badge" }); item.append(badge); }
+  badge.textContent = String(n);
+}
+
+function v174AttentionItems() {
+  if (!isTechManager()) return [];
+  const waiting = (techRequests || []).filter((r) => r.status === "new");
+  if (!waiting.length) return [];
+  return [{ kind: "warn", text: tr("{n} resident(s) asked for a technician", { n: waiting.length }), action: "techRequests", key: `tech:${waiting.map((r) => r.id).join(",")}` }];
+}
+
+// ── Residents: "Need a technician?" ──
+function techRequestStatusLine(request) {
+  if (request.status === "new") return tr("Waiting for the building manager");
+  if (request.status === "sent") return tr("{name} will contact you", { name: request.technicianName || tr("A technician") });
+  if (request.status === "done") return tr("Done");
+  return tr("Cancelled");
+}
+
+async function openTechRequestDialog() {
+  if (!(isTenantSession() && sessionMode === "tenant")) { showToast("Link this phone with an invite code first"); return; }
+  const trade = tradeSelect("", { placeholder: true });
+  const details = mk("textarea", { rows: "4", maxlength: "1000", placeholder: tr("What needs fixing, where in the flat, when you're home") });
+  const photo = mk("input", { type: "file", accept: "image/*" });
+  const mine = mk("div", { className: "tech-my-requests" }, note(tr("Loading…")));
+  const submit = primaryButton(tr("Send"), async () => {
+    if (!trade.value) { showToast("Choose what kind of technician you need"); return; }
+    if (details.value.trim().length < 3) { showToast("Say what needs fixing"); return; }
+    submit.disabled = true;
+    try {
+      const uploaded = photo.files?.[0] ? await uploadPhotoUnder(`requests/${sessionTenantId}`, photo.files[0]) : null;
+      await supabaseRequest("rpc/request_technician", { method: "POST", body: JSON.stringify({ p_trade: trade.value, p_details: details.value.trim(), p_photo_path: uploaded?.storagePath || null }) });
+      closeToolDialog();
+      showToast("Sent. The building manager will find you a technician.");
+    } catch (error) {
+      showToast(techMissingDb(error) || (error.status ? tr(error.message) : describeSyncProblem(error)), 6000);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+  openToolDialog(tr("Need a technician?"),
+    note(tr("For repairs inside your flat. The building manager sends you a trusted technician who will call you. You agree the price with them and pay them directly.")),
+    field(tr("What kind?"), trade),
+    field(tr("What needs fixing?"), details),
+    field(tr("Photo (optional)"), photo),
+    mk("div", { className: "button-row" }, submit, secondaryButton(tr("Cancel"), closeToolDialog)),
+    mk("h3", { className: "tech-my-head", text: tr("Your requests") }),
+    mine);
+  try {
+    const res = await supabaseRequest("rpc/my_service_requests", { method: "POST", body: "{}" });
+    const list = await res.json();
+    fillChildren(mine, list.length ? list.map((request) => mk("div", { className: `breakdown-row tech-mine is-${request.status}` },
+      mk("span", { className: "tech-person-main" },
+        mk("strong", { text: `${tradeLabel(request.trade)} · ${formatDateLabel(String(request.createdAt).slice(0, 10))}` }),
+        mk("small", { text: request.details }),
+        mk("small", { className: "tech-mine-status", text: techRequestStatusLine(request) })),
+      mk("span", { className: "tech-person-actions" },
+        request.status === "sent" && request.technicianPhone ? mk("a", { className: "mini-button", href: `tel:${request.technicianPhone}`, text: tr("Call") }) : null,
+        ["new", "sent"].includes(request.status) ? miniButton(tr("Cancel"), async () => {
+          if (!window.confirm(tr("Cancel this request?"))) return;
+          try {
+            await supabaseRequest("rpc/cancel_my_request", { method: "POST", body: JSON.stringify({ p_id: request.id }) });
+            closeToolDialog();
+            showToast("Request cancelled");
+          } catch (error) {
+            showToast(error.status ? tr(error.message) : describeSyncProblem(error), 6000);
+          }
+        }) : null))) : note(tr("No requests yet.")));
+  } catch (error) {
+    fillChildren(mine, note(techMissingDb(error) || describeSyncProblem(error)));
+  }
+}
+
+function renderV174() {
+  renderTechBadge();
+  if (document.querySelector("#techView.active")) renderTechView();
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -20579,6 +21324,7 @@ async function boot() {
   setFirstSyncLoading(true);
   await syncFromSheet();
   setFirstSyncLoading(false);
+  void refreshTechRequests();
 
   setInterval(() => { if (sessionMode) syncFromSheet({ silent: true }); }, 60000);
 }
@@ -20675,6 +21421,10 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  jobFee,
+  technicianStats,
+  techStatementText,
+  tradeLabel,
   buildingPath,
   currentBuildingId,
   buildingHeader,

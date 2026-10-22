@@ -147,6 +147,7 @@ app's auth), then reload.
 | v167 late reminders, concierge jobs/supplies/visitors, water meters, bookings, board, own details, month checks, hand over, approvals, deposits (`phase2j-v167.sql`) | ✅ applied 2026-10-21; 57/57 live checks (`phase2j-checks.sql`, rolled back) |
 | v170 tenants see the concierge's invoice photos (`phase2k-v170.sql`) | ✅ applied 2026-10-21; 6/6 live checks (`phase2k-checks.sql`, rolled back) |
 | v173 more than one building (`phase2l-v173.sql`): memberships, x-building header, per-building codes/invites/push/backups/reminders, `b/<id>/` photo folders, `create_building` / `my_buildings`, "building manager" wording | ✅ applied 2026-10-22 (run by Claude in the dashboard); 41/41 live checks (`phase2l-checks.sql`, rolled back); 7 accounts carried over into memberships |
+| v174 trusted technicians (`phase2m-v174.sql`): residents ask for a technician, the manager's private notebook, request photos | ⏳ waiting for the OK; rehearsed locally (2i 32/32, 2j 57/57, 2k 6/6, 2l 41/41, 2m 27/27); live checks `phase2m-checks.sql` (rolled back) |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.

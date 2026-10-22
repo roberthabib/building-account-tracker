@@ -342,6 +342,9 @@
             <button class="more-menu-item owner-only" type="button" data-view="equipmentView" data-nav-icon="wrench">
               <span class="mm-text"><strong data-i18n="nav.equipment">Equipment</strong><span data-i18n="more.equipmentSub">Pump, lift, generator: warranties and service</span></span>
             </button>
+            <button class="more-menu-item owner-only" type="button" data-view="techView" data-nav-icon="wrench">
+              <span class="mm-text"><strong data-i18n="nav.tech">Technicians</strong><span data-i18n="more.techSub">Residents' requests, your technicians, fees</span></span>
+            </button>
             <button class="more-menu-item staff-only" type="button" data-view="staffView" data-nav-icon="check">
               <span class="mm-text"><strong data-i18n="nav.staff">Jobs &amp; supplies</strong><span data-i18n="more.staffSub">Concierge's jobs, supplies, visitors</span></span>
             </button>
@@ -471,6 +474,17 @@
             </div>
           </div>
           <div id="staffBody"></div>
+        </section>
+
+        <section class="view sub-view" id="techView" aria-labelledby="techViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="techViewTitle" data-i18n="nav.tech">Technicians</h2>
+            </div>
+          </div>
+          <div id="techBody"></div>
         </section>
 
         <section class="view sub-view" id="bookingsView" aria-labelledby="bookingsViewTitle">

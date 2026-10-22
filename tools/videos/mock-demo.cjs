@@ -11,6 +11,8 @@ const conciergeTokens = new Set(); // tokens linked as concierge
 const adminCodes = new Map();      // invite code -> role
 const log = [];
 const UPLOADS = [];
+const REQUESTS = [];               // technician requests (v174)
+let BOOK = { data: {}, rev: 0 };    // the manager's technicians notebook (v174)
 const EXTRA = new Map();           // other buildings (v173): id -> { name, state, since }
 let anonGen = 1;
 
@@ -65,7 +67,7 @@ http.createServer((req, res) => {
     if (path === "/__state") return send(200, STATE);
     if (path === "/__put" && req.method === "POST") { STATE = b; touch(); return send(200, { ok: true }); }
     if (path === "/__uploads") return send(200, UPLOADS);
-    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); EXTRA.clear(); anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
+    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); EXTRA.clear(); REQUESTS.length = 0; BOOK = { data: {}, rev: 0 }; anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
     if (path === "/__reset_log") { log.length = 0; return send(200, []); }
     log.push(`${req.method} ${path.replace(/^\/(rest|auth|storage)\/v1\//, "")} as ${tok.slice(0, 9)}`);
     const isOwner = tok.startsWith("demo-owner");
@@ -257,6 +259,48 @@ http.createServer((req, res) => {
       if (!isOwner) return send(400, { message: "Only the building owner can restore backups" });
       return send(200, BACKUPS.find((x) => x.day === b.p_day).state);
     }
+    if (path === "/rest/v1/rpc/request_technician") {
+      if (!me) return send(400, { message: "This device is not linked to a tenant" });
+      const id = crypto.randomUUID();
+      REQUESTS.push({ id, buildingId: "building", tenantId: me, trade: b.p_trade, details: b.p_details, photoPath: b.p_photo_path || null, status: "new", technicianName: null, technicianPhone: null, createdAt: nowIso(), updatedAt: nowIso() });
+      log.push("PUSH admins request " + b.p_trade);
+      return send(200, id);
+    }
+    if (path === "/rest/v1/rpc/my_service_requests") {
+      if (!me) return send(200, []);
+      return send(200, REQUESTS.filter((r) => r.tenantId === me).slice().reverse());
+    }
+    if (path === "/rest/v1/rpc/cancel_my_request") {
+      const r = REQUESTS.find((x) => x.id === b.p_id && x.tenantId === me && ["new", "sent"].includes(x.status));
+      if (!r) return send(400, { message: "That request can no longer be cancelled" });
+      r.status = "cancelled"; r.updatedAt = nowIso(); return send(204);
+    }
+    if (path === "/rest/v1/rpc/list_service_requests") {
+      if (!isOwner) return send(400, { message: "Only the building manager can see technician requests" });
+      return send(200, REQUESTS.slice().reverse().map((r) => {
+        const t = STATE.tenants.find((x) => x.id === r.tenantId) || {};
+        return { ...r, buildingName: STATE.building.name, tenantName: t.name, unit: t.unit, phone: t.phone || "" };
+      }));
+    }
+    if (path === "/rest/v1/rpc/update_service_request") {
+      if (!isOwner) return send(400, { message: "Only the building manager can update technician requests" });
+      const r = REQUESTS.find((x) => x.id === b.p_id);
+      if (!r) return send(400, { message: "That request no longer exists" });
+      r.status = b.p_status; if (b.p_technician_name) r.technicianName = b.p_technician_name; if (b.p_technician_phone) r.technicianPhone = b.p_technician_phone; r.updatedAt = nowIso();
+      if (b.p_status === "sent") log.push("PUSH tenant " + r.tenantId + " " + r.technicianName);
+      return send(204);
+    }
+    if (path === "/rest/v1/rpc/get_manager_book") {
+      if (!isOwner) return send(400, { message: "Only the building manager has a technicians notebook" });
+      return send(200, BOOK);
+    }
+    if (path === "/rest/v1/rpc/save_manager_book") {
+      if (!isOwner) return send(400, { message: "Only the building manager has a technicians notebook" });
+      if (Number(b.p_rev) !== BOOK.rev) return send(400, { message: "changed-elsewhere" });
+      BOOK = { data: b.p_data, rev: BOOK.rev + 1 }; return send(200, BOOK.rev);
+    }
+    if (path === "/__book" && req.method === "POST") { BOOK = { data: b, rev: BOOK.rev + 1 }; return send(200, { ok: true }); }
+    if (path === "/__requests" && req.method === "POST") { REQUESTS.push(...b); return send(200, { ok: true }); }
     if (path === "/rest/v1/rpc/my_buildings") {
       if (isOwner) return send(200, [{ id: "building", name: STATE.building.name, role: "owner", tenant_id: null, since: "2026-01-01T00:00:00Z" },
         ...[...EXTRA].map(([id, x]) => ({ id, name: x.state.building?.name || x.name, role: "owner", tenant_id: null, since: x.since }))]);
@@ -285,7 +329,7 @@ http.createServer((req, res) => {
     }
     if (path.startsWith("/storage/v1/object/invoices/") && req.method === "POST") {
       const obj = decodeURIComponent(path.replace("/storage/v1/object/invoices/", ""));
-      if (isOwner || (me && (obj.startsWith("proofs/" + me + "/") || obj.startsWith("issues/" + me + "/") || obj.startsWith("board/" + me + "/"))) || (isConcierge && obj.startsWith("concierge/"))) { UPLOADS.push({ obj, by: tok.slice(0, 9), bytes: body.length }); return send(200, { Key: "invoices/" + obj }); }
+      if (isOwner || (me && (obj.startsWith("proofs/" + me + "/") || obj.startsWith("issues/" + me + "/") || obj.startsWith("board/" + me + "/") || obj.startsWith("requests/" + me + "/"))) || (isConcierge && obj.startsWith("concierge/"))) { UPLOADS.push({ obj, by: tok.slice(0, 9), bytes: body.length }); return send(200, { Key: "invoices/" + obj }); }
       return send(403, { message: "new row violates row-level security policy" });
     }
     if (req.method === "GET" && path.startsWith("/storage/v1/object/sign/")) {
