@@ -6305,3 +6305,9 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
 .balance-row.is-clear .balance-row-amount {
   color: var(--primary);
 }
+
+/* v192 — a sheet's row of buttons wraps instead of running off the screen */
+#toolDialog .button-row {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
