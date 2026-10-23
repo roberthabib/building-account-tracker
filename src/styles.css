@@ -6178,3 +6178,8 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   font-size: 0.85rem;
   opacity: 0.75;
 }
+
+/* v182 — the month's total on a printed receipt */
+.receipt-total-row td {
+  font-weight: 700;
+}

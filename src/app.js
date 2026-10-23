@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v181";
+const APP_VERSION = "v182";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,14 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Item": "البند",
+  "This payment": "هذه الدفعة",
+  "Monthly fee": "الرسم الشهري",
+  "Share of expenses": "حصة المصاريف",
+  "Total for the month": "مجموع الشهر",
+  "Extra (credit)": "زيادة (رصيد)",
+  "Monthly dues": "المستحقات الشهرية",
+  "Within a month, a payment covers the monthly fee first, then the generator, then the water.": "في كل شهر، تغطي الدفعة الرسم الشهري أولاً، ثم المولّد، ثم المياه.",
   "This PDF is too large (10 MB at most).": "ملف PDF كبير جداً (10 ميغابايت كحد أقصى).",
   "Choose a photo or a PDF of the invoice": "اختر صورة أو ملف PDF للفاتورة",
   "This PDF is too large to read (3 MB at most). Fill in the numbers yourself.": "ملف PDF كبير جداً لقراءته (3 ميغابايت كحد أقصى). أدخل الأرقام بنفسك.",
@@ -6735,11 +6743,7 @@ function receiptTableRows(data) {
     ];
   }
 
-  return data.receiptEntries.map((entry) => {
-    const applied = transactionNetUsd(entry);
-    const status = paymentStatus(data.tenant.id, entry.forMonth);
-    return [formatMonth(entry.forMonth), formatUsd(applied), status.label];
-  });
+  return receiptBreakdownRows(data);
 }
 
 function printPaymentReceipt(transactionId) {
@@ -6798,16 +6802,15 @@ function printPaymentReceipt(transactionId) {
   } else {
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
-    ["Month", "Applied USD", "Status"].forEach((heading, index) =>
-      appendHeaderCell(headerRow, heading, index === 1 ? "numeric" : ""),
+    RECEIPT_COLUMNS.forEach((heading, index) =>
+      appendHeaderCell(headerRow, heading, index === 2 || index === 3 ? "numeric" : ""),
     );
     thead.append(headerRow);
     const tbody = document.createElement("tbody");
     receiptTableRows(data).forEach((cells) => {
       const row = document.createElement("tr");
-      appendCell(row, cells[0]);
-      appendCell(row, cells[1], "numeric");
-      appendCell(row, cells[2]);
+      if (cells.total) row.className = "receipt-total-row";
+      cells.forEach((value, index) => appendCell(row, value, index === 2 || index === 3 ? "numeric" : ""));
       tbody.append(row);
     });
     table.append(thead, tbody);
@@ -6817,7 +6820,7 @@ function printPaymentReceipt(transactionId) {
   note.className = "print-note";
   note.textContent = data.isProject
     ? "Project payments are separate from monthly building fees."
-    : "Payments are applied to the flat's building dues for the month.";
+    : `${tr("Payments are applied to the flat's building dues for the month.")} ${tr("Within a month, a payment covers the monthly fee first, then the generator, then the water.")}`;
 
   page.append(header, summary, table, note);
   printPreparedPage(page);
@@ -6954,7 +6957,7 @@ function paymentReceiptPdfLines(data) {
   } else {
     lines.push(
       { text: "Monthly Allocation", size: 13, bold: true },
-      { text: "Month | Applied USD | Status", size: 9, bold: true },
+      { text: RECEIPT_COLUMNS.join(" | "), size: 9, bold: true },
       ...receiptTableRows(data).map((row) => ({ text: row.join(" | "), size: 9 })),
       { text: "Payments are applied to the flat's building dues for the month.", size: 10 },
     );
@@ -7143,8 +7146,8 @@ function buildReceiptLayoutPdf(data) {
       y -= 22;
     });
   } else {
-    const headers = ["Month", "Applied USD", "Status"];
-    const widths = [165, 165, 165];
+    const headers = RECEIPT_COLUMNS;
+    const widths = [90, 135, 85, 85, 100];
     const rows = receiptTableRows(data);
     let x = left;
     headers.forEach((heading, index) => {
@@ -7157,7 +7160,7 @@ function buildReceiptLayoutPdf(data) {
       x = left;
       row.forEach((value, index) => {
         commands.push(pdfRectCommand(x, y - 16, widths[index], 22));
-        commands.push(pdfTextCommand(pdfClip(value, index === 4 ? 18 : 14), x + 5, y - 4, 8));
+        commands.push(pdfTextCommand(pdfClip(value, index === 1 ? 26 : 16), x + 5, y - 4, 8, Boolean(row.total)));
         x += widths[index];
       });
       y -= 22;
@@ -7175,6 +7178,7 @@ function buildReceiptLayoutPdf(data) {
       9,
     ),
   );
+  if (!data.isProject) commands.push(pdfTextCommand("Within a month, a payment covers the monthly fee first, then the generator, then the water.", left, Math.max(40, y - 13), 9));
 
   return buildPdfDocument(`${commands.join("\n")}\n`);
 }
@@ -22271,6 +22275,67 @@ async function backfillRentVerifyCodes() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v182 — receipts show what a payment paid for
+// ═══════════════════════════════════════════════════════════════════════════
+// A monthly payment's receipt lists, for each month, the monthly fee (or the
+// share of expenses), the generator and the water, what was due and what this
+// payment covered. Within a month a payment covers the fee first, then the
+// generator, then the water, after whatever was already paid for that month.
+const RECEIPT_COLUMNS = ["Month", "Item", "Due", "This payment", "Status"];
+
+function receiptMonthParts(tenantId, month) {
+  const fixed = isFixedMode();
+  return [
+    [fixed ? "Monthly fee" : "Share of expenses", fixed ? getExpectedForTenant(tenantId, month) : getTenantExpenseShare(tenantId, month)],
+    ["Generator", getTenantServicesDue(tenantId, { serviceType: "generator", month })],
+    ["Water", getTenantServicesDue(tenantId, { serviceType: "water", month })],
+  ].map(([label, due]) => [label, roundUsd(due)]).filter(([, due]) => due > 0.005);
+}
+
+// Paid for the month before this payment (other receipts, earlier first).
+function paidForMonthBefore(entry, receiptEntries) {
+  const mine = new Set(receiptEntries.map((e) => e.id));
+  const key = (t) => `${t.date || ""}|${t.id}`;
+  return roundUsd(state.transactions
+    .filter((t) => isMonthlyPayment(t) && t.tenantId === entry.tenantId && t.forMonth === entry.forMonth && !mine.has(t.id) && key(t) < key(entry))
+    .reduce((sum, t) => sum + transactionNetUsd(t), 0));
+}
+
+// One row per part of the month's due (plus a total row when there are
+// several), as [month, item, due, this payment, status]; total rows carry
+// .total = true.
+function receiptBreakdownRows(data) {
+  const rows = [];
+  data.receiptEntries.forEach((entry) => {
+    const month = formatMonth(entry.forMonth);
+    const applied = roundUsd(transactionNetUsd(entry));
+    const parts = receiptMonthParts(data.tenant.id, entry.forMonth);
+    if (!parts.length) {
+      rows.push([month, "Monthly dues", "-", formatUsd(applied), paymentStatus(data.tenant.id, entry.forMonth).label]);
+      return;
+    }
+    let before = paidForMonthBefore(entry, data.receiptEntries);
+    // The month as of this payment: paid in full, or partly.
+    const totalDue = roundUsd(parts.reduce((s, [, due]) => s + due, 0));
+    const status = before + applied >= totalDue - 0.005 ? "Paid" : before + applied > 0.005 ? "Partial" : "Due";
+    let left = applied;
+    parts.forEach(([label, due], index) => {
+      const covered = Math.min(due, Math.max(0, before));
+      before -= covered;
+      const take = roundUsd(Math.max(0, Math.min(due - covered, left)));
+      left = roundUsd(left - take);
+      rows.push([index === 0 ? month : "", label, formatUsd(due), formatUsd(take), parts.length === 1 ? status : ""]);
+    });
+    if (left > 0.005) rows.push(["", "Extra (credit)", "", formatUsd(left), ""]);
+    if (parts.length > 1) {
+      const total = Object.assign(["", "Total for the month", formatUsd(totalDue), formatUsd(applied), status], { total: true });
+      rows.push(total);
+    }
+  });
+  return rows;
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -22484,6 +22549,7 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  receiptBreakdownRows,
   addReceiptVerifyCodes,
   voidedReceiptsBetween,
   receiptCheckLink,
