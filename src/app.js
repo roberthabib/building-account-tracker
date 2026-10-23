@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v189";
+const APP_VERSION = "v190";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,7 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "This flat is already rented for those dates": "هذه الشقة مؤجّرة أصلاً في هذه التواريخ",
   "Flat {unit} is rented to {name} until {date}. Start this lease after that, or end that lease first.": "الشقة {unit} مؤجّرة إلى {name} حتى {date}. ابدأ هذا العقد بعد ذلك، أو أنهِ ذلك العقد أولاً.",
   "Flat {unit} is already rented to {name}. End that lease first.": "الشقة {unit} مؤجّرة أصلاً إلى {name}. أنهِ ذلك العقد أولاً.",
   "rented to {name}": "مؤجّرة إلى {name}",

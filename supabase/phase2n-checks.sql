@@ -59,7 +59,7 @@ insert into r (name, ok) select 'manager: updates it with the right version', pu
 insert into r (name, ok) select 'manager: a stale copy is refused', pg_temp.fails($$select public.save_lease('zz-check-lease-1', 'fr1', '{"rent":1}', 1)$$);
 insert into r (name, ok) select 'manager: a bad id is refused', pg_temp.fails($$select public.save_lease('x', 'fr1', '{"rent":1}', 0)$$);
 insert into r (name, ok) select 'manager: a lease needs a flat', pg_temp.fails($$select public.save_lease('zz-check-lease-2', ' ', '{"rent":1}', 0)$$);
-insert into r (name, ok) select 'manager: adds and deletes a second lease', public.save_lease('zz-check-lease-2', 'fr1', '{"rent":1}', 0) = 1
+insert into r (name, ok) select 'manager: adds and deletes a second lease', public.save_lease('zz-check-lease-2', 'fr2', '{"rent":1}', 0) = 1
   and not pg_temp.fails($$select public.delete_lease('zz-check-lease-2')$$);
 insert into r (name, ok) select 'manager: the deleted lease is gone', jsonb_array_length(public.list_leases()) = 1;
 
