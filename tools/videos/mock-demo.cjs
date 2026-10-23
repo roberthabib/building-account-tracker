@@ -13,6 +13,7 @@ const log = [];
 const UPLOADS = [];
 const REQUESTS = [];               // technician requests (v174)
 let BOOK = { data: {}, rev: 0 };    // the manager's technicians notebook (v174)
+const FILES = new Map();          // v186: uploaded bytes, for previews that read them back
 const LEASES = new Map();         // rentals (v178): id -> { id, flatId, data, rev }
 const RENTERS = new Map();         // v179: token -> leaseId (a flat's tenant)
 const renterCodes = new Map();     // v179: invite code -> leaseId
@@ -59,8 +60,10 @@ http.createServer((req, res) => {
   const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS", "Content-Type": "application/json" };
   if (req.method === "OPTIONS") return res.writeHead(204, cors).end();
   let body = "";
-  req.on("data", (c) => (body += c));
+  const chunks = [];
+  req.on("data", (c) => chunks.push(c));
   req.on("end", () => {
+    body = Buffer.concat(chunks).toString();
     const send = (code, obj) => res.writeHead(code, cors).end(obj === undefined ? "" : JSON.stringify(obj));
     const url = new URL(req.url, "http://x");
     const path = url.pathname;
@@ -405,10 +408,16 @@ http.createServer((req, res) => {
     }
     if (path.startsWith("/storage/v1/object/invoices/") && req.method === "POST") {
       const obj = decodeURIComponent(path.replace("/storage/v1/object/invoices/", ""));
-      if (isOwner || (me && (obj.startsWith("proofs/" + me + "/") || obj.startsWith("issues/" + me + "/") || obj.startsWith("board/" + me + "/") || obj.startsWith("requests/" + me + "/"))) || (isConcierge && obj.startsWith("concierge/"))) { UPLOADS.push({ obj, by: tok.slice(0, 9), bytes: body.length }); return send(200, { Key: "invoices/" + obj }); }
+      if (isOwner || (me && (obj.startsWith("proofs/" + me + "/") || obj.startsWith("issues/" + me + "/") || obj.startsWith("board/" + me + "/") || obj.startsWith("requests/" + me + "/"))) || (isConcierge && obj.startsWith("concierge/"))) { UPLOADS.push({ obj, by: tok.slice(0, 9), bytes: body.length }); FILES.set(obj, { type: req.headers["content-type"] || "application/octet-stream", bytes: Buffer.concat(chunks) }); return send(200, { Key: "invoices/" + obj }); }
       return send(403, { message: "new row violates row-level security policy" });
     }
+    if (req.method === "GET" && path.startsWith("/storage/v1/object/authenticated/invoices/")) {
+      const f = FILES.get(decodeURIComponent(path.replace("/storage/v1/object/authenticated/invoices/", "")));
+      return f ? res.writeHead(200, { ...cors, "Content-Type": f.type }).end(f.bytes) : send(404, { message: "not found" });
+    }
     if (req.method === "GET" && path.startsWith("/storage/v1/object/sign/")) {
+      const f = FILES.get(decodeURIComponent(path.replace("/storage/v1/object/sign/invoices/", "").split("?")[0]));
+      if (f && f.type.startsWith("image/")) return res.writeHead(200, { ...cors, "Content-Type": f.type }).end(f.bytes);
       // A made-up invoice picture for previews.
       const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800"><rect width="600" height="800" fill="#fff"/><text x="40" y="80" font-family="Arial" font-size="36" font-weight="700">Clean Team s.a.r.l.</text><text x="40" y="130" font-family="Arial" font-size="22" fill="#555">Invoice INV-0412 · Cedar Residence</text><line x1="40" y1="170" x2="560" y2="170" stroke="#ccc"/><text x="40" y="230" font-family="Arial" font-size="24">Building cleaning — October</text><text x="560" y="230" font-family="Arial" font-size="24" text-anchor="end">$240.00</text><line x1="40" y1="300" x2="560" y2="300" stroke="#333" stroke-width="2"/><text x="40" y="350" font-family="Arial" font-size="28" font-weight="700">Total</text><text x="560" y="350" font-family="Arial" font-size="28" font-weight="700" text-anchor="end">$240.00</text><text x="40" y="740" font-family="Arial" font-size="18" fill="#888">Made-up invoice for the demo building</text></svg>';
       return res.writeHead(200, { ...cors, "Content-Type": "image/svg+xml" }).end(svg);

@@ -6199,3 +6199,22 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
 .th-rent-note.is-warning {
   color: var(--red);
 }
+
+/* v186 — inspection rooms */
+.inspection-rooms {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.inspection-room {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inner);
+  padding: 10px 12px;
+  background: var(--surface-soft);
+}
+
+.inspection-room textarea {
+  width: 100%;
+  margin-top: 6px;
+}

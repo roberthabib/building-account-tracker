@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v185";
+const APP_VERSION = "v186";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,74 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "At move-in": "عند الدخول",
+  "Signed lease": "عقد الإيجار الموقّع",
+  "Tenant's ID": "هوية المستأجر",
+  "Owner's ID": "هوية المالك",
+  "Electricity subscription": "اشتراك الكهرباء",
+  "Water subscription": "اشتراك المياه",
+  "Living room": "الصالون",
+  "Kitchen": "المطبخ",
+  "Bedroom 1": "غرفة النوم 1",
+  "Bedroom 2": "غرفة النوم 2",
+  "Bathroom": "الحمّام",
+  "Balcony": "الشرفة",
+  "Good": "جيدة",
+  "Worn": "مستهلكة",
+  "Damaged": "متضرّرة",
+  "Sign in with Google as the building manager to keep files": "سجّل الدخول بحساب Google كمدير المبنى لحفظ الملفات",
+  "Documents": "المستندات",
+  "Keep the signed lease, ID copies and subscriptions here. Only you can open them.": "احفظ هنا عقد الإيجار الموقّع ونسخ الهويات والاشتراكات. أنت وحدك تستطيع فتحها.",
+  "Add a document": "إضافة مستند",
+  "e.g. Parking agreement": "مثلاً: اتفاقية الموقف",
+  "Choose a photo or a PDF": "اختر صورة أو ملف PDF",
+  "Add a document — {title}": "إضافة مستند — {title}",
+  "What is it?": "ما هو؟",
+  "Photo or PDF": "صورة أو PDF",
+  "Only you can open lease documents: not the owner, the tenant or view-only helpers.": "أنت وحدك تستطيع فتح مستندات العقد: لا المالك ولا المستأجر ولا المساعدون للاطلاع فقط.",
+  "Remove {name}? The file is deleted.": "إزالة {name}؟ سيُحذف الملف.",
+  "this document": "هذا المستند",
+  "Move-out inspection": "معاينة الخروج",
+  "Move-in inspection": "معاينة الدخول",
+  "Inspections": "المعاينات",
+  "{n} rooms": "{n} غرف",
+  "{n} damaged": "{n} متضرّرة",
+  "{n} photos": "{n} صور",
+  "Record each room's condition with photos when the tenant moves in, and again when they leave: it settles questions about the deposit.": "سجّل حالة كل غرفة مع صور عند دخول المستأجر، ومرة أخرى عند خروجه: هكذا تُحسم أسئلة التأمين.",
+  "What you see (optional)": "ما تلاحظه (اختياري)",
+  "Add photos": "إضافة صور",
+  "Room": "الغرفة",
+  "Condition": "الحالة",
+  "At move-in: {condition}{note}": "عند الدخول: {condition}{note}",
+  "Photo {n}": "صورة {n}",
+  "Remove room": "إزالة الغرفة",
+  "Keys handed over": "المفاتيح المسلّمة",
+  "Electricity meter": "عدّاد الكهرباء",
+  "Water meter": "عدّاد المياه",
+  "Add a room": "إضافة غرفة",
+  "Photos": "الصور",
+  "Tenant's signature": "توقيع المستأجر",
+  "Building manager's signature": "توقيع مدير المبنى",
+  "The photo couldn't be loaded.": "تعذّر تحميل الصورة.",
+  "Preparing the PDF…": "جارٍ تحضير ملف PDF…",
+  "Renew": "تجديد",
+  "The new end date must be after {date}": "يجب أن يكون تاريخ الانتهاء الجديد بعد {date}",
+  "Lease renewed": "تم تجديد العقد",
+  "Until {date}. Rent from {from}: {amount}.": "حتى {date}. الإيجار ابتداءً من {from}: {amount}.",
+  "Send the new terms on WhatsApp.": "أرسل الشروط الجديدة عبر واتساب.",
+  "To the tenant": "إلى المستأجر",
+  "To the owner": "إلى المالك",
+  "Renew lease — {title}": "تجديد العقد — {title}",
+  "The lease ends on {date}. The renewal starts the next day.": "ينتهي العقد في {date}. يبدأ التجديد في اليوم التالي.",
+  "This lease has no end date: the renewal starts today.": "لا تاريخ انتهاء لهذا العقد: يبدأ التجديد اليوم.",
+  "New end date": "تاريخ الانتهاء الجديد",
+  "Rent ({currency})": "الإيجار ({currency})",
+  "Now {amount} · {period}": "حالياً {amount} · {period}",
+  "The yearly increase of {pct}% continues from the new start.": "تستمر الزيادة السنوية {pct}% من البداية الجديدة.",
+  "Hello {name},": "مرحباً {name}،",
+  "The lease of flat {unit} is renewed until {date}.": "تم تجديد عقد إيجار الشقة {unit} حتى {date}.",
+  "Rent from {from}: {amount} · {period}.": "الإيجار ابتداءً من {from}: {amount} · {period}.",
+  "Renewed on {at}: until {end}, {amount} from {from}": "جُدّد في {at}: حتى {end}، {amount} ابتداءً من {from}",
   "Rent Receipt": "إيصال إيجار",
   "Rent paid until": "الإيجار مدفوع حتى",
   "Rent periods paid": "فترات الإيجار المدفوعة",
@@ -21525,11 +21593,12 @@ function leasePeriods(lease, today = localDateInput()) {
   for (let i = 0; i < 600; i += 1) {
     const start = addMonthsToDate(lease.start, i * step);
     if (start > last) break;
-    const years = Math.floor((i * step) / 12);
+    const base = leaseRentBase(lease, start);
+    const years = Math.floor(monthsBetween(base.since, start) / 12);
     periods.push({
       start,
       end: addDays(addMonthsToDate(lease.start, (i + 1) * step), -1),
-      amount: roundMoney(Number(lease.rent) * Math.pow(1 + increase, years), lease.currency),
+      amount: roundMoney(base.rent * Math.pow(1 + increase, years), lease.currency),
       lateFrom: addDays(start, grace),
     });
   }
@@ -21859,10 +21928,14 @@ function openLeaseDetails(id) {
     reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "breakdown-row tech-person" },
       mk("span", { className: "tech-person-main" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method), p.chargesUsd ? tr("+ {amount} building charges", { amount: formatUsd(p.chargesUsd) }) : ""].filter(Boolean).join(" · ") })),
       mk("span", { className: "tech-person-actions" }, miniButton(tr("PDF"), () => shareRentReceiptPdf(lease, p)), tenant.phone ? miniButton("WhatsApp", () => sendRentReceipt(lease, p)) : null)))) : note(tr("No payments yet."))),
+    leaseDocumentsSection(lease),
+    leaseInspectionsSection(lease),
+    leaseRenewalsNote(lease),
     lease.ownFlat ? null : reportsSection(tr("Owner"), mk("p", { className: "tech-where", text: [tr("Collected {amount}", { amount: formatMoney(a.collected, c) }), tr("your fee {amount}", { amount: formatMoney(a.fee, c) }), a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, c) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, c) }), tr("to hand over {amount}", { amount: formatMoney(a.toHandOver, c) })].filter(Boolean).join(" · ") })),
     lease.deposit?.amount ? note(tr("Deposit: {amount}{returned}", { amount: formatMoney(lease.deposit.amount, c), returned: lease.deposit.returnedOn ? tr(" — returned {amount} on {date}", { amount: formatMoney(lease.deposit.returnedAmount || 0, c), date: formatDateLabel(lease.deposit.returnedOn) }) : "" })) : null,
     mk("div", { className: "button-row" },
       lease.status !== "ended" ? secondaryButton(tr("Invite to the app"), () => { void inviteRenter(lease); }) : null,
+      lease.status !== "ended" ? secondaryButton(tr("Renew"), () => openRenewLeaseDialog(lease.id)) : null,
       secondaryButton(tr("Edit"), () => openLeaseEditor(lease.id)),
       lease.status !== "ended" ? secondaryButton(tr("End lease"), () => openEndLeaseDialog(lease.id)) : null,
       !(lease.payments || []).length ? secondaryButton(tr("Delete"), () => deleteLease(lease.id)) : null));
@@ -22649,6 +22722,355 @@ function rentPeriodAmountText(p, c) {
   return p.lateFee ? tr("{amount} · incl. late fee {fee}", { amount: formatMoney(p.amount, c), fee: formatMoney(p.lateFee, c) }) : formatMoney(p.amount, c);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v186 — rentals: lease documents, move-in / move-out inspections, renewals
+// ═══════════════════════════════════════════════════════════════════════════
+// Files live under leases/<lease id>/ in the photo store, which only the
+// building manager can open (supabase/phase2r-v186.sql); owners' and tenants'
+// phones never receive lease.documents or lease.inspections. A renewal adds
+// lease.rentChanges [{ from, rent }] (leasePeriods uses the latest change on
+// or before each period, with the yearly increase counted from it) and a line
+// in lease.renewals.
+const LEASE_DOC_KINDS = [["contract", "Signed lease"], ["tenant-id", "Tenant's ID"], ["owner-id", "Owner's ID"], ["electricity", "Electricity subscription"], ["water", "Water subscription"], ["other", "Other"]];
+const INSPECTION_ROOMS = ["Living room", "Kitchen", "Bedroom 1", "Bedroom 2", "Bathroom", "Balcony"];
+const INSPECTION_CONDITIONS = [["good", "Good"], ["worn", "Worn"], ["damaged", "Damaged"]];
+
+function monthsBetween(from, to) {
+  const [fy, fm] = String(from).split("-").map(Number);
+  const [ty, tm] = String(to).split("-").map(Number);
+  return (ty - fy) * 12 + (tm - fm);
+}
+
+// The rent a period starts from: the lease's rent, or the latest renewal's.
+function leaseRentBase(lease, start) {
+  const change = (lease.rentChanges || []).filter((c) => c.from && c.from <= start).sort((a, b) => a.from.localeCompare(b.from)).at(-1);
+  return change ? { rent: Number(change.rent), since: change.from } : { rent: Number(lease.rent), since: lease.start };
+}
+
+async function uploadLeaseFile(lease, file, folder = "") {
+  if (cloudProvider() !== "supabase" || !authSession) throw new Error(tr("Sign in with Google as the building manager to keep files"));
+  const prepared = await prepareInvoiceUpload({ id: lease.id, invoice: "lease", description: folder || "document", date: localDateInput() }, file, { allowPdf: true });
+  const extension = prepared.mimeType === PDF_MIME ? "pdf" : "jpg";
+  const path = buildingPath(`leases/${lease.id}/${folder ? `${folder}/` : ""}${Date.now()}-${randomToken()}.${extension}`);
+  const c = cloudConfig();
+  await ensureFreshSession();
+  const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
+    method: "POST",
+    headers: { apikey: c.supabaseKey, Authorization: `Bearer ${authBearer()}`, "Content-Type": prepared.mimeType, "x-upsert": "false" },
+    body: base64ToBytes(prepared.dataBase64),
+  });
+  if (!res.ok) throw Object.assign(new Error(tr("Upload failed ({status})", { status: res.status })), { status: res.status });
+  return { fileName: file.name || `file.${extension}`, mimeType: prepared.mimeType, size: prepared.size, storagePath: path, uploadedAt: new Date().toISOString() };
+}
+
+// ── Documents ──
+function leaseDocumentsSection(lease) {
+  const docs = lease.documents || [];
+  return reportsSection(tr("Documents"), mk("div", {},
+    docs.length ? docs.map((d) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: d.name || tr("Document") }), mk("small", { text: [formatDateLabel(String(d.uploadedAt || "").slice(0, 10)), d.mimeType === PDF_MIME ? "PDF" : tr("Photo")].filter(Boolean).join(" · ") })),
+      mk("span", { className: "tech-person-actions" },
+        miniButton(tr("View"), () => openInvoicePhoto(d)),
+        miniButton(tr("Remove"), () => { void removeLeaseDocument(lease.id, d.id); })))) : note(tr("Keep the signed lease, ID copies and subscriptions here. Only you can open them.")),
+    mk("div", { className: "notice-actions" }, miniButton(tr("Add a document"), () => openLeaseDocumentDialog(lease.id)))));
+}
+
+function openLeaseDocumentDialog(leaseId) {
+  const lease = rentalLeases.find((l) => l.id === leaseId);
+  if (!lease) return;
+  const kind = selectInput(LEASE_DOC_KINDS.map(([v, l]) => [v, tr(l)]), "contract");
+  const name = textInput("", { maxlength: "80", placeholder: tr("e.g. Parking agreement") });
+  const nameField = field(tr("Name"), name);
+  const sync = () => nameField.classList.toggle("hidden", kind.value !== "other");
+  kind.addEventListener("change", sync);
+  sync();
+  const file = mk("input", { type: "file", accept: "image/*,application/pdf,.pdf" });
+  const save = primaryButton(tr("Save"), async () => {
+    const chosen = file.files?.[0];
+    if (!chosen) { showToast("Choose a photo or a PDF"); return; }
+    if (kind.value === "other" && !name.value.trim()) { showToast("Give it a name"); return; }
+    save.disabled = true;
+    try {
+      const uploaded = await uploadLeaseFile(lease, chosen);
+      const label = kind.value === "other" ? name.value.trim() : tr(LEASE_DOC_KINDS.find(([v]) => v === kind.value)[1]);
+      const saved = await saveLease({ ...lease, documents: [...(lease.documents || []), { id: newId("doc"), kind: kind.value, name: label, ...uploaded }] });
+      if (saved) { closeToolDialog(); openLeaseDetails(leaseId); showToast("Saved"); }
+    } catch (error) {
+      showToast(error.message || describeSyncProblem(error), 6000);
+    } finally {
+      save.disabled = false;
+    }
+  });
+  openToolDialog(tr("Add a document — {title}", { title: leaseTitle(lease) }),
+    field(tr("What is it?"), kind), nameField,
+    field(tr("Photo or PDF"), file),
+    note(tr("Only you can open lease documents: not the owner, the tenant or view-only helpers.")),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), () => { closeToolDialog(); openLeaseDetails(leaseId); })));
+}
+
+async function removeLeaseDocument(leaseId, docId) {
+  const lease = rentalLeases.find((l) => l.id === leaseId);
+  const doc = lease?.documents?.find((d) => d.id === docId);
+  if (!doc || !window.confirm(tr("Remove {name}? The file is deleted.", { name: doc.name || tr("this document") }))) return;
+  const saved = await saveLease({ ...lease, documents: lease.documents.filter((d) => d.id !== docId) });
+  if (!saved) return;
+  deleteInvoicePhoto(doc);
+  closeToolDialog();
+  openLeaseDetails(leaseId);
+}
+
+// ── Inspections ──
+function inspectionLabel(kind) {
+  return kind === "move-out" ? tr("Move-out inspection") : tr("Move-in inspection");
+}
+
+function conditionLabel(value) {
+  return tr((INSPECTION_CONDITIONS.find(([v]) => v === value) || INSPECTION_CONDITIONS[0])[1]);
+}
+
+function leaseInspectionsSection(lease) {
+  const list = (lease.inspections || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const hasIn = list.some((i) => i.kind === "move-in");
+  const hasOut = list.some((i) => i.kind === "move-out");
+  return reportsSection(tr("Inspections"), mk("div", {},
+    list.length ? list.map((i) => {
+      const damaged = (i.rooms || []).filter((r) => r.condition === "damaged").length;
+      const photos = (i.rooms || []).reduce((t, r) => t + (r.photos || []).length, 0);
+      return mk("div", { className: "breakdown-row tech-person" },
+        mk("span", { className: "tech-person-main" }, mk("strong", { text: inspectionLabel(i.kind) }),
+          mk("small", { text: [formatDateLabel(i.date), tr("{n} rooms", { n: (i.rooms || []).length }), damaged ? tr("{n} damaged", { n: damaged }) : "", photos ? tr("{n} photos", { n: photos }) : ""].filter(Boolean).join(" · ") })),
+        mk("span", { className: "tech-person-actions" },
+          miniButton(tr("View"), () => openInspectionEditor(lease.id, i.kind, i.id)),
+          miniButton("PDF", () => { void shareInspectionPdf(lease.id, i.id); })));
+    }) : note(tr("Record each room's condition with photos when the tenant moves in, and again when they leave: it settles questions about the deposit.")),
+    mk("div", { className: "notice-actions" },
+      hasIn ? null : miniButton(tr("Move-in inspection"), () => openInspectionEditor(lease.id, "move-in")),
+      hasIn && !hasOut ? miniButton(tr("Move-out inspection"), () => openInspectionEditor(lease.id, "move-out")) : null)));
+}
+
+function openInspectionEditor(leaseId, kind, id = null) {
+  const lease = rentalLeases.find((l) => l.id === leaseId);
+  if (!lease) return;
+  const existing = id ? (lease.inspections || []).find((i) => i.id === id) : null;
+  const moveIn = (lease.inspections || []).find((i) => i.kind === "move-in");
+  const rooms = (existing?.rooms || (kind === "move-out" && moveIn ? moveIn.rooms.map((r) => ({ name: r.name, condition: r.condition })) : INSPECTION_ROOMS.map((name) => ({ name: tr(name) }))))
+    .map((r) => ({ name: r.name, condition: r.condition || "good", note: r.note || "", photos: [...(r.photos || [])] }));
+  const date = mk("input", { type: "date", value: existing?.date || (kind === "move-in" ? lease.start : localDateInput()) });
+  const electricity = textInput(existing?.meters?.electricity || "", { inputmode: "decimal", maxlength: "20" });
+  const water = textInput(existing?.meters?.water || "", { inputmode: "decimal", maxlength: "20" });
+  const keys = numberInput(existing?.keys ?? "");
+  const list = mk("div", { className: "inspection-rooms" });
+  const drawRooms = () => fillChildren(list, ...rooms.map((room, index) => {
+    const before = kind === "move-out" ? moveIn?.rooms?.find((r) => r.name === room.name) : null;
+    const name = textInput(room.name, { maxlength: "40" });
+    name.addEventListener("input", () => { room.name = name.value; });
+    const condition = selectInput(INSPECTION_CONDITIONS.map(([v, l]) => [v, tr(l)]), room.condition);
+    condition.addEventListener("change", () => { room.condition = condition.value; });
+    const noteBox = mk("textarea", { rows: "2", maxlength: "300", placeholder: tr("What you see (optional)") });
+    noteBox.value = room.note;
+    noteBox.addEventListener("input", () => { room.note = noteBox.value; });
+    const photoInput = mk("input", { type: "file", accept: "image/*", multiple: "multiple", className: "file-input-hidden" });
+    const addPhoto = miniButton(tr("Add photos"), () => photoInput.click());
+    photoInput.addEventListener("change", async () => {
+      const files = [...(photoInput.files || [])];
+      if (!files.length) return;
+      addPhoto.disabled = true;
+      addPhoto.textContent = tr("Uploading…");
+      try {
+        for (const f of files) room.photos.push(await uploadLeaseFile(lease, f, "inspections"));
+      } catch (error) {
+        showToast(error.message || describeSyncProblem(error), 6000);
+      }
+      drawRooms();
+    });
+    return mk("div", { className: "inspection-room" },
+      mk("div", { className: "two-col" }, field(tr("Room"), name), field(tr("Condition"), condition)),
+      before ? mk("small", { className: "field-hint", text: tr("At move-in: {condition}{note}", { condition: conditionLabel(before.condition), note: before.note ? ` — ${before.note}` : "" }) }) : null,
+      noteBox,
+      mk("div", { className: "notice-actions" },
+        addPhoto, photoInput,
+        ...room.photos.map((p, i) => miniButton(tr("Photo {n}", { n: i + 1 }), () => openInvoicePhoto(p))),
+        miniButton(tr("Remove room"), () => { rooms.splice(index, 1); drawRooms(); })));
+  }));
+  drawRooms();
+  const save = primaryButton(tr("Save"), async () => {
+    save.disabled = true;
+    const record = {
+      id: existing?.id || newId("insp"), kind, date: date.value || localDateInput(),
+      meters: { electricity: electricity.value.trim(), water: water.value.trim() }, keys: Number(keys.value) || 0,
+      rooms: rooms.filter((r) => String(r.name).trim()).map((r) => ({ ...r, name: String(r.name).trim(), note: String(r.note).trim() })),
+      updatedAt: new Date().toISOString(),
+    };
+    const inspections = [...(lease.inspections || []).filter((i) => i.id !== record.id), record];
+    const saved = await saveLease({ ...lease, inspections });
+    save.disabled = false;
+    if (saved) { closeToolDialog(); openLeaseDetails(leaseId); showToast("Saved"); }
+  });
+  openToolDialog(`${inspectionLabel(kind)} — ${leaseTitle(lease)}`,
+    mk("div", { className: "two-col" }, field(tr("Date"), date), field(tr("Keys handed over"), keys)),
+    mk("div", { className: "two-col" }, field(tr("Electricity meter"), electricity), field(tr("Water meter"), water)),
+    list,
+    mk("div", { className: "notice-actions" }, miniButton(tr("Add a room"), () => { rooms.push({ name: "", condition: "good", note: "", photos: [] }); drawRooms(); })),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), () => { closeToolDialog(); openLeaseDetails(leaseId); })));
+}
+
+// A photo from the store, drawn into the PDF as a JPEG image.
+async function pdfPhotoImage(attachment, maxEdge = 900) {
+  const bytes = await fetchStoredPhoto(attachment.storagePath);
+  const bitmap = await createImageBitmap(new Blob([bytes], { type: attachment.mimeType || "image/jpeg" }));
+  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const binary = atob(canvas.toDataURL("image/jpeg", 0.8).split(",")[1] || "");
+  let hex = "";
+  for (let i = 0; i < binary.length; i += 1) hex += binary.charCodeAt(i).toString(16).padStart(2, "0");
+  const img = { name: `Tx${pdfTextImages.length + 1}`, width: canvas.width, height: canvas.height, ascent: canvas.height, hex };
+  pdfTextImages.push(img);
+  return img;
+}
+
+async function buildInspectionPdf(lease, inspection) {
+  const flat = leaseFlat(lease);
+  const left = 50;
+  const right = 545;
+  const pages = [];
+  let commands = ["0.2 w"];
+  let y = 800;
+  commands.push(pdfTextCommand(state.building?.name || "", left, y, 11));
+  commands.push(pdfTextCommand(inspection.kind === "move-out" ? "Move-out inspection" : "Move-in inspection", left, y - 28, 20, true));
+  commands.push(pdfTextCommand(tr("{name} | Unit {unit}", { name: lease.tenant?.name || "", unit: flat?.unit || "" }), left, y - 48, 11));
+  commands.push(pdfTextCommand(tr("Date: {date}", { date: inspection.date }), 380, y, 10));
+  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 16, 9));
+  commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+  y -= 92;
+  const facts = [[tr("Electricity meter"), inspection.meters?.electricity || "-"], [tr("Water meter"), inspection.meters?.water || "-"], [tr("Keys handed over"), String(inspection.keys || 0)]];
+  facts.forEach(([label, value], i) => {
+    const x = left + i * 168;
+    commands.push(pdfRectCommand(x, y - 34, 159, 40));
+    commands.push(pdfTextCommand(label, x + 8, y - 8, 8));
+    commands.push(pdfTextCommand(pdfClip(value, 26), x + 8, y - 25, 11, true));
+  });
+  y -= 62;
+  // A move-out report shows each room as it was at move-in next to it.
+  const moveIn = inspection.kind === "move-out" ? (lease.inspections || []).find((i) => i.kind === "move-in") : null;
+  const cols = moveIn ? [["Room", 110], ["At move-in", 80], ["Condition", 80], ["Notes", 170], ["Photos", 55]] : [["Room", 130], ["Condition", 90], ["Notes", 215], ["Photos", 60]];
+  let x = left;
+  cols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; });
+  y -= 22;
+  (inspection.rooms || []).forEach((r) => {
+    if (y < 120) { pages.push(`${commands.join("\n")}\n`); commands = ["0.2 w"]; y = 800; }
+    x = left;
+    const before = moveIn?.rooms?.find((x) => x.name === r.name);
+    (moveIn ? [r.name, before ? conditionLabel(before.condition) : "-", conditionLabel(r.condition), r.note || "", String((r.photos || []).length)]
+      : [r.name, conditionLabel(r.condition), r.note || "", String((r.photos || []).length)]).forEach((v, i) => {
+      commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22));
+      commands.push(pdfTextCommand(pdfClip(v, Math.floor(cols[i][1] / 4.6)), x + 5, y - 4, 8));
+      x += cols[i][1];
+    });
+    y -= 22;
+  });
+  y = Math.max(70, y - 40);
+  commands.push(pdfTextCommand("Tenant's signature", left, y, 9));
+  commands.push(pdfLineCommand(left + 95, y - 2, left + 230, y - 2));
+  commands.push(pdfTextCommand("Building manager's signature", 300, y, 9));
+  commands.push(pdfLineCommand(300 + 140, y - 2, right, y - 2));
+  pages.push(`${commands.join("\n")}\n`);
+  // Photos: four to a page, with the room's name.
+  const photos = (inspection.rooms || []).flatMap((r) => (r.photos || []).map((p) => ({ room: r.name, photo: p })));
+  for (let i = 0; i < photos.length; i += 4) {
+    commands = ["0.2 w"];
+    for (let j = 0; j < 4 && i + j < photos.length; j += 1) {
+      const { room, photo } = photos[i + j];
+      const cx = left + (j % 2) * 255;
+      const cy = 800 - Math.floor(j / 2) * 370;
+      commands.push(pdfTextCommand(room, cx, cy, 10, true));
+      try {
+        const img = await pdfPhotoImage(photo);
+        const scale = Math.min(240 / img.width, 330 / img.height);
+        const w = (img.width * scale).toFixed(2);
+        const h = (img.height * scale).toFixed(2);
+        commands.push(`q ${w} 0 0 ${h} ${cx} ${(cy - 12 - img.height * scale).toFixed(2)} cm /${img.name} Do Q`);
+      } catch {
+        commands.push(pdfTextCommand("The photo couldn't be loaded.", cx, cy - 24, 9));
+      }
+    }
+    pages.push(`${commands.join("\n")}\n`);
+  }
+  return buildMultiPagePdf(pages);
+}
+
+async function shareInspectionPdf(leaseId, inspectionId) {
+  const lease = rentalLeases.find((l) => l.id === leaseId);
+  const inspection = lease?.inspections?.find((i) => i.id === inspectionId);
+  if (!inspection) return;
+  showToast("Preparing the PDF…");
+  try {
+    const pdf = await buildInspectionPdf(lease, inspection);
+    const flat = leaseFlat(lease);
+    await sharePdfFile(pdf, `${inspection.kind === "move-out" ? "Move-out" : "Move-in"}_${safeFilePart(flat?.unit || "flat", "flat")}_${inspection.date}.pdf`, inspectionLabel(inspection.kind));
+  } catch (error) {
+    showToast(describeSyncProblem(error), 6000);
+  }
+}
+
+// ── Renewals ──
+function openRenewLeaseDialog(leaseId) {
+  const lease = rentalLeases.find((l) => l.id === leaseId);
+  if (!lease) return;
+  const c = lease.currency || "USD";
+  const from = lease.end ? addDays(lease.end, 1) : localDateInput();
+  const current = leaseCurrentRent(lease);
+  const suggested = roundMoney(current * (1 + Number(lease.increasePct || 0) / 100), c);
+  const newEnd = mk("input", { type: "date", value: addDays(addMonthsToDate(from, 12), -1) });
+  const rent = numberInput(suggested);
+  const save = primaryButton(tr("Renew"), async () => {
+    const value = roundMoney(Number(rent.value), c);
+    if (!(value > 0)) { showToast("Enter the rent"); return; }
+    if (!newEnd.value || newEnd.value <= from) { showToast(tr("The new end date must be after {date}", { date: formatDateLabel(from) }), 5000); return; }
+    save.disabled = true;
+    const record = { at: new Date().toISOString(), from, previousEnd: lease.end || "", end: newEnd.value, rent: value };
+    const saved = await saveLease({
+      ...lease, end: newEnd.value,
+      rentChanges: [...(lease.rentChanges || []).filter((x) => x.from !== from), { from, rent: value }],
+      renewals: [...(lease.renewals || []), record],
+    });
+    save.disabled = false;
+    if (!saved) return;
+    notifyTenants(lease.flatId, tr("Lease renewed"), tr("Until {date}. Rent from {from}: {amount}.", { date: formatDateLabel(newEnd.value), from: formatDateLabel(from), amount: formatMoney(value, c) }));
+    const flat = leaseFlat(saved);
+    openToolDialog(tr("Lease renewed"),
+      note(tr("Send the new terms on WhatsApp.")),
+      mk("div", { className: "button-row" },
+        saved.tenant?.phone ? primaryButton(tr("To the tenant"), () => window.open(whatsappLink(saved.tenant.phone, renewalText(saved, record, saved.tenant?.language || "en", saved.tenant?.name)), "_blank", "noopener")) : null,
+        flat?.phone && !saved.ownFlat ? secondaryButton(tr("To the owner"), () => window.open(whatsappLink(flat.phone, renewalText(saved, record, tenantLanguage(flat), flat.name)), "_blank", "noopener")) : null,
+        secondaryButton(tr("Done"), () => { closeToolDialog(); openLeaseDetails(leaseId); })));
+  });
+  openToolDialog(tr("Renew lease — {title}", { title: leaseTitle(lease) }),
+    note(lease.end ? tr("The lease ends on {date}. The renewal starts the next day.", { date: formatDateLabel(lease.end) }) : tr("This lease has no end date: the renewal starts today.")),
+    mk("div", { className: "two-col" }, field(tr("New end date"), newEnd), field(tr("Rent ({currency})", { currency: c }), rent, tr("Now {amount} · {period}", { amount: formatMoney(current, c), period: periodLabel(lease) }))),
+    lease.increasePct ? note(tr("The yearly increase of {pct}% continues from the new start.", { pct: lease.increasePct })) : null,
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), () => { closeToolDialog(); openLeaseDetails(leaseId); })));
+}
+
+function renewalText(lease, record, lang, name) {
+  const flat = leaseFlat(lease);
+  return [
+    trIn(lang, "Hello {name},", { name: name || "" }),
+    trIn(lang, "The lease of flat {unit} is renewed until {date}.", { unit: flat?.unit || "", date: formatDateLabel(record.end) }),
+    trIn(lang, "Rent from {from}: {amount} · {period}.", { from: formatDateLabel(record.from), amount: formatMoney(record.rent, lease.currency || "USD"), period: trIn(lang, (LEASE_PERIODS.find(([v]) => v === lease.period) || LEASE_PERIODS[0])[1]) }),
+    trIn(lang, "Thank you."),
+  ].join("\n");
+}
+
+function leaseRenewalsNote(lease) {
+  const list = lease.renewals || [];
+  if (!list.length) return null;
+  const c = lease.currency || "USD";
+  return note(list.map((r) => tr("Renewed on {at}: until {end}, {amount} from {from}", { at: formatDateLabel(String(r.at).slice(0, 10)), end: formatDateLabel(r.end), amount: formatMoney(r.rent, c), from: formatDateLabel(r.from) })).join("\n"));
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -22862,6 +23284,7 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  leaseRentBase,
   withLateFees,
   leaseSchedule,
   rentPaymentAllocation,
