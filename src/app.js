@@ -21406,6 +21406,7 @@ boot().catch((error) => {
 // Pure calculation functions plus a way to load a state; nothing here touches
 // the network.
 export const __test = {
+  tenantStatementRows,
   setState(raw) { state = hydrateState(raw); currentLang = normalizeLang(state.settings.language); },
   setSessionMode(mode) { sessionMode = mode; },
   saveState,
