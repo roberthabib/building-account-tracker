@@ -6525,3 +6525,27 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   font-size: 0.78rem;
   text-align: end;
 }
+
+/* v194 — rent periods paid ahead */
+.rent-dot.is-ahead {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--accent-green);
+  color: var(--green-tint-text);
+}
+
+.rent-owner-due {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: none;
+}
+
+.rent-owner-due small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.rent-owner-due strong {
+  font-size: 1rem;
+  color: var(--primary);
+}

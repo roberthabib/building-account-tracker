@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v193";
+const APP_VERSION = "v194";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,14 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Pay now: {amount}": "للدفع الآن: {amount}",
+  "Rent due so far": "الإيجار المستحق حتى الآن",
+  "…and {n} earlier payments (see the PDF).": "…و{n} دفعات سابقة (راجع ملف PDF).",
+  "paid until {date}": "مدفوع حتى {date}",
+  "Nothing more to pay on this lease": "لا شيء آخر للدفع على هذا العقد",
+  "Next rent: {amount} on {date}": "الإيجار التالي: {amount} في {date}",
+  "{amount} of it already paid": "دُفع منه {amount}",
+  "Paid ahead": "مدفوع مسبقاً",
   "paid on {date}": "دُفع في {date}",
   "paid {amount} on {date}": "دُفع {amount} في {date}",
   "{paid} of {due}": "{paid} من {due}",
@@ -21727,16 +21735,31 @@ function leaseStatus(lease, today = localDateInput()) {
   const late = rows.filter((r) => r.state === "late");
   const firstOpen = rows.findIndex((r) => r.state !== "paid");
   const lastPaid = firstOpen === -1 ? rows.at(-1) || null : firstOpen > 0 ? rows[firstOpen - 1] : null;
+  const credit = roundMoney(Math.max(0, paidTotal - dueTotal), currency);
+  // v194: rent paid ahead covers the coming periods, in order; paid until
+  // moves to the last one fully covered (what is left is a part-payment).
+  const ahead = [];
+  let creditLeft = credit;
+  if (credit > 0.005 && lease?.status !== "ended") {
+    const coming = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 120)).filter((p) => p.start > today);
+    for (const p of coming) {
+      if (creditLeft < p.amount - 0.005) break;
+      creditLeft = roundMoney(creditLeft - p.amount, currency);
+      ahead.push({ ...p, paid: p.amount, left: 0, state: "paid", ahead: true });
+    }
+  }
   return {
     currency,
     periods: rows,
+    ahead,
     dueTotal,
     paidTotal,
     owed,
-    credit: roundMoney(Math.max(0, paidTotal - dueTotal), currency),
+    credit,
+    creditLeft,
     lateAmount: roundMoney(late.reduce((s, r) => s + r.left, 0), currency),
     lateCount: late.length,
-    paidUntil: lastPaid ? lastPaid.end : null,
+    paidUntil: ahead.length ? ahead.at(-1).end : lastPaid ? lastPaid.end : null,
   };
 }
 
@@ -21895,10 +21918,11 @@ function renderRentalOwners() {
       ? [tr("Collected {amount}", { amount: formatMoney(a.collected, a.currency) })]
       : [tr("Collected {amount}", { amount: formatMoney(a.collected, a.currency) }), tr("your fee {amount}", { amount: formatMoney(a.fee, a.currency) }),
         a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, a.currency) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, a.currency) })].filter(Boolean);
-    return mk("div", { className: "breakdown-row tech-person" },
-      mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: lines.join(" · ") })),
-      g.own ? null : mk("span", { className: "tech-person-actions" },
-        mk("strong", { className: "tech-due", text: formatMoney(a.toHandOver, a.currency) }),
+    return mk("div", { className: "rent-pay-row" },
+      mk("div", { className: "rent-pay-head" },
+        mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: lines.join(" · ") })),
+        g.own ? null : mk("span", { className: "rent-owner-due" }, mk("small", { text: tr("To hand over") }), mk("strong", { text: formatMoney(a.toHandOver, a.currency) }))),
+      g.own ? null : mk("div", { className: "notice-actions" },
         miniButton(tr("Hand over"), () => openPayoutDialog(l.id)),
         miniButton(tr("Expense"), () => openDeductionDialog(l.id)),
         miniButton(tr("Statement"), () => sendOwnerStatement(l)),
@@ -23492,7 +23516,8 @@ async function chargeJobToOwner(lease, job, technician) {
 // Another lease of the same flat whose dates overlap [start, end] (an open
 // end runs forever; an ended lease stops on the day it ended).
 function leaseClash(leases, { id = null, flatId, start, end = "" }) {
-  const last = (l) => (l.status === "ended" ? l.endedOn || l.end || l.start : l.end || "9999-12-31");
+  // An ended lease frees the flat from the day it ended (the next tenant can move in that day).
+  const last = (l) => (l.status === "ended" ? addDays(l.endedOn || l.end || l.start, -1) : l.end || "9999-12-31");
   return (leases || []).find((l) => l.id !== id && l.flatId === flatId
     && String(l.start) <= String(end || "9999-12-31") && String(start) <= String(last(l))) || null;
 }
@@ -23518,7 +23543,7 @@ function rentStatementRows(lease, today = localDateInput()) {
   const pays = (lease.payments || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.id).localeCompare(String(b.id)));
   let i = 0;
   let left = Number(pays[0]?.amount || 0);
-  const rows = s.periods.map((p) => {
+  const rows = [...s.periods, ...(s.ahead || [])].map((p) => {
     let need = p.amount;
     const paidBy = [];
     while (need > 0.005 && i < pays.length) {
@@ -23582,25 +23607,25 @@ function rentStateClass(state) {
 }
 
 function rentStateText(p, c) {
-  return p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : p.paid > 0 ? tr("{amount} left", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) });
+  return p.ahead ? tr("Paid ahead") : p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : p.paid > 0 ? tr("{amount} left", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) });
 }
 
 // Twelve little squares: the last rent periods, coloured by status.
 function rentPeriodStrip(lease, s = leaseStatus(lease)) {
-  const periods = s.periods.slice(-12);
+  const periods = [...s.periods, ...(s.ahead || [])].slice(-12);
   if (!periods.length) return null;
   return mk("div", { className: "rent-strip", "aria-label": tr("Rent periods") },
-    ...periods.map((p) => mk("span", { className: `rent-dot ${rentStateClass(p.state)}`, title: `${leasePeriodLabel(lease, p)} · ${rentStateText(p, s.currency)}`, text: lease.period === "yearly" ? p.start.slice(2, 4) : String(Number(p.start.slice(5, 7))) })));
+    ...periods.map((p) => mk("span", { className: `rent-dot ${rentStateClass(p.state)}${p.ahead ? " is-ahead" : ""}`, title: `${leasePeriodLabel(lease, p)} · ${rentStateText(p, s.currency)}`, text: lease.period === "yearly" ? p.start.slice(2, 4) : String(Number(p.start.slice(5, 7))) })));
 }
 
 function leaseMoneyLine(lease, s = leaseStatus(lease)) {
   const c = s.currency;
+  if (lease.status === "ended") return "";
+  if (s.owed > 0.005) return [tr("Owes {amount}", { amount: formatMoney(s.owed, c) }), s.paidUntil ? tr("paid until {date}", { date: formatDateLabel(s.paidUntil) }) : ""].filter(Boolean).join(" · ");
   const next = nextRentDue(lease);
-  return [
-    s.owed > 0.005 ? tr("Owes {amount}", { amount: formatMoney(s.owed, c) }) : s.credit > 0.005 ? tr("{amount} in advance", { amount: formatMoney(s.credit, c) }) : tr("Up to date"),
-    s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : "",
-    next && !next.now ? tr("next {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) }) : "",
-  ].filter(Boolean).join(" · ");
+  if (!next) return tr("Nothing more to pay on this lease");
+  return [tr("Next rent: {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) }),
+    s.creditLeft > 0.005 ? tr("{amount} of it already paid", { amount: formatMoney(s.creditLeft, c) }) : ""].filter(Boolean).join(" · ");
 }
 
 // ── The Leases tab ──
@@ -23680,9 +23705,9 @@ function leaseSummaryCells(lease, s = leaseStatus(lease)) {
   const c = s.currency;
   const next = nextRentDue(lease);
   return mk("div", { className: "tech-summary" },
-    mk("div", { className: `tech-summary-cell${s.owed > 0.005 ? " is-owed" : ""}` }, mk("span", { text: s.owed > 0.005 ? tr("Owed now") : s.credit > 0.005 ? tr("In advance") : tr("Owed now") }), mk("strong", { text: formatMoney(s.owed > 0.005 ? s.owed : s.credit, c) })),
+    mk("div", { className: `tech-summary-cell${s.owed > 0.005 ? " is-owed" : ""}` }, mk("span", { text: tr("Owed now") }), mk("strong", { text: formatMoney(s.owed, c) })),
     mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Paid until") }), mk("strong", { text: s.paidUntil ? formatDateLabel(s.paidUntil) : "—" })),
-    mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Next rent") }), mk("strong", { text: next ? formatMoney(next.amount, c) : "—" }), mk("small", { text: next ? (next.now ? tr("now") : formatDateLabel(next.date)) : "" })));
+    mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Next rent") }), mk("strong", { text: next ? formatMoney(next.amount, c) : "—" }), mk("small", { text: next ? (next.now ? tr("now") : [formatDateLabel(next.date), s.creditLeft > 0.005 ? tr("{amount} of it already paid", { amount: formatMoney(s.creditLeft, c) }) : ""].filter(Boolean).join(" · ")) : "" })));
 }
 
 function openLeaseDetails(id) {
@@ -23797,7 +23822,7 @@ function buildRentStatementPdf(lease) {
   start(true);
   const boxes = [
     ["Rent", `${formatMoney(leaseCurrentRent(lease), c)} · ${periodLabel(lease)}`],
-    [s.owed > 0.005 ? "Owed now" : s.credit > 0.005 ? "In advance" : "Owed now", formatMoney(s.owed > 0.005 ? s.owed : s.credit, c)],
+    ["Owed now", formatMoney(s.owed, c)],
     ["Paid until", s.paidUntil ? formatDateLabel(s.paidUntil) : "-"],
     ["Rent paid in total", formatMoney(s.paidTotal, c)],
     ...(lease.deposit?.amount ? [["Deposit held", formatMoney(lease.deposit.returnedOn ? 0 : lease.deposit.amount, c)]] : []),
@@ -23822,7 +23847,7 @@ function buildRentStatementPdf(lease) {
   rows.forEach((p) => {
     if (y < 80) { start(false); header(); }
     let x = left;
-    [leasePeriodLabel(lease, p), formatMoney(p.amount, c), formatMoney(p.paid, c), formatMoney(p.left, c), p.state === "paid" ? "Paid" : p.state === "late" ? "Late" : p.paid > 0 ? "Partial" : "Due"]
+    [leasePeriodLabel(lease, p), formatMoney(p.amount, c), formatMoney(p.paid, c), formatMoney(p.left, c), p.ahead ? "Paid ahead" : p.state === "paid" ? "Paid" : p.state === "late" ? "Late" : p.paid > 0 ? "Partial" : "Due"]
       .forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, Math.floor(cols[i][1] / 4.6)), x + 5, y - 4, 8, i === 4 && p.state === "late")); x += cols[i][1]; });
     y -= 22;
   });
@@ -23855,11 +23880,14 @@ function drawRentStatementCanvas(lease) {
   const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
   const { rows, status: s } = rentStatementRows(lease);
   const c = s.currency;
-  const list = rows.slice(-10);
+  const periods = rows.slice(-8).reverse();
+  const payments = (lease.payments || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.id).localeCompare(String(a.id)));
+  const shownPayments = payments.slice(0, 8);
   const flat = leaseFlat(lease);
+  const next = nextRentDue(lease);
   const W = 1080;
   const PAD = 64;
-  const H = 700 + list.length * 96 + 140;
+  const H = 820 + 110 + periods.length * 92 + 110 + Math.max(1, shownPayments.length) * 78 + (payments.length > shownPayments.length ? 40 : 0) + (lease.deposit?.amount ? 60 : 0) + 120;
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -23867,31 +23895,63 @@ function drawRentStatementCanvas(lease) {
   ctx.direction = rtl ? "rtl" : "ltr";
   const X = (x) => (rtl ? W - x : x);
   const box = (x, y, w, h, color, radius = 0) => { ctx.fillStyle = color; ctx.beginPath(); const lx = rtl ? W - x - w : x; if (radius && typeof ctx.roundRect === "function") ctx.roundRect(lx, y, w, h, radius); else ctx.rect(lx, y, w, h); ctx.fill(); };
-  const text = (value, x, y, { size = 30, weight = 400, color = C.ink, align = "start" } = {}) => { ctx.font = `${weight} ${size}px ${FONT}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(String(value ?? ""), X(x), y); };
+  // In Arabic, amounts keep their left-to-right order ("$600.00", not "600.00$").
+  const ltrMoney = (v) => (rtl ? String(v ?? "").replace(/\$[\d,]+(?:\.\d+)?|[\d,]+ LBP/g, (m) => `⁦${m}⁩`) : String(v ?? ""));
+  const text = (value, x, y, { size = 30, weight = 400, color = C.ink, align = "start" } = {}) => { ctx.font = `${weight} ${size}px ${FONT}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(ltrMoney(value), X(x), y); };
   box(0, 0, W, H, C.white);
   box(0, 0, W, 250, C.green);
   text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
   text(tr("Rent statement"), PAD, 160, { size: 64, weight: 800, color: C.white });
   text(`${lease.tenant?.name || ""} · ${tr("Unit {unit}", { unit: flat?.unit || "" })} · ${formatDateLabel(localDateInput())}`, PAD, 212, { size: 30, color: C.soft });
-  box(PAD, 300, W - PAD * 2, 210, C.tint, 26);
+  // What is owed now, paid until, next rent.
   const owes = s.owed > 0.005;
-  text(owes ? tr("Owed now") : s.credit > 0.005 ? tr("In advance") : tr("All paid"), PAD + 36, 360, { size: 30, color: C.muted });
-  text(owes || s.credit > 0.005 ? formatMoney(owes ? s.owed : s.credit, c) : "✓", PAD + 36, 440, { size: 72, weight: 800, color: owes ? C.red : C.accent });
-  text([`${formatMoney(leaseCurrentRent(lease), c)} · ${periodLabel(lease)}`, s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : ""].filter(Boolean).join(" · "), PAD + 36, 486, { size: 28, color: C.muted });
-  let y = 590;
-  text(tr("Period"), PAD, y, { size: 28, weight: 700, color: C.muted });
-  text(tr("Paid"), W - PAD, y, { size: 28, weight: 700, color: C.muted, align: "end" });
-  y += 24;
+  box(PAD, 290, W - PAD * 2, 250, C.tint, 26);
+  text(owes ? tr("Owed now") : tr("All paid"), PAD + 36, 350, { size: 30, color: C.muted });
+  text(owes ? formatMoney(s.owed, c) : "✓", PAD + 36, 430, { size: 72, weight: 800, color: owes ? C.red : C.accent });
+  text(s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : "", PAD + 36, 480, { size: 30, weight: 700, color: C.ink });
+  text(next ? (next.now ? tr("Pay now: {amount}", { amount: formatMoney(next.amount, c) }) : tr("Next rent: {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) })) : "", PAD + 36, 520, { size: 28, color: C.muted });
+  // Lease and totals.
+  text([`${formatMoney(leaseCurrentRent(lease), c)} · ${periodLabel(lease)}`, tr("since {date}", { date: formatDateLabel(lease.start) })].join(" · "), PAD, 600, { size: 28, color: C.muted });
+  const cell = (i, label, value, color = C.ink) => {
+    const w = (W - PAD * 2 - 40) / 3;
+    const x = PAD + i * (w + 20);
+    box(x, 630, w, 130, C.white);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.strokeRect(rtl ? W - x - w : x, 630, w, 130);
+    text(label, x + 22, 680, { size: 24, color: C.muted });
+    text(value, x + 22, 735, { size: 36, weight: 800, color });
+  };
+  cell(0, tr("Rent due so far"), formatMoney(s.dueTotal, c));
+  cell(1, tr("Paid"), formatMoney(s.paidTotal, c), C.accent);
+  cell(2, owes ? tr("Owed now") : tr("Paid ahead"), formatMoney(owes ? s.owed : s.credit, c), owes ? C.red : C.accent);
+  // Month by month.
+  let y = 830;
+  text(tr("Month by month"), PAD, y, { size: 32, weight: 800 });
+  y += 30;
   box(PAD, y, W - PAD * 2, 2, C.line);
-  y += 60;
-  list.slice().reverse().forEach((p) => {
-    text(leasePeriodLabel(lease, p), PAD, y, { size: 32 });
+  y += 58;
+  periods.forEach((p) => {
     const color = p.state === "paid" ? C.accent : p.state === "late" ? C.red : C.amber;
-    text(tr("{paid} of {due}", { paid: formatMoney(p.paid, c), due: formatMoney(p.amount, c) }), W - PAD, y, { size: 32, weight: 700, color, align: "end" });
+    text(leasePeriodLabel(lease, p), PAD, y, { size: 30, weight: 700 });
+    text(tr("{paid} of {due}", { paid: formatMoney(p.paid, c), due: formatMoney(p.amount, c) }), W - PAD, y, { size: 30, weight: 700, color, align: "end" });
     const when = p.paidBy.map((x) => formatDateLabel(x.date)).join(", ");
-    text([rentStateText(p, c), when].filter(Boolean).join(" · "), PAD, y + 38, { size: 24, color: C.muted });
-    y += 96;
+    text([rentStateText(p, c), when ? tr("paid on {date}", { date: when }) : ""].filter(Boolean).join(" · "), PAD, y + 36, { size: 23, color: C.muted });
+    y += 92;
   });
+  // Payments received.
+  y += 20;
+  text(tr("Payments received"), PAD, y, { size: 32, weight: 800 });
+  y += 30;
+  box(PAD, y, W - PAD * 2, 2, C.line);
+  y += 56;
+  if (!shownPayments.length) { text(tr("No payments yet."), PAD, y, { size: 28, color: C.muted }); y += 78; }
+  shownPayments.forEach((p) => {
+    text(formatDateLabel(p.date), PAD, y, { size: 30, weight: 700 });
+    text(formatMoney(p.amount, c), W - PAD, y, { size: 30, weight: 800, color: C.accent, align: "end" });
+    text([methodLabel(p.method), tr("Receipt: {no}", { no: String(p.id).toUpperCase() })].filter(Boolean).join(" · "), PAD, y + 34, { size: 22, color: C.muted });
+    y += 78;
+  });
+  if (payments.length > shownPayments.length) { text(tr("…and {n} earlier payments (see the PDF).", { n: payments.length - shownPayments.length }), PAD, y, { size: 24, color: C.muted }); y += 40; }
+  if (lease.deposit?.amount) text(tr("Deposit held: {amount}", { amount: formatMoney(lease.deposit.returnedOn ? 0 : lease.deposit.amount, c) }), PAD, y + 10, { size: 26, color: C.muted });
   text(tr("Generated by Building Account Tracker"), PAD, H - 52, { size: 24, color: C.muted });
   return canvas;
 }
