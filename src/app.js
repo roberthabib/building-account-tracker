@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v188";
+const APP_VERSION = "v189";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,9 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Flat {unit} is rented to {name} until {date}. Start this lease after that, or end that lease first.": "الشقة {unit} مؤجّرة إلى {name} حتى {date}. ابدأ هذا العقد بعد ذلك، أو أنهِ ذلك العقد أولاً.",
+  "Flat {unit} is already rented to {name}. End that lease first.": "الشقة {unit} مؤجّرة أصلاً إلى {name}. أنهِ ذلك العقد أولاً.",
+  "rented to {name}": "مؤجّرة إلى {name}",
   "{n} m²": "{n} م²",
   "Overview": "نظرة عامة",
   "For rent": "للإيجار",
@@ -21907,7 +21910,8 @@ function openLeaseEditor(id = null, prefill = null) {
   const pre = prefill || {};
   const flats = state.tenants.filter((t) => t.active !== false || t.id === lease?.flatId);
   if (!flats.length) { showToast("Add the flats first (Flats tab)"); return; }
-  const flat = selectInput(flats.map((t) => [t.id, [t.unit ? tr("Flat {unit}", { unit: t.unit }) : "", t.name].filter(Boolean).join(" · ")]), lease?.flatId || pre.flatId || flats[0].id);
+  const rentedTo = (flatId) => (rentalLeases || []).find((l) => l.flatId === flatId && l.status !== "ended" && l.id !== lease?.id);
+  const flat = selectInput(flats.map((t) => [t.id, [t.unit ? tr("Flat {unit}", { unit: t.unit }) : "", t.name, rentedTo(t.id) ? tr("rented to {name}", { name: rentedTo(t.id).tenant?.name || "" }) : ""].filter(Boolean).join(" · ")]), lease?.flatId || pre.flatId || flats.find((t) => !rentedTo(t.id))?.id || flats[0].id);
   const name = textInput(lease?.tenant?.name || pre.tenant?.name || "", { maxlength: "80", placeholder: tr("Tenant's full name") });
   const phone = textInput(lease?.tenant?.phone || pre.tenant?.phone || "", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
   const lang = selectInput([["en", "English"], ["ar", "العربية"]], lease?.tenant?.language || state.settings.language || "en");
@@ -21938,6 +21942,13 @@ function openLeaseEditor(id = null, prefill = null) {
     if (!(Number(rent.value) > 0)) { showToast("Enter the rent"); return; }
     if (!start.value) { showToast("Enter the start date"); return; }
     if (end.value && end.value < start.value) { showToast("The end date is before the start"); return; }
+    const clash = leaseClash(rentalLeases, { id: lease?.id, flatId: flat.value, start: start.value, end: end.value });
+    if (clash) {
+      const until = clash.status === "ended" ? clash.endedOn : clash.end;
+      showToast(tr(until ? "Flat {unit} is rented to {name} until {date}. Start this lease after that, or end that lease first." : "Flat {unit} is already rented to {name}. End that lease first.",
+        { unit: leaseFlat(clash)?.unit || "", name: clash.tenant?.name || "", date: until ? formatDateLabel(until) : "" }), 8000);
+      return;
+    }
     save.disabled = true;
     const now = new Date().toISOString();
     const next = {
@@ -23517,6 +23528,15 @@ async function chargeJobToOwner(lease, job, technician) {
   if (saved) showToast(tr("Taken off the owner's rent: {amount}", { amount: formatMoney(amount, c) }));
 }
 
+// ── v189 — one lease at a time per flat ──
+// Another lease of the same flat whose dates overlap [start, end] (an open
+// end runs forever; an ended lease stops on the day it ended).
+function leaseClash(leases, { id = null, flatId, start, end = "" }) {
+  const last = (l) => (l.status === "ended" ? l.endedOn || l.end || l.start : l.end || "9999-12-31");
+  return (leases || []).find((l) => l.id !== id && l.flatId === flatId
+    && String(l.start) <= String(end || "9999-12-31") && String(start) <= String(last(l))) || null;
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -23730,6 +23750,7 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  leaseClash,
   rentalsOverviewData,
   ownerStatementMonths,
   arrearsAge,
