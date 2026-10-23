@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v174";
+const APP_VERSION = "v175";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,12 @@ const I18N = {
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
     "nav.help": "Help & videos",
+    "more.groupMoney": "Money",
+    "more.groupResidents": "Residents",
+    "more.groupRepairs": "Repairs & upkeep",
+    "more.groupRecords": "Records",
+    "set.thisPhone": "This phone",
+    "set.buildingGroup": "Building",
     "nav.tech": "Technicians",
     "more.techSub": "Residents' requests, your technicians, fees",
     "nav.myFlat": "My flat",
@@ -762,6 +768,12 @@ const I18N = {
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
     "nav.help": "المساعدة والفيديوهات",
+    "more.groupMoney": "المال",
+    "more.groupResidents": "السكان",
+    "more.groupRepairs": "التصليحات والصيانة",
+    "more.groupRecords": "السجلات",
+    "set.thisPhone": "هذا الهاتف",
+    "set.buildingGroup": "المبنى",
     "nav.tech": "الفنّيون",
     "more.techSub": "طلبات السكان، فنّيوك، العمولات",
     "nav.myFlat": "شقتي",
@@ -2287,6 +2299,8 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Notifications, display, building & access": "الإشعارات، العرض، المبنى والوصول",
+  "Notifications, display, app lock": "الإشعارات، العرض، قفل التطبيق",
   "Choose…": "اختر…",
   "The database update for technicians hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بالفنّيين.",
   "Your technicians notebook was changed on another device. It was reloaded: please do that again.": "تغيّر دفتر الفنّيين على جهاز آخر. أُعيد تحميله: أعد الخطوة من فضلك.",
@@ -3082,6 +3096,13 @@ const LUCIDE_ICONS = {
   megaphone: [["path", { d: "m3 11 18-5v12L3 14v-3z" }], ["path", { d: "M11.6 16.8a3 3 0 1 1-5.8-1.6" }]],
   play: [["path", { d: "M7 4.5v15a1 1 0 0 0 1.5.86l12.4-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" }]],
   playCircle: [["circle", { cx: 12, cy: 12, r: 10 }], ["path", { d: "M10 8.5v7a.5.5 0 0 0 .77.42l5.4-3.5a.5.5 0 0 0 0-.84l-5.4-3.5A.5.5 0 0 0 10 8.5z" }]],
+  layers: [["path", { d: "m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" }], ["path", { d: "m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" }], ["path", { d: "m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" }]],
+  message: [["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" }]],
+  clock: [["circle", { cx: 12, cy: 12, r: 10 }], ["path", { d: "M12 6v6l4 2" }]],
+  box: [["path", { d: "M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" }], ["path", { d: "M12 22V12" }], ["path", { d: "m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7" }], ["path", { d: "m7.5 4.27 9 5.15" }]],
+  truck: [["path", { d: "M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" }], ["path", { d: "M15 18H9" }], ["path", { d: "M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" }], ["circle", { cx: 17, cy: 18, r: 2 }], ["circle", { cx: 7, cy: 18, r: 2 }]],
+  fileText: [["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" }], ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4" }], ["path", { d: "M10 9H8" }], ["path", { d: "M16 13H8" }], ["path", { d: "M16 17H8" }]],
+  building: [["rect", { width: 16, height: 20, x: 4, y: 2, rx: 2 }], ["path", { d: "M9 22v-4h6v4" }], ["path", { d: "M8 6h.01" }], ["path", { d: "M16 6h.01" }], ["path", { d: "M12 6h.01" }], ["path", { d: "M12 10h.01" }], ["path", { d: "M12 14h.01" }], ["path", { d: "M16 10h.01" }], ["path", { d: "M16 14h.01" }], ["path", { d: "M8 10h.01" }], ["path", { d: "M8 14h.01" }]],
   hammer: [["path", { d: "m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9" }], ["path", { d: "m18 15 4-4" }], ["path", { d: "m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5" }]],
   wrench: [["path", { d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" }]],
   barChart: [["path", { d: "M3 3v18h18" }], ["path", { d: "M18 17V9" }], ["path", { d: "M13 17V5" }], ["path", { d: "M8 17v-3" }]],
@@ -7947,7 +7968,7 @@ function renderAll() {
 const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView", "myFlatView", "techView"];
 
 function setView(viewId) {
-  if (sessionMode === "tenant" && ["settingsView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "techView"].includes(viewId)) viewId = "moreView";
+  if (sessionMode === "tenant" && ["reportsView", "maintenanceView", "suppliersView", "documentsView", "techView"].includes(viewId)) viewId = "moreView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
   // Re-run the enter animation each time a view is shown.
   const active = document.getElementById(viewId);
@@ -13567,6 +13588,7 @@ function renderV148() {
   renderV167b();
   renderV173();
   renderV174();
+  renderMoreGroups();
   renderMyFlat();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
   renderGeneratorScheduleNote();
@@ -15774,13 +15796,13 @@ function applyDisplayPrefs(prefs = loadDisplayPrefs()) {
 }
 
 function renderDisplayPanel() {
-  const more = document.querySelector("#moreView");
-  if (!more) return;
+  // Settings → This phone (v175; it used to sit at the bottom of More).
+  const host = document.querySelector("#phoneSettings");
+  if (!host) return;
   let panel = document.querySelector("#displayPanel");
   if (!panel) {
     panel = mk("section", { id: "displayPanel", className: "panel display-panel" });
-    const version = more.querySelector(".app-version-note");
-    if (version) version.before(panel); else more.append(panel);
+    host.append(panel);
   }
   const prefs = loadDisplayPrefs();
   const save = (patch) => {
@@ -17171,7 +17193,7 @@ function emergencyCard() {
 function renderEmergencyOnMore() {
   document.querySelector("#emergencyMore")?.remove();
   const card = emergencyCard();
-  const anchor = document.querySelector("#displayPanel");
+  const anchor = document.querySelector("#moreView .app-version-note");
   if (!card || !anchor) return;
   card.id = "emergencyMore";
   anchor.before(card);
@@ -20572,10 +20594,14 @@ function installBuildingsMenuItem() {
   const menu = document.querySelector("#moreMenu");
   if (!menu || menu.querySelector(".buildings-menu-item")) return;
   const b = mk("button", { type: "button", className: "more-menu-item owner-only buildings-menu-item" },
-    mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("home", { size: 22 })),
+    mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("building", { size: 22 })),
     mk("span", { className: "mm-text" }, mk("strong", { text: tr("Your buildings") }), mk("span", { text: tr("Switch building or add another one") })));
+  const chev = lucide("chevronRight", { size: 19, color: "#b3bbb6", stroke: 2.2 });
+  chev.classList.add("mm-chevron");
+  b.append(chev);
   b.addEventListener("click", openBuildingsDialog);
-  menu.append(b);
+  const help = menu.querySelector('.more-menu-item[data-view="helpView"]');
+  if (help) help.before(b); else menu.append(b);
 }
 
 function renderV173() {
@@ -21209,6 +21235,37 @@ async function openTechRequestDialog() {
 function renderV174() {
   renderTechBadge();
   if (document.querySelector("#techView.active")) renderTechView();
+}
+
+// ── v175 — More menu in groups ───────────────────────────────────────────────
+// The More menu is grouped under small headings; a heading whose items are all
+// hidden for this phone's role (tenant, concierge, view-only) is hidden too.
+function renderMoreGroups() {
+  const menu = document.querySelector("#moreMenu");
+  if (!menu) return;
+  // Items added by code keep their words when the language changes.
+  const retext = (selector, title, sub) => {
+    const item = menu.querySelector(selector);
+    if (!item) return;
+    const strong = item.querySelector(".mm-text strong");
+    const small = item.querySelector(".mm-text span");
+    if (strong) strong.textContent = tr(title);
+    if (small) small.textContent = tr(sub);
+  };
+  retext(".buildings-menu-item", "Your buildings", "Switch building or add another one");
+  retext(".ask-menu-item", "Ask the app", "Questions about the money, in your own words");
+  const settingsSub = menu.querySelector('.more-menu-item[data-view="settingsView"] .mm-text span');
+  if (settingsSub) settingsSub.textContent = sessionMode === "owner" ? tr("Notifications, display, building & access") : tr("Notifications, display, app lock");
+  if (typeof getComputedStyle !== "function") return;
+  const nodes = [...menu.children];
+  nodes.forEach((node, i) => {
+    if (!node.classList?.contains("more-group")) return;
+    let visible = false;
+    for (let j = i + 1; j < nodes.length && !nodes[j].classList?.contains("more-group"); j += 1) {
+      if (getComputedStyle(nodes[j]).display !== "none") { visible = true; break; }
+    }
+    node.classList.toggle("is-empty", !visible);
+  });
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.

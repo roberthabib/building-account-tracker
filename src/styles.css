@@ -6086,3 +6086,54 @@ a.mini-button {
 .more-menu-item .th-badge {
   margin-inline-start: auto;
 }
+
+/* v175 — More menu in groups, phone settings inside Settings */
+.more-group {
+  margin: 14px 4px 2px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--label-muted, var(--muted));
+}
+
+.more-group:first-child {
+  margin-top: 0;
+}
+
+.more-group.is-divider {
+  height: 1px;
+  margin: 12px 4px 4px;
+  background: var(--line);
+}
+
+.more-group.is-empty {
+  display: none;
+}
+
+.settings-group-title {
+  margin: 6px 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--label-muted, var(--muted));
+}
+
+.building-settings-title {
+  margin-top: 22px;
+}
+
+.phone-settings {
+  display: grid;
+  gap: 12px;
+}
+
+.phone-settings > .panel {
+  margin: 0;
+}
+
+/* Tenants and the concierge only get "This phone" in Settings. */
+body.tenant-mode #settingsView > :not(.section-title):not(#phoneSettings) {
+  display: none !important;
+}
