@@ -6156,3 +6156,25 @@ body.tenant-mode #settingsView > :not(.section-title):not(#phoneSettings) {
   color: var(--primary) !important;
   font-weight: 700;
 }
+
+/* v179 — rentals on the phones */
+body.renter-phone .more-menu-item[data-view="pollsView"],
+body.renter-phone .more-menu-item[data-view="meetingsView"] {
+  display: none !important;
+}
+
+.th-rent {
+  margin: 12px 0 0;
+}
+
+.th-rent-due {
+  margin: 6px 0 0;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.th-kind {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}

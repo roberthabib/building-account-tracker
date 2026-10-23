@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v178";
+const APP_VERSION = "v179";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2295,6 +2295,30 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Your rent": "إيجارك",
+  "Building charges": "رسوم المبنى",
+  "Building charges · paid by your tenant {name}": "رسوم المبنى · يدفعها المستأجر {name}",
+  "Rent payments": "دفعات الإيجار",
+  "Deposit paid: {amount}": "التأمين المدفوع: {amount}",
+  "Your lease": "عقد إيجارك",
+  "End": "النهاية",
+  "You also pay this flat's building charges: they show above, with the building's notices.": "تدفع أيضاً رسوم المبنى عن هذه الشقة: تظهر في الأعلى مع إعلانات المبنى.",
+  "Your rented flat": "شقتك المؤجّرة",
+  "Your account": "حسابك",
+  "Rent collected": "الإيجار المقبوض",
+  "Management fee": "عمولة الإدارة",
+  "Already handed over": "سُلِّم سابقاً",
+  "Due to you now": "المستحق لك الآن",
+  "Invite {name} to the app": "دعوة {name} إلى التطبيق",
+  "the tenant": "المستأجر",
+  "They'll see their rent, the flat's building charges, the notices, and can report problems. Not the owners' votes or meetings. Their access ends when you end the lease.": "سيرى إيجاره ورسوم المبنى عن الشقة والإعلانات، ويمكنه الإبلاغ عن المشاكل. لا يرى تصويت المالكين ولا اجتماعاتهم. ينتهي وصوله عند إنهاء العقد.",
+  "The database update for tenants' phones hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بهواتف المستأجرين.",
+  "Invite to the app": "دعوة إلى التطبيق",
+  "Rent received": "تم قبض الإيجار",
+  "This lease has ended. Ask the building manager if this is a mistake.": "انتهى عقد الإيجار هذا. اسأل مدير المبنى إن كان ذلك خطأً.",
+  "Only flat owners vote on building decisions": "التصويت على قرارات المبنى للمالكين فقط",
+  "Only the flat owner can change these details": "مالك الشقة فقط يمكنه تغيير هذه التفاصيل",
+  "That lease has ended": "انتهى عقد الإيجار هذا",
   "Flat {unit}": "الشقة {unit}",
   "The database update for rentals hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بالإيجارات.",
   "This lease was changed on another device. It was reloaded: please do that again.": "تغيّر هذا العقد على جهاز آخر. أُعيد تحميله: أعد الخطوة من فضلك.",
@@ -13710,6 +13734,7 @@ function renderV148() {
   renderV173();
   renderV174();
   renderV178();
+  renderV179();
   renderMoreGroups();
   renderMyFlat();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
@@ -20301,7 +20326,8 @@ function tenantHeroCard() {
     toggle.textContent = open ? tr("Hide the details") : tr("See the details");
   });
   return mk("section", { className: `th-hero is-${status}` },
-    mk("p", { className: "th-who", text: [me?.name, me?.unit ? tr("Unit {unit}", { unit: me.unit }) : ""].filter(Boolean).join(" · ") }),
+    mk("p", { className: "th-who", text: [residentName(me), me?.unit ? tr("Unit {unit}", { unit: me.unit }) : ""].filter(Boolean).join(" · ") }),
+    heroChargesNote(),
     mk("p", { className: "th-label", text: status === "owes" ? (late ? tr("Late — to pay") : tr("To pay")) : status === "credit" ? tr("In credit") : tr("All paid") }),
     mk("p", { className: "th-amount tnum", text: status === "clear" ? "✓" : formatUsd(status === "owes" ? due : -balance) }),
     mk("p", { className: "th-sub", text: until || (dueDate ? tr(late ? "Was due {date}" : "Due by {date}", { date: formatDateLabel(dueDate) }) : status === "clear" ? tr("Thank you — nothing to pay.") : "") }),
@@ -20382,11 +20408,13 @@ function renderTenantHome() {
   els.tenantDuesPanel?.classList.add("hidden");
   const me = state.tenants.find((t) => t.id === sessionTenantId);
   const title = document.querySelector("#dashboardTitle");
-  if (title && me?.name) title.textContent = tr("Hello {name}", { name: String(me.name).trim().split(/\s+/)[0] });
+  if (title && residentName(me)) title.textContent = tr("Hello {name}", { name: String(residentName(me)).trim().split(/\s+/)[0] });
   els.tenantNoticesPanel?.classList.add("hidden");
   const items = tenantForYouItems();
   const home = mk("div", { id: "tenantHome", className: "tenant-home" },
     tenantHeroCard(),
+    renterRentCard(),
+    ownerRentalCards(),
     mk("section", { className: "th-section" },
       mk("h3", { className: "th-heading", text: tr("For you") }),
       items.length ? mk("div", { className: "th-rows" }, items) : mk("p", { className: "th-empty", text: tr("Nothing new — you're all set ✓") })),
@@ -20404,14 +20432,14 @@ function renderMyFlat() {
   const usage = typeof tenantGeneratorUsage === "function" ? tenantGeneratorUsage(sessionTenantId) : [];
   fillChildren(body,
     mk("section", { className: "panel my-flat-panel" },
-      mk("div", { className: "panel-header" }, mk("h3", { text: [me?.unit ? tr("Unit {unit}", { unit: me.unit }) : "", me?.name].filter(Boolean).join(" · ") })),
+      mk("div", { className: "panel-header" }, mk("h3", { text: [me?.unit ? tr("Unit {unit}", { unit: me.unit }) : "", residentName(me)].filter(Boolean).join(" · ") })),
       breakdownRow(tr("Parking"), me?.parking || "—"),
-      depositsHeld(sessionTenantId).length
+      !isRenterPhone() && depositsHeld(sessionTenantId).length
         ? breakdownRow(tr("Deposit held"), formatUsd(depositsHeld(sessionTenantId).reduce((s, d) => s + Number(d.amountUsd || 0), 0)), depositsHeld(sessionTenantId).map((d) => tr("since {date}", { date: formatDateLabel(d.receivedOn) })).join(" · "))
         : null,
       me?.breakerAmps ? breakdownRow(tr("Generator breaker"), `${me.breakerAmps}A`) : null),
-    myDetailsCard(),
-    directoryCard(),
+    isRenterPhone() ? renterLeaseCard() : myDetailsCard(),
+    isRenterPhone() ? null : directoryCard(),
     usage.length ? mk("article", { className: "notice-card" }, mk("div", { className: "notice-head" }, mk("strong", { text: tr("Generator use (kWh)") })),
       miniBars(usage, "kwh", (u) => shortMonth(u.month), (u) => numberFormat.format(u.kwh))) : null);
 }
@@ -21761,6 +21789,7 @@ function openLeaseDetails(id) {
     lease.ownFlat ? null : reportsSection(tr("Owner"), mk("p", { className: "tech-where", text: [tr("Collected {amount}", { amount: formatMoney(a.collected, c) }), tr("your fee {amount}", { amount: formatMoney(a.fee, c) }), a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, c) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, c) }), tr("to hand over {amount}", { amount: formatMoney(a.toHandOver, c) })].filter(Boolean).join(" · ") })),
     lease.deposit?.amount ? note(tr("Deposit: {amount}{returned}", { amount: formatMoney(lease.deposit.amount, c), returned: lease.deposit.returnedOn ? tr(" — returned {amount} on {date}", { amount: formatMoney(lease.deposit.returnedAmount || 0, c), date: formatDateLabel(lease.deposit.returnedOn) }) : "" })) : null,
     mk("div", { className: "button-row" },
+      lease.status !== "ended" ? secondaryButton(tr("Invite to the app"), () => { void inviteRenter(lease); }) : null,
       secondaryButton(tr("Edit"), () => openLeaseEditor(lease.id)),
       lease.status !== "ended" ? secondaryButton(tr("End lease"), () => openEndLeaseDialog(lease.id)) : null,
       !(lease.payments || []).length ? secondaryButton(tr("Delete"), () => deleteLease(lease.id)) : null));
@@ -21806,6 +21835,7 @@ function openRentPaymentDialog(id) {
     }
     closeToolDialog();
     showToast("Payment recorded");
+    if (value > 0) notifyTenants(lease.flatId, tr("Rent received"), tr("{amount} recorded — thank you.", { amount: formatMoney(value, c) }));
     if (lease.tenant?.phone) openToolDialog(tr("Send a receipt?"),
       note(tr("Send {name} a receipt on WhatsApp.", { name: lease.tenant.name })),
       mk("div", { className: "button-row" }, primaryButton(tr("Send on WhatsApp"), () => { sendRentReceipt(saved, value > 0 ? payment : { ...payment, amount: 0 }); closeToolDialog(); }), secondaryButton(tr("Not now"), closeToolDialog)));
@@ -21980,6 +22010,133 @@ function decorateRentedFlats() {
 function renderV178() {
   if (document.querySelector("#rentalsView.active")) renderRentalsView();
   decorateRentedFlats();
+}
+
+// ── v179 — rentals on the phones ─────────────────────────────────────────────
+// A flat's tenant (renter) links their phone with an invite made from the
+// lease (rpc create_renter_code). The server (supabase/phase2o-v179.sql) sends
+// them the flat's building charges (they pay them) plus their own lease as
+// state.myLease, without votes, owners' meetings, the directory or the owner's
+// details; their access ends with the lease. The flat's owner gets
+// state.myRentals: their rented flat's rent account.
+function isRenterPhone() {
+  return sessionMode === "tenant" && state.myRole === "renter";
+}
+
+function residentName(flat) {
+  return isRenterPhone() ? state.myLease?.tenant?.name || "" : flat?.name || "";
+}
+
+// ── The tenant's phone ──
+function renterRentCard() {
+  if (!isRenterPhone() || !state.myLease) return null;
+  const lease = state.myLease;
+  const s = leaseStatus(lease);
+  const c = s.currency;
+  const owes = s.owed > 0.005;
+  return mk("section", { className: `panel th-rent${s.lateAmount > 0 ? " is-late" : ""}` },
+    mk("div", { className: "tech-card-head" }, mk("strong", { className: "tech-trade", text: tr("Your rent") }), leasePill(lease, s)),
+    mk("p", { className: "tech-where", text: [tr("{amount} · {period}", { amount: formatMoney(s.periods.at(-1)?.amount || lease.rent, c), period: periodLabel(lease) }), lease.end ? tr("until {date}", { date: formatDateLabel(lease.end) }) : ""].filter(Boolean).join(" · ") }),
+    mk("div", { className: "notice-actions" },
+      owes ? mk("button", { type: "button", className: "mini-button is-primary", text: tr("How to pay"), onclick: openHowToPay }) : null,
+      miniButton(tr("Rent payments"), openMyRentPayments)));
+}
+
+function openMyRentPayments() {
+  const lease = state.myLease;
+  if (!lease) return;
+  const s = leaseStatus(lease);
+  const c = s.currency;
+  const payments = (lease.payments || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  openToolDialog(tr("Your rent"),
+    mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("{amount} · {period}", { amount: formatMoney(s.periods.at(-1)?.amount || lease.rent, c), period: periodLabel(lease) }) }), leasePill(lease, s)),
+    reportsSection(tr("Rent"), mk("div", {}, s.periods.slice(-6).reverse().map((p) => mk("div", { className: "breakdown-row rent-period" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: leasePeriodLabel(lease, p) }), mk("small", { text: formatMoney(p.amount, c) })),
+      mk("span", { className: `status-pill ${p.state === "paid" ? "tech-status-done" : p.state === "late" ? "tech-status-new" : "tech-status-sent"}`, text: p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) }) }))))),
+    reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method)].filter(Boolean).join(" · ") }))))) : note(tr("No payments yet."))),
+    lease.deposit?.amount ? note(tr("Deposit paid: {amount}", { amount: formatMoney(lease.deposit.amount, c) })) : null);
+}
+
+function renterLeaseCard() {
+  const lease = state.myLease;
+  if (!lease) return null;
+  const c = lease.currency || "USD";
+  return mk("section", { className: "panel my-flat-panel" },
+    mk("div", { className: "panel-header" }, mk("h3", { text: tr("Your lease") })),
+    breakdownRow(tr("Rent"), tr("{amount} · {period}", { amount: formatMoney(leaseStatus(lease).periods.at(-1)?.amount || lease.rent, c), period: periodLabel(lease) })),
+    breakdownRow(tr("Start"), formatDateLabel(lease.start)),
+    lease.end ? breakdownRow(tr("End"), formatDateLabel(lease.end)) : null,
+    lease.deposit?.amount ? breakdownRow(tr("Deposit"), formatMoney(lease.deposit.amount, c)) : null,
+    note(tr("You also pay this flat's building charges: they show above, with the building's notices.")));
+}
+
+// ── The owner's phone ──
+function ownerRentalCards() {
+  if (sessionMode !== "tenant" || isRenterPhone()) return null;
+  const leases = (state.myRentals || []).filter((l) => l.status !== "ended");
+  if (!leases.length) return null;
+  return mk("div", { className: "th-rentals" }, leases.map((lease) => {
+    const s = leaseStatus(lease);
+    const a = leaseOwnerAccount(lease);
+    return mk("section", { className: "panel th-rent" },
+      mk("div", { className: "tech-card-head" }, mk("strong", { className: "tech-trade", text: tr("Your rented flat") }), leasePill(lease, s)),
+      mk("p", { className: "tech-where", text: [tr("Rented to {name}", { name: lease.tenant?.name || "" }), tr("{amount} · {period}", { amount: formatMoney(s.periods.at(-1)?.amount || lease.rent, s.currency), period: periodLabel(lease) })].join(" · ") }),
+      mk("p", { className: "th-rent-due", text: tr("Due to you now: {amount}", { amount: formatMoney(a.toHandOver, a.currency) }) }),
+      mk("div", { className: "notice-actions" }, miniButton(tr("Details"), () => openOwnerRentalSheet(lease.id))));
+  }));
+}
+
+function openOwnerRentalSheet(id) {
+  const lease = (state.myRentals || []).find((l) => l.id === id);
+  if (!lease) return;
+  const s = leaseStatus(lease);
+  const a = leaseOwnerAccount(lease);
+  const c = a.currency;
+  const payments = (lease.payments || []).slice().sort((x, y) => String(y.date).localeCompare(String(x.date))).slice(0, 12);
+  openToolDialog(tr("Your rented flat"),
+    mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("Rented to {name}", { name: lease.tenant?.name || "" }) }), leasePill(lease, s)),
+    reportsSection(tr("Your account"), mk("div", {},
+      breakdownRow(tr("Rent collected"), formatMoney(a.collected, c)),
+      breakdownRow(tr("Management fee"), `−${formatMoney(a.fee, c)}`),
+      ...(lease.deductions || []).map((d) => breakdownRow(d.description, `−${formatMoney(d.amount, c)}`, formatDateLabel(d.date))),
+      breakdownRow(tr("Already handed over"), `−${formatMoney(a.paidOut, c)}`),
+      breakdownRow(tr("Due to you now"), formatMoney(a.toHandOver, c)))),
+    reportsSection(tr("Rent payments"), payments.length ? mk("div", {}, payments.map((p) => breakdownRow(formatDateLabel(p.date), formatMoney(p.amount, c)))) : note(tr("No payments yet."))));
+}
+
+// ── The manager invites a lease's tenant ──
+async function inviteRenter(lease) {
+  try {
+    const res = await supabaseRequest("rpc/create_renter_code", { method: "POST", body: JSON.stringify({ p_lease_id: lease.id }) });
+    const code = String(await res.json());
+    const link = joinLink(code);
+    const lang = lease.tenant?.language || "en";
+    const message = trIn(lang, "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I have an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.", {
+      name: lease.tenant?.name || "", building: state.building?.name || "", url: link, code,
+    });
+    openToolDialog(tr("Invite {name} to the app", { name: lease.tenant?.name || tr("the tenant") }),
+      note(tr("They'll see their rent, the flat's building charges, the notices, and can report problems. Not the owners' votes or meetings. Their access ends when you end the lease.")),
+      mk("p", { className: "invite-code", text: code }),
+      qrBlock(link, tr("Or let them scan this with the phone camera.")),
+      mk("div", { className: "button-row" },
+        lease.tenant?.phone ? primaryButton(tr("Send on WhatsApp"), () => window.open(whatsappLink(lease.tenant.phone, message), "_blank", "noopener")) : null,
+        secondaryButton(tr("Copy link"), () => navigator.clipboard?.writeText(link).then(() => showToast("Link copied")).catch(() => showToast(link, 8000)))));
+  } catch (error) {
+    showToast(error.status === 404 ? tr("The database update for tenants' phones hasn't been applied yet.") : (error.status ? tr(error.message) : describeSyncProblem(error)), 6000);
+  }
+}
+
+// Says whose building charges the balance card shows once a flat is rented.
+function heroChargesNote() {
+  if (isRenterPhone()) return mk("p", { className: "th-kind", text: tr("Building charges") });
+  const rented = (state.myRentals || []).find((l) => l.status !== "ended");
+  return rented ? mk("p", { className: "th-kind", text: tr("Building charges · paid by your tenant {name}", { name: rented.tenant?.name || "" }) }) : null;
+}
+
+function renderV179() {
+  if (typeof document === "undefined" || !document.body?.classList) return;
+  document.body.classList.toggle("renter-phone", isRenterPhone());
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.

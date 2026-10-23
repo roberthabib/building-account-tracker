@@ -14,6 +14,8 @@ const UPLOADS = [];
 const REQUESTS = [];               // technician requests (v174)
 let BOOK = { data: {}, rev: 0 };    // the manager's technicians notebook (v174)
 const LEASES = new Map();         // rentals (v178): id -> { id, flatId, data, rev }
+const RENTERS = new Map();         // v179: token -> leaseId (a flat's tenant)
+const renterCodes = new Map();     // v179: invite code -> leaseId
 const EXTRA = new Map();           // other buildings (v173): id -> { name, state, since }
 let anonGen = 1;
 
@@ -68,11 +70,13 @@ http.createServer((req, res) => {
     if (path === "/__state") return send(200, STATE);
     if (path === "/__put" && req.method === "POST") { STATE = b; touch(); return send(200, { ok: true }); }
     if (path === "/__uploads") return send(200, UPLOADS);
-    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); EXTRA.clear(); LEASES.clear(); REQUESTS.length = 0; BOOK = { data: {}, rev: 0 }; anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
+    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); EXTRA.clear(); LEASES.clear(); RENTERS.clear(); renterCodes.clear(); REQUESTS.length = 0; BOOK = { data: {}, rev: 0 }; anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
     if (path === "/__reset_log") { log.length = 0; return send(200, []); }
     log.push(`${req.method} ${path.replace(/^\/(rest|auth|storage)\/v1\//, "")} as ${tok.slice(0, 9)}`);
     const isOwner = tok.startsWith("demo-owner");
-    const me = anonProfile.get(tok) || null;
+    const renterLease = RENTERS.has(tok) ? LEASES.get(RENTERS.get(tok)) : null;
+    const me = anonProfile.get(tok) || (renterLease && renterLease.data.status !== "ended" ? renterLease.flatId : null);
+    const isRenter = Boolean(renterLease);
     const isConcierge = conciergeTokens.has(tok);
     const nowIso = () => new Date().toISOString();
 
@@ -219,6 +223,21 @@ http.createServer((req, res) => {
       if (!isOwner) return send(400, { message: "Only the building owner can create claim codes" });
       const code = crypto.randomBytes(4).toString("hex").toUpperCase(); codes.set(code, b.p_tenant_id); return send(200, code);
     }
+    if (path === "/rest/v1/rpc/claim_tenant" && renterCodes.has(String(b.p_code || "").toUpperCase())) {
+      const lid = renterCodes.get(String(b.p_code).toUpperCase()); const l = LEASES.get(lid);
+      if (!l || l.data.status === "ended") return send(400, { message: "That lease has ended" });
+      renterCodes.delete(String(b.p_code).toUpperCase()); RENTERS.set(tok, lid); return send(200, l.flatId);
+    }
+    if (path === "/rest/v1/rpc/create_renter_code") {
+      if (!isOwner) return send(400, { message: "Only the building manager can create invite codes" });
+      const l = LEASES.get(b.p_lease_id);
+      if (!l) return send(400, { message: "That lease no longer exists" });
+      if (l.data.status === "ended") return send(400, { message: "That lease has ended" });
+      const code = crypto.randomBytes(4).toString("hex").toUpperCase(); renterCodes.set(code, l.id); return send(200, code);
+    }
+    if (isRenter && ["/rest/v1/rpc/cast_my_vote", "/rest/v1/rpc/update_my_details", "/rest/v1/rpc/set_directory_optin"].includes(path)) {
+      return send(400, { message: path.endsWith("cast_my_vote") ? "Only flat owners vote on building decisions" : "Only the flat owner can change these details" });
+    }
     if (path === "/rest/v1/rpc/claim_tenant") {
       const tid = codes.get(String(b.p_code || "").toUpperCase());
       if (!tid) return send(400, { message: "That code is not valid" });
@@ -237,8 +256,15 @@ http.createServer((req, res) => {
           routineTasks: c.routineTasks || [], routineLog: c.routineLog || [], supplies: c.supplies || [], visitorLog: c.visitorLog || [],
           bookings: (c.bookings || []).filter((b) => b.status !== "cancelled").map(({ tenantId, note, by, ...b }) => b) });
       }
+      if (isRenter && renterLease.data.status === "ended") return send(400, { message: "This lease has ended. Ask the building manager if this is a mistake." });
       if (!me) return send(400, { message: "This device is not linked to a tenant yet" });
-      return send(200, redacted(me));
+      if (isRenter) {
+        const s = redacted(me); delete s.polls; delete s.meetings; delete s.directory;
+        s.tenants = s.tenants.map(({ phone, details, language, directory, directoryAt, detailsAt, settlement, ...t }) => t);
+        const { fee, payouts, deductions, ownFlat, notes, ...lease } = renterLease.data;
+        return send(200, { ...s, myRole: "renter", myLease: { ...lease, id: renterLease.id } });
+      }
+      return send(200, { ...redacted(me), myRentals: [...LEASES.values()].filter((l) => l.flatId === me && !l.data.ownFlat).map((l) => { const { notes, ...d } = l.data; return { ...d, id: l.id }; }) });
     }
     if (path === "/rest/v1/rpc/declare_my_payment") {
       if (!me) return send(400, { message: "This device is not linked to a tenant" });
@@ -323,7 +349,7 @@ http.createServer((req, res) => {
     if (path === "/rest/v1/rpc/my_buildings") {
       if (isOwner) return send(200, [{ id: "building", name: STATE.building.name, role: "owner", tenant_id: null, since: "2026-01-01T00:00:00Z" },
         ...[...EXTRA].map(([id, x]) => ({ id, name: x.state.building?.name || x.name, role: "owner", tenant_id: null, since: x.since }))]);
-      if (me) return send(200, [{ id: "building", name: STATE.building.name, role: "tenant", tenant_id: me, since: "2026-01-01T00:00:00Z" }]);
+      if (me) return send(200, [{ id: "building", name: STATE.building.name, role: isRenter ? "renter" : "tenant", tenant_id: me, since: "2026-01-01T00:00:00Z" }]);
       if (isConcierge) return send(200, [{ id: "building", name: STATE.building.name, role: "concierge", tenant_id: null, since: "2026-01-01T00:00:00Z" }]);
       return send(200, []);
     }
