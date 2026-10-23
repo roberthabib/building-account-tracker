@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v187";
+const APP_VERSION = "v188";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -6057,28 +6057,19 @@ function renderTenantStatus() {
 
   els.collectionRate.textContent = `${rate}%`;
   els.collectionProgress.style.width = `${rate}%`;
+  // v188: one owner per row, the biggest debt first; a row opens the flat.
   els.tenantStatusGrid.replaceChildren(
-    ...balanceData.map(({ tenant, balance }) => {
+    ...balanceData.slice().sort((a, b) => b.balance - a.balance || String(a.tenant.unit || "").localeCompare(String(b.tenant.unit || ""), undefined, { numeric: true })).map(({ tenant, balance }) => {
       const due = balance > 0.005;
-      const card = document.createElement("article");
-      card.className = "status-card";
-      const top = document.createElement("div");
-      top.className = "status-card-top";
-      const nameEl = document.createElement("strong");
-      nameEl.textContent = tenant.name;
-      top.append(avatarChip(tenant.name, 32), nameEl);
-      const bottom = document.createElement("div");
-      bottom.className = "status-card-bottom";
-      const sub = document.createElement("span");
-      sub.textContent = due
-        ? tr("Owes {amount}", { amount: formatUsd(balance) })
-        : balance < -0.005 ? tr("Credit {amount}", { amount: formatUsd(-balance) }) : tr("Settled in full");
-      const pill = document.createElement("span");
-      pill.className = `status-pill status-${due ? "due" : "paid"}`;
-      pill.textContent = due ? tr("Due") : tr("Settled");
-      bottom.append(sub, pill);
-      card.append(top, bottom);
-      return card;
+      const credit = balance < -0.005;
+      return mk("button", { type: "button", className: `balance-row is-${due ? "due" : credit ? "credit" : "clear"}`, onclick: () => openTenantPage(tenant.id) },
+        avatarChip(tenant.name, 34),
+        mk("span", { className: "balance-row-main" },
+          mk("strong", { text: tenant.name }),
+          mk("small", { text: [tenant.unit ? tr("Unit {unit}", { unit: tenant.unit }) : "", isFixedMode() ? paidUntilText(tenant.id) : ""].filter(Boolean).join(" · ") })),
+        mk("span", { className: "balance-row-amount" },
+          mk("strong", { text: due ? formatUsd(balance) : credit ? formatUsd(-balance) : "✓" }),
+          mk("small", { text: due ? tr("Due") : credit ? tr("In credit") : tr("Settled") })));
     }),
   );
 }

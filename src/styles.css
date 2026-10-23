@@ -6226,3 +6226,82 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   font-weight: 700;
   color: var(--red);
 }
+
+/* v188 — Owner Balances: one owner per row */
+.tenant-status-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+@media (min-width: 900px) {
+  .tenant-status-grid {
+    display: flex;
+  }
+}
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--line-inner);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.balance-row:last-child {
+  border-bottom: 0;
+}
+
+.balance-row-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.balance-row-main strong {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.balance-row-main small {
+  color: var(--label-muted);
+  font-size: 0.76rem;
+  margin-top: 2px;
+}
+
+.balance-row-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: none;
+}
+
+.balance-row-amount strong {
+  font-size: 0.98rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.balance-row-amount small {
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.balance-row.is-due .balance-row-amount {
+  color: var(--red);
+}
+
+.balance-row.is-credit .balance-row-amount,
+.balance-row.is-clear .balance-row-amount {
+  color: var(--primary);
+}
