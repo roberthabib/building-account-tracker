@@ -152,7 +152,7 @@ app's auth), then reload.
 | v179 rentals on the phones (`phase2o-v179.sql`): renter role + invites tied to a lease, `get_my_state` wrapper (renter trimming, owner `myRentals`), renter guards, push to the tenant | ✅ applied 2026-10-23 (run by Claude in the dashboard); 23/23 live checks (`phase2o-checks.sql`, rolled back) |
 | v180 receipts that can be checked (`phase2p-v180.sql`): public `verify_receipt` (anon), `get_my_state` drops `voidedReceipts` | ✅ applied 2026-10-23 (run by Claude in the dashboard); 16/16 live checks (`phase2p-checks.sql`, rolled back) |
 | v185 rentals round A (`phase2q-v185.sql`): rent reminders job, `declare_rent_payment`, push target renter, renters' photos | ✅ applied 2026-10-23 (run by Claude in the dashboard); 16/16 live checks (`phase2q-checks.sql`, rolled back) |
-| v186 rentals round B (`phase2r-v186.sql`): lease documents and inspections manager-only (storage read policy, `get_my_state`) | ⏳ waiting |
+| v186 rentals round B (`phase2r-v186.sql`): lease documents and inspections manager-only (storage read policy, `get_my_state`) | ✅ applied 2026-10-23 (run by Claude in the dashboard); 11/11 live checks (`phase2r-checks.sql`, rolled back) |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.
