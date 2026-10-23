@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v190";
+const APP_VERSION = "v191";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -22664,7 +22664,8 @@ function buildRentReceiptPdf(lease, payment) {
   y -= Math.ceil(summary.length / 2) * (boxHeight + 8) + 18;
   commands.push(pdfTextCommand("Rent periods paid", left, y, 13, true));
   y -= 20;
-  const cols = [["Period", 165], ["Rent", 80], ["Late fee", 70], ["This payment", 90], ["Status", 90]];
+  // Periods that don't start on the 1st show two full dates: give them room.
+  const cols = [["Period", 215], ["Rent", 70], ["Late fee", 60], ["This payment", 80], ["Status", 70]];
   let x = left;
   cols.forEach(([heading, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(heading, x + 5, y - 4, 8, true)); x += w; });
   y -= 22;
