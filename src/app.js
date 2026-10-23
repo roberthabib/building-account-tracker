@@ -21423,6 +21423,7 @@ export const __test = {
   occupantsOn,
   getExpectedForTenant,
   getMonthlyDueForTenant,
+  tenantStatementRows,
   getPreviousMeterReading,
   expectedCashOn,
   extraAttentionItems,
