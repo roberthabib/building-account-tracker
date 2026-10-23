@@ -251,6 +251,14 @@ http.createServer((req, res) => {
       if (v) return send(200, { status: "cancelled", kind: "building", building: STATE.building.name, unit: v.unit, amount: v.amountUsd, currency: "USD", at: v.at, ref: b.p_ref });
       return send(200, { status: "not_found" });
     }
+    if (path === "/rest/v1/rpc/declare_rent_payment") {
+      if (!isRenter || renterLease.data.status === "ended") return send(400, { message: "Only the flat's tenant can do this" });
+      const d = { id: "rdecl-" + crypto.randomBytes(3).toString("hex"), amount: Number(b.p_amount), date: b.p_date, method: b.p_method || "", status: "pending", at: nowIso(),
+        ...(b.p_proof_path ? { proof: { storagePath: b.p_proof_path, fileName: "rent-proof.jpg", mimeType: "image/jpeg" } } : {}) };
+      renterLease.data.declarations = [...(renterLease.data.declarations || []), d];
+      renterLease.rev += 1;
+      return send(204);
+    }
     if (path === "/rest/v1/rpc/create_renter_code") {
       if (!isOwner) return send(400, { message: "Only the building manager can create invite codes" });
       const l = LEASES.get(b.p_lease_id);

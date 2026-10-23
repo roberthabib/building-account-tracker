@@ -6188,3 +6188,14 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
 .invoice-source-row {
   grid-template-columns: minmax(0, 1fr);
 }
+
+/* v185 — the tenant's rent card: what's waiting for the manager */
+.th-rent-note {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.th-rent-note.is-warning {
+  color: var(--red);
+}
