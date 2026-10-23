@@ -6218,3 +6218,11 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   width: 100%;
   margin-top: 6px;
 }
+
+/* v187 — rentals overview */
+.rent-age-head {
+  margin: 10px 0 2px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--red);
+}

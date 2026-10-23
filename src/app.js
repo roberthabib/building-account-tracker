@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v186";
+const APP_VERSION = "v187";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,61 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "{n} m²": "{n} م²",
+  "Overview": "نظرة عامة",
+  "For rent": "للإيجار",
+  "Rent this month": "إيجار هذا الشهر",
+  "of {amount} expected": "من أصل {amount} متوقّع",
+  "Rented flats": "الشقق المؤجّرة",
+  "{n} for rent": "{n} للإيجار",
+  "To hand over": "للتسليم",
+  "Behind on rent": "المتأخرون في الإيجار",
+  "{days} days late": "متأخر {days} يوماً",
+  "{days} days · {amount}": "{days} يوماً · {amount}",
+  "Nobody is behind on rent.": "لا أحد متأخر في الإيجار.",
+  "Leases ending soon": "عقود تنتهي قريباً",
+  "ends on {date}": "ينتهي في {date}",
+  "Rent collected, last 12 months (USD)": "الإيجار المقبوض، آخر 12 شهراً (دولار)",
+  "Owners get a notice on the 2nd of each month that their rent statement is ready.": "يصل إلى المالكين إشعار في 2 من كل شهر بأن كشف الإيجار جاهز.",
+  "Rent statement": "كشف الإيجار",
+  "Tenant: {name}": "المستأجر: {name}",
+  "Expenses paid for you": "مصاريف دُفعت عنك",
+  "{year}, month by month": "{year}، شهراً بشهر",
+  "Rent due": "الإيجار المستحق",
+  "Fee": "العمولة",
+  "Handed over": "المسلَّم",
+  "The rent is collected by the building manager and handed over to you after the fee and expenses.": "يقبض مدير المبنى الإيجار ويسلّمه لك بعد خصم العمولة والمصاريف.",
+  "A flat for rent": "شقة للإيجار",
+  "No lease now: {flats}. Add them here to find a tenant.": "لا عقد حالياً: {flats}. أضفها هنا لإيجاد مستأجر.",
+  "Flats you are looking to rent appear here, with their listing picture and the people who came to see them.": "تظهر هنا الشقق التي تبحث لها عن مستأجر، مع صورة الإعلان والأشخاص الذين عاينوها.",
+  "{n} bedrooms": "{n} غرف نوم",
+  "Rented": "مؤجّرة",
+  "{n} viewings": "{n} معاينات",
+  "Listing picture": "صورة الإعلان",
+  "Viewings": "المعاينات",
+  "e.g. Furnished, sunny, 24h electricity, parking spot": "مثلاً: مفروشة، مشمسة، كهرباء 24/24، موقف سيارة",
+  "Edit — flat for rent": "تعديل — شقة للإيجار",
+  "Asking rent (monthly)": "الإيجار المطلوب (شهرياً)",
+  "Available from": "متاحة من",
+  "Bedrooms": "غرف النوم",
+  "Size (m²)": "المساحة (م²)",
+  "Phone for viewings": "هاتف للمعاينة",
+  "Shown on the listing picture.": "يظهر على صورة الإعلان.",
+  "e.g. Couple, wants to move in December": "مثلاً: زوجان، يريدان الانتقال في كانون الأول",
+  "Enter the name": "أدخل الاسم",
+  "Viewings — flat {unit}": "المعاينات — الشقة {unit}",
+  "Interested": "مهتم",
+  "Not interested": "غير مهتم",
+  "Make the lease": "إنشاء العقد",
+  "No viewings yet.": "لا معاينات بعد.",
+  "Add a viewing": "إضافة معاينة",
+  "{amount} a month": "{amount} شهرياً",
+  "Available from {date}": "متاحة من {date}",
+  "Call or WhatsApp {phone}": "اتصل أو راسل على واتساب {phone}",
+  "Ask the building manager": "اسأل مدير المبنى",
+  "Preparing the picture…": "جارٍ تحضير الصورة…",
+  "Take it off the owner's rent (flat {unit} is rented)": "تُخصم من إيجار المالك (الشقة {unit} مؤجّرة)",
+  "Taken off the owner's rent: {amount}": "خُصمت من إيجار المالك: {amount}",
   "At move-in": "عند الدخول",
   "Signed lease": "عقد الإيجار الموقّع",
   "Tenant's ID": "هوية المستأجر",
@@ -7352,14 +7407,32 @@ function buildTenantStatementPdf(tenantId) {
     });
     y -= ROW_H;
   }
+  // A cell may be a list of lines (receipt numbers that don't fit on one line);
+  // the row then grows to hold them.
+  function rowHeight(cells, size = 8) {
+    return ROW_H + (Math.max(1, ...cells.map((c) => (Array.isArray(c) ? c.length : 1))) - 1) * (size + 2);
+  }
   function drawRow(cells, cols, boldFirst, size = 8) {
+    const h = rowHeight(cells, size);
     x = left;
     cols.forEach((col, index) => {
-      commands.push(pdfRectCommand(x, y - 16, col.width, ROW_H));
-      commands.push(pdfTextCommand(pdfClip(cells[index], Math.floor(col.width / (size * 0.66))), x + 4, y - 4, size, Boolean(boldFirst) && (index === 0 || size < 8)));
+      commands.push(pdfRectCommand(x, y - 16 - (h - ROW_H), col.width, h));
+      const lines = Array.isArray(cells[index]) ? cells[index] : [pdfClip(cells[index], Math.floor(col.width / (size * 0.66)))];
+      lines.forEach((line, i) => commands.push(pdfTextCommand(line, x + 4, y - 4 - i * (size + 2), size, Boolean(boldFirst) && (index === 0 || size < 8))));
       x += col.width;
     });
-    y -= ROW_H;
+    y -= h;
+  }
+  // Receipt numbers in full, as many per line as fit.
+  function receiptLines(numbers, width, size) {
+    const lines = [];
+    let line = "";
+    numbers.forEach((no) => {
+      const next = line ? `${line}, ${no}` : no;
+      if (line && pdfTextWidth(next, size) > width - 8) { lines.push(`${line},`); line = no; } else line = next;
+    });
+    if (line) lines.push(line);
+    return lines.length ? lines : [""];
   }
   function ensureSpace(needed, redraw) {
     if (y - needed < BOTTOM) {
@@ -7403,8 +7476,11 @@ function buildTenantStatementPdf(tenantId) {
     y -= ROW_H;
   }
   rows.forEach((entry) => {
-    ensureSpace(ROW_H, () => drawColHeader(monthCols));
-    drawRow(monthCols.map((col) => col.cell(entry)), monthCols, false, 7);
+    const cells = monthCols.map((col) => (col.heading === "Receipts"
+      ? receiptLines(entry.receipts.map((no) => String(no).replace(/^RCT-/, "")), col.width, 7)
+      : col.cell(entry)));
+    ensureSpace(rowHeight(cells, 7), () => drawColHeader(monthCols));
+    drawRow(cells, monthCols, false, 7);
   });
   ensureSpace(ROW_H, () => drawColHeader(monthCols));
   drawRow(monthCols.map((col, index) => (index === 0 ? "Total" : col.total ? col.total() : "")), monthCols, true, 7);
@@ -21328,6 +21404,8 @@ function openJobDoneDialog(job, request = null) {
   const quality = ratingSelect(job.rating?.quality);
   const notes = mk("textarea", { rows: "2", maxlength: "500" });
   notes.value = job.note || "";
+  const rentedLease = rentedLeaseForJob(job);
+  const ownerPays = rentedLease ? checkboxRow(tr("Take it off the owner's rent (flat {unit} is rented)", { unit: job.flat }), true) : null;
   const save = primaryButton(tr("Save"), async () => {
     save.disabled = true;
     const now = new Date().toISOString();
@@ -21343,6 +21421,7 @@ function openJobDoneDialog(job, request = null) {
       await supabaseRequest("rpc/update_service_request", { method: "POST", body: JSON.stringify({ p_id: job.requestId || request.id, p_status: "done" }) })
         .then(() => loadTechRequests()).catch((error) => showToast(describeSyncProblem(error), 6000));
     }
+    if (ok && ownerPays?.input.checked) await chargeJobToOwner(rentedLease, done, technician);
     save.disabled = false;
     if (!ok) return;
     closeToolDialog();
@@ -21355,6 +21434,7 @@ function openJobDoneDialog(job, request = null) {
     field(tr("What the resident paid (USD)"), value, tr("Ask the resident or the technician.")),
     field(tr("Your fee (USD)"), fee, technician ? feeTermsText(technician) : ""),
     mk("div", { className: "tech-rating-row" }, field(tr("On time"), onTime), field(tr("Fair price"), price), field(tr("Quality"), quality)),
+    ownerPays?.row || null,
     field(tr("Notes"), notes),
     mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
   if (!job.feeUsd && job.valueUsd) updateFee();
@@ -21761,8 +21841,10 @@ function renderRentalsView() {
   fillChildren(body,
     mk("div", { className: "tech-tabs", role: "group" },
       rentalsTabButton("leases", tr("Leases"), late),
-      rentalsTabButton("owners", tr("Owners"))),
-    rentalsTab === "owners" ? renderRentalOwners() : renderRentalLeases());
+      rentalsTabButton("overview", tr("Overview")),
+      rentalsTabButton("owners", tr("Owners")),
+      rentalsTabButton("vacant", tr("For rent"))),
+    rentalsTab === "owners" ? renderRentalOwners() : rentalsTab === "overview" ? renderRentalOverview() : rentalsTab === "vacant" ? renderRentalVacancies() : renderRentalLeases());
 }
 
 function leasePill(lease, s = leaseStatus(lease)) {
@@ -21823,23 +21905,25 @@ function renderRentalOwners() {
         mk("strong", { className: "tech-due", text: formatMoney(a.toHandOver, a.currency) }),
         miniButton(tr("Hand over"), () => openPayoutDialog(l.id)),
         miniButton(tr("Expense"), () => openDeductionDialog(l.id)),
-        miniButton(tr("Statement"), () => sendOwnerStatement(l))));
+        miniButton(tr("Statement"), () => sendOwnerStatement(l)),
+        miniButton("PDF", () => shareOwnerStatementPdf(l))));
   })))));
 }
 
 // ── Lease editor ──
-function openLeaseEditor(id = null) {
+function openLeaseEditor(id = null, prefill = null) {
   const lease = id ? rentalLeases.find((l) => l.id === id) : null;
+  const pre = prefill || {};
   const flats = state.tenants.filter((t) => t.active !== false || t.id === lease?.flatId);
   if (!flats.length) { showToast("Add the flats first (Flats tab)"); return; }
-  const flat = selectInput(flats.map((t) => [t.id, [t.unit ? tr("Flat {unit}", { unit: t.unit }) : "", t.name].filter(Boolean).join(" · ")]), lease?.flatId || flats[0].id);
-  const name = textInput(lease?.tenant?.name || "", { maxlength: "80", placeholder: tr("Tenant's full name") });
-  const phone = textInput(lease?.tenant?.phone || "", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
+  const flat = selectInput(flats.map((t) => [t.id, [t.unit ? tr("Flat {unit}", { unit: t.unit }) : "", t.name].filter(Boolean).join(" · ")]), lease?.flatId || pre.flatId || flats[0].id);
+  const name = textInput(lease?.tenant?.name || pre.tenant?.name || "", { maxlength: "80", placeholder: tr("Tenant's full name") });
+  const phone = textInput(lease?.tenant?.phone || pre.tenant?.phone || "", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
   const lang = selectInput([["en", "English"], ["ar", "العربية"]], lease?.tenant?.language || state.settings.language || "en");
-  const start = mk("input", { type: "date", value: lease?.start || localDateInput() });
+  const start = mk("input", { type: "date", value: lease?.start || pre.start || localDateInput() });
   const end = mk("input", { type: "date", value: lease?.end || "" });
-  const rent = numberInput(lease?.rent || "");
-  const currency = selectInput([["USD", "USD"], ["LBP", "LBP"]], lease?.currency || "USD");
+  const rent = numberInput(lease?.rent || pre.rent || "");
+  const currency = selectInput([["USD", "USD"], ["LBP", "LBP"]], lease?.currency || pre.currency || "USD");
   const period = selectInput(LEASE_PERIODS.map(([v, l]) => [v, tr(l)]), lease?.period || "monthly");
   const increase = numberInput(lease?.increasePct ?? "");
   const grace = numberInput(lease?.graceDays ?? 5);
@@ -21886,6 +21970,7 @@ function openLeaseEditor(id = null) {
     if (!saved) return;
     closeToolDialog();
     showToast(lease ? "Lease updated" : "Lease added");
+    pre.onSaved?.(saved);
   });
   openToolDialog(lease ? tr("Edit lease") : tr("Add a lease"),
     field(tr("Flat"), flat),
@@ -22254,7 +22339,8 @@ function openOwnerRentalSheet(id) {
       ...(lease.deductions || []).map((d) => breakdownRow(d.description, `−${formatMoney(d.amount, c)}`, formatDateLabel(d.date))),
       breakdownRow(tr("Already handed over"), `−${formatMoney(a.paidOut, c)}`),
       breakdownRow(tr("Due to you now"), formatMoney(a.toHandOver, c)))),
-    reportsSection(tr("Rent payments"), payments.length ? mk("div", {}, payments.map((p) => breakdownRow(formatDateLabel(p.date), formatMoney(p.amount, c)))) : note(tr("No payments yet."))));
+    reportsSection(tr("Rent payments"), payments.length ? mk("div", {}, payments.map((p) => breakdownRow(formatDateLabel(p.date), formatMoney(p.amount, c)))) : note(tr("No payments yet."))),
+    mk("div", { className: "button-row" }, primaryButton(tr("Statement PDF"), () => shareOwnerStatementPdf(lease))));
 }
 
 // ── The manager invites a lease's tenant ──
@@ -23071,6 +23157,375 @@ function leaseRenewalsNote(lease) {
   return note(list.map((r) => tr("Renewed on {at}: until {end}, {amount} from {from}", { at: formatDateLabel(String(r.at).slice(0, 10)), end: formatDateLabel(r.end), amount: formatMoney(r.rent, c), from: formatDateLabel(r.from) })).join("\n"));
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v187 — rentals: overview, owners' statements, empty flats, repairs
+// ═══════════════════════════════════════════════════════════════════════════
+// Overview tab (this month's rent, who is behind and for how long, occupancy,
+// leases ending, hand-overs, 12 months collected). Owner statement PDF for
+// the manager and the owner's phone; the server reminds owners on the 2nd of
+// each month (send_owner_statements, supabase/phase2s-v187.sql). Empty flats
+// live in the manager's notebook (techBook.data.vacancies, never in a
+// building's state): asking rent, photos (leases/vacancy-<id>/), a listing
+// picture to share, viewings, and "Rented" turns one into a lease. A finished
+// technician job in a rented flat can be taken off the owner's rent account.
+
+// ── Overview ──
+function arrearsAge(lease, today = localDateInput()) {
+  const s = leaseStatus(lease, today);
+  const open = s.periods.find((p) => p.state === "late");
+  if (!open) return null;
+  const days = Math.max(0, Math.round((Date.parse(`${today}T12:00:00`) - Date.parse(`${open.lateFrom}T12:00:00`)) / 864e5));
+  return { days, owed: s.owed, currency: s.currency };
+}
+
+function rentalsOverviewData(leases, flats, today = localDateInput()) {
+  const month = today.slice(0, 7);
+  const active = leases.filter((l) => l.status !== "ended");
+  const expected = active.map((l) => ({ currency: l.currency || "USD", v: leaseStatus(l, today).periods.filter((p) => p.start.slice(0, 7) === month).reduce((t, p) => t + p.amount, 0) }));
+  const collected = leases.map((l) => ({ currency: l.currency || "USD", v: (l.payments || []).filter((p) => String(p.date).slice(0, 7) === month).reduce((t, p) => t + Number(p.amount || 0), 0) }));
+  const buckets = [["1–30", 0, 30], ["31–60", 31, 60], ["61–90", 61, 90], ["90+", 91, 1e9]].map(([label, from, to]) => {
+    const rows = active.map((l) => ({ l, a: arrearsAge(l, today) })).filter(({ a }) => a && a.days >= from && a.days <= to);
+    return { label, count: rows.length, rows };
+  });
+  const rentedFlats = new Set(active.map((l) => l.flatId));
+  const months = [];
+  for (let i = 11; i >= 0; i -= 1) {
+    const key = addMonthsToDate(`${month}-01`, -i).slice(0, 7);
+    months.push({ month: key, usd: roundUsd(leases.filter((l) => (l.currency || "USD") === "USD").reduce((t, l) => t + (l.payments || []).filter((p) => String(p.date).slice(0, 7) === key).reduce((s2, p) => s2 + Number(p.amount || 0), 0), 0)) });
+  }
+  return {
+    expected, collected, buckets,
+    rented: rentedFlats.size, flats: flats.filter((f) => f.active !== false).length,
+    ending: active.filter((l) => l.end && l.end >= today && l.end <= addDays(today, 60)).sort((a, b) => a.end.localeCompare(b.end)),
+    toHandOver: active.filter((l) => !l.ownFlat).map((l) => { const a = leaseOwnerAccount(l, today); return { currency: a.currency, v: Math.max(0, a.toHandOver) }; }),
+    months,
+  };
+}
+
+function renderRentalOverview() {
+  const d = rentalsOverviewData(rentalLeases, state.tenants);
+  const vacancies = buildingVacancies().filter((v) => v.status !== "let");
+  return mk("div", {},
+    mk("div", { className: "tech-summary" },
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Rent this month") }), mk("strong", { text: moneyTotals(d.collected, (x) => x.v) }), mk("small", { text: tr("of {amount} expected", { amount: moneyTotals(d.expected, (x) => x.v) }) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Rented flats") }), mk("strong", { text: `${d.rented} / ${d.flats}` }), mk("small", { text: vacancies.length ? tr("{n} for rent", { n: vacancies.length }) : "" })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("To hand over") }), mk("strong", { text: moneyTotals(d.toHandOver, (x) => x.v) }))),
+    reportsSection(tr("Behind on rent"), d.buckets.some((b) => b.count)
+      ? mk("div", {}, d.buckets.filter((b) => b.count).map((b) => mk("div", {},
+        mk("p", { className: "rent-age-head", text: tr("{days} days late", { days: b.label }) }),
+        ...b.rows.map(({ l, a }) => mk("div", { className: "breakdown-row tech-person" },
+          mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("{days} days · {amount}", { days: a.days, amount: formatMoney(a.owed, a.currency) }) })),
+          mk("span", { className: "tech-person-actions" }, l.tenant?.phone ? miniButton(tr("Remind"), () => sendRentReminder(l)) : null, miniButton(tr("Details"), () => openLeaseDetails(l.id))))))))
+      : note(tr("Nobody is behind on rent."))),
+    d.ending.length ? reportsSection(tr("Leases ending soon"), mk("div", {}, d.ending.map((l) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("ends on {date}", { date: formatDateLabel(l.end) }) })),
+      mk("span", { className: "tech-person-actions" }, miniButton(tr("Renew"), () => openRenewLeaseDialog(l.id))))))) : null,
+    reportsSection(tr("Rent collected, last 12 months (USD)"), miniBars(d.months.slice(Math.min(Math.max(0, d.months.findIndex((m) => m.usd > 0)), 9)), "usd", (m) => shortMonth(`${m.month}-01`), (m) => formatUsd(m.usd))),
+    note(tr("Owners get a notice on the 2nd of each month that their rent statement is ready.")));
+}
+
+// ── Owner statement PDF ──
+function ownerStatementMonths(lease, year) {
+  const c = lease.currency || "USD";
+  const pct = !lease.ownFlat && lease.fee?.kind === "percent" ? Number(lease.fee.value) || 0 : 0;
+  const fixed = !lease.ownFlat && lease.fee?.kind === "fixed" ? Number(lease.fee.value) || 0 : 0;
+  const s = leaseStatus(lease);
+  const rows = [];
+  for (let m = 1; m <= 12; m += 1) {
+    const key = `${year}-${String(m).padStart(2, "0")}`;
+    if (key > localDateInput().slice(0, 7)) break;
+    const sum = (list) => (list || []).filter((x) => String(x.date).slice(0, 7) === key).reduce((t, x) => t + Number(x.amount || 0), 0);
+    const due = s.periods.filter((p) => p.start.slice(0, 7) === key).reduce((t, p) => t + p.amount, 0);
+    const collected = sum(lease.payments);
+    const fee = roundMoney(pct ? (collected * pct) / 100 : fixed * s.periods.filter((p) => p.start.slice(0, 7) === key && p.state === "paid").length, c);
+    const row = { month: key, due: roundMoney(due, c), collected: roundMoney(collected, c), fee, expenses: roundMoney(sum(lease.deductions), c), handedOver: roundMoney(sum(lease.payouts), c) };
+    if (row.due || row.collected || row.expenses || row.handedOver) rows.push(row);
+  }
+  return rows;
+}
+
+function buildOwnerStatementPdf(lease, ownerName) {
+  const c = lease.currency || "USD";
+  const flat = leaseFlat(lease);
+  const year = localDateInput().slice(0, 4);
+  const a = leaseOwnerAccount(lease);
+  const rows = ownerStatementMonths(lease, year);
+  const left = 50;
+  const right = 545;
+  const commands = ["0.2 w"];
+  let y = 800;
+  commands.push(pdfTextCommand(state.building?.name || "", left, y, 11));
+  commands.push(pdfTextCommand("Rent statement", left, y - 28, 20, true));
+  commands.push(pdfTextCommand(tr("{name} | Unit {unit}", { name: ownerName || flat?.name || "", unit: flat?.unit || "" }), left, y - 48, 11));
+  commands.push(pdfTextCommand(tr("Date: {date}", { date: localDateInput() }), 380, y, 10));
+  commands.push(pdfTextCommand(tr("Tenant: {name}", { name: lease.tenant?.name || "" }), 380, y - 16, 10));
+  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 32, 9));
+  commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+  y -= 120;
+  const summary = [["Rent collected", formatMoney(a.collected, c)], ["Management fee", formatMoney(a.fee, c)], ["Expenses paid for you", formatMoney(a.deductions, c)], ["Already handed over", formatMoney(a.paidOut, c)], ["Due to you now", formatMoney(a.toHandOver, c)]];
+  summary.forEach(([label, value], index) => {
+    const x = left + (index % 2) * 256;
+    const boxY = y - Math.floor(index / 2) * 52;
+    commands.push(pdfRectCommand(x, boxY, 238, 44));
+    commands.push(pdfTextCommand(label, x + 8, boxY + 26, 8));
+    commands.push(pdfTextCommand(value, x + 8, boxY + 10, 12, true));
+  });
+  y -= Math.ceil(summary.length / 2) * 52 + 18;
+  commands.push(pdfTextCommand(tr("{year}, month by month", { year }), left, y, 13, true));
+  y -= 20;
+  const cols = [["Month", 75], ["Rent due", 80], ["Collected", 80], ["Fee", 70], ["Expenses", 90], ["Handed over", 100]];
+  let x = left;
+  cols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; });
+  y -= 22;
+  const totals = { due: 0, collected: 0, fee: 0, expenses: 0, handedOver: 0 };
+  [...rows, null].forEach((r) => {
+    const cells = r ? [formatMonth(`${r.month}-01`), formatMoney(r.due, c), formatMoney(r.collected, c), formatMoney(r.fee, c), formatMoney(r.expenses, c), formatMoney(r.handedOver, c)]
+      : ["Total", ...["due", "collected", "fee", "expenses", "handedOver"].map((k) => formatMoney(totals[k], c))];
+    if (r) Object.keys(totals).forEach((k) => { totals[k] = roundMoney(totals[k] + r[k], c); });
+    x = left;
+    cells.forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(v, x + 5, y - 4, 8, !r)); x += cols[i][1]; });
+    y -= 22;
+  });
+  const deductions = (lease.deductions || []).filter((d) => String(d.date).startsWith(year));
+  if (deductions.length && y > 140) {
+    y -= 16;
+    commands.push(pdfTextCommand("Expenses paid for you", left, y, 11, true));
+    y -= 16;
+    deductions.slice(0, 12).forEach((d) => { commands.push(pdfTextCommand(pdfClip(`${formatDateLabel(d.date)} — ${d.description}: ${formatMoney(d.amount, c)}`, 100), left, y, 9)); y -= 13; });
+  }
+  commands.push(pdfTextCommand("The rent is collected by the building manager and handed over to you after the fee and expenses.", left, Math.max(48, y - 18), 9));
+  return buildPdfDocument(`${commands.join("\n")}\n`);
+}
+
+function shareOwnerStatementPdf(lease, ownerName) {
+  const flat = leaseFlat(lease);
+  void sharePdfFile(buildOwnerStatementPdf(lease, ownerName), `Rent-statement_${safeFilePart(flat?.unit || "flat", "flat")}_${localDateInput()}.pdf`, tr("Rent statement"));
+}
+
+// ── Empty flats ──
+function buildingVacancies() {
+  const id = currentBuildingId();
+  return (techBook?.data.vacancies || []).filter((v) => (v.buildingId || "building") === id);
+}
+
+async function changeVacancies(change) {
+  return changeTechBook((data) => { data.vacancies = Array.isArray(data.vacancies) ? data.vacancies : []; change(data.vacancies); });
+}
+
+function renderRentalVacancies() {
+  if (!techBook) {
+    loadTechBook().then(() => renderRentalsView()).catch((error) => { rentalsProblem = techMissingDb(error) || describeSyncProblem(error); renderRentalsView(); });
+    return note(tr("Loading…"));
+  }
+  const list = buildingVacancies().sort((a, b) => Number(a.status === "let") - Number(b.status === "let") || String(b.createdAt).localeCompare(String(a.createdAt)));
+  const open = list.filter((v) => v.status !== "let");
+  const endedFree = (rentalLeases || []).filter((l) => l.status === "ended" && !(rentalLeases || []).some((x) => x.flatId === l.flatId && x.status !== "ended") && !open.some((v) => v.flatId === l.flatId));
+  return mk("div", {},
+    mk("div", { className: "button-row" }, primaryButton(tr("A flat for rent"), () => openVacancyEditor())),
+    endedFree.length ? note(tr("No lease now: {flats}. Add them here to find a tenant.", { flats: [...new Set(endedFree.map((l) => leaseFlat(l)?.unit || ""))].filter(Boolean).join(", ") })) : null,
+    open.length ? null : note(tr("Flats you are looking to rent appear here, with their listing picture and the people who came to see them.")),
+    mk("div", { className: "tech-list" }, list.map((v) => {
+      const c = v.currency || "USD";
+      return mk("article", { className: `tech-card${v.status === "let" ? " is-done" : ""}` },
+        mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: [tr("Flat {unit}", { unit: v.unit || "" }), v.rooms ? tr("{n} bedrooms", { n: v.rooms }) : ""].filter(Boolean).join(" · ") }),
+          mk("span", { className: `status-pill ${v.status === "let" ? "tech-status-done" : "tech-status-sent"}`, text: v.status === "let" ? tr("Rented") : tr("For rent") })),
+        mk("p", { className: "tech-where", text: [tr("{amount} · {period}", { amount: formatMoney(v.askingRent, c), period: tr("Monthly") }), v.availableFrom ? tr("from {date}", { date: formatDateLabel(v.availableFrom) }) : "", tr("{n} viewings", { n: (v.viewings || []).length })].filter(Boolean).join(" · ") }),
+        v.status === "let" ? null : mk("div", { className: "notice-actions" },
+          mk("button", { type: "button", className: "mini-button is-primary", text: tr("Listing picture"), onclick: () => { void shareListingPicture(v.id); } }),
+          miniButton(tr("Viewings"), () => openViewingsDialog(v.id)),
+          miniButton(tr("Edit"), () => openVacancyEditor(v.id)),
+          miniButton(tr("Rented"), () => vacancyToLease(v.id))));
+    })));
+}
+
+function openVacancyEditor(id = null) {
+  const v = id ? buildingVacancies().find((x) => x.id === id) : null;
+  const flats = state.tenants.filter((t) => t.active !== false);
+  if (!flats.length) { showToast("Add the flats first (Flats tab)"); return; }
+  const flat = selectInput(flats.map((t) => [t.id, [t.unit ? tr("Flat {unit}", { unit: t.unit }) : "", t.name].filter(Boolean).join(" · ")]), v?.flatId || flats[0].id);
+  const rent = numberInput(v?.askingRent || "");
+  const currency = selectInput([["USD", "USD"], ["LBP", "LBP"]], v?.currency || "USD");
+  const from = mk("input", { type: "date", value: v?.availableFrom || localDateInput() });
+  const rooms = numberInput(v?.rooms ?? "");
+  const size = numberInput(v?.size ?? "");
+  const description = mk("textarea", { rows: "3", maxlength: "400", placeholder: tr("e.g. Furnished, sunny, 24h electricity, parking spot") });
+  description.value = v?.description || "";
+  const contact = textInput(v?.contact || "", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
+  const photos = [...(v?.photos || [])];
+  const photoInput = mk("input", { type: "file", accept: "image/*", multiple: "multiple", className: "file-input-hidden" });
+  const photoRow = mk("div", { className: "notice-actions" });
+  const vacancyId = v?.id || newId("vac");
+  const drawPhotos = () => fillChildren(photoRow, miniButton(tr("Add photos"), () => photoInput.click()), photoInput,
+    ...photos.map((p, i) => miniButton(tr("Photo {n}", { n: i + 1 }), () => openInvoicePhoto(p))));
+  photoInput.addEventListener("change", async () => {
+    const files = [...(photoInput.files || [])];
+    for (const f of files) {
+      try { photos.push(await uploadLeaseFile({ id: `vacancy-${vacancyId}` }, f)); } catch (error) { showToast(error.message || describeSyncProblem(error), 6000); break; }
+    }
+    drawPhotos();
+  });
+  drawPhotos();
+  const save = primaryButton(tr("Save"), async () => {
+    if (!(Number(rent.value) > 0)) { showToast("Enter the rent"); return; }
+    save.disabled = true;
+    const chosen = state.tenants.find((t) => t.id === flat.value);
+    const record = {
+      ...(v || { id: vacancyId, status: "open", viewings: [], createdAt: new Date().toISOString() }),
+      buildingId: currentBuildingId(), buildingName: state.building?.name || "", flatId: flat.value, unit: chosen?.unit || "",
+      askingRent: Number(rent.value), currency: currency.value, availableFrom: from.value || "", rooms: Number(rooms.value) || 0, size: Number(size.value) || 0,
+      description: description.value.trim(), contact: contact.value.trim(), photos, updatedAt: new Date().toISOString(),
+    };
+    const ok = await changeVacancies((list) => { const i = list.findIndex((x) => x.id === record.id); if (i >= 0) list[i] = record; else list.push(record); });
+    save.disabled = false;
+    if (ok) { closeToolDialog(); renderRentalsView(); showToast("Saved"); }
+  });
+  openToolDialog(v ? tr("Edit — flat for rent") : tr("A flat for rent"),
+    field(tr("Flat"), flat),
+    mk("div", { className: "tech-fee-row" }, field(tr("Asking rent (monthly)"), rent), field(tr("Currency"), currency), field(tr("Available from"), from)),
+    mk("div", { className: "two-col" }, field(tr("Bedrooms"), rooms), field(tr("Size (m²)"), size)),
+    field(tr("Description"), description),
+    field(tr("Phone for viewings"), contact, tr("Shown on the listing picture.")),
+    mk("div", {}, mk("span", { className: "field-label", text: tr("Photos") }), photoRow),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openViewingsDialog(id) {
+  const v = buildingVacancies().find((x) => x.id === id);
+  if (!v) return;
+  const name = textInput("", { maxlength: "80", placeholder: tr("Name") });
+  const phone = textInput("", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const notes = textInput("", { maxlength: "200", placeholder: tr("e.g. Couple, wants to move in December") });
+  const add = primaryButton(tr("Add"), async () => {
+    if (!name.value.trim()) { showToast("Enter the name"); return; }
+    add.disabled = true;
+    const viewing = { id: newId("view"), name: name.value.trim(), phone: phone.value.trim(), date: date.value || localDateInput(), notes: notes.value.trim(), outcome: "" };
+    const ok = await changeVacancies((list) => { const x = list.find((y) => y.id === id); if (x) x.viewings = [...(x.viewings || []), viewing]; });
+    add.disabled = false;
+    if (ok) { closeToolDialog(); openViewingsDialog(id); }
+  });
+  const setOutcome = async (viewingId, outcome) => {
+    const ok = await changeVacancies((list) => { const x = list.find((y) => y.id === id); (x?.viewings || []).forEach((w) => { if (w.id === viewingId) w.outcome = outcome; }); });
+    if (ok) { closeToolDialog(); openViewingsDialog(id); }
+  };
+  openToolDialog(tr("Viewings — flat {unit}", { unit: v.unit || "" }),
+    (v.viewings || []).length ? mk("div", {}, v.viewings.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).map((w) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: w.name }), mk("small", { text: [formatDateLabel(w.date), w.phone, w.notes, w.outcome === "interested" ? tr("Interested") : w.outcome === "no" ? tr("Not interested") : ""].filter(Boolean).join(" · ") })),
+      mk("span", { className: "tech-person-actions" },
+        w.phone ? mk("a", { className: "mini-button", href: whatsappLink(w.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }) : null,
+        w.outcome ? null : miniButton(tr("Interested"), () => { void setOutcome(w.id, "interested"); }),
+        w.outcome ? null : miniButton(tr("No"), () => { void setOutcome(w.id, "no"); }),
+        miniButton(tr("Make the lease"), () => vacancyToLease(id, w.id)))))) : note(tr("No viewings yet.")),
+    reportsSection(tr("Add a viewing"), mk("div", {},
+      mk("div", { className: "two-col" }, field(tr("Name"), name), field(tr("Phone"), phone)),
+      mk("div", { className: "two-col" }, field(tr("Date"), date), field(tr("Notes"), notes)),
+      mk("div", { className: "button-row" }, add, secondaryButton(tr("Close"), closeToolDialog)))));
+}
+
+function vacancyToLease(id, viewingId = null) {
+  const v = buildingVacancies().find((x) => x.id === id);
+  if (!v) return;
+  const w = (v.viewings || []).find((x) => x.id === viewingId);
+  openLeaseEditor(null, {
+    flatId: v.flatId, rent: v.askingRent, currency: v.currency || "USD", start: v.availableFrom && v.availableFrom > localDateInput() ? v.availableFrom : localDateInput(),
+    tenant: w ? { name: w.name, phone: w.phone } : null,
+    onSaved: () => { void changeVacancies((list) => { const x = list.find((y) => y.id === id); if (x) { x.status = "let"; x.letOn = localDateInput(); } }).then(() => renderRentalsView()); },
+  });
+}
+
+// The listing picture: a square image to post on WhatsApp or Marketplace.
+async function drawListingCanvas(v) {
+  const rtl = currentLang === "ar";
+  const W = 1080;
+  const H = 1350;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const X = (x) => (rtl ? W - x : x);
+  const text = (value, x, y, { size = 40, weight = 400, color = "#14211f", align = "start" } = {}) => {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.fillText(String(value ?? ""), X(x), y);
+  };
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, W, H);
+  // Photo (or a plain band when there is none).
+  const photoH = 700;
+  ctx.fillStyle = "#163832";
+  ctx.fillRect(0, 0, W, photoH);
+  if (v.photos?.[0]) {
+    try {
+      const bytes = await fetchStoredPhoto(v.photos[0].storagePath);
+      const bmp = await createImageBitmap(new Blob([bytes], { type: v.photos[0].mimeType || "image/jpeg" }));
+      const scale = Math.max(W / bmp.width, photoH / bmp.height);
+      ctx.drawImage(bmp, (W - bmp.width * scale) / 2, (photoH - bmp.height * scale) / 2, bmp.width * scale, bmp.height * scale);
+    } catch { /* keep the plain band */ }
+  }
+  ctx.fillStyle = "#1f6b5a";
+  const tagW = 360;
+  ctx.fillRect(rtl ? W - 64 - tagW : 64, 600, tagW, 76);
+  text(tr("For rent"), rtl ? 64 + tagW / 2 : 64 + tagW / 2, 652, { size: 42, weight: 800, color: "#ffffff", align: "center" });
+  const c = v.currency || "USD";
+  text(state.building?.name || v.buildingName || "", 64, 790, { size: 36, weight: 700, color: "#61706b" });
+  text([tr("Flat {unit}", { unit: v.unit || "" }), v.rooms ? tr("{n} bedrooms", { n: v.rooms }) : "", v.size ? tr("{n} m²", { n: v.size }) : ""].filter(Boolean).join(" · "), 64, 860, { size: 54, weight: 800 });
+  text(tr("{amount} a month", { amount: formatMoney(v.askingRent, c) }), 64, 950, { size: 64, weight: 800, color: "#1f6b5a" });
+  if (v.availableFrom) text(tr("Available from {date}", { date: formatDateLabel(v.availableFrom) }), 64, 1020, { size: 36, color: "#61706b" });
+  // Description, wrapped.
+  ctx.font = `400 34px ${FONT}`;
+  const words = String(v.description || "").split(/\s+/).filter(Boolean);
+  let line = "";
+  let y = 1090;
+  for (const word of words) {
+    const next = line ? `${line} ${word}` : word;
+    if (ctx.measureText(next).width > W - 128 && line) { text(line, 64, y, { size: 34 }); y += 46; line = word; if (y > 1200) break; } else line = next;
+  }
+  if (line && y <= 1200) text(line, 64, y, { size: 34 });
+  ctx.fillStyle = "#eef4ef";
+  ctx.fillRect(0, H - 110, W, 110);
+  text(v.contact ? tr("Call or WhatsApp {phone}", { phone: v.contact }) : tr("Ask the building manager"), 64, H - 42, { size: 40, weight: 700, color: "#163832" });
+  return canvas;
+}
+
+async function shareListingPicture(id) {
+  const v = buildingVacancies().find((x) => x.id === id);
+  if (!v) return;
+  showToast("Preparing the picture…");
+  const canvas = await drawListingCanvas(v);
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.9));
+  const fileName = `For-rent_${safeFilePart(v.unit || "flat", "flat")}.jpg`;
+  try {
+    if (typeof navigator.share === "function" && typeof File === "function") {
+      const file = new File([blob], fileName, { type: "image/jpeg" });
+      if (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: tr("For rent") }); return; }
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(blob, "image/jpeg", fileName);
+}
+
+// ── Repairs in a rented flat: taken off the owner's rent account ──
+function rentedLeaseForJob(job) {
+  if (!Array.isArray(rentalLeases)) return null;
+  const sameBuilding = job.buildingId ? job.buildingId === currentBuildingId() : (job.buildingName || "") === (state.building?.name || "");
+  if (!sameBuilding || !job.flat) return null;
+  const flat = state.tenants.find((t) => String(t.unit || "").trim().toLowerCase() === String(job.flat).trim().toLowerCase());
+  return flat ? rentalLeases.find((l) => l.flatId === flat.id && l.status !== "ended" && !l.ownFlat) || null : null;
+}
+
+async function chargeJobToOwner(lease, job, technician) {
+  const c = lease.currency || "USD";
+  const amount = roundMoney(c === "LBP" ? Number(job.valueUsd || 0) * getConversionRate() : Number(job.valueUsd || 0), c);
+  if (!(amount > 0) || (lease.deductions || []).some((d) => d.jobId === job.id)) return;
+  const description = [tradeLabel(job.trade), technician?.name, job.title].filter(Boolean).join(" — ").slice(0, 120);
+  const saved = await saveLease({ ...lease, deductions: [...(lease.deductions || []), { id: newId("ded"), date: job.doneOn || localDateInput(), amount, description, jobId: job.id }] });
+  if (saved) showToast(tr("Taken off the owner's rent: {amount}", { amount: formatMoney(amount, c) }));
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -23284,6 +23739,9 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  rentalsOverviewData,
+  ownerStatementMonths,
+  arrearsAge,
   leaseRentBase,
   withLateFees,
   leaseSchedule,
