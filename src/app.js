@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v179";
+const APP_VERSION = "v180";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2295,6 +2295,8 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Scan the QR code to check this receipt.": "امسح رمز QR للتحقق من هذا الإيصال.",
+  "Check this receipt: {url}": "للتحقق من هذا الإيصال: {url}",
   "Your rent": "إيجارك",
   "Building charges": "رسوم المبنى",
   "Building charges · paid by your tenant {name}": "رسوم المبنى · يدفعها المستأجر {name}",
@@ -3488,6 +3490,7 @@ function showToast(message, durationMs = 2200) {
 function saveState(options = {}) {
   stampLbpRates(state, getConversionRate());
   if (options.sync !== false && !guardAndAuditSave()) return false;
+  if (options.sync !== false && canIssueReceiptChecks()) addReceiptVerifyCodes();
   if (sessionMode === "owner" && !isViewerSession()) state.balanceSnapshot = buildBalanceSnapshot();
   state.monthlyExpected = normalizedMonthlyExpected(state.monthlyExpected);
   state.meta = state.meta || {};
@@ -3535,6 +3538,7 @@ function hydrateState(rawState) {
   hydrated.deleted.equipment ||= [];
   hydrated.equipment ||= [];
   hydrated.dieselChecks ||= [];
+  hydrated.voidedReceipts ||= [];
   hydrated.deleted.routineTasks ||= [];
   hydrated.deleted.supplies ||= [];
   hydrated.deleted.deposits ||= [];
@@ -6692,7 +6696,8 @@ function getPaymentReceiptData(transactionId) {
           samePaymentGroup(entry, transaction))
         .reduce((sum, entry) => sum + transactionNetUsd(entry), 0);
   saveState();
-  return { transaction, tenant, isProject, receiptNo, receiptEntries, amount, advanceAmount };
+  const checkLink = receiptCheckLink({ ref: receiptNo, code: transaction.verifyCode, amount });
+  return { transaction, tenant, isProject, receiptNo, receiptEntries, amount, advanceAmount, checkLink };
 }
 
 function receiptSummaryRows(data) {
@@ -7091,9 +7096,14 @@ function buildReceiptLayoutPdf(data) {
   commands.push(pdfTextCommand(state.building.name, left, y, 11));
   commands.push(pdfTextCommand("Payment Receipt", left, y - 28, 20, true));
   commands.push(pdfTextCommand(tr("{name} | Unit {unit}", { name: data.tenant.name, unit: data.tenant.unit }), left, y - 48, 11));
-  commands.push(pdfTextCommand(tr("Receipt: {no}", { no: data.receiptNo }), 380, y, 10));
-  commands.push(pdfTextCommand(tr("Date: {date}", { date: data.transaction.date || localDateInput() }), 380, y - 16, 10));
-  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 32, 9));
+  const infoX = data.checkLink ? 300 : 380;
+  commands.push(pdfTextCommand(tr("Receipt: {no}", { no: data.receiptNo }), infoX, y, 10));
+  commands.push(pdfTextCommand(tr("Date: {date}", { date: data.transaction.date || localDateInput() }), infoX, y - 16, 10));
+  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, infoX, y - 32, 9));
+  if (data.checkLink) {
+    commands.push(pdfQrCommand(data.checkLink, 467, 740, 78));
+    commands.push(pdfTextCommand("Scan the QR code to check this receipt.", infoX, y - 48, 8));
+  }
   commands.push(pdfLineCommand(left, y - 64, right, y - 64));
 
   y -= 120;
@@ -9219,6 +9229,7 @@ function mergeStates(local, remote) {
   merged.announcements = mergeAnnouncementsV166(older.announcements, newer.announcements, merged.deleted.announcements);
   merged.equipment = mergeByStamp(older.equipment, newer.equipment, merged.deleted.equipment, "updatedAt");
   merged.dieselChecks = mergeById(older.dieselChecks, newer.dieselChecks);
+  merged.voidedReceipts = mergeById(older.voidedReceipts, newer.voidedReceipts);
   merged.issues = mergeByStamp(older.issues, newer.issues, merged.deleted.issues, "updatedAt");
   merged.generatorServices = mergeById(older.generatorServices, newer.generatorServices, merged.deleted.generatorServices);
   merged.documents = mergeByStamp(older.documents, newer.documents, merged.deleted.documents, "updatedAt");
@@ -12382,6 +12393,7 @@ function guardAndAuditSave() {
     return false;
   }
   appendAudit(changes);
+  recordVoidedReceipts(previous);
   return true;
 }
 
@@ -21554,6 +21566,7 @@ async function loadLeases() {
   const res = await supabaseRequest("rpc/list_leases", { method: "POST", body: "{}" });
   const rows = await res.json();
   rentalLeases = (Array.isArray(rows) ? rows : []).map((r) => ({ id: r.id, rev: Number(r.rev || 0), ...r.data, flatId: r.flatId }));
+  void backfillRentVerifyCodes();
   return rentalLeases;
 }
 
@@ -21817,7 +21830,7 @@ function openRentPaymentDialog(id) {
     if (!(value > 0) && !(chargesValue > 0)) { showToast("Enter the amount"); return; }
     save.disabled = true;
     const day = date.value || localDateInput();
-    const payment = { id: newId("rent"), date: day, amount: value, method: method.value, ...(chargesValue ? { chargesUsd: chargesValue } : {}) };
+    const payment = { id: newId("rent"), date: day, amount: value, method: method.value, verifyCode: newVerifyCode(), ...(chargesValue ? { chargesUsd: chargesValue } : {}) };
     const saved = value > 0 ? await saveLease({ ...lease, payments: [...(lease.payments || []), payment] }) : lease;
     if (!saved) { save.disabled = false; return; }
     // The building charges are a normal building payment for the flat.
@@ -21943,6 +21956,8 @@ function sendRentReceipt(lease, payment) {
   if (payment.chargesUsd) lines.push(trIn(lang, "Building charges received: {amount}", { amount: formatUsd(payment.chargesUsd) }));
   const s = leaseStatus(lease);
   if (s.paidUntil) lines.push(trIn(lang, "Rent paid until {date}.", { date: formatDateLabel(s.paidUntil) }));
+  const check = Number(payment.amount) > 0 ? receiptCheckLink({ ref: payment.id, code: payment.verifyCode, amount: payment.amount, kind: "rent", lang }) : "";
+  if (check) lines.push(trIn(lang, "Check this receipt: {url}", { url: check }));
   lines.push(trIn(lang, "Thank you."));
   window.open(whatsappLink(lease.tenant.phone, lines.join("\n")), "_blank", "noopener");
 }
@@ -22139,6 +22154,101 @@ function renderV179() {
   document.body.classList.toggle("renter-phone", isRenterPhone());
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v180 — receipts that can be checked
+// ═══════════════════════════════════════════════════════════════════════════
+// Every receipt carries a QR code / link to verify.html. The link holds the
+// building, the receipt number, the amount printed and a random check code
+// stored on the payment (verifyCode; payments of one receipt share it). The
+// public rpc verify_receipt (supabase/phase2p-v180.sql) answers valid,
+// changed, cancelled or not found, without names or phone numbers. Only the
+// manager's phone hands out codes; a deleted payment's receipt is kept in
+// state.voidedReceipts so the check can say it was cancelled.
+const VERIFY_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const APP_HOME = "https://building-account-tracker.vercel.app";
+
+function newVerifyCode() {
+  const bytes = new Uint8Array(10);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map((b) => VERIFY_ALPHABET[b % 32]).join("");
+}
+
+function canIssueReceiptChecks() {
+  return sessionMode === "owner" && !isViewerSession() && canPushDocument();
+}
+
+// Gives every receipted payment a check code; returns how many changed.
+function addReceiptVerifyCodes(target = state) {
+  const payments = (target.transactions || []).filter((t) => isReceiptablePayment(t) && t.receiptRef);
+  const byRef = new Map();
+  payments.forEach((t) => { if (t.verifyCode && !byRef.has(t.receiptRef)) byRef.set(t.receiptRef, t.verifyCode); });
+  let added = 0;
+  payments.forEach((t) => {
+    if (t.verifyCode) return;
+    if (!byRef.has(t.receiptRef)) byRef.set(t.receiptRef, newVerifyCode());
+    t.verifyCode = byRef.get(t.receiptRef);
+    added += 1;
+  });
+  return added;
+}
+
+// Receipts whose payments are gone between two copies of the building.
+function voidedReceiptsBetween(previous, next) {
+  const kept = new Set((next.transactions || []).filter((t) => t.verifyCode).map((t) => `${t.receiptRef}:${t.verifyCode}`));
+  const gone = new Map();
+  (previous.transactions || []).filter((t) => isReceiptablePayment(t) && t.receiptRef && t.verifyCode).forEach((t) => {
+    const id = `${t.receiptRef}:${t.verifyCode}`;
+    if (kept.has(id)) return;
+    const entry = gone.get(id) || { id, ref: t.receiptRef, code: t.verifyCode, unit: (previous.tenants || []).find((x) => x.id === t.tenantId)?.unit || "", amountUsd: 0, at: new Date().toISOString() };
+    entry.amountUsd = roundUsd(entry.amountUsd + transactionNetUsd(t));
+    gone.set(id, entry);
+  });
+  return [...gone.values()];
+}
+
+function recordVoidedReceipts(previous) {
+  const gone = voidedReceiptsBetween(previous, state);
+  if (!gone.length) return;
+  const known = new Set((state.voidedReceipts || []).map((v) => v.id));
+  state.voidedReceipts = [...(state.voidedReceipts || []), ...gone.filter((v) => !known.has(v.id))].slice(-2000);
+}
+
+function receiptCheckLink({ ref, code, amount, kind = "building", lang = state.settings?.language || "en" }) {
+  if (!ref || !code) return "";
+  const origin = typeof location !== "undefined" && /^https?:/.test(location.origin || "") ? location.origin : APP_HOME;
+  const q = new URLSearchParams({ b: currentBuildingId(), r: ref, c: code, a: String(Math.round(Number(amount || 0) * 100) / 100), l: lang === "ar" ? "ar" : "en" });
+  if (kind === "rent") q.set("k", "rent");
+  return `${origin}/verify?${q}`;
+}
+
+// After a sync on the manager's phone: give older receipts their codes.
+function backfillReceiptChecks() {
+  if (!canIssueReceiptChecks()) return;
+  if (state.transactions.some((t) => isReceiptablePayment(t) && t.receiptRef && !t.verifyCode)) saveState();
+}
+
+// A QR code drawn into a PDF page (an image, like the Arabic text images).
+function pdfQrCommand(text, x, y, size) {
+  const canvas = qrCanvas(text, 480);
+  const binary = atob(canvas.toDataURL("image/jpeg", 0.95).split(",")[1] || "");
+  let hex = "";
+  for (let i = 0; i < binary.length; i += 1) hex += binary.charCodeAt(i).toString(16).padStart(2, "0");
+  const img = { name: `Tx${pdfTextImages.length + 1}`, width: canvas.width, height: canvas.height, ascent: canvas.height, hex };
+  pdfTextImages.push(img);
+  return `q ${size} 0 0 ${size} ${x} ${y} cm /${img.name} Do Q`;
+}
+
+// Rent payments recorded before v180 get their check codes once.
+let rentCodesBackfilled = false;
+async function backfillRentVerifyCodes() {
+  if (rentCodesBackfilled || !isOwnerSession() || isViewerSession()) return;
+  rentCodesBackfilled = true;
+  for (const lease of rentalLeases || []) {
+    if (!(lease.payments || []).some((p) => !p.verifyCode)) continue;
+    await saveLease({ ...lease, payments: lease.payments.map((p) => (p.verifyCode ? p : { ...p, verifyCode: newVerifyCode() })) });
+  }
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -22183,7 +22293,7 @@ async function syncFromSheet({ silent = false } = {}) {
       // Cloud unchanged since this device last synced. When clean, this is the
       // round trip that earns "Saved" (boot shows "Saving…" until one happens).
       if (dirty) queueCloudSave();
-      else setSyncChip("saved");
+      else { setSyncChip("saved"); backfillReceiptChecks(); }
       return;
     }
     if (dirty) {
@@ -22213,6 +22323,7 @@ async function syncFromSheet({ silent = false } = {}) {
     renderCloudStatus(`Last synced at ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
     setSyncChip("saved");
     refreshBalanceSnapshot();
+    backfillReceiptChecks();
   } catch (error) {
     reportSyncProblem(error);
     if (!silent) renderCloudStatus(lastSyncProblem);
@@ -22351,6 +22462,10 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  addReceiptVerifyCodes,
+  voidedReceiptsBetween,
+  receiptCheckLink,
+  newVerifyCode,
   leasePeriods,
   leaseStatus,
   leaseOwnerAccount,

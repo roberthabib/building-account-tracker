@@ -28,7 +28,7 @@ function redacted(me) {
   s.transactions = s.transactions.filter((x) => !x.tenantId || x.tenantId === me)
     .map((x) => (x.shares ? { ...x, shares: x.shares[me] != null ? { [me]: x.shares[me] } : {} } : x));
   s.paymentDeclarations = s.paymentDeclarations.filter((d) => d.tenantId === me);
-  delete s.auditLog; delete s.cashChecks;
+  delete s.auditLog; delete s.cashChecks; delete s.voidedReceipts;
   ["routineTasks", "routineLog", "supplies", "visitorLog", "monthChecks", "balanceSnapshot", "equipment", "pendingExpenses"].forEach((k) => delete s[k]);
   s.deposits = (s.deposits || []).filter((d) => d.tenantId === me);
   s.bookings = (s.bookings || []).filter((b) => b.status !== "cancelled" || b.tenantId === me)
@@ -227,6 +227,29 @@ http.createServer((req, res) => {
       const lid = renterCodes.get(String(b.p_code).toUpperCase()); const l = LEASES.get(lid);
       if (!l || l.data.status === "ended") return send(400, { message: "That lease has ended" });
       renterCodes.delete(String(b.p_code).toUpperCase()); RENTERS.set(tok, lid); return send(200, l.flatId);
+    }
+    if (path === "/rest/v1/rpc/verify_receipt") {
+      const n = (v) => Number(v || 0) || 0;
+      const changed = (amt) => b.p_amount != null && Math.abs(amt - Number(b.p_amount)) > 0.009 ? "changed" : "valid";
+      const unitOf = (id) => (STATE.tenants.find((t) => t.id === id) || {}).unit || null;
+      if (!b.p_ref || String(b.p_code || "").length < 8) return send(200, { status: "not_found" });
+      if (b.p_kind === "rent") {
+        for (const l of LEASES.values()) {
+          const p = (l.data.payments || []).find((x) => x.id === b.p_ref && x.verifyCode === b.p_code);
+          if (p) return send(200, { status: changed(n(p.amount)), kind: "rent", building: STATE.building.name, unit: unitOf(l.flatId), amount: n(p.amount), currency: l.data.currency || "USD", date: p.date, ref: b.p_ref });
+        }
+        return send(200, { status: "not_found" });
+      }
+      const rate = n(STATE.settings.lbpPerUsd) || 89500;
+      const tx = STATE.transactions.filter((t) => t.category === "Payments" && t.receiptRef === b.p_ref && t.verifyCode === b.p_code);
+      if (tx.length) {
+        const amount = Math.round(tx.reduce((a, t) => a + n(t.creditUsd) - n(t.debitUsd) + (n(t.creditLbp) - n(t.debitLbp)) / (n(t.lbpRate) || rate), 0) * 100) / 100;
+        return send(200, { status: changed(amount), kind: "building", building: STATE.building.name, unit: unitOf(tx[0].tenantId), amount, currency: "USD",
+          date: tx.map((t) => t.date).sort()[0], months: [...new Set(tx.filter((t) => !t.project && t.forMonth).map((t) => t.forMonth))].sort(), project: (tx.find((t) => t.project) || {}).project || null, ref: b.p_ref });
+      }
+      const v = (STATE.voidedReceipts || []).find((x) => x.ref === b.p_ref && x.code === b.p_code);
+      if (v) return send(200, { status: "cancelled", kind: "building", building: STATE.building.name, unit: v.unit, amount: v.amountUsd, currency: "USD", at: v.at, ref: b.p_ref });
+      return send(200, { status: "not_found" });
     }
     if (path === "/rest/v1/rpc/create_renter_code") {
       if (!isOwner) return send(400, { message: "Only the building manager can create invite codes" });

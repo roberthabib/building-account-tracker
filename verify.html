@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#163832" />
+    <meta name="robots" content="noindex" />
+    <title>Receipt check</title>
+    <link rel="icon" href="assets/icon-192.png" />
+    <style>
+      /* v180: the public page a receipt's QR code opens. It asks the database
+         (rpc verify_receipt) whether the receipt is genuine; no sign-in. */
+      :root {
+        --bg: #f4f6f3;
+        --surface: #ffffff;
+        --ink: #14211f;
+        --muted: #61706b;
+        --line: #e4e9e4;
+        --primary-dark: #163832;
+        --ok: #0f513f;
+        --ok-bg: #dcefe8;
+        --warn: #8a5312;
+        --warn-bg: #f7ead6;
+        --bad: #8a3232;
+        --bad-bg: #f6dede;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f1715;
+          --surface: #18221f;
+          --ink: #e6ece9;
+          --muted: #9aa8a3;
+          --line: #2a3632;
+          --primary-dark: #0b1412;
+          --ok: #8fd8b8;
+          --ok-bg: #163a2f;
+          --warn: #f0c27e;
+          --warn-bg: #3b2c16;
+          --bad: #f1a3a3;
+          --bad-bg: #3d1f1f;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.45 "Segoe UI", system-ui, -apple-system, Tahoma, "Noto Sans Arabic", sans-serif;
+      }
+      header {
+        background: var(--primary-dark);
+        color: #fff;
+        padding: 22px 16px 54px;
+      }
+      header .wrap { display: flex; align-items: center; gap: 12px; }
+      header img { width: 42px; height: 42px; border-radius: 11px; }
+      header small { display: block; opacity: 0.7; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+      header strong { font-size: 1.25rem; }
+      .wrap { max-width: 460px; margin: 0 auto; }
+      main { padding: 0 16px 32px; margin-top: -36px; }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px 20px;
+        box-shadow: 0 6px 16px rgba(22, 56, 50, 0.12);
+      }
+      .status { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 14px; }
+      .status .mark { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 1.6rem; font-weight: 800; background: rgba(255, 255, 255, 0.55); }
+      .status h1 { margin: 0; font-size: 1.2rem; }
+      .status p { margin: 2px 0 0; font-size: 0.93rem; }
+      .is-valid { background: var(--ok-bg); color: var(--ok); }
+      .is-changed { background: var(--warn-bg); color: var(--warn); }
+      .is-cancelled, .is-not_found, .is-error { background: var(--bad-bg); color: var(--bad); }
+      .is-loading { background: var(--line); color: var(--muted); }
+      dl { margin: 18px 0 0; }
+      .row { display: flex; justify-content: space-between; gap: 16px; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+      .row:last-child { border-bottom: 0; }
+      dt { color: var(--muted); }
+      dd { margin: 0; font-weight: 700; text-align: end; }
+      .amount dd { font-size: 1.3rem; }
+      .note { color: var(--muted); font-size: 0.85rem; margin: 18px 4px 0; text-align: center; }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <img src="assets/icon-192.png" alt="" />
+        <div><small id="eyebrow">Building Account Tracker</small><strong id="title">Receipt check</strong></div>
+      </div>
+    </header>
+    <main>
+      <div class="wrap">
+        <section class="card">
+          <div id="status" class="status is-loading">
+            <span class="mark" id="mark">…</span>
+            <div><h1 id="headline">Checking…</h1><p id="sub"></p></div>
+          </div>
+          <dl id="details" class="hidden"></dl>
+        </section>
+        <p class="note" id="note"></p>
+      </div>
+    </main>
+    <script type="module">
+      const q = new URLSearchParams(location.search);
+      const lang = q.get("l") === "ar" || (!q.get("l") && /^ar/i.test(navigator.language || "")) ? "ar" : "en";
+      const T = {
+        en: {
+          title: "Receipt check", checking: "Checking…",
+          valid: "Genuine receipt", validSub: "This receipt is in the building's records.",
+          changed: "This receipt was changed", changedSub: "The payment in the records is now {amount}, not {printed} as on the receipt.",
+          cancelled: "This receipt was cancelled", cancelledSub: "The payment was removed from the records on {date}.",
+          not_found: "Not found", not_foundSub: "This receipt isn't in the building's records. Ask the building manager.",
+          error: "Couldn't check right now", errorSub: "Check your internet connection and try again.",
+          building: "Building", flat: "Flat", amount: "Amount", date: "Date", forWhat: "For", receipt: "Receipt",
+          rent: "Rent", project: "Project: {name}", note: "Checked {time}. Names and phone numbers are never shown here.",
+        },
+        ar: {
+          title: "التحقق من الإيصال", checking: "جارٍ التحقق…",
+          valid: "إيصال صحيح", validSub: "هذا الإيصال موجود في سجلات المبنى.",
+          changed: "تم تعديل هذا الإيصال", changedSub: "الدفعة في السجلات أصبحت {amount}، وليست {printed} كما في الإيصال.",
+          cancelled: "تم إلغاء هذا الإيصال", cancelledSub: "حُذفت الدفعة من السجلات في {date}.",
+          not_found: "غير موجود", not_foundSub: "هذا الإيصال غير موجود في سجلات المبنى. اسأل مدير المبنى.",
+          error: "تعذّر التحقق الآن", errorSub: "تحقّق من اتصال الإنترنت وحاول مجدداً.",
+          building: "المبنى", flat: "الشقة", amount: "المبلغ", date: "التاريخ", forWhat: "عن", receipt: "الإيصال",
+          rent: "الإيجار", project: "مشروع: {name}", note: "تم التحقق {time}. لا تظهر هنا الأسماء ولا أرقام الهواتف.",
+        },
+      }[lang];
+      const fill = (s, p = {}) => s.replace(/\{(\w+)\}/g, (_, k) => p[k] ?? "");
+      const $ = (id) => document.getElementById(id);
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      document.title = T.title;
+      $("title").textContent = T.title;
+      $("headline").textContent = T.checking;
+      const locale = lang === "ar" ? "ar-LB" : "en-GB";
+      const money = (n, c = "USD") => {
+        if (c === "LBP") return `${Math.round(Number(n || 0)).toLocaleString("en-US")} LBP`;
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n || 0));
+      };
+      const day = (d) => (d ? new Date(`${String(d).slice(0, 10)}T12:00:00`).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }) : "");
+      const month = (m) => new Date(`${String(m).slice(0, 7)}-15T12:00:00`).toLocaleDateString(locale, { month: "long", year: "numeric" });
+
+      function show(status, r = {}) {
+        $("status").className = `status is-${status}`;
+        $("mark").textContent = status === "valid" ? "✓" : status === "changed" ? "!" : "✕";
+        $("headline").textContent = T[status];
+        $("sub").textContent = fill(T[`${status}Sub`], { amount: money(r.amount, r.currency), printed: money(q.get("a"), r.currency), date: day(r.at) });
+        const rows = [];
+        if (r.building) rows.push([T.building, r.building]);
+        if (r.unit) rows.push([T.flat, r.unit]);
+        if (r.amount != null && status !== "not_found") rows.push([T.amount, money(r.amount, r.currency), "amount"]);
+        if (r.date) rows.push([T.date, day(r.date)]);
+        const what = r.kind === "rent" ? T.rent : r.project ? fill(T.project, { name: r.project }) : (r.months || []).map(month).join(" · ");
+        if (what) rows.push([T.forWhat, what]);
+        if (r.ref && r.kind !== "rent") rows.push([T.receipt, r.ref]);
+        const dl = $("details");
+        dl.replaceChildren(...rows.map(([k, v, cls]) => {
+          const row = document.createElement("div");
+          row.className = `row ${cls || ""}`.trim();
+          const dt = document.createElement("dt"); dt.textContent = k;
+          const dd = document.createElement("dd"); dd.textContent = v;
+          row.append(dt, dd);
+          return row;
+        }));
+        dl.classList.toggle("hidden", !rows.length);
+        $("note").textContent = status === "error" ? "" : fill(T.note, { time: new Date().toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) });
+      }
+
+      try {
+        if (!q.get("r") || !q.get("c")) throw Object.assign(new Error("missing"), { notFound: true });
+        const { CLOUD_CONFIG } = await import("./src/cloud-config.js");
+        const key = CLOUD_CONFIG.supabaseAnonKey;
+        const res = await fetch(`${CLOUD_CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/verify_receipt`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
+          body: JSON.stringify({ p_building: q.get("b") || "building", p_ref: q.get("r"), p_code: q.get("c"), p_amount: q.get("a") ? Number(q.get("a")) : null, p_kind: q.get("k") === "rent" ? "rent" : "building" }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const r = await res.json();
+        show(["valid", "changed", "cancelled"].includes(r.status) ? r.status : "not_found", r);
+      } catch (error) {
+        show(error.notFound ? "not_found" : "error");
+      }
+    </script>
+  </body>
+</html>
