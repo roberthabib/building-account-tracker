@@ -25,7 +25,7 @@
         </div>
         <div class="login-tabs">
           <button class="login-tab active" id="loginOwnerTab" type="button" data-i18n="login.owner">Manager</button>
-          <button class="login-tab" id="loginTenantTab" type="button" data-i18n="login.tenant">Tenant</button>
+          <button class="login-tab" id="loginTenantTab" type="button" data-i18n="login.tenant">Resident</button>
         </div>
         <div id="loginOwnerForm">
           <p class="login-account hidden" id="loginOwnerAccount"></p>
@@ -51,7 +51,7 @@
         <button class="login-link-btn hidden" id="loginDeviceFallbackBtn" type="button" data-i18n="login.deviceFallback">Can't sign in? Use this device's password</button>
         <button class="login-link-btn hidden" id="loginBackToAccountBtn" type="button" data-i18n="login.backToAccount">Back to Google sign-in</button>
         <button class="login-link-btn hidden" id="loginUnlinkBtn" type="button" data-i18n="login.unlink">Unlink this phone</button>
-        <button class="login-link-btn" id="connectBuildingButton" type="button" data-i18n="login.connect">I'm a tenant with an invite code</button>
+        <button class="login-link-btn" id="connectBuildingButton" type="button" data-i18n="login.connect">I have an invite code</button>
       </div>
     </div>
 
@@ -140,7 +140,7 @@
 
           <section class="panel building-wide">
             <div class="panel-header">
-              <h3 data-i18n="tenantBalances.title">Tenant Balances</h3>
+              <h3 data-i18n="tenantBalances.title">Owner Balances</h3>
               <span id="collectionRate"></span>
             </div>
             <div class="progress-track" aria-hidden="true">
@@ -251,7 +251,7 @@
           <div class="section-title">
             <div>
               <p class="eyebrow" data-i18n="ten.eyebrow">Residents</p>
-              <h2 id="tenantsTitle" data-i18n="ten.title">Tenant Accounts</h2>
+              <h2 id="tenantsTitle" data-i18n="ten.title">Flats &amp; Owners</h2>
             </div>
             <div class="section-actions">
               <button class="secondary-button owner-only" id="inviteAllButton" type="button" data-i18n="ten.inviteAll">Invite all</button>
@@ -259,7 +259,7 @@
             </div>
           </div>
           <div class="search-field" data-nav-icon="search">
-            <input id="tenantSearch" type="search" placeholder="Search tenants" data-i18n-ph="ten.searchPh" />
+            <input id="tenantSearch" type="search" placeholder="Search flats or owners" data-i18n-ph="ten.searchPh" />
           </div>
           <div class="tenant-list" id="tenantList"></div>
         </section>
@@ -591,7 +591,7 @@
               <input id="ownerPasswordInput" type="password" placeholder="Leave blank for no password" autocomplete="new-password" />
             </label>
             <button class="mini-button hidden" id="removeOwnerPasswordButton" type="button" data-i18n="set.removePassword">Remove current password</button>
-            <p class="settings-note" style="margin:0 0 4px" data-i18n="set.passwordNote">Tenants use a PIN set per-tenant (in the Tenants tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.</p>
+            <p class="settings-note" style="margin:0 0 4px" data-i18n="set.passwordNote">Owners use a PIN set per flat (in the Flats tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.</p>
 
             <p class="settings-section-header" data-i18n="set.buildingDetails">Building Details</p>
             <label>
@@ -636,7 +636,7 @@
               <button class="secondary-button" id="ownerSignOutButton" type="button" data-i18n="set.signOut">Sign out</button>
             </div>
             <div class="settings-action" id="shareAccessAction">
-              <div class="settings-action-text"><strong data-i18n="set.shareAccessTitle">Invite a tenant</strong><span data-i18n="set.shareAccessDesc">Create a one-time code that links a tenant's phone to their own account. They only ever see their own figures.</span></div>
+              <div class="settings-action-text"><strong data-i18n="set.shareAccessTitle">Invite a resident</strong><span data-i18n="set.shareAccessDesc">Create a one-time code that links a resident's phone to their own flat. They only ever see their own figures.</span></div>
               <button class="secondary-button" id="shareSyncCodeButton" type="button" data-i18n="common.invite">Invite</button>
             </div>
 
@@ -655,7 +655,7 @@
               <button class="secondary-button" id="cloudBackupsButton" type="button" data-i18n="common.choose">Choose…</button>
             </div>
             <div class="settings-action owner-only">
-              <div class="settings-action-text"><strong data-i18n="set.fullExportTitle">Export everything to Excel</strong><span data-i18n="set.fullExportDesc">One workbook with every tenant, transaction, month, reading, project and poll — formatted and ready to print or share.</span></div>
+              <div class="settings-action-text"><strong data-i18n="set.fullExportTitle">Export everything to Excel</strong><span data-i18n="set.fullExportDesc">One workbook with every flat, transaction, month, reading, project and poll — formatted and ready to print or share.</span></div>
               <button class="secondary-button" id="fullExportButton" type="button" data-i18n="common.export">Export</button>
             </div>
             <div class="settings-action">
@@ -677,17 +677,17 @@
 
             <p class="settings-section-header" data-i18n="set.reset">Reset</p>
             <div class="settings-action">
-              <div class="settings-action-text"><strong data-i18n="set.clearTxTitle">Clear transactions</strong><span data-i18n="set.clearTxDesc">Delete all payments and expenses but keep your tenants and settings — for example to start a new year.</span></div>
+              <div class="settings-action-text"><strong data-i18n="set.clearTxTitle">Clear transactions</strong><span data-i18n="set.clearTxDesc">Delete all payments and expenses but keep your flats and settings — for example to start a new year.</span></div>
               <button class="danger-button" id="zeroAccountsButton" type="button" data-i18n="common.clear">Clear</button>
             </div>
             <div class="settings-action">
-              <div class="settings-action-text"><strong data-i18n="set.eraseTitle">Erase everything</strong><span data-i18n="set.eraseDesc">Delete all tenants, payments, expenses and settings, then start setup from scratch. This cannot be undone.</span></div>
+              <div class="settings-action-text"><strong data-i18n="set.eraseTitle">Erase everything</strong><span data-i18n="set.eraseDesc">Delete all flats, payments, expenses and settings, then start setup from scratch. This cannot be undone.</span></div>
               <button class="danger-button" id="startFreshButton" type="button" data-i18n="common.erase">Erase</button>
             </div>
 
             <p class="settings-section-header" data-i18n="set.appSetup">App Setup</p>
             <div class="settings-action">
-              <div class="settings-action-text"><strong data-i18n="set.wizardTitle">Setup wizard</strong><span data-i18n="set.wizardDesc">Re-run the guided setup for building details and tenants.</span></div>
+              <div class="settings-action-text"><strong data-i18n="set.wizardTitle">Setup wizard</strong><span data-i18n="set.wizardDesc">Re-run the guided setup for building details and flats.</span></div>
               <button class="secondary-button" id="runWizardButton" type="button" data-i18n="common.open">Open</button>
             </div>
 
@@ -701,7 +701,7 @@
       <nav class="bottom-nav" aria-label="Primary">
         <button class="nav-button active" type="button" data-view="dashboardView" data-nav-icon="home"><span class="nav-label" data-i18n="nav.dashboard">Dashboard</span></button>
         <button class="nav-button" type="button" data-view="paymentsView" data-nav-icon="wallet"><span class="nav-label" data-i18n="nav.payments">Payments</span></button>
-        <button class="nav-button" type="button" data-view="tenantsView" data-nav-icon="users"><span class="nav-label" data-i18n="nav.tenants">Tenants</span></button>
+        <button class="nav-button" type="button" data-view="tenantsView" data-nav-icon="users"><span class="nav-label" data-i18n="nav.tenants">Flats</span></button>
         <button class="nav-button" type="button" data-view="ledgerView" data-nav-icon="receipt"><span class="nav-label" data-i18n="nav.ledger">Ledger</span></button>
         <button class="nav-button" id="moreNavButton" type="button" data-view="moreView" data-nav-icon="grid"><span class="nav-label" data-i18n="nav.more">More</span></button>
       </nav>
@@ -717,7 +717,7 @@
       <div class="entry-chooser-list">
         <button class="entry-chooser-btn" type="button" data-category="Payments" data-entry-icon="wallet">
           <span class="ec-icon" aria-hidden="true"></span>
-          <span class="ec-text"><strong data-i18n="entry.paymentTitle">Record a payment</strong><small data-i18n="entry.paymentDesc">A tenant paid their dues</small></span>
+          <span class="ec-text"><strong data-i18n="entry.paymentTitle">Record a payment</strong><small data-i18n="entry.paymentDesc">Dues paid for a flat</small></span>
         </button>
         <button class="entry-chooser-btn" type="button" data-category="Expenses" data-entry-icon="receipt">
           <span class="ec-icon" aria-hidden="true"></span>
@@ -729,7 +729,7 @@
         </button>
         <button class="entry-chooser-btn" type="button" data-category="Opening Balance" data-entry-icon="home">
           <span class="ec-icon" aria-hidden="true"></span>
-          <span class="ec-text"><strong data-i18n="entry.openingTitle">Opening balance</strong><small data-i18n="entry.openingDesc">Starting cash or a tenant carry-in</small></span>
+          <span class="ec-text"><strong data-i18n="entry.openingTitle">Opening balance</strong><small data-i18n="entry.openingDesc">Starting cash or a flat's carry-in</small></span>
         </button>
       </div>
     </dialog>
@@ -792,7 +792,7 @@
         </label>
 
         <label class="tenant-field">
-          <span data-i18n="tx.tenant">Tenant</span>
+          <span data-i18n="tx.tenant">Resident</span>
           <select id="transactionTenant"></select>
         </label>
 
@@ -941,7 +941,7 @@
     <dialog id="tenantDialog">
       <form id="tenantForm" method="dialog">
         <div class="dialog-header">
-          <h2 id="tenantDialogTitle" data-i18n="tenant.addTitle">Add Tenant</h2>
+          <h2 id="tenantDialogTitle" data-i18n="tenant.addTitle">Add Flat</h2>
           <button class="icon-button small" id="closeTenantDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
         </div>
         <label>
@@ -966,8 +966,8 @@
           <input id="tenantBreakerInput" type="number" min="0" step="1" placeholder="e.g. 20" data-i18n-ph="tenant.breakerPh" />
         </label>
         <label>
-          <span data-i18n="tenant.pin">Tenant PIN (for app access)</span>
-          <input id="tenantPinDialogInput" type="password" placeholder="Leave blank to disable tenant login" data-i18n-ph="tenant.pinPh" maxlength="20" autocomplete="new-password" />
+          <span data-i18n="tenant.pin">Owner PIN (for app access)</span>
+          <input id="tenantPinDialogInput" type="password" placeholder="Leave blank to disable owner login" data-i18n-ph="tenant.pinPh" maxlength="20" autocomplete="new-password" />
         </label>
         <button class="mini-button hidden" id="removeTenantPinButton" type="button" data-i18n="tenant.removePin">Remove current PIN</button>
         <div class="button-row">
@@ -990,11 +990,11 @@
 
     <dialog id="inviteDialog">
       <div class="dialog-header">
-        <h2 data-i18n="invite.title">Invite a tenant</h2>
+        <h2 data-i18n="invite.title">Invite a resident</h2>
         <button class="icon-button small" id="closeInviteDialog" type="button" aria-label="Close" data-i18n-aria="common.close">x</button>
       </div>
-      <p class="settings-note" data-i18n="invite.note">Each code links one phone to one tenant, once, within 30 days. That phone then shows only that tenant's figures and the building expenses.</p>
-      <label><span data-i18n="invite.tenant">Tenant</span><select id="inviteTenantSelect"></select></label>
+      <p class="settings-note" data-i18n="invite.note">Each code links one phone to one flat, once, within 30 days. That phone then shows only that flat's figures and the building expenses.</p>
+      <label><span data-i18n="invite.tenant">Resident</span><select id="inviteTenantSelect"></select></label>
       <div class="invite-result hidden" id="inviteResult">
         <p class="invite-code" id="inviteCodeText"></p>
         <p class="settings-note" id="inviteHowTo"></p>
@@ -1140,7 +1140,7 @@
         <label class="wizard-field">
           <span data-i18n="wiz.collectionMode">Collection Mode</span>
           <select id="wizardCollectionMode" class="wizard-input">
-            <option value="actual" data-i18n="wiz.collectionActual">Split actual monthly expenses among tenants</option>
+            <option value="actual" data-i18n="wiz.collectionActual">Split actual monthly expenses among the flats</option>
             <option value="fixed" data-i18n="set.collectionFixed">Fixed monthly amount + reserve fund</option>
           </select>
         </label>
@@ -1161,8 +1161,8 @@
 
       <div class="wizard-step hidden" id="wizardStep3">
         <div class="wizard-hero">&#128101;</div>
-        <h2 class="wizard-title" data-i18n="wiz.tenantsTitle">Add Tenants</h2>
-        <p class="wizard-subtitle" data-i18n="wiz.tenantsSub">Add your building's tenants. You can add or edit more at any time in the Tenants tab.</p>
+        <h2 class="wizard-title" data-i18n="wiz.tenantsTitle">Add the Flats</h2>
+        <p class="wizard-subtitle" data-i18n="wiz.tenantsSub">Add your building's flats and their owners. You can add or edit more at any time in the Flats tab.</p>
         <div id="wizardTenantList" class="wizard-tenant-list"></div>
         <div class="wizard-tenant-form">
           <div class="wizard-two-col">
@@ -1190,7 +1190,7 @@
             <input id="wizardTenantCoeff" class="wizard-input" type="number" min="0" max="1000" step="1" placeholder="e.g. 125" />
           </label>
           <div class="wizard-add-row">
-            <button id="wizardAddTenantBtn" class="secondary-button" type="button" data-i18n="wiz.addTenant">+ Add Tenant</button>
+            <button id="wizardAddTenantBtn" class="secondary-button" type="button" data-i18n="wiz.addTenant">+ Add Flat</button>
             <button id="wizardCancelEditBtn" class="text-link-btn hidden" type="button" data-i18n="wiz.cancelEdit">Cancel Edit</button>
           </div>
           <p id="wizardCoeffStatus" class="wizard-coeff-status"></p>
@@ -1250,7 +1250,7 @@
           <input id="generatorBillMonth" type="month" required />
         </label>
         <p class="settings-note" id="generatorPoolsSummary"></p>
-        <p class="settings-note" data-i18n="gen.note">Costs come from the Services Expenses you logged for this month. Fuel is split by each tenant's metered kWh (current − previous); maintenance is split pro-rata by breaker size.</p>
+        <p class="settings-note" data-i18n="gen.note">Costs come from the Services Expenses you logged for this month. Fuel is split by each flat's metered kWh (current − previous); maintenance is split pro-rata by breaker size.</p>
         <div class="field-label" data-i18n="gen.readings">Meter readings (kWh)</div>
         <div id="generatorReadingRows" class="generator-reading-rows"></div>
         <div class="shared-expense-preview hidden" id="generatorBillPreview"></div>

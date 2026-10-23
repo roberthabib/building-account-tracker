@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v176";
+const APP_VERSION = "v177";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -450,7 +450,7 @@ const I18N = {
     "declare.proofNote": "A photo of the bank transfer, OMT or Whish receipt helps the building manager confirm it quickly.",
     "declare.submit": "Notify the building manager",
     "set.fullExportTitle": "Export everything to Excel",
-    "set.fullExportDesc": "One workbook with every tenant, transaction, month, reading, project and poll — formatted and ready to print or share.",
+    "set.fullExportDesc": "One workbook with every flat, transaction, month, reading, project and poll — formatted and ready to print or share.",
     "common.restore": "Restore",
     "common.reload": "Reload",
     "common.clear": "Clear",
@@ -461,13 +461,13 @@ const I18N = {
     "common.dismiss": "Dismiss",
     // Login
     "login.owner": "Manager",
-    "login.tenant": "Tenant",
+    "login.tenant": "Resident",
     "login.appName": "Building Account",
     "login.passwordPh": "Password",
     "login.pinPh": "PIN",
     "login.error": "Incorrect password or PIN",
     "login.enter": "Enter",
-    "login.connect": "I'm a tenant with an invite code",
+    "login.connect": "I have an invite code",
     "login.emailPh": "Email",
     "login.switchAccount": "Use a different account",
     "login.deviceFallback": "Can't sign in? Use this device's password",
@@ -476,7 +476,7 @@ const I18N = {
     "login.emailMode": "Use email and password instead",
     // Connect dialog
     "connect.title": "Link your phone",
-    "connect.note": "Enter the invite code the building manager sent you. It links this phone to your own account: you'll see your balance, payments and the building expenses — never other tenants.",
+    "connect.note": "Enter the invite code the building manager sent you. It links this phone to your own account: you'll see your balance, payments and the building expenses — never other residents.",
     "connect.placeholder": "Invite code, e.g. 7KQ2M9XB",
     "connect.submit": "Link this phone",
     "login.unlink": "Unlink this phone",
@@ -484,9 +484,9 @@ const I18N = {
     "common.choose": "Choose…",
     "set.cloudBackupsTitle": "Restore a daily cloud backup",
     "set.cloudBackupsDesc": "The cloud keeps a copy of your data every night for 60 days. Pick a day to go back to.",
-    "invite.title": "Invite a tenant",
-    "invite.note": "Each code links one phone to one tenant, once, within 30 days. That phone then shows only that tenant's figures and the building expenses.",
-    "invite.tenant": "Tenant",
+    "invite.title": "Invite a resident",
+    "invite.note": "Each code links one phone to one flat, once, within 30 days. That phone then shows only that flat's figures and the building expenses.",
+    "invite.tenant": "Flat",
     "invite.create": "Create invite code",
     "backups.title": "Daily cloud backups",
     "backups.note": "Restoring replaces the data on every device with that day's copy. A safety copy of today's data is downloaded first.",
@@ -509,7 +509,7 @@ const I18N = {
     // Nav
     "nav.dashboard": "Dashboard",
     "nav.payments": "Payments",
-    "nav.tenants": "Tenants",
+    "nav.tenants": "Flats",
     "nav.ledger": "Ledger",
     "nav.more": "More",
     "nav.projects": "Projects",
@@ -525,7 +525,7 @@ const I18N = {
     "financial.title": "Building Financial Position",
     "newMonth.add": "Add Month",
     "declarations.title": "Payment Notifications",
-    "tenantBalances.title": "Tenant Balances",
+    "tenantBalances.title": "Owner Balances",
     "monthlyServices.title": "Monthly Services Expenses",
     "monthlyActivity.title": "Monthly Activity",
     "expensesByCategory.title": "Expenses by Category",
@@ -543,8 +543,8 @@ const I18N = {
     "pay.monthHistoryHint": "Tap a month to see who paid.",
     // Tenants view
     "ten.eyebrow": "Residents",
-    "ten.title": "Tenant Accounts",
-    "ten.searchPh": "Search tenants",
+    "ten.title": "Flats & Owners",
+    "ten.searchPh": "Search flats or owners",
     "ten.add": "+ Add",
     // Ledger view
     "led.eyebrow": "Transactions",
@@ -579,7 +579,7 @@ const I18N = {
     "set.ownerPasswordPh": "Leave blank for no password",
     "set.ownerPasswordSetPh": "Password set — type to change",
     "set.removePassword": "Remove current password",
-    "set.passwordNote": "Tenants use a PIN set per-tenant (in the Tenants tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.",
+    "set.passwordNote": "Owners use a PIN set per flat (in the Flats tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.",
     "set.buildingDetails": "Building Details",
     "set.buildingName": "Building name",
     "set.language": "Language",
@@ -603,8 +603,8 @@ const I18N = {
     "set.driveFolderId": "Google Drive invoice folder ID",
     "set.syncSecret": "Sync secret (optional)",
     "set.syncSecretPh": "Match the SYNC_SECRET set in Apps Script",
-    "set.shareAccessTitle": "Invite a tenant",
-    "set.shareAccessDesc": "Create a one-time code that links a tenant's phone to their own account. They only ever see their own figures.",
+    "set.shareAccessTitle": "Invite a resident",
+    "set.shareAccessDesc": "Create a one-time code that links a resident's phone to their own flat. They only ever see their own figures.",
     "set.backup": "Backup & Restore",
     "set.downloadBackupTitle": "Download backup",
     "set.backupPhotosTitle": "Download backup with photos",
@@ -616,12 +616,12 @@ const I18N = {
     "set.reloadSheetDesc": "Pull the latest copy from the cloud and replace this device's data. Use when setting up a new phone.",
     "set.reset": "Reset",
     "set.clearTxTitle": "Clear transactions",
-    "set.clearTxDesc": "Delete all payments and expenses but keep your tenants and settings — for example to start a new year.",
+    "set.clearTxDesc": "Delete all payments and expenses but keep your flats and settings — for example to start a new year.",
     "set.eraseTitle": "Erase everything",
-    "set.eraseDesc": "Delete all tenants, payments, expenses and settings, then start setup from scratch. This cannot be undone.",
+    "set.eraseDesc": "Delete all flats, payments, expenses and settings, then start setup from scratch. This cannot be undone.",
     "set.appSetup": "App Setup",
     "set.wizardTitle": "Setup wizard",
-    "set.wizardDesc": "Re-run the guided setup for building details and tenants.",
+    "set.wizardDesc": "Re-run the guided setup for building details and flats.",
     "set.cloudNote": "Cloud sync is automatic after the script URL and Google Sheet ID are saved.",
     // More menu
     "more.title": "More",
@@ -633,13 +633,13 @@ const I18N = {
     // Entry chooser
     "entry.title": "Add Entry",
     "entry.paymentTitle": "Record a payment",
-    "entry.paymentDesc": "A tenant paid their dues",
+    "entry.paymentDesc": "Dues paid for a flat",
     "entry.expenseTitle": "Record an expense",
     "entry.expenseDesc": "A shared building cost",
     "entry.servicesTitle": "Generator / Water cost",
     "entry.servicesDesc": "Diesel, maintenance or a water tanker",
     "entry.openingTitle": "Opening balance",
-    "entry.openingDesc": "Starting cash or a tenant carry-in",
+    "entry.openingDesc": "Starting cash or a flat's carry-in",
     // Transaction dialog
     "tx.addTitle": "Add Transaction",
     "tx.type": "Type",
@@ -647,7 +647,7 @@ const I18N = {
     "tx.costType": "Cost type",
     "tx.split": "Split",
     "tx.direction": "Direction",
-    "tx.tenant": "Tenant",
+    "tx.tenant": "Flat",
     "tx.description": "Description",
     "tx.date": "Date",
     "tx.forMonth": "For month",
@@ -686,7 +686,7 @@ const I18N = {
     "opt.equalSplitProper": "Equal Split",
     "opt.byCoefficientProp": "By Coefficient (proportional)",
     // Tenant dialog
-    "tenant.addTitle": "Add Tenant",
+    "tenant.addTitle": "Add Flat",
     "tenant.name": "Name",
     "tenant.namePh": "e.g. John Smith",
     "tenant.unit": "Unit number",
@@ -696,8 +696,8 @@ const I18N = {
     "tenant.coefficientPh": "e.g. 125",
     "tenant.breaker": "Generator breaker size (Amps)",
     "tenant.breakerPh": "e.g. 20",
-    "tenant.pin": "Tenant PIN (for app access)",
-    "tenant.pinPh": "Leave blank to disable tenant login",
+    "tenant.pin": "Owner PIN (for app access)",
+    "tenant.pinPh": "Leave blank to disable owner login",
     "tenant.removePin": "Remove current PIN",
     // WhatsApp dialog
     "wa.title": "Send Payment Reminders",
@@ -723,11 +723,11 @@ const I18N = {
     "wiz.financialTitle": "Financial Settings",
     "wiz.financialSub": "Choose how the building collects money and set the LBP/USD exchange rate.",
     "wiz.collectionMode": "Collection Mode",
-    "wiz.collectionActual": "Split actual monthly expenses among tenants",
+    "wiz.collectionActual": "Split actual monthly expenses among the flats",
     "wiz.monthlyBudget": "Total Monthly Expected Building Budget (USD)",
     "wiz.lbpRate": "LBP per USD Rate",
-    "wiz.tenantsTitle": "Add Tenants",
-    "wiz.tenantsSub": "Add your building's tenants. You can add or edit more at any time in the Tenants tab.",
+    "wiz.tenantsTitle": "Add the Flats",
+    "wiz.tenantsSub": "Add your building's flats and their owners. You can add or edit more at any time in the Flats tab.",
     "wiz.name": "Name",
     "wiz.namePh": "Full name",
     "wiz.unit": "Unit",
@@ -736,7 +736,7 @@ const I18N = {
     "wiz.pin": "PIN (app access)",
     "wiz.pinPh": "4 digits",
     "wiz.coefficient": "Coefficient (X / 1000)",
-    "wiz.addTenant": "+ Add Tenant",
+    "wiz.addTenant": "+ Add Flat",
     "wiz.cancelEdit": "Cancel Edit",
     "wiz.finish": "✓ Finish Setup",
     // Project dialog
@@ -751,7 +751,7 @@ const I18N = {
     // Generator readings dialog
     "gen.title": "Generator Meter Readings",
     "gen.month": "Month",
-    "gen.note": "Costs come from the Services Expenses you logged for this month. Fuel is split by each tenant's metered kWh (current − previous); maintenance is split pro-rata by breaker size.",
+    "gen.note": "Costs come from the Services Expenses you logged for this month. Fuel is split by each flat's metered kWh (current − previous); maintenance is split pro-rata by breaker size.",
     "gen.readings": "Meter readings (kWh)",
     "gen.removeReadings": "Remove meter readings",
     "gen.save": "Save Readings",
@@ -843,7 +843,7 @@ const I18N = {
     "declare.proofNote": "صورة التحويل المصرفي أو إيصال OMT أو Whish تساعد المدير على التأكيد بسرعة.",
     "declare.submit": "إبلاغ المدير",
     "set.fullExportTitle": "تصدير كل البيانات إلى Excel",
-    "set.fullExportDesc": "ملف واحد يضم كل المستأجرين والقيود والأشهر والقراءات والمشاريع والاستطلاعات — منسّق وجاهز للطباعة أو المشاركة.",
+    "set.fullExportDesc": "ملف واحد يضم كل الشقق والقيود والأشهر والقراءات والمشاريع والاستطلاعات — منسّق وجاهز للطباعة أو المشاركة.",
     "common.restore": "استعادة",
     "common.reload": "إعادة تحميل",
     "common.clear": "مسح",
@@ -854,13 +854,13 @@ const I18N = {
     "common.dismiss": "إخفاء",
     // Login
     "login.owner": "المدير",
-    "login.tenant": "المستأجر",
+    "login.tenant": "ساكن",
     "login.appName": "حساب المبنى",
     "login.passwordPh": "كلمة السر",
     "login.pinPh": "الرمز",
     "login.error": "كلمة السر أو الرمز غير صحيح",
     "login.enter": "دخول",
-    "login.connect": "أنا مستأجر ولديّ رمز دعوة",
+    "login.connect": "لديّ رمز دعوة",
     "login.emailPh": "البريد الإلكتروني",
     "login.switchAccount": "استخدام حساب آخر",
     "login.deviceFallback": "تعذّر تسجيل الدخول؟ استخدم كلمة سر هذا الجهاز",
@@ -869,7 +869,7 @@ const I18N = {
     "login.emailMode": "استخدام البريد الإلكتروني وكلمة السر بدلاً من ذلك",
     // Connect dialog
     "connect.title": "ربط هاتفك",
-    "connect.note": "أدخل رمز الدعوة الذي أرسله لك مدير المبنى. يربط هذا الهاتف بحسابك فقط: سترى رصيدك ودفعاتك ومصاريف المبنى — ولن ترى المستأجرين الآخرين أبداً.",
+    "connect.note": "أدخل رمز الدعوة الذي أرسله لك مدير المبنى. يربط هذا الهاتف بحسابك فقط: سترى رصيدك ودفعاتك ومصاريف المبنى — ولن ترى بيانات السكان الآخرين أبداً.",
     "connect.placeholder": "رمز الدعوة، مثل 7KQ2M9XB",
     "connect.submit": "ربط هذا الهاتف",
     "login.unlink": "إلغاء ربط هذا الهاتف",
@@ -877,9 +877,9 @@ const I18N = {
     "common.choose": "اختر…",
     "set.cloudBackupsTitle": "استعادة نسخة احتياطية يومية من السحابة",
     "set.cloudBackupsDesc": "تحتفظ السحابة بنسخة من بياناتك كل ليلة لمدة 60 يوماً. اختر يوماً للعودة إليه.",
-    "invite.title": "دعوة مستأجر",
-    "invite.note": "كل رمز يربط هاتفاً واحداً بمستأجر واحد، مرة واحدة، خلال 30 يوماً. بعدها يعرض ذلك الهاتف أرقام ذلك المستأجر ومصاريف المبنى فقط.",
-    "invite.tenant": "المستأجر",
+    "invite.title": "دعوة ساكن",
+    "invite.note": "كل رمز يربط هاتفاً واحداً بشقة واحدة، مرة واحدة، خلال 30 يوماً. بعدها يعرض ذلك الهاتف أرقام تلك الشقة ومصاريف المبنى فقط.",
+    "invite.tenant": "الشقة",
     "invite.create": "إنشاء رمز دعوة",
     "backups.title": "النسخ الاحتياطية اليومية",
     "backups.note": "الاستعادة تستبدل البيانات على كل الأجهزة بنسخة ذلك اليوم. تُنزَّل أولاً نسخة أمان من بيانات اليوم.",
@@ -902,7 +902,7 @@ const I18N = {
     // Nav
     "nav.dashboard": "الرئيسية",
     "nav.payments": "الدفعات",
-    "nav.tenants": "المستأجرون",
+    "nav.tenants": "الشقق",
     "nav.ledger": "السجل",
     "nav.more": "المزيد",
     "nav.projects": "المشاريع",
@@ -918,7 +918,7 @@ const I18N = {
     "financial.title": "الوضع المالي للمبنى",
     "newMonth.add": "إضافة شهر",
     "declarations.title": "إشعارات الدفع",
-    "tenantBalances.title": "أرصدة المستأجرين",
+    "tenantBalances.title": "أرصدة المالكين",
     "monthlyServices.title": "مصاريف الخدمات الشهرية",
     "monthlyActivity.title": "الحركة الشهرية",
     "expensesByCategory.title": "المصاريف حسب الفئة",
@@ -936,8 +936,8 @@ const I18N = {
     "pay.monthHistoryHint": "اضغط على شهر لترى من دفع.",
     // Tenants view
     "ten.eyebrow": "السكان",
-    "ten.title": "حسابات المستأجرين",
-    "ten.searchPh": "بحث عن مستأجر",
+    "ten.title": "الشقق والمالكون",
+    "ten.searchPh": "بحث عن شقة أو مالك",
     "ten.add": "+ إضافة",
     // Ledger view
     "led.eyebrow": "العمليات",
@@ -972,7 +972,7 @@ const I18N = {
     "set.ownerPasswordPh": "اتركه فارغاً لعدم وجود كلمة سر",
     "set.ownerPasswordSetPh": "كلمة السر مضبوطة — اكتب لتغييرها",
     "set.removePassword": "إزالة كلمة السر الحالية",
-    "set.passwordNote": "يستخدم المستأجرون رمزاً يُحدّد لكل مستأجر (في تبويب المستأجرين). تُخزّن كلمات السر والرموز مُشفّرة. اترك الحقل فارغاً للإبقاء على كلمة السر الحالية.",
+    "set.passwordNote": "يستخدم المالكون رمزاً يُحدَّد لكل شقة (في تبويب الشقق). تُخزّن كلمات السر والرموز مُشفّرة. اترك الحقل فارغاً للإبقاء على كلمة السر الحالية.",
     "set.buildingDetails": "تفاصيل المبنى",
     "set.buildingName": "اسم المبنى",
     "set.language": "اللغة",
@@ -996,8 +996,8 @@ const I18N = {
     "set.driveFolderId": "معرّف مجلد الفواتير في Google Drive",
     "set.syncSecret": "كلمة سر المزامنة (اختياري)",
     "set.syncSecretPh": "يطابق SYNC_SECRET المحدّد في Apps Script",
-    "set.shareAccessTitle": "دعوة مستأجر",
-    "set.shareAccessDesc": "أنشئ رمزاً لمرة واحدة يربط هاتف المستأجر بحسابه فقط. لن يرى سوى أرقامه.",
+    "set.shareAccessTitle": "دعوة ساكن",
+    "set.shareAccessDesc": "أنشئ رمزاً لمرة واحدة يربط هاتف الساكن بشقته فقط. لن يرى سوى أرقامه.",
     "set.backup": "النسخ الاحتياطي والاستعادة",
     "set.downloadBackupTitle": "تنزيل نسخة احتياطية",
     "set.backupPhotosTitle": "تنزيل نسخة احتياطية مع الصور",
@@ -1009,12 +1009,12 @@ const I18N = {
     "set.reloadSheetDesc": "اسحب أحدث نسخة من السحابة واستبدل بيانات هذا الجهاز. استخدمه عند إعداد هاتف جديد.",
     "set.reset": "إعادة تعيين",
     "set.clearTxTitle": "مسح العمليات",
-    "set.clearTxDesc": "احذف كل الدفعات والمصاريف مع الإبقاء على المستأجرين والإعدادات — مثلاً لبدء سنة جديدة.",
+    "set.clearTxDesc": "احذف كل الدفعات والمصاريف مع الإبقاء على الشقق والإعدادات — مثلاً لبدء سنة جديدة.",
     "set.eraseTitle": "محو كل شيء",
-    "set.eraseDesc": "احذف كل المستأجرين والدفعات والمصاريف والإعدادات، ثم ابدأ الإعداد من جديد. لا يمكن التراجع.",
+    "set.eraseDesc": "احذف كل الشقق والدفعات والمصاريف والإعدادات، ثم ابدأ الإعداد من جديد. لا يمكن التراجع.",
     "set.appSetup": "إعداد التطبيق",
     "set.wizardTitle": "معالج الإعداد",
-    "set.wizardDesc": "أعد تشغيل الإعداد الموجّه لتفاصيل المبنى والمستأجرين.",
+    "set.wizardDesc": "أعد تشغيل الإعداد الموجّه لتفاصيل المبنى والشقق.",
     "set.cloudNote": "تتم المزامنة السحابية تلقائياً بعد حفظ رابط السكربت ومعرّف Google Sheet.",
     // More menu
     "more.title": "المزيد",
@@ -1026,13 +1026,13 @@ const I18N = {
     // Entry chooser
     "entry.title": "إضافة عملية",
     "entry.paymentTitle": "تسجيل دفعة",
-    "entry.paymentDesc": "دفع مستأجر مستحقاته",
+    "entry.paymentDesc": "دفع مستحقات شقة",
     "entry.expenseTitle": "تسجيل مصروف",
     "entry.expenseDesc": "كلفة مشتركة للمبنى",
     "entry.servicesTitle": "كلفة مولّد / مياه",
     "entry.servicesDesc": "مازوت، صيانة أو صهريج مياه",
     "entry.openingTitle": "رصيد افتتاحي",
-    "entry.openingDesc": "نقد ابتدائي أو رصيد منقول لمستأجر",
+    "entry.openingDesc": "نقد ابتدائي أو رصيد منقول لشقة",
     // Transaction dialog
     "tx.addTitle": "إضافة عملية",
     "tx.type": "النوع",
@@ -1040,7 +1040,7 @@ const I18N = {
     "tx.costType": "نوع الكلفة",
     "tx.split": "التقسيم",
     "tx.direction": "الاتجاه",
-    "tx.tenant": "المستأجر",
+    "tx.tenant": "الشقة",
     "tx.description": "الوصف",
     "tx.date": "التاريخ",
     "tx.forMonth": "عن شهر",
@@ -1079,7 +1079,7 @@ const I18N = {
     "opt.equalSplitProper": "تقسيم متساوٍ",
     "opt.byCoefficientProp": "حسب المعامل (تناسبي)",
     // Tenant dialog
-    "tenant.addTitle": "إضافة مستأجر",
+    "tenant.addTitle": "إضافة شقة",
     "tenant.name": "الاسم",
     "tenant.namePh": "مثال: جون سميث",
     "tenant.unit": "رقم الشقة",
@@ -1089,8 +1089,8 @@ const I18N = {
     "tenant.coefficientPh": "مثال: 125",
     "tenant.breaker": "حجم قاطع المولّد (أمبير)",
     "tenant.breakerPh": "مثال: 20",
-    "tenant.pin": "رمز المستأجر (للدخول للتطبيق)",
-    "tenant.pinPh": "اتركه فارغاً لتعطيل دخول المستأجر",
+    "tenant.pin": "رمز المالك (للدخول للتطبيق)",
+    "tenant.pinPh": "اتركه فارغاً لتعطيل دخول المالك",
     "tenant.removePin": "إزالة الرمز الحالي",
     // WhatsApp dialog
     "wa.title": "إرسال تذكيرات الدفع",
@@ -1116,11 +1116,11 @@ const I18N = {
     "wiz.financialTitle": "الإعدادات المالية",
     "wiz.financialSub": "اختر طريقة تحصيل الأموال وحدّد سعر صرف الليرة/الدولار.",
     "wiz.collectionMode": "طريقة التحصيل",
-    "wiz.collectionActual": "تقسيم المصاريف الشهرية الفعلية بين المستأجرين",
+    "wiz.collectionActual": "تقسيم المصاريف الشهرية الفعلية بين الشقق",
     "wiz.monthlyBudget": "إجمالي ميزانية المبنى الشهرية المتوقعة (دولار)",
     "wiz.lbpRate": "سعر الليرة مقابل الدولار",
-    "wiz.tenantsTitle": "إضافة المستأجرين",
-    "wiz.tenantsSub": "أضف مستأجري مبناك. يمكنك الإضافة أو التعديل في أي وقت من تبويب المستأجرين.",
+    "wiz.tenantsTitle": "إضافة الشقق",
+    "wiz.tenantsSub": "أضف شقق مبناك ومالكيها. يمكنك الإضافة أو التعديل في أي وقت من تبويب الشقق.",
     "wiz.name": "الاسم",
     "wiz.namePh": "الاسم الكامل",
     "wiz.unit": "الشقة",
@@ -1129,7 +1129,7 @@ const I18N = {
     "wiz.pin": "الرمز (للدخول)",
     "wiz.pinPh": "4 أرقام",
     "wiz.coefficient": "المعامل (X / 1000)",
-    "wiz.addTenant": "+ إضافة مستأجر",
+    "wiz.addTenant": "+ إضافة شقة",
     "wiz.cancelEdit": "إلغاء التعديل",
     "wiz.finish": "✓ إنهاء الإعداد",
     // Project dialog
@@ -1144,7 +1144,7 @@ const I18N = {
     // Generator readings dialog
     "gen.title": "قراءات عداد المولّد",
     "gen.month": "الشهر",
-    "gen.note": "تأتي الكلفة من مصاريف الخدمات التي سجّلتها لهذا الشهر. يُقسّم الوقود حسب كيلوواط كل مستأجر (الحالي − السابق)؛ وتُقسّم الصيانة تناسبياً حسب حجم القاطع.",
+    "gen.note": "تأتي الكلفة من مصاريف الخدمات التي سجّلتها لهذا الشهر. يُقسّم الوقود حسب كيلوواط كل شقة (الحالي − السابق)؛ وتُقسّم الصيانة تناسبياً حسب حجم القاطع.",
     "gen.readings": "قراءات العداد (ك.و.س)",
     "gen.removeReadings": "إزالة قراءات العداد",
     "gen.save": "حفظ القراءات",
@@ -1209,7 +1209,7 @@ const DYN_AR = {
   "Income recorded": "تم تسجيل الدخل",
   "Other income": "دخل آخر",
   "Antenna, parking or shop rent": "إيجار هوائي أو موقف أو محل",
-  "Money the building receives that isn't a tenant's dues: antenna rent, a parking space, a shop. It goes into the building's cash.": "مال يتلقاه المبنى ليس من مستحقات المستأجرين: إيجار هوائي، موقف، محل. يدخل في صندوق المبنى.",
+  "Money the building receives that isn't an owner's dues: antenna rent, a parking space, a shop. It goes into the building's cash.": "مال يتلقاه المبنى ليس من مستحقات المالكين: إيجار هوائي، موقف، محل. يدخل في صندوق المبنى.",
   "What for": "مقابل ماذا",
   "Currency": "العملة",
   "Paid into": "أُودع في",
@@ -1243,7 +1243,7 @@ const DYN_AR = {
   "Not the building's money — kept apart": "ليست مال المبنى — محفوظة على حدة",
   "Deposit held: {amount}. Return it from {name}'s page.": "تأمين محفوظ: {amount}. أعِده من صفحة {name}.",
   "…or paste the statement lines here": "…أو الصق أسطر الكشف هنا",
-  "— not a tenant payment —": "— ليست دفعة مستأجر —",
+  "— not a flat payment —": "— ليست دفعة شقة —",
   "Already recorded on {date}": "مسجّلة سابقاً في {date}",
   "No incoming payments found yet.": "لم تُوجد دفعات واردة بعد.",
   "Could not read that file: {msg}": "تعذّرت قراءة الملف: {msg}",
@@ -1270,13 +1270,13 @@ const DYN_AR = {
   "Approval for big expenses": "موافقة على المصاريف الكبيرة",
   "Saved — it counts once a second administrator approves it": "حُفظ — يُحتسب بعد موافقة مشرف ثانٍ",
   "Everyone's statement": "كشوفات الجميع",
-  "A statement picture for each tenant. Send each one on WhatsApp, or download them all at once.": "صورة كشف لكل مستأجر. أرسل كل واحدة على واتساب، أو نزّلها كلها دفعة واحدة.",
+  "A statement picture for each flat. Send each one on WhatsApp, or download them all at once.": "صورة كشف لكل شقة. أرسل كل واحدة على واتساب، أو نزّلها كلها دفعة واحدة.",
   "In credit {amount}": "رصيد دائن {amount}",
   "Download all (ZIP)": "تنزيل الكل (ZIP)",
   "Statements downloaded": "تم تنزيل الكشوفات",
   "e.g. P3, P4": "مثلاً: P3، P4",
   "Parking spaces": "مواقف السيارات",
-  "Which spots belong to each flat. Tenants see theirs on their phone.": "أي المواقف لكل شقة. يرى المستأجرون مواقفهم على هواتفهم.",
+  "Which spots belong to each flat. Residents see theirs on their phone.": "أي المواقف لكل شقة. يرى السكان مواقفهم على هواتفهم.",
   "Parking saved": "تم حفظ المواقف",
   "Your parking": "موقفك",
   "Parking {spots}": "الموقف {spots}",
@@ -1311,7 +1311,7 @@ const DYN_AR = {
   "Install": "ثبّت",
   "Notifications": "الإشعارات",
   "Know straight away": "اعرف فوراً",
-  "Get a notification on this phone when a tenant says they paid, reports a problem or posts on the board.": "تلقَّ إشعاراً على هذا الهاتف عندما يبلّغ مستأجر أنه دفع، أو يبلّغ عن مشكلة، أو ينشر على اللوحة.",
+  "Get a notification on this phone when a resident says they paid, reports a problem or posts on the board.": "تلقَّ إشعاراً على هذا الهاتف عندما يبلّغ ساكن أنه دفع، أو يبلّغ عن مشكلة، أو ينشر على اللوحة.",
   "Get a notification on this phone for receipts, notices, replies and votes — like a WhatsApp message.": "تلقَّ إشعاراً على هذا الهاتف للإيصالات والإعلانات والردود والتصويتات — مثل رسالة واتساب.",
   "Full screen, one tap away from your Home screen": "شاشة كاملة، بلمسة من شاشتك الرئيسية",
   "Say what the money is for": "قل مقابل ماذا هذا المال",
@@ -1348,10 +1348,10 @@ const DYN_AR = {
   "Last generator reading": "آخر قراءة للمولّد",
   "Last water reading": "آخر قراءة للمياه",
   "Settled on {date}": "سُوّيت في {date}",
-  "Remind late tenants automatically": "ذكّر المتأخرين تلقائياً",
+  "Remind late owners automatically": "ذكّر المتأخرين تلقائياً",
   "{n} days after the due day": "بعد {n} أيام من يوم الاستحقاق",
   "When": "متى",
-  "Once a month, each tenant who still owes for a month whose due day has passed gets a polite phone notification, in their language.": "مرة في الشهر، يتلقى كل مستأجر لا يزال مديناً عن شهر فات يوم استحقاقه إشعاراً لطيفاً على هاتفه، بلغته.",
+  "Once a month, each owner who still owes for a month whose due day has passed gets a polite phone notification, in their language.": "مرة في الشهر، يتلقى كل مالك لا يزال مديناً عن شهر فات يوم استحقاقه إشعاراً لطيفاً على هاتفه، بلغته.",
   "Set the due day in Settings first; reminders go out that many days after it.": "حدّد يوم الاستحقاق في الإعدادات أولاً؛ تُرسل التذكيرات بعده بهذا العدد من الأيام.",
   "{amps}A × {price}": "{amps} أمبير × {price}",
   "{kwh} kWh × {price}": "{kwh} ك.و.س × {price}",
@@ -1570,7 +1570,7 @@ const DYN_AR = {
   "Installed on": "تاريخ التركيب",
   "Installed {date}": "رُكّب في {date}",
   "Last service {date}: {note}": "آخر صيانة {date}: {note}",
-  "Leave empty to publish now. Tenants see it, and get the notification, at that time.": "اتركه فارغاً للنشر الآن. يراه المستأجرون ويصلهم الإشعار في ذلك الوقت.",
+  "Leave empty to publish now. Residents see it, and get the notification, at that time.": "اتركه فارغاً للنشر الآن. يراه السكان ويصلهم الإشعار في ذلك الوقت.",
   "Litres in the tank now": "الليترات في الخزان الآن",
   "Litres of water delivered (optional)": "ليترات المياه المسلّمة (اختياري)",
   "Locked. Use your fingerprint or face to open.": "مقفل. استخدم بصمتك أو وجهك للفتح.",
@@ -1611,7 +1611,7 @@ const DYN_AR = {
   "Share my contact": "شارك رقمي",
   "Share picture": "مشاركة الصورة",
   "Share your name, flat and phone with the neighbours who share theirs. Only they see it, and you can stop any time.": "شارك اسمك وشقتك ورقمك مع الجيران الذين يشاركون أرقامهم. هم فقط يرونه، ويمكنك التوقف متى شئت.",
-  "Shown to tenants and the concierge with a Call button.": "تظهر للمستأجرين والناطور مع زر اتصال.",
+  "Shown to residents and the concierge with a Call button.": "تظهر للسكان والناطور مع زر اتصال.",
   "Sign out on this phone and turn the lock off? You'll sign in again afterwards.": "تسجيل الخروج من هذا الهاتف وإيقاف القفل؟ ستسجّل الدخول مجدداً بعد ذلك.",
   "Stop sharing": "إيقاف المشاركة",
   "Tank size (litres, optional)": "سعة الخزان (لتر، اختياري)",
@@ -1664,10 +1664,10 @@ const DYN_AR = {
   "Offline": "غير متصل",
   "Sync error": "خطأ في المزامنة",
   "Local": "محلي",
-  "A phone number for every tenant": "رقم هاتف لكل مستأجر",
+  "A phone number for every owner": "رقم هاتف لكل مالك",
   "Add the first entry": "أضف أول قيد",
-  "Add the flats and tenants": "أضف الشقق والمستأجرين",
-  "After that day, unpaid tenants show as late. 0 or empty = no due day.": "بعد هذا اليوم يظهر غير الدافعين متأخرين. 0 أو فارغ = بلا يوم استحقاق.",
+  "Add the flats and owners": "أضف الشقق والمالكين",
+  "After that day, unpaid owners show as late. 0 or empty = no due day.": "بعد هذا اليوم يظهر غير الدافعين متأخرين. 0 أو فارغ = بلا يوم استحقاق.",
   "All receipts": "كل الإيصالات",
   "Breaker size for every flat (generator)": "حجم القاطع لكل شقة (المولّد)",
   "Building app": "تطبيق المبنى",
@@ -1678,11 +1678,11 @@ const DYN_AR = {
   "Dues are due by day": "تستحق الدفعات قبل اليوم",
   "Every expense this year has its invoice photo ✓": "لكل مصروف هذه السنة صورة فاتورة ✓",
   "Generator hours": "ساعات المولّد",
-  "Generator hours (shown to tenants)": "ساعات المولّد (تظهر للمستأجرين)",
+  "Generator hours (shown to residents)": "ساعات المولّد (تظهر للسكان)",
   "Getting started": "البداية",
-  "How tenants can pay (Settings)": "طريقة دفع المستأجرين (الإعدادات)",
+  "How residents can pay (Settings)": "طريقة دفع السكان (الإعدادات)",
   "In {amount}": "دخل {amount}",
-  "Invite tenants to the app": "ادعُ المستأجرين إلى التطبيق",
+  "Invite residents to the app": "ادعُ السكان إلى التطبيق",
   "Invoice photos missing": "صور فواتير ناقصة",
   "LBP rate": "سعر الليرة",
   "Late · {amount}": "متأخر · {amount}",
@@ -1706,21 +1706,21 @@ const DYN_AR = {
   "Record the first payment": "سجّل أول دفعة",
   "Reminder message — Arabic": "رسالة التذكير — بالعربية",
   "Reminder message — English": "رسالة التذكير — بالإنكليزية",
-  "Reminders and invites to this tenant use this language.": "تُرسل التذكيرات والدعوات لهذا المستأجر بهذه اللغة.",
+  "Reminders and invites to this owner use this language.": "تُرسل التذكيرات والدعوات لهذا المالك بهذه اللغة.",
   "Repeat": "تكرار",
   "Same as the app": "مثل التطبيق",
   "Scan to see your balance and the news": "امسح الرمز لترى رصيدك وأخبار المبنى",
   "Search": "بحث",
   "Sign in with Google as the building manager to keep meter photos": "سجّل الدخول عبر Google كمدير لحفظ صور العدادات",
   "Spending is ahead of income by {amount} a month on average. At this pace the cash runs out in about {n} months.": "المصاريف تفوق المداخيل بـ{amount} شهرياً في المتوسط. بهذا المعدل ينفد النقد خلال {n} أشهر تقريباً.",
-  "Tenant, supplier, receipt no., notice…": "مستأجر، مورّد، رقم إيصال، إعلان…",
+  "Owner, flat, supplier, receipt no., notice…": "مالك، شقة، مورّد، رقم إيصال، إعلان…",
   "Type at least two letters.": "اكتب حرفين على الأقل.",
   "Uploading…": "جارٍ الرفع…",
   "View": "عرض",
   "Vote closed: {title}": "انتهى التصويت: {title}",
   "YES {y} · NO {n}": "نعم {y} · لا {n}",
   "YES {y}% · NO {n}% of the shares": "نعم {y}% · لا {n}% من الحصص",
-  "You can use {name}, {amount}, {month}, {unit} and {building}. Each tenant gets the language set in their Details.": "يمكنك استخدام {name} و{amount} و{month} و{unit} و{building}. يتلقى كل مستأجر الرسالة باللغة المحددة في تفاصيله.",
+  "You can use {name}, {amount}, {month}, {unit} and {building}. Each owner gets the language set in their Details.": "يمكنك استخدام {name} و{amount} و{month} و{unit} و{building}. يتلقى كل مالك الرسالة باللغة المحددة في تفاصيله.",
   "You have {amount} outstanding. Please contact the building manager to settle your balance.": "عليك {amount} مستحقة. يرجى التواصل مع مدير المبنى لتسوية رصيدك.",
   "comes in more than goes out": "يدخل أكثر مما يخرج",
   "e.g. 10": "مثال: 10",
@@ -1742,12 +1742,12 @@ const DYN_AR = {
   "{n} min ago": "منذ {n} دقيقة",
   "{n} reading(s) are lower than last month. Save anyway?": "{n} قراءة أقل من الشهر الماضي. هل تريد الحفظ رغم ذلك؟",
   "{n} receipts downloaded": "تم تنزيل {n} إيصال",
-  "{n} tenant is late for {month}": "مستأجر واحد متأخر عن {month}",
-  "{n} tenants are late for {month}": "{n} مستأجرين متأخرون عن {month}",
+  "{n} owner is late for {month}": "مالك واحد متأخر عن {month}",
+  "{n} owners are late for {month}": "{n} مالكين متأخرون عن {month}",
   "{rate} LBP/USD": "{rate} ل.ل/دولار",
   "{rate} since {date}": "{rate} منذ {date}",
   "$ / litre": "$ / لتر",
-  "+ Owed by tenants": "+ المستحق على المستأجرين",
+  "+ Owed by owners": "+ المستحق على المالكين",
   "− Paid in advance": "− المدفوع مسبقاً",
   "1 January to {date}: {now} this year, {before} the same months last year ({pct}).": "من 1 كانون الثاني حتى {date}: {now} هذه السنة، و{before} للأشهر نفسها من السنة الماضية ({pct}).",
   "Accountant pack downloaded: {r} receipts, {i} invoices": "تم تنزيل ملف المحاسب: {r} إيصال، {i} فاتورة",
@@ -1774,7 +1774,7 @@ const DYN_AR = {
   "For the accountant": "للمحاسب",
   "Generated by Building Account Tracker": "صادر عن تطبيق حساب المبنى",
   "Generator use (kWh)": "استهلاك المولّد (ك.و.س)",
-  "How tenants can pay": "كيف يمكن للمستأجرين الدفع",
+  "How residents can pay": "كيف يمكن للسكان الدفع",
   "How to pay": "طريقة الدفع",
   "Large": "كبير",
   "Last months": "الأشهر الأخيرة",
@@ -1788,15 +1788,15 @@ const DYN_AR = {
   "Open Reports": "فتح التقارير",
   "Previous month": "الشهر السابق",
   "Recent payments": "الدفعات الأخيرة",
-  "Remove all {n} test entries? Your real entries stay. The monthly balance messages to tenants are switched back on.": "إزالة كل قيود الاختبار ({n})؟ تبقى قيودك الحقيقية. وتُعاد رسائل الرصيد الشهرية للمستأجرين.",
+  "Remove all {n} test entries? Your real entries stay. The monthly balance messages to owners are switched back on.": "إزالة كل قيود الاختبار ({n})؟ تبقى قيودك الحقيقية. وتُعاد رسائل الرصيد الشهرية للمالكين.",
   "Same as the phone": "مثل الهاتف",
-  "Shown to tenants on their phones with what they owe. Saved with the Save button below.": "تظهر للمستأجرين على هواتفهم مع ما عليهم. تُحفظ بزر الحفظ أدناه.",
+  "Shown to residents on their phones with what they owe. Saved with the Save button below.": "تظهر للسكان على هواتفهم مع ما عليهم. تُحفظ بزر الحفظ أدناه.",
   "Statement PDF": "كشف حساب PDF",
   "Statement picture": "كشف حساب كصورة",
   "Test data": "بيانات الاختبار",
   "Text size": "حجم الخط",
   "What the books say should be in each place today.": "ما يجب أن يكون في كل مكان اليوم حسب الدفاتر.",
-  "What the building would have if every tenant paid what they owe today.": "ما سيكون لدى المبنى لو دفع كل مستأجر ما عليه اليوم.",
+  "What the building would have if every owner paid what they owe today.": "ما سيكون لدى المبنى لو دفع كل مالك ما عليه اليوم.",
   "When you've paid, tap I've Paid on the Payments screen.": "عندما تدفع، اضغط «لقد دفعت» في شاشة الدفعات.",
   "Where the money is": "أين المال",
   "Who owes": "من عليه مستحقات",
@@ -1826,22 +1826,22 @@ const DYN_AR = {
   "One picture for the building's WhatsApp group": "صورة واحدة لمجموعة واتساب المبنى",
   "Generator readings and bills": "قراءات المولّد والفواتير",
   "Split fairly by what each flat used": "تقسيم عادل حسب استهلاك كل شقة",
-  "Invite your tenants": "دعوة المستأجرين",
-  "Each tenant gets the app on their phone": "كل مستأجر يحصل على التطبيق على هاتفه",
+  "Invite your residents": "دعوة السكان",
+  "Each resident gets the app on their phone": "كل ساكن يحصل على التطبيق على هاتفه",
   "Reports and closing the month": "التقارير وإقفال الشهر",
   "Monthly report, cash count, health check": "تقرير شهري، عدّ النقد، فحص البيانات",
   "Maintenance calendar": "روزنامة الصيانة",
   "Never miss an inspection or a cleaning": "لا تفوّت أي كشف أو تنظيف",
   "Notices, votes and problems": "الإعلانات والتصويت والمشاكل",
-  "Keep the residents in the loop": "أبقِ المستأجرين على اطلاع",
+  "Keep the residents in the loop": "أبقِ السكان على اطلاع",
   "Join with your invite code": "الانضمام برمز الدعوة",
-  "For tenants, the first time": "للمستأجرين، في المرة الأولى",
+  "For residents, the first time": "للسكان، في المرة الأولى",
   "Your balance and payments": "رصيدك ودفعاتك",
   "See what you owe and tell the building manager you paid": "اعرف ما عليك وأبلغ المدير أنك دفعت",
   "Votes, problems and notifications": "التصويت والمشاكل والإشعارات",
   "Take part in the building": "شارك في شؤون المبنى",
   "For you": "لك",
-  "What your tenants see": "ما يراه المستأجرون",
+  "What your residents see": "ما يراه السكان",
   "New here? Watch the 1-minute tour": "جديد هنا؟ شاهد جولة من دقيقة واحدة",
   "New to the app?": "جديد في التطبيق؟",
   "A 1-minute video shows how it works.": "فيديو من دقيقة واحدة يشرح طريقة الاستخدام.",
@@ -1955,7 +1955,7 @@ const DYN_AR = {
   "Minutes saved": "تم حفظ المحضر",
   "Document": "مستند",
   "Meeting": "اجتماع",
-  "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.": "مرحباً {name}! هذه دعوتك إلى تطبيق {building} حيث يمكنك رؤية رصيدك ودفعاتك.\n1. افتح {url}\n2. اضغط \"أنا مستأجر ولديّ رمز دعوة\"\n3. أدخل: {code}\nيعمل الرمز مرة واحدة خلال 30 يوماً.\n\nنصيحة: أضف التطبيق إلى شاشتك الرئيسية. على iPhone: اضغط مشاركة ثم \"إضافة إلى الشاشة الرئيسية\". على Android: اضغط ⋮ ثم \"تثبيت التطبيق\". ثم افتح المزيد > إشعارات الهاتف لتصلك أرصدتك والأخبار.",
+  "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I have an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.": "مرحباً {name}! هذه دعوتك إلى تطبيق {building} حيث يمكنك رؤية رصيدك ودفعاتك.\n1. افتح {url}\n2. اضغط \"لديّ رمز دعوة\"\n3. أدخل: {code}\nيعمل الرمز مرة واحدة خلال 30 يوماً.\n\nنصيحة: أضف التطبيق إلى شاشتك الرئيسية. على iPhone: اضغط مشاركة ثم \"إضافة إلى الشاشة الرئيسية\". على Android: اضغط ⋮ ثم \"تثبيت التطبيق\". ثم افتح المزيد > إشعارات الهاتف لتصلك أرصدتك والأخبار.",
   "Phone not linked yet": "الهاتف غير مربوط بعد",
   "Phone linked · notifications on": "الهاتف مربوط · الإشعارات مفعّلة",
   "Phone linked · notifications off": "الهاتف مربوط · الإشعارات متوقفة",
@@ -1965,8 +1965,8 @@ const DYN_AR = {
   "Send again": "إرسال مجدداً",
   "Send invite": "إرسال الدعوة",
   "Sent ✓": "أُرسلت ✓",
-  "Invite all tenants": "دعوة كل المستأجرين",
-  "Each tenant gets their own one-time code on WhatsApp, with the link and how to add the app to their home screen. Tap Send for each one.": "يتلقى كل مستأجر رمزه الخاص لمرة واحدة عبر واتساب، مع الرابط وطريقة إضافة التطبيق إلى شاشته الرئيسية. اضغط إرسال لكل واحد.",
+  "Invite everyone": "دعوة الجميع",
+  "Each owner gets their own one-time code on WhatsApp, with the link and how to add the app to their home screen. Tap Send for each one.": "يتلقى كل مالك رمزه الخاص لمرة واحدة عبر واتساب، مع الرابط وطريقة إضافة التطبيق إلى شاشته الرئيسية. اضغط إرسال لكل واحد.",
   "Cash": "نقداً",
   "Bank transfer": "تحويل مصرفي",
   "OMT": "OMT",
@@ -1978,7 +1978,7 @@ const DYN_AR = {
   "Cash box: counted {counted}, books {books}": "الصندوق: المعدود {counted}، الدفاتر {books}",
   "Bank & wallets: counted {counted}, books {books}": "المصرف والمحافظ: المعدود {counted}، الدفاتر {books}",
   "Nothing due": "لا شيء مستحق",
-  "Tick at least one tenant with an amount": "حدد مستأجراً واحداً على الأقل مع مبلغ",
+  "Tick at least one flat with an amount": "حدد شقة واحدة على الأقل مع مبلغ",
   "{n} payment recorded with its receipt": "سُجّلت {n} دفعة مع إيصالها",
   "{n} payments recorded with their receipts": "سُجّلت {n} دفعات مع إيصالاتها",
   "Who paid? — {month}": "من دفع؟ — {month}",
@@ -2065,8 +2065,8 @@ const DYN_AR = {
   "Backup with {n} photos downloaded": "تم تنزيل النسخة الاحتياطية مع {n} صور",
   "Coefficients add up to {sum}/1000 instead of 1000": "مجموع المعاملات {sum}/1000 بدلاً من 1000",
   "No coefficient for: {units}": "لا معامل للوحدات: {units}",
-  "{n} tenant has no phone number ({units})": "{n} مستأجر بلا رقم هاتف ({units})",
-  "{n} tenants have no phone number ({units})": "{n} مستأجرين بلا رقم هاتف ({units})",
+  "{n} owner has no phone number ({units})": "{n} مالك بلا رقم هاتف ({units})",
+  "{n} owners have no phone number ({units})": "{n} مالكين بلا رقم هاتف ({units})",
   "No breaker size for: {units}": "لا قيمة للقاطع للوحدات: {units}",
   "Generator costs without meter readings: {months}": "تكاليف مولد بلا قراءات عدّاد: {months}",
   "Possible duplicate payment: {name}, {amount} on {first} and {second}": "دفعة مكررة محتملة: {name}، {amount} بتاريخ {first} و{second}",
@@ -2098,8 +2098,8 @@ const DYN_AR = {
   "{building} — monthly report, {month}": "{building} — التقرير الشهري، {month}",
   "Monthly report shared": "تمت مشاركة التقرير الشهري",
   "Monthly report downloaded": "تم تنزيل التقرير الشهري",
-  "On the 1st of each month, send each tenant who owes money a phone notification with their balance": "في الأول من كل شهر، أرسل لكل مستأجر عليه مبلغ إشعاراً على هاتفه برصيده",
-  "Only tenants who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.": "يصل فقط إلى المستأجرين الذين ربطوا هواتفهم وفعّلوا الإشعارات. المبالغ هي الموجودة على جهازك عند آخر حفظ.",
+  "On the 1st of each month, send each owner who owes money a phone notification with their balance": "في الأول من كل شهر، أرسل لكل مالك عليه مبلغ إشعاراً على هاتفه برصيده",
+  "Only owners who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.": "يصل فقط إلى المالكين الذين ربطوا هواتفهم وفعّلوا الإشعارات. المبالغ هي الموجودة على جهازك عند آخر حفظ.",
   "Monthly balance notifications on": "إشعارات الرصيد الشهرية مفعّلة",
   "Monthly balance notifications off": "إشعارات الرصيد الشهرية متوقفة",
   "{name} already has a payment of {amount} on {date}. Record this one too?": "لدى {name} دفعة بقيمة {amount} بتاريخ {date}. هل تسجّل هذه أيضاً؟",
@@ -2117,7 +2117,7 @@ const DYN_AR = {
   "Total outstanding": "إجمالي المستحق",
   "Up to date": "المسدِّدون",
   "{n} of {total} units": "{n} من {total} وحدات",
-  "Tenant credit": "أرصدة دائنة للمستأجرين",
+  "Owner credit": "أرصدة دائنة للمالكين",
   "In credit": "رصيد دائن",
   "Paid up": "مسدَّد",
   "Balances include monthly charges, generator and water up to today.": "تشمل الأرصدة الرسوم الشهرية والمولد والمياه حتى اليوم.",
@@ -2209,10 +2209,10 @@ const DYN_AR = {
   "No notices from the building.": "لا إعلانات من إدارة المبنى.",
   "Water cut on Tuesday": "انقطاع المياه يوم الثلاثاء",
   "Details for the residents": "تفاصيل للسكان",
-  "Also send a phone notification to tenants": "إرسال إشعار إلى هواتف المستأجرين أيضاً",
+  "Also send a phone notification to residents": "إرسال إشعار إلى هواتف السكان أيضاً",
   "Give the notice a title": "أعطِ الإعلان عنواناً",
   "Notice posted": "تم نشر الإعلان",
-  "Tenants see it on their phones. Post it to the building's WhatsApp group too?": "يراه المستأجرون على هواتفهم. هل تنشره أيضاً في مجموعة واتساب المبنى؟",
+  "Residents see it on their phones. Post it to the building's WhatsApp group too?": "يراه السكان على هواتفهم. هل تنشره أيضاً في مجموعة واتساب المبنى؟",
   "Done": "تم",
   "New notice": "إعلان جديد",
   "Message": "الرسالة",
@@ -2246,29 +2246,19 @@ const DYN_AR = {
   "Photo": "صورة",
   "Update": "تحديث",
   "Close": "إغلاق",
-  "New occupant's name": "اسم الشاغل الجديد",
-  "The leaving tenant settles it": "يسدّده المستأجر المغادر",
-  "Transfer it to the new occupant": "ينتقل إلى الشاغل الجديد",
+  "The previous owner settles it": "يسدّده المالك السابق",
   "{name} is settled in full.": "حساب {name} مسدّد بالكامل.",
   "{name} owes {amount}.": "على {name} مبلغ {amount}.",
   "{name} has a credit of {amount}.": "لـ {name} رصيد دائن بقيمة {amount}.",
   "Choose the handover date": "اختر تاريخ التسليم",
-  "Enter the new occupant's name": "أدخل اسم الشاغل الجديد",
+  "Enter the new owner's name": "أدخل اسم المالك الجديد",
   "Balance transferred to {name}": "رصيد محوّل إلى {name}",
   "Balance taken over from {name}": "رصيد منقول من {name}",
-  "Handover recorded": "تم تسجيل التسليم",
-  "{old} has moved out and {new} is now the occupant of unit {unit}. From {month}, {new} pays the monthly charges.": "غادر {old} وأصبح {new} شاغل الوحدة {unit}. ابتداءً من {month} يدفع {new} الرسوم الشهرية.",
   "Final statement for {name}": "الكشف النهائي لـ {name}",
   "Invite {name}": "دعوة {name}",
-  "Move out — {name}": "مغادرة — {name}",
-  "Records a change of occupant for unit {unit}. The old account is kept (inactive) with its full history.": "يسجّل تغيير شاغل الوحدة {unit}. يُحتفظ بالحساب القديم (غير نشط) مع كامل سجلّه.",
-  "Handover date": "تاريخ التسليم",
-  "The leaving tenant pays up to the month before; the new occupant from this month.": "يدفع المستأجر المغادر حتى الشهر السابق، والشاغل الجديد ابتداءً من هذا الشهر.",
-  "New occupant": "الشاغل الجديد",
+  "The previous owner pays up to the month before; the new owner from this month.": "يدفع المالك السابق حتى الشهر السابق، والمالك الجديد ابتداءً من هذا الشهر.",
   "Phone (optional)": "الهاتف (اختياري)",
-  "Generator meter at handover (optional)": "عدّاد المولد عند التسليم (اختياري)",
   "The balance": "الرصيد",
-  "Record handover": "تسجيل التسليم",
   "Sign in with Google as the building manager to manage administrators": "سجّل الدخول عبر Google كمدير لإدارة المسؤولين",
   "View only — sees everything, changes nothing": "اطلاع فقط — يرى كل شيء ولا يغيّر شيئاً",
   "Full access — can change everything": "صلاحية كاملة — يمكنه تغيير كل شيء",
@@ -2289,7 +2279,7 @@ const DYN_AR = {
   "Access removed": "تمت إزالة الوصول",
   "The database update for administrators hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بالمسؤولين.",
   "This phone or browser can't receive notifications. On an iPhone, add the app to the Home Screen first.": "لا يمكن لهذا الهاتف أو المتصفح استقبال الإشعارات. على iPhone أضف التطبيق إلى الشاشة الرئيسية أولاً.",
-  "Sign in first (Google for the building manager, an invite code for tenants)": "سجّل الدخول أولاً (Google للمدير، رمز دعوة للمستأجرين)",
+  "Sign in first (Google for the building manager, an invite code for residents)": "سجّل الدخول أولاً (Google للمدير، رمز دعوة للسكان)",
   "Notifications are blocked for this site in the phone's settings": "الإشعارات محظورة لهذا الموقع في إعدادات الهاتف",
   "Notifications aren't set up on the server yet": "الإشعارات غير مفعّلة على الخادم بعد",
   "Notifications are on for this phone": "الإشعارات مفعّلة على هذا الهاتف",
@@ -2297,8 +2287,34 @@ const DYN_AR = {
   "Not available in this browser. On an iPhone, add the app to the Home Screen first.": "غير متاحة في هذا المتصفح. على iPhone أضف التطبيق إلى الشاشة الرئيسية أولاً.",
   "On for this phone.": "مفعّلة على هذا الهاتف.",
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
-  "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
+  "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Generator meter on the transfer date (optional)": "عداد المولّد بتاريخ النقل (اختياري)",
+  "Transfer recorded": "تم تسجيل نقل الملكية",
+  "Record the transfer": "تسجيل نقل الملكية",
+  "Transfer date": "تاريخ نقل الملكية",
+  "{new} is now the owner of flat {unit} instead of {old}. From {month}, {new} pays the monthly charges.": "أصبح {new} مالك الشقة {unit} بدلاً من {old}. ابتداءً من {month} يدفع {new} الرسوم الشهرية.",
+  "Records a change of owner for flat {unit}. The previous owner's account is kept (inactive) with its full history.": "يسجّل تغيير مالك الشقة {unit}. يبقى حساب المالك السابق (غير نشط) مع كامل سجلّه.",
+  "Transfer it to the new owner": "نقله إلى المالك الجديد",
+  "New owner's name": "اسم المالك الجديد",
+  "New owner": "المالك الجديد",
+  "Ownership transfer — {name}": "نقل ملكية — {name}",
+  "Transfer": "نقل الملكية",
+  "Building cash (no flat)": "صندوق المبنى (بلا شقة)",
+  "Copy this access code and send it to your residents:": "انسخ رمز الوصول هذا وأرسله للسكان:",
+  "Leave blank to disable owner login": "اتركه فارغاً لتعطيل دخول المالك",
+  "Erase everything? This permanently deletes all flats, payments, expenses and settings on this device and starts setup over. This cannot be undone.": "مسح كل شيء؟ سيحذف هذا نهائياً كل الشقق والدفعات والمصاريف والإعدادات على هذا الجهاز ويبدأ الإعداد من جديد. لا يمكن التراجع.",
+  "{names} skipped – no phone number saved in the Flats tab.": "تم تخطي {names} – لا رقم هاتف محفوظ في تبويب الشقق.",
+  "Delete {name}? Their {count} transaction(s) will be kept but unlinked from this flat.": "حذف {name}؟ ستبقى قيودها ({count}) لكن دون ربطها بهذه الشقة.",
+  "Clear all payments and expenses? Your flats are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone.": "مسح كل الدفعات والمصاريف؟ تبقى الشقق. استخدم هذا لبدء فترة جديدة (مثلاً سنة جديدة). لا يمكن التراجع.",
+  "No coefficients set — all flats pay the same monthly amount.": "لا معاملات محددة — كل الشقق تدفع المبلغ الشهري نفسه.",
+  "Coefficients: {sum}/1000 — all flats accounted for.": "المعاملات: {sum}/1000 — كل الشقق محتسبة.",
+  "Each month's recorded expenses are split among the flats (by coefficient when set). No fixed monthly amount.": "تُقسَّم المصاريف المسجّلة لكل شهر بين الشقق (حسب المعامل عند تحديده). لا مبلغ شهرياً ثابتاً.",
+  "Each flat pays a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund.": "تدفع كل شقة مبلغاً شهرياً ثابتاً (يُقسَّم حسب المعامل عند تحديده). وما يُجمع فوق المصاريف يكوّن صندوق الاحتياط.",
+  "Each month's actual expenses are split among the flats.": "تُقسَّم المصاريف الفعلية لكل شهر بين الشقق.",
+  "Each flat pays a fixed monthly amount; the surplus builds the reserve fund.": "تدفع كل شقة مبلغاً شهرياً ثابتاً؛ والفائض يكوّن صندوق الاحتياط.",
+  "Not yet billed — enter this month's meter readings to split the costs among the flats.": "لم تُوزَّع بعد — أدخل قراءات عدادات هذا الشهر لتوزيع الكلفة على الشقق.",
+  "Remove the meter readings for {month}? The flats' generator charges for that month will be undone until you re-enter readings.": "إزالة قراءات العداد لشهر {month}؟ ستُلغى رسوم المولّد لذلك الشهر على الشقق حتى تعيد إدخال القراءات.",
   "of {amount} · incl. {services} generator & water": "من {amount} · منها {services} للمولّد والمياه",
   "Notifications, display, building & access": "الإشعارات، العرض، المبنى والوصول",
   "Notifications, display, app lock": "الإشعارات، العرض، قفل التطبيق",
@@ -2418,7 +2434,7 @@ const DYN_AR = {
   "The database update for more than one building hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بإدارة أكثر من مبنى.",
   "Your buildings": "مبانيك",
   "Add a building": "إضافة مبنى",
-  "It starts empty, with its own tenants, notices, concierge and helpers. Nothing is shared with your other buildings.": "يبدأ فارغاً، بمستأجريه وإعلاناته وناطوره ومساعديه الخاصين. لا يُشارَك شيء مع مبانيك الأخرى.",
+  "It starts empty, with its own flats, notices, concierge and helpers. Nothing is shared with your other buildings.": "يبدأ فارغاً، بشققه وإعلاناته وناطوره ومساعديه الخاصين. لا يُشارَك شيء مع مبانيك الأخرى.",
   "Building name": "اسم المبنى",
   "New building": "مبنى جديد",
   "Switch building": "تبديل المبنى",
@@ -2453,7 +2469,7 @@ const DYN_AR = {
   "Money in": "المداخيل",
   "Money out": "المصاريف",
   "Cash on 31 December": "النقد في 31 كانون الأول",
-  "Still owed by tenants": "المستحق على المستأجرين",
+  "Still owed by owners": "المستحق على المالكين",
   "Month by month": "شهراً بشهر",
   "Net": "الصافي",
   "Where the money went": "أين صُرفت الأموال",
@@ -2496,7 +2512,6 @@ const DYN_AR = {
   "Close {month}? Its figures can't change until you reopen it.": "إقفال شهر {month}؟ لا يمكن تغيير أرقامه حتى تعيد فتحه.",
   "Payment received": "تم استلام الدفعة",
   "{amount} recorded — thank you.": "تم تسجيل {amount} — شكراً لك.",
-  "Move out": "مغادرة",
   "Moved out {date}": "غادر بتاريخ {date}",
   "view only": "اطلاع فقط",
   "You've been invited to help manage this building. Continue with Google to accept.": "تمت دعوتك للمساعدة في إدارة هذا المبنى. تابع عبر Google للقبول.",
@@ -2505,8 +2520,8 @@ const DYN_AR = {
   "That invite is not valid": "هذه الدعوة غير صالحة",
   "That invite has already been used": "تم استخدام هذه الدعوة مسبقاً",
   "That invite has expired": "انتهت صلاحية هذه الدعوة",
-  "The other tenants already use all 1000/1000. Lower someone else's coefficient first.": "المستأجرون الآخرون يستخدمون كامل الـ 1000/1000. خفّض معامل مستأجر آخر أولاً.",
-  "Only {room}/1000 is left for this tenant: the total can't go over 1000/1000.": "تبقّى {room}/1000 فقط لهذا المستأجر: لا يمكن أن يتجاوز المجموع 1000/1000.",
+  "The other flats already use all 1000/1000. Lower another flat's coefficient first.": "الشقق الأخرى تستخدم كامل الـ 1000/1000. خفّض معامل شقة أخرى أولاً.",
+  "Only {room}/1000 is left for this flat: the total can't go over 1000/1000.": "تبقّى {room}/1000 فقط لهذه الشقة: لا يمكن أن يتجاوز المجموع 1000/1000.",
   "Available: {room} of 1000": "المتاح: {room} من 1000",
   "{building} — balances as of {date}": "{building} — الأرصدة بتاريخ {date}",
   "paid up ✓ (credit {amount})": "مسدَّد ✓ (رصيد {amount})",
@@ -2514,7 +2529,7 @@ const DYN_AR = {
   "Total outstanding: {amount}": "إجمالي المستحق: {amount}",
   "Everyone is up to date for the {month} statement.": "الجميع مسدِّد لكشف شهر {month}.",
   "{names}: no number saved, so WhatsApp will ask who to send it to.": "{names}: لا يوجد رقم محفوظ، لذا سيسألك واتساب لمن ترسل.",
-  "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.": "مرحباً {name}! هذه دعوتك إلى تطبيق {building} حيث يمكنك رؤية رصيدك ودفعاتك.\n1. افتح {url}\n2. اضغط \"أنا مستأجر ولديّ رمز دعوة\"\n3. أدخل: {code}\nيعمل الرمز مرة واحدة خلال 30 يوماً.",
+  "Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I have an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.": "مرحباً {name}! هذه دعوتك إلى تطبيق {building} حيث يمكنك رؤية رصيدك ودفعاتك.\n1. افتح {url}\n2. اضغط \"لديّ رمز دعوة\"\n3. أدخل: {code}\nيعمل الرمز مرة واحدة خلال 30 يوماً.",
   "Send balance reminders for the {month} statement": "أرسل تذكيرات الرصيد لكشف شهر {month}",
   "{n} monthly expense to confirm for {month}": "{n} مصروف شهري بانتظار التأكيد لشهر {month}",
   "{n} monthly expenses to confirm for {month}": "{n} مصاريف شهرية بانتظار التأكيد لشهر {month}",
@@ -2536,7 +2551,7 @@ const DYN_AR = {
   "Proof photo must be one of your own uploads": "يجب أن تكون صورة الإثبات من تحميلاتك أنت",
   "Outstanding USD": "المتبقي $",
   "Payment Receipt": "إيصال دفع",
-  "Tenant Account Statement": "كشف حساب المستأجر",
+  "Flat Account Statement": "كشف حساب الشقة",
   "{name} | Unit {unit}": "{name} | الوحدة {unit}",
   "{name} | Unit {unit} - statement (continued)": "{name} | الوحدة {unit} - كشف الحساب (تابع)",
   "Receipt: {no}": "رقم الإيصال: {no}",
@@ -2561,17 +2576,17 @@ const DYN_AR = {
   "Monthly Fee Impact": "الأثر على الرسوم الشهرية",
   "Not attributed to monthly dues": "لا تُحتسب ضمن المستحقات الشهرية",
   "Project payments are separate from monthly building fees.": "دفعات المشاريع منفصلة عن رسوم المبنى الشهرية.",
-  "Payments are applied to the tenant's building dues for the month.": "تُطبَّق الدفعات على مستحقات المبنى الشهرية للمستأجر.",
+  "Payments are applied to the flat's building dues for the month.": "تُطبَّق الدفعات على مستحقات المبنى الشهرية للشقة.",
   "Monthly dues and project payments are separated. Project payments are not applied to monthly fees.": "المستحقات الشهرية ودفعات المشاريع منفصلة. لا تُطبَّق دفعات المشاريع على الرسوم الشهرية.",
   "Advance Balance": "رصيد مسبق الدفع",
   "Expense Share": "حصة المصاريف",
   "Total Monthly Dues": "إجمالي المستحقات الشهرية",
   "No share": "لا حصة",
   "Linked as {name} — Unit {unit}": "مرتبط باسم {name} — الوحدة {unit}",
-  "This phone is linked to a tenant": "هذا الهاتف مرتبط بمستأجر",
+  "This phone is linked to a flat": "هذا الهاتف مرتبط بشقة",
   "Enter the invite code first": "أدخل رمز الدعوة أولاً",
   "This app isn't connected to the cloud database": "هذا التطبيق غير متصل بقاعدة البيانات السحابية",
-  "This phone is signed in as the building manager. Link it to a tenant instead? The building manager will be signed out here.": "هذا الهاتف مسجّل الدخول كمدير المبنى. هل تريد ربطه بمستأجر بدلاً من ذلك؟ سيتم تسجيل خروج المدير من هذا الهاتف.",
+  "This phone is signed in as the building manager. Link it to a flat instead? The building manager will be signed out here.": "هذا الهاتف مسجّل الدخول كمدير المبنى. هل تريد ربطه بشقة بدلاً من ذلك؟ سيتم تسجيل خروج المدير من هذا الهاتف.",
   "Could not create this phone's account": "تعذّر إنشاء حساب لهذا الهاتف",
   "That code is not valid": "هذا الرمز غير صالح",
   "That code has already been used": "هذا الرمز مستخدم مسبقاً",
@@ -2579,14 +2594,14 @@ const DYN_AR = {
   "Phone linked. You'll only see your own account.": "تم ربط الهاتف. سترى حسابك فقط.",
   "Unlink this phone? Its copy of your account is removed. You'll need a new invite code from the building manager to link it again.": "إلغاء ربط هذا الهاتف؟ ستُحذف نسخة حسابك منه، وستحتاج إلى رمز دعوة جديد من المدير لربطه مجدداً.",
   "Sign in with Google first: only the signed-in building manager can create invite codes": "سجّل الدخول عبر Google أولاً: فقط المدير المسجّل يمكنه إنشاء رموز الدعوة",
-  "Send this to {name}. On their phone: open {url}, tap \"I'm a tenant with an invite code\" and enter the code. It works once, within 30 days.": "أرسل هذا إلى {name}. على هاتفه: افتح {url}، واضغط \"أنا مستأجر ولديّ رمز دعوة\" وأدخل الرمز. يعمل مرة واحدة خلال 30 يوماً.",
+  "Send this to {name}. On their phone: open {url}, tap \"I have an invite code\" and enter the code. It works once, within 30 days.": "أرسل هذا إلى {name}. على هاتفه: افتح {url}، واضغط \"لديّ رمز دعوة\" وأدخل الرمز. يعمل مرة واحدة خلال 30 يوماً.",
   "Your invite code for {building}": "رمز الدعوة الخاص بك لـ {building}",
   "Invite copied — paste it in WhatsApp or a message": "تم نسخ الدعوة — الصقها في واتساب أو رسالة",
   "Copy this invite:": "انسخ هذه الدعوة:",
   "Sign in with Google first: only the signed-in building manager can restore backups": "سجّل الدخول عبر Google أولاً: فقط المدير المسجّل يمكنه استعادة النسخ الاحتياطية",
   "Loading…": "جارٍ التحميل…",
   "No backups yet. The first one is taken tonight.": "لا توجد نسخ احتياطية بعد. تُؤخذ الأولى الليلة.",
-  "{tenants} tenants · {transactions} transactions": "{tenants} مستأجرين · {transactions} قيود",
+  "{tenants} flats · {transactions} transactions": "{tenants} شقق · {transactions} قيود",
   "Restore the backup from {day}? It replaces the data on every device. Today's data is downloaded first as a safety copy.": "استعادة نسخة {day}؟ ستستبدل البيانات على كل الأجهزة. تُنزَّل بيانات اليوم أولاً كنسخة أمان.",
   "That backup is empty": "هذه النسخة الاحتياطية فارغة",
   "Restored the backup from {day}": "تمت استعادة نسخة {day}",
@@ -2600,16 +2615,16 @@ const DYN_AR = {
   "Total": "المجموع",
   "Yes": "نعم",
   "No": "لا",
-  "(removed tenant)": "(مستأجر محذوف)",
+  "(removed flat)": "(شقة محذوفة)",
   "Summary": "ملخص",
-  "Tenant balances": "أرصدة المستأجرين",
+  "Owner balances": "أرصدة المالكين",
   "Transactions": "القيود",
   "Monthly activity": "النشاط الشهري",
   "Generator readings": "قراءات المولّد",
   "Monthly budget": "الميزانية الشهرية",
   "Polls": "الاستطلاعات",
   "Payment declarations": "إشعارات الدفع",
-  "Tenant": "المستأجر",
+  "Owner": "المالك",
   "Unit": "الوحدة",
   "Coefficient": "المعامل",
   "Breaker (A)": "القاطع (أمبير)",
@@ -2666,13 +2681,13 @@ const DYN_AR = {
   "LBP per USD": "ل.ل لكل دولار",
   "Position": "الوضع المالي",
   "Cash / reserve": "النقد / الاحتياطي",
-  "Owed by tenants": "مستحق على المستأجرين",
-  "Tenant credit (prepaid)": "رصيد دائن للمستأجرين (مدفوع مسبقاً)",
+  "Owed by owners": "مستحق على المالكين",
+  "Owner credit (prepaid)": "رصيد دائن للمالكين (مدفوع مسبقاً)",
   "Net position": "صافي الوضع",
   "Total expenses (incl. generator & water)": "إجمالي المصاريف (مع المولّد والمياه)",
   "Total payments received": "إجمالي الدفعات المستلمة",
   "Contents": "المحتويات",
-  "Tenants": "المستأجرون",
+  "Flats": "الشقق",
   "Months with activity": "أشهر فيها نشاط",
   "Generator fuel": "وقود المولّد",
   "Generator maintenance": "صيانة المولّد",
@@ -2702,18 +2717,18 @@ const DYN_AR = {
   "Select a payment due date": "اختر تاريخ استحقاق الدفع",
   "Project created": "تم إنشاء المشروع",
   "Project deleted": "تم حذف المشروع",
-  "Add tenants before entering meter readings": "أضف مستأجرين قبل إدخال قراءات العداد",
+  "Add the flats before entering meter readings": "أضف الشقق قبل إدخال قراءات العداد",
   "Select a month": "اختر شهراً",
   "Meter readings saved": "تم حفظ قراءات العداد",
   "Meter readings removed": "تم حذف قراءات العداد",
   "Please enter the building name.": "الرجاء إدخال اسم المبنى.",
-  "Please enter the tenant name.": "الرجاء إدخال اسم المستأجر.",
+  "Please enter the owner's name.": "الرجاء إدخال اسم المالك.",
   "Please enter the unit number.": "الرجاء إدخال رقم الشقة.",
   "Setup complete! Welcome to Building Account Tracker.": "اكتمل الإعداد! أهلاً بك في متتبّع حساب المبنى.",
   "Building manager notified of your payment": "تم إبلاغ المدير بدفعتك",
-  "Tenant not found": "لم يُعثر على المستأجر",
-  "No tenant payment receipt found": "لا يوجد إيصال دفع للمستأجر",
-  "Receipt is available for tenant payments only": "الإيصال متاح لدفعات المستأجرين فقط",
+  "Flat not found": "لم يُعثر على الشقة",
+  "No payment receipt found for this flat": "لا يوجد إيصال دفع لهذه الشقة",
+  "Receipt is available for flat payments only": "الإيصال متاح لدفعات الشقق فقط",
   "Could not generate statement": "تعذّر إنشاء كشف الحساب",
   "Statement PDF shared": "تمت مشاركة كشف الحساب PDF",
   "Sharing cancelled": "تم إلغاء المشاركة",
@@ -2732,7 +2747,7 @@ const DYN_AR = {
   "Loaded from the cloud": "تم التحميل من السحابة",
   "Set the Google Apps Script URL first, then Save": "حدّد رابط Google Apps Script أولاً ثم احفظ",
   "Set up the cloud database first, then Save": "أعدّ قاعدة البيانات السحابية أولاً ثم احفظ",
-  "Access code copied — send it to your tenants": "تم نسخ رمز الوصول — أرسله لمستأجريك",
+  "Access code copied — send it to your residents": "تم نسخ رمز الوصول — أرسله للسكان",
   "Paste the access code first": "الصق رمز الوصول أولاً",
   "That access code is not valid": "رمز الوصول غير صالح",
   "That access code is missing the sync address": "رمز الوصول ينقصه عنوان المزامنة",
@@ -2747,13 +2762,13 @@ const DYN_AR = {
   "No ledger rows to export": "لا توجد صفوف للتصدير",
   "Ledger Excel exported": "تم تصدير السجل Excel",
   "Ledger PDF ready": "السجل PDF جاهز",
-  "Tenant updated": "تم تحديث المستأجر",
+  "Flat updated": "تم تحديث الشقة",
   "No shared expenses for this month": "لا توجد مصاريف مشتركة لهذا الشهر",
-  "All tenants have paid their shared expenses": "دفع جميع المستأجرين مصاريفهم المشتركة",
-  "No due tenants have a phone number saved": "لا يوجد رقم هاتف محفوظ للمستأجرين المتأخرين",
-  "All tenants have paid their share": "دفع جميع المستأجرين حصتهم",
+  "All owners have paid their shared expenses": "دفع جميع المالكين مصاريفهم المشتركة",
+  "No due owners have a phone number saved": "لا يوجد رقم هاتف محفوظ للمالكين المتأخرين",
+  "All owners have paid their share": "دفع جميع المالكين حصتهم",
   "No outstanding statement balances": "لا توجد أرصدة مستحقة",
-  "Tenant PIN removed": "تم حذف رمز المستأجر",
+  "Owner PIN removed": "تم حذف رمز المالك",
   "Uploading replacement invoice": "جارٍ رفع الفاتورة البديلة",
   "Uploading invoice picture": "جارٍ رفع صورة الفاتورة",
   "Payment added. Receipt saved": "تمت إضافة الدفعة. حُفظ الإيصال",
@@ -2775,8 +2790,6 @@ const DYN_AR = {
   // Confirm dialogs
   'Delete project "{name}"? Payment transactions linked to this project will remain in the ledger.':
     'حذف المشروع "{name}"؟ ستبقى دفعات هذا المشروع في السجل.',
-  "Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.":
-    "إزالة قراءات العداد لشهر {month}؟ ستُلغى أعباء المولّد لذلك الشهر حتى تُعيد إدخال القراءات.",
   "Notify the building manager that you've paid {amount} for {month}?":
     "إبلاغ المدير بأنك دفعت {amount} عن {month}؟",
   "Delete this poll? This cannot be undone.": "حذف هذا التصويت؟ لا يمكن التراجع.",
@@ -2794,19 +2807,13 @@ const DYN_AR = {
     "النسخة السحابية فارغة — تم الإبقاء على بيانات هذا الجهاز",
   "Reload cancelled — this device's data was kept":
     "أُلغيت إعادة التحميل — تم الإبقاء على بيانات هذا الجهاز",
-  "Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone.":
-    "مسح كل الدفعات والمصاريف؟ سيبقى المستأجرون. استخدمه لبدء فترة جديدة (مثلاً سنة جديدة). لا يمكن التراجع.",
   "Delete this ledger entry?\n\n{label}\n\nThis removes the record from the app and Google Sheet sync.":
     "حذف قيد السجل؟\n\n{label}\n\nيزيل هذا القيد من التطبيق ومن مزامنة Google Sheet.",
   "Remove {name}'s PIN? They will no longer be able to log in.":
     "إزالة رمز {name}؟ لن يتمكن بعد ذلك من تسجيل الدخول.",
   "Remove the building manager password? Anyone opening the app can then enter as manager.":
     "إزالة كلمة سر المدير؟ يمكن لأي شخص يفتح التطبيق الدخول كمدير.",
-  "Delete {name}? Their {count} transaction(s) will be kept but unlinked from this tenant.":
-    "حذف {name}؟ ستبقى {count} عملية له لكن ستُفصل عن هذا المستأجر.",
   "Delete {name}?": "حذف {name}؟",
-  "Erase everything? This permanently deletes all tenants, payments, expenses and settings on this device and starts setup over. This cannot be undone.":
-    "محو كل شيء؟ يحذف هذا نهائياً كل المستأجرين والدفعات والمصاريف والإعدادات على هذا الجهاز ويبدأ الإعداد من جديد. لا يمكن التراجع.",
   // KPI cards (dashboard)
   "Cash Balance": "الرصيد النقدي",
   "Reserve Fund": "الصندوق الاحتياطي",
@@ -2815,12 +2822,12 @@ const DYN_AR = {
   "Total Expenses": "إجمالي المصاريف",
   "All shared building costs": "كل تكاليف المبنى المشتركة",
   "Outstanding": "المستحق",
-  "Tenant balances owed": "أرصدة المستأجرين المستحقة",
+  "Owner balances owed": "أرصدة المالكين المستحقة",
   "Net Position": "الوضع الصافي",
   "Cash + outstanding - credits": "النقد + المستحق − الأرصدة الدائنة",
   "Collected funds minus expenses": "الأموال المحصّلة ناقص المصاريف",
   "All recorded building costs": "كل تكاليف المبنى المسجّلة",
-  "Tenant dues owed": "مستحقات المستأجرين",
+  "Owner dues owed": "مستحقات المالكين",
   "Reserve + outstanding - credits": "الاحتياطي + المستحق − الأرصدة الدائنة",
   // Monthly activity / category summary
   "Monthly Payments": "الدفعات الشهرية",
@@ -2835,9 +2842,9 @@ const DYN_AR = {
   "{month} isn't set up yet": "لم يُضبط {month} بعد",
   "Add it to start tracking this month's payments.": "أضِفه لبدء تتبّع دفعات هذا الشهر.",
   "Entries dated in the selected month": "قيود بتاريخ الشهر المحدد",
-  "Tenant payments received by date": "دفعات المستأجرين المقبوضة حسب التاريخ",
+  "Owner payments received by date": "دفعات المالكين المقبوضة حسب التاريخ",
   "Payments toward building projects": "دفعات لمشاريع المبنى",
-  "Prepaid tenant credit": "رصيد مستأجر مدفوع مقدماً",
+  "Prepaid owner credit": "رصيد مالك مدفوع مقدماً",
   "Paid expenses, LBP converted to USD": "المصاريف المدفوعة، محوّلة من الليرة للدولار",
   "Generator fuel, maintenance and water": "وقود المولّد والصيانة والمياه",
   "Cash increase or decrease this month": "زيادة أو نقصان النقد هذا الشهر",
@@ -2859,8 +2866,8 @@ const DYN_AR = {
   "Owes {amount}": "مدين بـ {amount}",
   "Credit {amount}": "رصيد دائن {amount}",
   // Attention items
-  "{n} tenant owes {amount}": "{n} مستأجر مدين بمبلغ {amount}",
-  "{n} tenants owe {amount}": "{n} مستأجرون مدينون بمبلغ {amount}",
+  "{n} owner owes {amount}": "{n} مالك مدين بمبلغ {amount}",
+  "{n} owners owe {amount}": "{n} مالكون مدينون بمبلغ {amount}",
   "Generator: {n} month needs meter readings": "المولّد: {n} شهر يحتاج قراءات عداد",
   "Generator: {n} months need meter readings": "المولّد: {n} أشهر تحتاج قراءات عداد",
   "Reserve fund is negative ({amount})": "الصندوق الاحتياطي سالب ({amount})",
@@ -2885,18 +2892,6 @@ const DYN_AR = {
   "Status": "الحالة",
   "Receipts": "الإيصالات",
   // Settings notes
-  "Tenants pay a fixed monthly amount; surplus builds the reserve fund.":
-    "يدفع المستأجرون مبلغاً شهرياً ثابتاً؛ ويُبنى الفائض في الصندوق الاحتياطي.",
-  "Each month's actual expenses are split among tenants.":
-    "تُقسّم مصاريف كل شهر الفعلية بين المستأجرين.",
-  "Tenants pay a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund.":
-    "يدفع المستأجرون مبلغاً شهرياً ثابتاً (يُقسّم حسب المعامل عند ضبطه). يُبنى كل ما يُحصّل فوق المصاريف في الصندوق الاحتياطي.",
-  "Each month's recorded expenses are split among tenants (by coefficient when set). No fixed monthly amount.":
-    "تُقسّم مصاريف كل شهر المسجّلة بين المستأجرين (حسب المعامل عند ضبطه). لا يوجد مبلغ شهري ثابت.",
-  "No coefficients set — all tenants use the same flat monthly amount.":
-    "لم تُضبط معاملات — يستخدم جميع المستأجرين نفس المبلغ الشهري الموحّد.",
-  "Coefficients: {sum}/1000 — all tenants accounted for.":
-    "المعاملات: {sum}/1000 — جميع المستأجرين محتسبون.",
   "Coefficients: {sum}/1000 — must total 1000. {rest}":
     "المعاملات: {sum}/1000 — يجب أن يكون المجموع 1000. {rest}",
   "{n} remaining.": "بقي {n}.",
@@ -2916,7 +2911,7 @@ const DYN_AR = {
   "{paid} paid of {share}": "{paid} مدفوع من {share}",
   "of {amount}": "من {amount}",
   // Tenant cards
-  "Delete tenant": "حذف المستأجر",
+  "Delete flat": "حذف الشقة",
   "Edit": "تعديل",
   "Statement": "كشف حساب",
   "no phone": "بلا هاتف",
@@ -2933,7 +2928,7 @@ const DYN_AR = {
   "Edit Expense": "تعديل مصروف",
   "Save": "حفظ",
   "Saving...": "جارٍ الحفظ...",
-  "Edit Tenant": "تعديل مستأجر",
+  "Edit Flat": "تعديل شقة",
   "PIN set — type to change": "الرمز مضبوط — اكتب لتغييره",
   // Services cards
   "equal split": "تقسيم متساوٍ",
@@ -2942,8 +2937,6 @@ const DYN_AR = {
   "Update Readings": "تحديث القراءات",
   "Enter Readings": "إدخال القراءات",
   "Remove meter readings": "إزالة قراءات العداد",
-  "Not yet billed — enter this month's meter readings to split the costs among tenants.":
-    "لم تُحتسب بعد — أدخل قراءات عداد هذا الشهر لتقسيم الكلفة بين المستأجرين.",
   "Not yet billed for this month.": "لم تُحتسب لهذا الشهر بعد.",
   "No services yet.": "لا خدمات بعد.",
   "No services yet. Log generator (diesel/maintenance) or water tanker costs with the + button (choose Services Expenses). Generator is split by meter readings entered here; water is split equally or by coefficient.":
@@ -2969,7 +2962,6 @@ const DYN_AR = {
   "No polls yet. Tap \"+ New Poll\" to start one.": "لا تصويتات بعد. اضغط «+ تصويت جديد» للبدء.",
   "Open": "مفتوح",
   "Closed": "مغلق",
-  "Owner": "المالك",
   "By {name} · {date}": "بواسطة {name} · {date}",
   "YES {n}": "نعم {n}",
   "ABSTAIN {n}": "امتناع {n}",
@@ -3030,8 +3022,6 @@ const DYN_AR = {
   "Shared Expenses Reminders – {month}": "تذكيرات المصاريف المشتركة – {month}",
   "Reminders – {project}": "تذكيرات – {project}",
   "Payment Reminders – {month} Statement": "تذكيرات الدفع – كشف {month}",
-  "{names} skipped – no phone number saved in the Tenants tab.":
-    "{names} — تم تجاهلهم لعدم وجود رقم هاتف محفوظ في تبويب المستأجرين.",
   "{names} skipped – no phone number saved.":
     "{names} — تم تجاهلهم لعدم وجود رقم هاتف محفوظ.",
   "Unit {unit} – {amount} due – {month}": "شقة {unit} – {amount} مستحق – {month}",
@@ -3045,8 +3035,8 @@ const DYN_AR = {
   "{amount} balance impact": "{amount} أثر على الرصيد",
   "{lbp} = {usd} at {rate} LBP/USD": "{lbp} = {usd} بسعر {rate} ل.ل/دولار",
   // Direction (opening balance)
-  "Tenant has credit (prepaid)": "للمستأجر رصيد (مدفوع مقدماً)",
-  "Tenant owes (opening due)": "على المستأجر (مستحق افتتاحي)",
+  "Owner has credit (prepaid)": "للمالك رصيد (مدفوع مقدماً)",
+  "Owner owes (opening due)": "على المالك (مستحق افتتاحي)",
   "Cash on hand (add)": "نقد متوفر (إضافة)",
   "Cash shortfall (subtract)": "عجز نقدي (طرح)",
   // Generator readings dialog
@@ -4223,7 +4213,7 @@ function updateGeneratorReadingsPreview() {
 function openGeneratorReadingsDialog(month) {
   if (sessionMode !== "owner" && sessionMode !== "concierge") return;
   const activeTenants = state.tenants.filter((t) => t.active !== false);
-  if (!activeTenants.length) { showToast("Add tenants before entering meter readings"); return; }
+  if (!activeTenants.length) { showToast("Add the flats before entering meter readings"); return; }
   els.generatorBillForm.reset();
   const m = month ? monthKey(month) : (selectedMonth ? monthKey(selectedMonth) : monthKey(localDateInput()));
   els.generatorBillMonth.value = m;
@@ -4289,7 +4279,7 @@ function submitGeneratorReadings(event) {
 function deleteServiceReadings(serviceType, month) {
   if (sessionMode !== "owner") return false;
   if (isMonthClosed(month)) { showToast(closedMonthError(month).message, 5000); return false; }
-  if (!window.confirm(tr("Remove the meter readings for {month}? Tenant charges for that month's generator will be undone until you re-enter readings.", { month: formatMonth(month) }))) return false;
+  if (!window.confirm(tr("Remove the meter readings for {month}? The flats' generator charges for that month will be undone until you re-enter readings.", { month: formatMonth(month) }))) return false;
   state.serviceReadings = (state.serviceReadings || []).filter(
     (r) => !(r.serviceType === serviceType && monthKey(r.forMonth) === monthKey(month)),
   );
@@ -4373,7 +4363,7 @@ function buildGeneratorCard(month, tenantsById) {
     const note = document.createElement("p");
     note.className = "settings-note";
     note.textContent = sessionMode === "owner"
-      ? tr("Not yet billed — enter this month's meter readings to split the costs among tenants.")
+      ? tr("Not yet billed — enter this month's meter readings to split the costs among the flats.")
       : tr("Not yet billed for this month.");
     card.append(note);
     return card;
@@ -4825,9 +4815,9 @@ function getMonthlyActivityRows(month) {
   const hasLegacyAdvancePayments = state.transactions.some((transaction) => transaction.category === "Advance Payments");
   const rows = [
     { category: "Opening Balance", usd: 0, desc: "Entries dated in the selected month" },
-    { category: "Monthly Payments", usd: 0, sourceCategory: "Payments", desc: "Tenant payments received by date" },
+    { category: "Monthly Payments", usd: 0, sourceCategory: "Payments", desc: "Owner payments received by date" },
     { category: "Project Payments", usd: 0, desc: "Payments toward building projects" },
-    ...(hasLegacyAdvancePayments ? [{ category: "Advance Payments", usd: 0, desc: "Prepaid tenant credit" }] : []),
+    ...(hasLegacyAdvancePayments ? [{ category: "Advance Payments", usd: 0, desc: "Prepaid owner credit" }] : []),
     { category: "Expenses", usd: 0, desc: "Paid expenses, LBP converted to USD" },
     { category: "Generator & Water", usd: 0, sourceCategory: "Services Expenses", desc: "Generator fuel, maintenance and water" },
   ];
@@ -5117,7 +5107,7 @@ function renderAttention() {
     items.push({
       kind: "due",
       icon: "💰",
-      text: tr(overdue.length === 1 ? "{n} tenant owes {amount}" : "{n} tenants owe {amount}", { n: overdue.length, amount: formatUsd(total) }),
+      text: tr(overdue.length === 1 ? "{n} owner owes {amount}" : "{n} owners owe {amount}", { n: overdue.length, amount: formatUsd(total) }),
       view: "paymentsView",
       key: "owing",
     });
@@ -5351,13 +5341,13 @@ function renderDashboard() {
       ? [
           { label: "Reserve Fund", value: formatUsd(totals.cashUsd), note: "Collected funds minus expenses", valueClass: cashNegative },
           { label: "Expenses this year", value: formatUsd(yearExpenses), note: tr("Since 1 January {year}", { year: new Date().getFullYear() }) },
-          { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Tenant dues owed", valueClass: outstandingAmber },
+          { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Owner dues owed", valueClass: outstandingAmber },
           { label: "Net Position", value: formatUsd(totals.netPositionUsd), note: "Reserve + outstanding - credits", hero: true },
         ]
       : [
           { label: "Cash Balance", value: formatUsd(totals.cashUsd), note: "Ledger net cash", valueClass: cashNegative },
           { label: "Expenses this year", value: formatUsd(yearExpenses), note: tr("Since 1 January {year}", { year: new Date().getFullYear() }) },
-          { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Tenant balances owed", valueClass: outstandingAmber },
+          { label: "Outstanding", value: formatUsd(totals.receivableUsd), note: "Owner balances owed", valueClass: outstandingAmber },
           { label: "Net Position", value: formatUsd(totals.netPositionUsd), note: "Cash + outstanding - credits", hero: true },
         ],
   ));
@@ -5430,8 +5420,8 @@ function applyWizardCollectionModeVisibility() {
   const fixed = els.wizardCollectionMode.value === "fixed";
   els.wizardBudgetField.classList.toggle("hidden", !fixed);
   els.wizardCollectionModeNote.textContent = fixed
-    ? tr("Tenants pay a fixed monthly amount; surplus builds the reserve fund.")
-    : tr("Each month's actual expenses are split among tenants.");
+    ? tr("Each flat pays a fixed monthly amount; the surplus builds the reserve fund.")
+    : tr("Each month's actual expenses are split among the flats.");
 }
 
 function openSetupWizard() {
@@ -5528,7 +5518,7 @@ function wizardEditTenant(idx) {
 function wizardAddTenant() {
   const name = els.wizardTenantName.value.trim();
   const unit = els.wizardTenantUnit.value.trim();
-  if (!name) { showToast("Please enter the tenant name."); els.wizardTenantName.focus(); return; }
+  if (!name) { showToast("Please enter the owner's name."); els.wizardTenantName.focus(); return; }
   if (!unit) { showToast("Please enter the unit number."); els.wizardTenantUnit.focus(); return; }
   const data = {
     name,
@@ -6195,7 +6185,7 @@ function renderTenants() {
               <span class="tenant-unit-line"></span>
             </div>
           </div>
-          <button class="tenant-trash-btn delete-tenant-button" type="button" aria-label="Delete tenant"></button>
+          <button class="tenant-trash-btn delete-tenant-button" type="button" aria-label="Delete flat"></button>
         </div>
         <div class="tenant-metrics">
           <div class="metric metric-paid"><span></span><b></b></div>
@@ -6212,7 +6202,7 @@ function renderTenants() {
       `;
       card.querySelector(".tenant-id").insertBefore(avatarChip(tenant.name, 38), card.querySelector(".tenant-id-text"));
       const trashBtn = card.querySelector(".delete-tenant-button");
-      trashBtn.setAttribute("aria-label", tr("Delete tenant"));
+      trashBtn.setAttribute("aria-label", tr("Delete flat"));
       trashBtn.appendChild(lucide("trash", { size: 17, color: "var(--label-muted)" }));
       const metricLabels = card.querySelectorAll(".metric span");
       metricLabels[0].textContent = `✓ ${tr("Paid")}`;
@@ -6230,7 +6220,7 @@ function renderTenants() {
         if (linkLine) card.querySelector(".tenant-id-text").append(linkLine);
       }
       const moveBtn = card.querySelector(".moveout-tenant-button");
-      moveBtn.textContent = tr("Move out");
+      moveBtn.textContent = tr("Transfer");
       moveBtn.dataset.tenantId = tenant.id;
       moveBtn.classList.toggle("hidden", tenant.active === false);
       card.querySelector(".invite-tenant-button").classList.toggle("hidden", tenant.active === false);
@@ -6325,7 +6315,7 @@ function tenantStatementSummaryItems(tenant, projectTotal, tenantTotals) {
 function printTenantStatement(tenantId) {
   const tenant = state.tenants.find((entry) => entry.id === tenantId);
   if (!tenant) {
-    showToast("Tenant not found");
+    showToast("Flat not found");
     return;
   }
 
@@ -6353,7 +6343,7 @@ function printTenantStatement(tenantId) {
   const building = document.createElement("p");
   building.textContent = state.building.name;
   const title = document.createElement("h1");
-  title.textContent = "Tenant Account Statement";
+  title.textContent = "Flat Account Statement";
   const tenantLine = document.createElement("p");
   tenantLine.textContent = `${tenant.name} | Unit ${tenant.unit}`;
   titleBlock.append(building, title, tenantLine);
@@ -6528,13 +6518,13 @@ function formatCoveredMonths(entries) {
 function getPaymentReceiptData(transactionId) {
   const transaction = state.transactions.find((entry) => entry.id === transactionId);
   if (!transaction || !isReceiptablePayment(transaction)) {
-    showToast("Receipt is available for tenant payments only");
+    showToast("Receipt is available for flat payments only");
     return null;
   }
 
   const tenant = state.tenants.find((entry) => entry.id === transaction.tenantId);
   if (!tenant) {
-    showToast("Tenant not found");
+    showToast("Flat not found");
     return null;
   }
 
@@ -6674,7 +6664,7 @@ function printPaymentReceipt(transactionId) {
   note.className = "print-note";
   note.textContent = data.isProject
     ? "Project payments are separate from monthly building fees."
-    : "Payments are applied to the tenant's building dues for the month.";
+    : "Payments are applied to the flat's building dues for the month.";
 
   page.append(header, summary, table, note);
   printPreparedPage(page);
@@ -6813,7 +6803,7 @@ function paymentReceiptPdfLines(data) {
       { text: "Monthly Allocation", size: 13, bold: true },
       { text: "Month | Applied USD | Status", size: 9, bold: true },
       ...receiptTableRows(data).map((row) => ({ text: row.join(" | "), size: 9 })),
-      { text: "Payments are applied to the tenant's building dues for the month.", size: 10 },
+      { text: "Payments are applied to the flat's building dues for the month.", size: 10 },
     );
   }
 
@@ -7021,7 +7011,7 @@ function buildReceiptLayoutPdf(data) {
     pdfTextCommand(
       data.isProject
         ? "Project payments are separate from monthly building fees."
-        : "Payments are applied to the tenant's building dues for the month.",
+        : "Payments are applied to the flat's building dues for the month.",
       left,
       Math.max(52, y),
       9,
@@ -7074,7 +7064,7 @@ function buildTenantStatementPdf(tenantId) {
     y = TOP;
     if (kind === "full") {
       commands.push(pdfTextCommand(state.building.name, left, y, 11));
-      commands.push(pdfTextCommand("Tenant Account Statement", left, y - 28, 18, true));
+      commands.push(pdfTextCommand("Flat Account Statement", left, y - 28, 18, true));
       commands.push(pdfTextCommand(tr("{name} | Unit {unit}", { name: tenant.name, unit: tenant.unit }), left, y - 48, 11));
       commands.push(pdfTextCommand(tr("Date: {date}", { date: localDateInput() }), 380, y, 10));
       commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 16, 9));
@@ -7203,7 +7193,7 @@ function buildTenantStatementPdf(tenantId) {
 
 async function shareTenantStatementPdf(tenantId) {
   const tenant = state.tenants.find((entry) => entry.id === tenantId);
-  if (!tenant) { showToast("Tenant not found"); return; }
+  if (!tenant) { showToast("Flat not found"); return; }
 
   if (ensureAllReceiptReferences()) saveState();
 
@@ -7914,8 +7904,8 @@ function applyCollectionModeVisibility(mode) {
   const fixed = mode === "fixed";
   els.monthlyBudgetField.classList.toggle("hidden", !fixed);
   els.collectionModeNote.textContent = fixed
-    ? tr("Tenants pay a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund.")
-    : tr("Each month's recorded expenses are split among tenants (by coefficient when set). No fixed monthly amount.");
+    ? tr("Each flat pays a fixed monthly amount (split by coefficient when set). Anything collected beyond expenses builds the reserve fund.")
+    : tr("Each month's recorded expenses are split among the flats (by coefficient when set). No fixed monthly amount.");
 }
 
 function renderSettings() {
@@ -7948,11 +7938,11 @@ function renderSettings() {
   if (tenantsWithCoeff > 0) {
     const ok = coeffSum === 1000;
     els.coefficientStatus.textContent = ok
-      ? tr("Coefficients: {sum}/1000 — all tenants accounted for.", { sum: coeffSum })
+      ? tr("Coefficients: {sum}/1000 — all flats accounted for.", { sum: coeffSum })
       : tr("Coefficients: {sum}/1000 — must total 1000. {rest}", { sum: coeffSum, rest: 1000 - coeffSum > 0 ? tr("{n} remaining.", { n: 1000 - coeffSum }) : tr("{n} over.", { n: coeffSum - 1000 }) });
     els.coefficientStatus.className = ok ? "settings-note coeff-ok" : "settings-note coeff-warn";
   } else {
-    els.coefficientStatus.textContent = tr("No coefficients set — all tenants use the same flat monthly amount.");
+    els.coefficientStatus.textContent = tr("No coefficients set — all flats pay the same monthly amount.");
     els.coefficientStatus.className = "settings-note";
   }
   els.reloadSheetAction.classList.toggle("hidden", !hasCloudConfig());
@@ -8048,7 +8038,7 @@ function populateTenantSelect(includeBuildingOption = false) {
   if (includeBuildingOption) {
     const option = document.createElement("option");
     option.value = "";
-    option.textContent = "Building cash (no tenant)";
+    option.textContent = tr("Building cash (no flat)");
     options.push(option);
   }
   state.tenants.forEach((tenant) => {
@@ -8067,8 +8057,8 @@ function updateTransactionDirectionLabels() {
   const [creditOption, debitOption] = els.transactionDirection.options;
   if (category === "Opening Balance") {
     if (els.transactionTenant.value) {
-      creditOption.textContent = tr("Tenant has credit (prepaid)");
-      debitOption.textContent = tr("Tenant owes (opening due)");
+      creditOption.textContent = tr("Owner has credit (prepaid)");
+      debitOption.textContent = tr("Owner owes (opening due)");
     } else {
       creditOption.textContent = tr("Cash on hand (add)");
       debitOption.textContent = tr("Cash shortfall (subtract)");
@@ -9225,8 +9215,8 @@ function coefficientRoom(tenants, excludeId = null) {
 
 function coefficientTooHighMessage(room) {
   return room <= 0
-    ? tr("The other tenants already use all 1000/1000. Lower someone else's coefficient first.")
-    : tr("Only {room}/1000 is left for this tenant: the total can't go over 1000/1000.", { room });
+    ? tr("The other flats already use all 1000/1000. Lower another flat's coefficient first.")
+    : tr("Only {room}/1000 is left for this flat: the total can't go over 1000/1000.", { room });
 }
 
 function renderTenantCoefficientHint() {
@@ -9433,7 +9423,7 @@ function drawGroupBalancesCanvas() {
   [
     [tr("Total outstanding"), formatUsd(d.totalDue), d.totalDue > 0.005 ? C.red : C.ok],
     [tr("Up to date"), tr("{n} of {total} units", { n: d.upToDate, total: d.rows.length }), C.ok],
-    [tr("Tenant credit"), formatUsd(d.totalCredit), C.blue],
+    [tr("Owner credit"), formatUsd(d.totalCredit), C.blue],
   ].forEach(([label, value, color], i) => {
     const x = PAD + i * (cardW + gap);
     box(x, CARDS_TOP, cardW, CARD_H, C.tint, 22);
@@ -9449,7 +9439,7 @@ function drawGroupBalancesCanvas() {
   box(PAD, TABLE_TOP, W - PAD * 2, HEAD_H, C.green, 18);
   const headY = TABLE_TOP + 46;
   text(tr("Unit"), colUnit, headY, { size: 26, weight: 700, color: C.white });
-  text(tr("Tenant"), colName, headY, { size: 26, weight: 700, color: C.white });
+  text(tr("Owner"), colName, headY, { size: 26, weight: 700, color: C.white });
   text(tr("Status"), colStatus, headY, { size: 26, weight: 700, color: C.white });
   text(tr("Amount"), colAmount, headY, { size: 26, weight: 700, color: C.white, align: "end" });
 
@@ -9516,7 +9506,7 @@ async function postBalancesToGroup() {
 }
 
 function inviteWhatsAppMessage(tenant, code) {
-  return tr("Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I'm a tenant with an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.", {
+  return tr("Hi {name}! Here is your invite to the {building} app, where you can see your balance and payments.\n1. Open {url}\n2. Tap \"I have an invite code\"\n3. Enter: {code}\nThe code works once, within 30 days.\n\nTip: add the app to your home screen. iPhone: tap Share, then \"Add to Home Screen\". Android: tap ⋮, then \"Install app\". Then open More > Phone notifications to get your balance and news.", {
     name: tenant?.name || "", building: state.building?.name || "", url: joinLink(code), code,
   });
 }
@@ -9803,7 +9793,7 @@ function renderTenantLoginForm() {
   if (linked) {
     els.loginTenantLinked.textContent = me
       ? tr("Linked as {name} — Unit {unit}", { name: me.name, unit: me.unit || "" })
-      : tr("This phone is linked to a tenant");
+      : tr("This phone is linked to a flat");
   }
   els.loginTenantSelect.classList.toggle("hidden", linked);
   els.loginPinInput.classList.toggle("hidden", linked);
@@ -9825,7 +9815,7 @@ async function joinWithInviteCode(rawCode) {
   const code = String(rawCode || "").trim().toUpperCase();
   if (!code) { showToast("Enter the invite code first"); return; }
   if (cloudProvider() !== "supabase") { showToast("This app isn't connected to the cloud database"); return; }
-  if (isOwnerSession() && !window.confirm(tr("This phone is signed in as the building manager. Link it to a tenant instead? The building manager will be signed out here."))) return;
+  if (isOwnerSession() && !window.confirm(tr("This phone is signed in as the building manager. Link it to a flat instead? The building manager will be signed out here."))) return;
   const c = cloudConfig();
   els.connectSubmitButton.disabled = true;
   try {
@@ -9917,7 +9907,7 @@ async function createInviteCode() {
     const code = String(await res.json());
     const tenant = state.tenants.find((t) => t.id === tenantId);
     els.inviteCodeText.textContent = code;
-    els.inviteHowTo.textContent = tr("Send this to {name}. On their phone: open {url}, tap \"I'm a tenant with an invite code\" and enter the code. It works once, within 30 days.", { name: tenant?.name || "", url: inviteAppUrl() });
+    els.inviteHowTo.textContent = tr("Send this to {name}. On their phone: open {url}, tap \"I have an invite code\" and enter the code. It works once, within 30 days.", { name: tenant?.name || "", url: inviteAppUrl() });
     document.querySelector("#inviteQr")?.remove();
     const qr = qrBlock(joinLink(code), tr("Or let them scan this with the phone camera."));
     qr.id = "inviteQr";
@@ -9980,7 +9970,7 @@ async function openBackupsDialog() {
       const day = document.createElement("strong");
       day.textContent = formatDateLabel(row.day);
       const meta = document.createElement("span");
-      meta.textContent = tr("{tenants} tenants · {transactions} transactions", { tenants: row.tenants, transactions: row.transactions });
+      meta.textContent = tr("{tenants} flats · {transactions} transactions", { tenants: row.tenants, transactions: row.transactions });
       btn.append(day, meta);
       btn.addEventListener("click", () => restoreCloudBackup(row.day));
       return btn;
@@ -10050,10 +10040,10 @@ async function shareSyncCode() {
   }
   try {
     await navigator.clipboard.writeText(code);
-    showToast("Access code copied — send it to your tenants");
+    showToast("Access code copied — send it to your residents");
     return;
   } catch {
-    window.prompt("Copy this access code and send it to your tenants:", code);
+    window.prompt(tr("Copy this access code and send it to your residents:"), code);
   }
 }
 
@@ -10105,7 +10095,7 @@ async function applySyncCode(rawCode) {
 }
 
 async function zeroAccounts() {
-  if (!window.confirm(tr("Clear all payments and expenses? Your tenants are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone."))) {
+  if (!window.confirm(tr("Clear all payments and expenses? Your flats are kept. Use this to start a fresh period (e.g. a new year). This cannot be undone."))) {
     return;
   }
   state.transactions = [];
@@ -10468,7 +10458,7 @@ function buildLedgerSheetXml(rows) {
   const headers = [
     "Date",
     "Category",
-    "Tenant",
+    "Owner",
     "Description",
     "For Month",
     "Supplier",
@@ -10780,7 +10770,7 @@ function safeSheetName(name, used) {
 // Gathers every table from the live state. Exposed to tests.
 function collectFullExportData() {
   const yesNo = (v) => (v ? tr("Yes") : tr("No"));
-  const name = (id) => tenantName(id) || (id ? tr("(removed tenant)") : "");
+  const name = (id) => tenantName(id) || (id ? tr("(removed flat)") : "");
   const sortByDate = (a, b) => String(transactionDateValue(a)).localeCompare(String(transactionDateValue(b)));
 
   // Tenants
@@ -10885,13 +10875,13 @@ function buildFullWorkbookFiles() {
   const C = (header, width, type = "text", total = false) => ({ header: tr(header), width, type, total });
 
   const tables = [
-    { name: tr("Tenant balances"), rows: d.tenantRows, columns: [
-      C("Tenant", 26), C("Unit", 9), C("Coefficient", 12, "int", true), C("Breaker (A)", 11, "int"), C("Phone", 16), C("Active", 9),
+    { name: tr("Owner balances"), rows: d.tenantRows, columns: [
+      C("Owner", 26), C("Unit", 9), C("Coefficient", 12, "int", true), C("Breaker (A)", 11, "int"), C("Phone", 16), C("Active", 9),
       C(isFixedMode() ? "Monthly dues to date" : "Expense share", 15, "usd", true), C("Generator & water", 15, "usd", true),
       C("Payments", 14, "usd", true), C("Opening credit (+) / debt (−)", 17, "usd", true), C("Balance (owes +)", 15, "usd", true),
       C("Projects outstanding", 15, "usd", true), C("Total due", 14, "usd", true)] },
     { name: tr("Transactions"), rows: d.txRows, columns: [
-      C("Date", 13, "date"), C("Category", 17), C("Tenant", 22), C("Description", 34), C("For month", 12, "month"),
+      C("Date", 13, "date"), C("Category", 17), C("Owner", 22), C("Description", 34), C("For month", 12, "month"),
       C("Expense category", 17), C("Supplier", 18), C("Invoice", 11), C("Project", 16), C("Service", 18),
       C("Debit USD", 13, "usd", true), C("Debit LBP", 15, "lbp", true), C("Credit USD", 13, "usd", true), C("Credit LBP", 15, "lbp", true),
       C("Net USD", 13, "usd", true), C("Receipt", 18), C("Invoice photo", 12)] },
@@ -10900,16 +10890,16 @@ function buildFullWorkbookFiles() {
       C("Other", 12, "usd", true), C("Expenses", 14, "usd", true), C("Generator & water", 16, "usd", true), C("Net cash flow", 15, "usd", true),
       C("Cash at month end", 17, "usd")] },
     { name: tr("Generator readings"), rows: d.readingRows, columns: [
-      C("Month", 12, "month"), C("Tenant", 24), C("Previous reading", 15, "int"), C("Current reading", 15, "int"), C("kWh used", 12, "int", true),
+      C("Month", 12, "month"), C("Owner", 24), C("Previous reading", 15, "int"), C("Current reading", 15, "int"), C("kWh used", 12, "int", true),
       C("Breaker (A)", 11, "int"), C("Fuel share", 13, "usd", true), C("Maintenance share", 16, "usd", true), C("Total", 13, "usd", true)] },
     { name: tr("Projects"), rows: d.projectRows, columns: [
       C("Project", 24), C("Status", 12), C("Budget", 14, "usd"), C("Due date", 13, "date"), C("Distribution", 14),
-      C("Tenant", 24), C("Share", 13, "usd", true), C("Paid", 13, "usd", true), C("Outstanding", 14, "usd", true)] },
+      C("Owner", 24), C("Share", 13, "usd", true), C("Paid", 13, "usd", true), C("Outstanding", 14, "usd", true)] },
     { name: tr("Monthly budget"), rows: d.budgetRows, columns: [C("Month", 14, "month"), C("Expected (USD)", 16, "usd", true)] },
     { name: tr("Polls"), rows: d.pollRows, columns: [
       C("Poll", 40), C("Status", 12), C("Created", 13, "date"), C("Yes", 8, "int", true), C("No", 8, "int", true), C("Abstain", 10, "int", true)] },
     { name: tr("Payment declarations"), rows: d.declarationRows, columns: [
-      C("Tenant", 24), C("Month", 12, "month"), C("Amount (USD)", 14, "usd", true), C("Status", 12), C("Declared on", 14, "date")] },
+      C("Owner", 24), C("Month", 12, "month"), C("Amount (USD)", 14, "usd", true), C("Status", 12), C("Declared on", 14, "date")] },
   ];
 
   const summarySections = [
@@ -10918,12 +10908,12 @@ function buildFullWorkbookFiles() {
       [tr("Collection mode"), isFixedMode() ? tr("Fixed monthly amount") : tr("Actual expenses")],
       [tr("LBP per USD"), getConversionRate(), "int"]] },
     { heading: tr("Position"), items: [
-      [tr("Cash / reserve"), roundUsd(d.position.cashUsd), "usd"], [tr("Owed by tenants"), d.position.receivableUsd, "usd"],
-      [tr("Tenant credit (prepaid)"), d.position.advanceLiabilityUsd, "usd"], [tr("Net position"), d.position.netPositionUsd, "usd"],
+      [tr("Cash / reserve"), roundUsd(d.position.cashUsd), "usd"], [tr("Owed by owners"), d.position.receivableUsd, "usd"],
+      [tr("Owner credit (prepaid)"), d.position.advanceLiabilityUsd, "usd"], [tr("Net position"), d.position.netPositionUsd, "usd"],
       [tr("Total expenses (incl. generator & water)"), roundUsd(d.account.expenseUsd), "usd"],
       [tr("Total payments received"), roundUsd(d.account.paymentsUsd), "usd"]] },
     { heading: tr("Contents"), items: [
-      [tr("Tenants"), state.tenants.length, "int"], [tr("Transactions"), state.transactions.length, "int"],
+      [tr("Flats"), state.tenants.length, "int"], [tr("Transactions"), state.transactions.length, "int"],
       [tr("Months with activity"), d.monthRows.length, "int"], [tr("Projects"), (state.buildingProjects || []).length, "int"],
       [tr("Polls"), (state.polls || []).length, "int"]] },
   ];
@@ -11141,7 +11131,7 @@ function openEditTenantDialog(tenantId) {
   const tenant = state.tenants.find((t) => t.id === tenantId);
   if (!tenant) return;
   editingTenantId = tenantId;
-  els.tenantDialogTitle.textContent = tr("Edit Tenant");
+  els.tenantDialogTitle.textContent = tr("Edit Flat");
   els.tenantNameInput.value = tenant.name;
   els.tenantUnitInput.value = tenant.unit;
   els.tenantPhoneDialogInput.value = tenant.phone || "";
@@ -11186,7 +11176,7 @@ function handleTenantFormSubmit(event) {
       tenant.breakerAmps = breakerAmps;
       if (pinEntered) tenant.pinHash = hashSecret(pinEntered, state.security.salt);
     }
-    showToast("Tenant updated");
+    showToast("Flat updated");
   } else {
     state.tenants.push({
       id: generateTenantId(name),
@@ -11213,7 +11203,7 @@ function deleteTenant(tenantId) {
   if (!tenant) return;
   const txCount = state.transactions.filter((t) => t.tenantId === tenantId).length;
   const msg = txCount > 0
-    ? tr("Delete {name}? Their {count} transaction(s) will be kept but unlinked from this tenant.", { name: tenant.name, count: txCount })
+    ? tr("Delete {name}? Their {count} transaction(s) will be kept but unlinked from this flat.", { name: tenant.name, count: txCount })
     : tr("Delete {name}?", { name: tenant.name });
   if (!window.confirm(msg)) return;
   state.tenants = state.tenants.filter((t) => t.id !== tenantId);
@@ -11258,18 +11248,18 @@ function openSharedExpensesWhatsAppReminderDialog() {
   if (!data) { showToast("No shared expenses for this month"); return; }
 
   const dueStatuses = data.tenantStatuses.filter(({ totalShare, covered }) => covered < totalShare - 0.005);
-  if (!dueStatuses.length) { showToast("All tenants have paid their shared expenses"); return; }
+  if (!dueStatuses.length) { showToast("All owners have paid their shared expenses"); return; }
 
   const withPhone = dueStatuses.filter(({ tenant }) => tenant.phone);
   const withoutPhone = dueStatuses.filter(({ tenant }) => !tenant.phone);
 
   els.whatsappDialogTitle.textContent = tr("Shared Expenses Reminders – {month}", { month: formatMonth(selectedMonth) });
   els.whatsappDialogNote.textContent = withoutPhone.length
-    ? tr("{names} skipped – no phone number saved in the Tenants tab.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
+    ? tr("{names} skipped – no phone number saved in the Flats tab.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
     : "";
   els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
 
-  if (!withPhone.length) { showToast("No due tenants have a phone number saved"); return; }
+  if (!withPhone.length) { showToast("No due owners have a phone number saved"); return; }
 
   els.whatsappReminderList.replaceChildren(
     ...withPhone.map(({ tenant, totalShare, covered }) => {
@@ -11315,7 +11305,7 @@ function openProjectWhatsAppReminderDialog(project) {
     .filter(({ share, paid }) => share > 0 && paid < share - 0.005);
 
   if (!dueStatuses.length) {
-    showToast("All tenants have paid their share");
+    showToast("All owners have paid their share");
     return;
   }
 
@@ -11324,12 +11314,12 @@ function openProjectWhatsAppReminderDialog(project) {
 
   els.whatsappDialogTitle.textContent = tr("Reminders – {project}", { project: project.name });
   els.whatsappDialogNote.textContent = withoutPhone.length
-    ? tr("{names} skipped – no phone number saved in the Tenants tab.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
+    ? tr("{names} skipped – no phone number saved in the Flats tab.", { names: withoutPhone.map(({ tenant }) => tenant.name).join("، ") })
     : "";
   els.whatsappDialogNote.classList.toggle("hidden", !withoutPhone.length);
 
   if (!withPhone.length) {
-    showToast("No due tenants have a phone number saved");
+    showToast("No due owners have a phone number saved");
     return;
   }
 
@@ -11447,8 +11437,8 @@ function attachEvents() {
     tenant.pinHash = "";
     saveState();
     els.removeTenantPinButton.classList.add("hidden");
-    els.tenantPinDialogInput.placeholder = "Leave blank to disable tenant login";
-    showToast("Tenant PIN removed");
+    els.tenantPinDialogInput.placeholder = tr("Leave blank to disable owner login");
+    showToast("Owner PIN removed");
   });
   els.tenantList.addEventListener("click", (event) => {
     const detailsBtn = event.target.closest(".details-tenant-button[data-tenant-id]");
@@ -11793,7 +11783,7 @@ function attachEvents() {
   els.zeroAccountsButton.addEventListener("click", zeroAccounts);
 
   els.startFreshButton.addEventListener("click", () => {
-    if (!window.confirm(tr("Erase everything? This permanently deletes all tenants, payments, expenses and settings on this device and starts setup over. This cannot be undone."))) return;
+    if (!window.confirm(tr("Erase everything? This permanently deletes all flats, payments, expenses and settings on this device and starts setup over. This cannot be undone."))) return;
     const nextEpoch = Number(state.meta?.epoch || 0) + 1;
     localStorage.removeItem(STORAGE_KEY);
     state = hydrateState({});
@@ -12294,7 +12284,7 @@ function monthToClose() {
 
 // ── Change history ──────────────────────────────────────────────────────────
 const AUDIT_KIND_LABELS = {
-  transaction: "Entry", tenant: "Tenant", project: "Project", reading: "Meter readings", recurring: "Monthly expense",
+  transaction: "Entry", tenant: "Owner", project: "Project", reading: "Meter readings", recurring: "Monthly expense",
   cashCheck: "Cash count", notice: "Notice", issue: "Problem", genService: "Generator service",
   monthLock: "Month lock", maintenance: "Maintenance job", supplier: "Supplier", document: "Document", meeting: "Meeting", poll: "Poll", budget: "Monthly budget", settings: "Settings", many: "Many records",
 };
@@ -12303,7 +12293,7 @@ function describeRecord(kind, record) {
   if (!record) return "";
   switch (kind) {
     case "transaction": {
-      const who = record.tenantId ? tenantName(record.tenantId) || tr("(removed tenant)") : "";
+      const who = record.tenantId ? tenantName(record.tenantId) || tr("(removed flat)") : "";
       const amount = formatUsd(Math.abs(transactionNetUsd(record)));
       return [tr(record.category || ""), who || record.description || "", amount, record.date ? formatDateLabel(record.date) : ""].filter(Boolean).join(" · ");
     }
@@ -12329,7 +12319,7 @@ function describeRecord(kind, record) {
 
 const AUDIT_FIELD_LABELS = {
   debitUsd: "Amount USD", creditUsd: "Amount USD", debitLbp: "Amount LBP", creditLbp: "Amount LBP", description: "Description",
-  date: "Date", forMonth: "Month", tenantId: "Tenant", supplier: "Supplier", invoice: "Invoice", expenseCategory: "Expense category",
+  date: "Date", forMonth: "Month", tenantId: "Owner", supplier: "Supplier", invoice: "Invoice", expenseCategory: "Expense category",
   name: "Name", unit: "Unit", coefficient: "Coefficient", breakerAmps: "Breaker (A)", phone: "Phone", active: "Active",
   status: "Status", title: "Title", expectedUsd: "Expected (USD)", collectionMode: "Collection mode", defaultDueUsd: "Monthly budget",
   lbpPerUsd: "LBP per USD", litres: "Litres", totalUsd: "Total", closed: "Closed", amount: "Amount",
@@ -12748,7 +12738,7 @@ function openNoticeDialog() {
   const title = textInput("", { placeholder: tr("Water cut on Tuesday"), maxlength: "120" });
   const body = mk("textarea", { rows: "4", placeholder: tr("Details for the residents"), maxlength: "1500" });
   const until = mk("input", { type: "date" });
-  const push = checkboxRow(tr("Also send a phone notification to tenants"), true);
+  const push = checkboxRow(tr("Also send a phone notification to residents"), true);
   const publishAt = mk("input", { type: "datetime-local" });
   const save = () => {
     if (!title.value.trim()) { showToast("Give the notice a title"); return; }
@@ -12759,7 +12749,7 @@ function openNoticeDialog() {
     renderAll();
     if (push.input.checked && !noticeIsScheduled(notice)) notifyTenants(null, `📢 ${notice.title}`, notice.body || notice.title);
     openToolDialog(tr("Notice posted"),
-      note(tr("Tenants see it on their phones. Post it to the building's WhatsApp group too?")),
+      note(tr("Residents see it on their phones. Post it to the building's WhatsApp group too?")),
       mk("div", { className: "button-row" },
         primaryButton(tr("Post to WhatsApp group"), () => { window.open(whatsappLink("", noticeMessage(notice)), "_blank", "noopener"); closeToolDialog(); }),
         secondaryButton(tr("Done"), closeToolDialog)));
@@ -12768,7 +12758,7 @@ function openNoticeDialog() {
     field(tr("Title"), title),
     field(tr("Message"), body),
     field(tr("Show until (optional)"), until, tr("Without a date it shows for 60 days.")),
-    field(tr("Publish on (optional)"), publishAt, tr("Leave empty to publish now. Tenants see it, and get the notification, at that time.")),
+    field(tr("Publish on (optional)"), publishAt, tr("Leave empty to publish now. Residents see it, and get the notification, at that time.")),
     canNotify() ? push.row : null,
     mk("div", { className: "button-row" }, primaryButton(tr("Post notice"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
 }
@@ -12882,7 +12872,7 @@ function openIssueManageDialog(id) {
   };
   openToolDialog(issue.title,
     issue.details ? note(issue.details) : null,
-    note(issue.tenantId ? tr("Reported by {name} on {date}", { name: tenantName(issue.tenantId) || tr("(removed tenant)"), date: formatDateLabel(String(issue.createdAt).slice(0, 10)) }) : tr("Building problem")),
+    note(issue.tenantId ? tr("Reported by {name} on {date}", { name: tenantName(issue.tenantId) || tr("(removed flat)"), date: formatDateLabel(String(issue.createdAt).slice(0, 10)) }) : tr("Building problem")),
     field(tr("Status"), status),
     field(tr("Note for the resident"), ownerNote),
     mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), mk("button", { type: "button", className: "danger-button", text: tr("Delete"), onclick: remove })));
@@ -12899,7 +12889,7 @@ function renderIssues() {
     return;
   }
   els.issuesList.replaceChildren(...issues.map((issue) => {
-    const who = issue.tenantId ? (tenantName(issue.tenantId) || tr("(removed tenant)")) : tr("Building");
+    const who = issue.tenantId ? (tenantName(issue.tenantId) || tr("(removed flat)")) : tr("Building");
     const card = mk("article", { className: "notice-card issue-card" },
       mk("div", { className: "notice-head" }, mk("strong", { text: issue.title }), issueStatusPill(issue.status)),
       issue.details ? mk("p", { className: "notice-body", text: issue.details }) : null,
@@ -12927,12 +12917,12 @@ function openMoveOutDialog(tenantId) {
   const balance = getTenantBalance(tenantId);
   const nextFirst = monthIso(monthKey(addMonths(currentMonthValue(), 1)));
   const date = mk("input", { type: "date", value: nextFirst });
-  const name = textInput("", { placeholder: tr("New occupant's name") });
+  const name = textInput("", { placeholder: tr("New owner's name") });
   const phone = mk("input", { type: "tel", placeholder: "70 123 456" });
   const reading = numberInput("", { step: "1", inputmode: "numeric" });
   const choice = selectInput([
-    ["leave", tr("The leaving tenant settles it")],
-    ["transfer", tr("Transfer it to the new occupant")],
+    ["leave", tr("The previous owner settles it")],
+    ["transfer", tr("Transfer it to the new owner")],
   ], "leave");
   const balanceLine = Math.abs(balance) < 0.005
     ? tr("{name} is settled in full.", { name: tenant.name })
@@ -12942,7 +12932,7 @@ function openMoveOutDialog(tenantId) {
   const save = () => {
     const moveDate = date.value;
     if (!moveDate) { showToast("Choose the handover date"); return; }
-    if (!name.value.trim()) { showToast("Enter the new occupant's name"); return; }
+    if (!name.value.trim()) { showToast("Enter the new owner's name"); return; }
     if (isMonthClosed(moveDate)) { showToast(closedMonthError(moveDate).message, 5000); return; }
     const newTenant = {
       id: generateTenantId(name.value.trim()),
@@ -12977,22 +12967,22 @@ function openMoveOutDialog(tenantId) {
     if (!saveState()) return;
     populateTenantSelect();
     renderAll();
-    openToolDialog(tr("Handover recorded"),
-      note(tr("{old} has moved out and {new} is now the occupant of unit {unit}. From {month}, {new} pays the monthly charges.", { old: tenant.name, new: newTenant.name, unit: tenant.unit, month: formatMonth(moveDate) })),
+    openToolDialog(tr("Transfer recorded"),
+      note(tr("{new} is now the owner of flat {unit} instead of {old}. From {month}, {new} pays the monthly charges.", { old: tenant.name, new: newTenant.name, unit: tenant.unit, month: formatMonth(moveDate) })),
       mk("div", { className: "button-row" },
         primaryButton(tr("Final statement for {name}", { name: tenant.name }), () => { void shareTenantStatementPdf(tenant.id); }),
         secondaryButton(tr("Invite {name}", { name: newTenant.name }), () => { closeToolDialog(); openInviteDialog(newTenant.id); }),
         secondaryButton(tr("Final settlement"), () => openSettlementDialog(tenant.id))));
   };
-  openToolDialog(tr("Move out — {name}", { name: tenant.name }),
-    note(tr("Records a change of occupant for unit {unit}. The old account is kept (inactive) with its full history.", { unit: tenant.unit })),
-    field(tr("Handover date"), date, tr("The leaving tenant pays up to the month before; the new occupant from this month.")),
-    field(tr("New occupant"), name),
+  openToolDialog(tr("Ownership transfer — {name}", { name: tenant.name }),
+    note(tr("Records a change of owner for flat {unit}. The previous owner's account is kept (inactive) with its full history.", { unit: tenant.unit })),
+    field(tr("Transfer date"), date, tr("The previous owner pays up to the month before; the new owner from this month.")),
+    field(tr("New owner"), name),
     field(tr("Phone (optional)"), phone),
-    field(tr("Generator meter at handover (optional)"), reading),
+    field(tr("Generator meter on the transfer date (optional)"), reading),
     note(balanceLine),
     Math.abs(balance) >= 0.005 ? field(tr("The balance"), choice) : null,
-    mk("div", { className: "button-row" }, primaryButton(tr("Record handover"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
+    mk("div", { className: "button-row" }, primaryButton(tr("Record the transfer"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
 }
 
 // ── Extra administrators ────────────────────────────────────────────────────
@@ -13093,7 +13083,7 @@ function urlBase64ToBytes(base64) {
 
 async function enablePushNotifications() {
   if (!pushSupported()) { showToast("This phone or browser can't receive notifications. On an iPhone, add the app to the Home Screen first.", 7000); return; }
-  if (!authSession) { showToast("Sign in first (Google for the building manager, an invite code for tenants)", 6000); return; }
+  if (!authSession) { showToast("Sign in first (Google for the building manager, an invite code for residents)", 6000); return; }
   try {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") { showToast("Notifications are blocked for this site in the phone's settings", 6000); return; }
@@ -13137,7 +13127,7 @@ function renderPushStatus() {
       ? tr("On for this phone.")
       : sessionMode === "tenant"
         ? tr("Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.")
-        : tr("Get a notification when a tenant says they paid or reports a problem.");
+        : tr("Get a notification when a resident says they paid or reports a problem.");
   els.pushToggleButton.textContent = on ? tr("Turn off") : tr("Turn on");
   els.pushToggleButton.disabled = !pushSupported();
   renderPushExtras(on && pushSupported());
@@ -13299,7 +13289,7 @@ function printAnnualReport(year) {
       [tr("Money in"), formatUsd(d.income)],
       [tr("Money out"), formatUsd(d.spending)],
       [tr("Cash on 31 December"), formatUsd(d.closingCash)],
-      [tr("Still owed by tenants"), formatUsd(d.owedAtEnd)],
+      [tr("Still owed by owners"), formatUsd(d.owedAtEnd)],
     ].map(([label, value]) => mk("div", {}, mk("span", { text: label }), mk("strong", { text: value })))),
     mk("h2", { className: "print-section-title", text: tr("Month by month") }),
     printTable([tr("Month"), tr("Payments"), tr("Projects"), tr("Expenses"), tr("Generator & water"), tr("Net"), tr("Cash at month end")],
@@ -13307,8 +13297,8 @@ function printAnnualReport(year) {
     mk("h2", { className: "print-section-title", text: tr("Where the money went") }),
     printTable([tr("Category"), tr("Amount"), tr("Share")],
       d.categories.map(([cat, usd]) => [cat, formatUsd(usd), d.spending > 0 ? `${Math.round((usd / d.spending) * 100)}%` : ""]), [1, 2]),
-    mk("h2", { className: "print-section-title", text: tr("Tenants") }),
-    printTable([tr("Unit"), tr("Tenant"), tr("Paid in the year"), tr("Projects"), tr("Balance (owes +)")],
+    mk("h2", { className: "print-section-title", text: tr("Flats") }),
+    printTable([tr("Unit"), tr("Owner"), tr("Paid in the year"), tr("Projects"), tr("Balance (owes +)")],
       d.tenants.map((t) => [t.unit, t.name, formatUsd(t.paid), formatUsd(t.projects), formatUsd(t.balance)]), [2, 3, 4]),
     d.projects.length ? mk("h2", { className: "print-section-title", text: tr("Projects") }) : null,
     d.projects.length ? printTable([tr("Project"), tr("Status"), tr("Budget"), tr("Collected")],
@@ -13335,7 +13325,7 @@ function buildAnnualWorkbookFiles(year) {
     { name: tr("Month by month"), columns: [C("Month", 12, "month"), C("Payments", 14, "usd", true), C("Projects", 14, "usd", true), C("Expenses", 14, "usd", true), C("Generator & water", 16, "usd", true), C("Other", 12, "usd", true), C("Net", 13, "usd", true), C("Cash at month end", 17, "usd")],
       rows: d.months.map((r) => [r.month, r.payments, r.projects, r.expenses, r.services, r.other, r.net, r.cashEnd]) },
     { name: tr("Where the money went"), columns: [C("Category", 30), C("Amount", 15, "usd", true)], rows: d.categories.map(([cat, usd]) => [cat, usd]) },
-    { name: tr("Tenants"), columns: [C("Unit", 9), C("Tenant", 26), C("Paid in the year", 16, "usd", true), C("Projects", 14, "usd", true), C("Balance (owes +)", 16, "usd", true)],
+    { name: tr("Flats"), columns: [C("Unit", 9), C("Owner", 26), C("Paid in the year", 16, "usd", true), C("Projects", 14, "usd", true), C("Balance (owes +)", 16, "usd", true)],
       rows: d.tenants.map((t) => [t.unit, t.name, t.paid, t.projects, t.balance]) },
     { name: tr("Projects"), columns: [C("Project", 26), C("Status", 12), C("Budget", 14, "usd", true), C("Collected", 14, "usd", true)],
       rows: d.projects.map((p) => [p.name, tr(p.status), p.budget, p.collected]) },
@@ -13343,7 +13333,7 @@ function buildAnnualWorkbookFiles(year) {
   const summary = [
     { heading: tr("Annual report {year}", { year: d.year }), items: [
       [tr("Building"), building], [tr("Cash on 1 January"), d.openingCash, "usd"], [tr("Money in"), d.income, "usd"],
-      [tr("Money out"), d.spending, "usd"], [tr("Cash on 31 December"), d.closingCash, "usd"], [tr("Still owed by tenants"), d.owedAtEnd, "usd"]] },
+      [tr("Money out"), d.spending, "usd"], [tr("Cash on 31 December"), d.closingCash, "usd"], [tr("Still owed by owners"), d.owedAtEnd, "usd"]] },
   ];
   const sheets = [
     { name: safeSheetName(tr("Summary"), used), xml: buildSummarySheetXml(building, subtitle, summary, rtl) },
@@ -13557,7 +13547,7 @@ function extraAttentionItems() {
   items.push(...v167AttentionItems(), ...v167bAttentionItems(), ...v174AttentionItems());
   [currentMonthValue()].forEach((m) => {
     const late = lateTenants(m);
-    if (late.length) items.push({ kind: "danger", text: tr(late.length === 1 ? "{n} tenant is late for {month}" : "{n} tenants are late for {month}", { n: late.length, month: formatMonth(m) }), view: "paymentsView", key: `late:${monthKey(m)}` });
+    if (late.length) items.push({ kind: "danger", text: tr(late.length === 1 ? "{n} owner is late for {month}" : "{n} owners are late for {month}", { n: late.length, month: formatMonth(m) }), view: "paymentsView", key: `late:${monthKey(m)}` });
   });
   if (keepaliveStale()) items.push({ kind: "danger", text: tr("The database keep-alive hasn't run since {date}. The free database pauses after a week without activity.", { date: formatDateLabel(localDateInputFrom(keepaliveLastOk)) }), view: "settingsView", key: "keepalive" });
   return items;
@@ -13709,7 +13699,7 @@ function dataHealthIssues() {
 
   const noPhone = active.filter((t) => !String(t.phone || "").trim());
   if (noPhone.length) {
-    issues.push({ text: tr(noPhone.length === 1 ? "{n} tenant has no phone number ({units})" : "{n} tenants have no phone number ({units})", { n: noPhone.length, units: unitList(noPhone) }), view: "tenantsView" });
+    issues.push({ text: tr(noPhone.length === 1 ? "{n} owner has no phone number ({units})" : "{n} owners have no phone number ({units})", { n: noPhone.length, units: unitList(noPhone) }), view: "tenantsView" });
   }
 
   const genMonths = getServiceMonths("generator");
@@ -13961,14 +13951,14 @@ function monthlyNoticesOn() {
 }
 
 function buildAutoNoticeSection() {
-  const toggle = checkboxRow(tr("On the 1st of each month, send each tenant who owes money a phone notification with their balance"), monthlyNoticesOn());
+  const toggle = checkboxRow(tr("On the 1st of each month, send each owner who owes money a phone notification with their balance"), monthlyNoticesOn());
   toggle.input.addEventListener("change", () => {
     state.settings.monthlyBalanceNotices = toggle.input.checked;
     if (!saveState()) return;
     showToast(toggle.input.checked ? "Monthly balance notifications on" : "Monthly balance notifications off");
   });
   return mk("div", {}, toggle.row,
-    note(tr("Only tenants who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.")),
+    note(tr("Only owners who linked their phone and turned on notifications receive it. The amounts are the ones on your device the last time you saved.")),
     buildLateReminderControls());
 }
 
@@ -14427,8 +14417,8 @@ function openInviteAllDialog() {
       mk("span", {}, mk("strong", { text: `${tenant.unit || ""} · ${tenant.name}` }), status),
       mk("span", { className: "invite-actions" }, miniButton("QR", () => { void openInviteQr(tenant); }), button));
   });
-  openToolDialog(tr("Invite all tenants"),
-    note(tr("Each tenant gets their own one-time code on WhatsApp, with the link and how to add the app to their home screen. Tap Send for each one.")),
+  openToolDialog(tr("Invite everyone"),
+    note(tr("Each owner gets their own one-time code on WhatsApp, with the link and how to add the app to their home screen. Tap Send for each one.")),
     mk("div", { className: "history-list compact" }, rows),
     mk("div", { className: "button-row" }, secondaryButton(tr("Done"), () => { closeToolDialog(); refreshTenantLinks(); })));
 }
@@ -14480,7 +14470,7 @@ function openWhoPaidDialog() {
   });
   const save = () => {
     const chosen = rows.filter((r) => r.tick.checked && Number(r.amount.value || 0) > 0);
-    if (!chosen.length) { showToast("Tick at least one tenant with an amount"); return; }
+    if (!chosen.length) { showToast("Tick at least one flat with an amount"); return; }
     const day = date.value || localDateInput();
     if (isMonthClosed(day)) { showToast(closedMonthError(day).message, 5000); return; }
     const created = [];
@@ -14554,7 +14544,7 @@ function openUnitDetailsDialog(tenantId) {
   openToolDialog(tr("Unit {unit} — details", { unit: tenant.unit || "" }),
     note(tr("Only you see these.")),
     UNIT_DETAIL_FIELDS.map(([key, label]) => field(tr(label), inputs[key])),
-    field(tr("Messages in"), language, tr("Reminders and invites to this tenant use this language.")),
+    field(tr("Messages in"), language, tr("Reminders and invites to this owner use this language.")),
     mk("div", { className: "button-row" }, primaryButton(tr("Save"), save), secondaryButton(tr("Cancel"), closeToolDialog)));
 }
 
@@ -15223,11 +15213,11 @@ const HELP_VIDEOS = [
   { id: "expense", role: "owner", title: "Record an expense", sub: "With a photo of the invoice", seconds: { en: 67, ar: 60 } },
   { id: "group", role: "owner", title: "Share balances with the group", sub: "One picture for the building's WhatsApp group", seconds: { en: 40, ar: 36 } },
   { id: "generator", role: "owner", title: "Generator readings and bills", sub: "Split fairly by what each flat used", seconds: { en: 47, ar: 43 } },
-  { id: "invite", role: "owner", title: "Invite your tenants", sub: "Each tenant gets the app on their phone", seconds: { en: 45, ar: 43 } },
+  { id: "invite", role: "owner", title: "Invite your residents", sub: "Each resident gets the app on their phone", seconds: { en: 45, ar: 43 } },
   { id: "reports", role: "owner", title: "Reports and closing the month", sub: "Monthly report, cash count, health check", seconds: { en: 59, ar: 55 } },
   { id: "maintenance", role: "owner", title: "Maintenance calendar", sub: "Never miss an inspection or a cleaning", seconds: { en: 53, ar: 50 } },
   { id: "residents", role: "owner", title: "Notices, votes and problems", sub: "Keep the residents in the loop", seconds: { en: 46, ar: 44 } },
-  { id: "join", role: "tenant", title: "Join with your invite code", sub: "For tenants, the first time", seconds: { en: 41, ar: 39 } },
+  { id: "join", role: "tenant", title: "Join with your invite code", sub: "For residents, the first time", seconds: { en: 41, ar: 39 } },
   { id: "tenant-home", role: "tenant", title: "Your balance and payments", sub: "See what you owe and tell the building manager you paid", seconds: { en: 40, ar: 36 } },
   { id: "tenant-more", role: "tenant", title: "Votes, problems and notifications", sub: "Take part in the building", seconds: { en: 51, ar: 48 } },
 ];
@@ -15285,7 +15275,7 @@ function renderHelp() {
   list.replaceChildren(owner
     ? mk("div", {},
       group(tr("For you"), videos.filter((v) => v.role === "owner")),
-      group(tr("What your tenants see"), videos.filter((v) => v.role === "tenant")))
+      group(tr("What your residents see"), videos.filter((v) => v.role === "tenant")))
     : group("", videos));
 }
 
@@ -15559,9 +15549,9 @@ function openOutstandingList() {
 function openNetPositionExplainer() {
   const totals = getPositionTotals();
   openToolDialog(tr("Net position"),
-    note(tr("What the building would have if every tenant paid what they owe today.")),
+    note(tr("What the building would have if every owner paid what they owe today.")),
     breakdownRow(isFixedMode() ? tr("Reserve Fund") : tr("Cash Balance"), formatUsd(totals.cashUsd)),
-    breakdownRow(tr("+ Owed by tenants"), formatUsd(totals.receivableUsd)),
+    breakdownRow(tr("+ Owed by owners"), formatUsd(totals.receivableUsd)),
     breakdownRow(tr("− Paid in advance"), formatUsd(roundUsd(totals.receivableUsd + totals.cashUsd - totals.netPositionUsd))),
     breakdownRow(tr("Net position"), formatUsd(totals.netPositionUsd)));
 }
@@ -15864,8 +15854,8 @@ function renderPaymentInstructionsField() {
   let box = document.querySelector("#paymentInstructionsField");
   if (!box) {
     const input = mk("textarea", { id: "paymentInstructionsInput", rows: "3", maxlength: "600", placeholder: tr("e.g. Bank Audi IBAN LB00 0000… · Whish 70 000 000 · cash to the concierge") });
-    box = mk("label", { id: "paymentInstructionsField" }, mk("span", { text: tr("How tenants can pay") }), input,
-      mk("small", { className: "field-hint", text: tr("Shown to tenants on their phones with what they owe. Saved with the Save button below.") }));
+    box = mk("label", { id: "paymentInstructionsField" }, mk("span", { text: tr("How residents can pay") }), input,
+      mk("small", { className: "field-hint", text: tr("Shown to residents on their phones with what they owe. Saved with the Save button below.") }));
     anchor.after(box);
   }
   const input = document.querySelector("#paymentInstructionsInput");
@@ -15940,7 +15930,7 @@ async function downloadAccountantPack(year, button) {
     files.unshift({ name: "README.txt", content: [
       `${state.building?.name || "Building"} — accountant pack ${y} (${localDateInput()})`,
       "",
-      `annual-report-${y}.xlsx: money in and out by month, where it went, tenants, projects.`,
+      `annual-report-${y}.xlsx: money in and out by month, where it went, flats, projects.`,
       "ledger-full-*.xlsx: every entry, all years.",
       `receipts/: ${receipts} payment receipts dated ${y}.`,
       `invoices/: ${invoices} invoice photos for ${y} expenses.`,
@@ -16041,7 +16031,7 @@ function renderTestDataAction() {
   row.replaceChildren(
     mk("div", { className: "settings-action-text" }, mk("strong", { text: tr("Test data") }), mk("span", { text: tr("{n} made-up entries marked “test” are in the building.", { n: count }) })),
     mk("button", { type: "button", className: "secondary-button danger-action", text: tr("Remove"), onclick: () => {
-      if (!window.confirm(tr("Remove all {n} test entries? Your real entries stay. The monthly balance messages to tenants are switched back on.", { n: count }))) return;
+      if (!window.confirm(tr("Remove all {n} test entries? Your real entries stay. The monthly balance messages to owners are switched back on.", { n: count }))) return;
       const result = removeTestData();
       state.settings.monthlyBalanceNotices = true;
       if (!saveState()) return;
@@ -16381,7 +16371,7 @@ function searchEverything(query) {
 }
 
 function openSearch() {
-  const input = mk("input", { type: "search", className: "search-everything", placeholder: tr("Tenant, supplier, receipt no., notice…"), autocomplete: "off" });
+  const input = mk("input", { type: "search", className: "search-everything", placeholder: tr("Owner, flat, supplier, receipt no., notice…"), autocomplete: "off" });
   const list = mk("div", { className: "search-results" });
   const go = (r) => {
     closeToolDialog();
@@ -16939,12 +16929,12 @@ function setupSteps() {
   const generatorUsed = state.transactions.some((t) => t.serviceType === "generator");
   const linked = Object.values(tenantLinkInfo || {}).some((i) => i?.phones);
   return [
-    { key: "tenants", done: active.length > 0, text: tr("Add the flats and tenants"), go: () => setView("tenantsView") },
+    { key: "tenants", done: active.length > 0, text: tr("Add the flats and owners"), go: () => setView("tenantsView") },
     { key: "coef", done: active.length > 0 && active.reduce((s, t) => s + Number(t.coefficient || 0), 0) === 1000, text: tr("Coefficients add up to 1000"), go: () => setView("tenantsView") },
-    { key: "phones", done: active.length > 0 && active.every((t) => t.phone), text: tr("A phone number for every tenant"), go: () => setView("tenantsView") },
+    { key: "phones", done: active.length > 0 && active.every((t) => t.phone), text: tr("A phone number for every owner"), go: () => setView("tenantsView") },
     ...(generatorUsed ? [{ key: "amps", done: active.every((t) => Number(t.breakerAmps || 0) > 0), text: tr("Breaker size for every flat (generator)"), go: () => setView("tenantsView") }] : []),
-    { key: "pay", done: Boolean(String(state.settings.paymentInstructions || "").trim()), text: tr("How tenants can pay (Settings)"), go: () => setView("settingsView") },
-    { key: "invite", done: linked, text: tr("Invite tenants to the app"), go: () => openInviteAllDialog() },
+    { key: "pay", done: Boolean(String(state.settings.paymentInstructions || "").trim()), text: tr("How residents can pay (Settings)"), go: () => setView("settingsView") },
+    { key: "invite", done: linked, text: tr("Invite residents to the app"), go: () => openInviteAllDialog() },
     { key: "payment", done: state.transactions.some((t) => t.category === "Payments"), text: tr("Record the first payment"), go: () => openEntryForm("Payments") },
   ];
 }
@@ -17025,11 +17015,11 @@ function renderV165SettingsFields() {
     const tplEn = mk("textarea", { id: "reminderTemplateEn", rows: "3", maxlength: "600", placeholder: tr("Leave empty for the standard message") });
     const tplAr = mk("textarea", { id: "reminderTemplateAr", rows: "3", maxlength: "600", dir: "rtl", placeholder: tr("Leave empty for the standard message") });
     after.after(mk("div", { id: "v165SettingsFields" },
-      mk("label", { id: "dueDayField" }, mk("span", { text: tr("Dues are due by day") }), due, mk("small", { className: "field-hint", text: tr("After that day, unpaid tenants show as late. 0 or empty = no due day.") })),
-      mk("label", {}, mk("span", { text: tr("Generator hours (shown to tenants)") }), schedule),
+      mk("label", { id: "dueDayField" }, mk("span", { text: tr("Dues are due by day") }), due, mk("small", { className: "field-hint", text: tr("After that day, unpaid owners show as late. 0 or empty = no due day.") })),
+      mk("label", {}, mk("span", { text: tr("Generator hours (shown to residents)") }), schedule),
       mk("label", {}, mk("span", { text: tr("Reminder message — English") }), tplEn),
       mk("label", {}, mk("span", { text: tr("Reminder message — Arabic") }), tplAr),
-      mk("small", { className: "field-hint", text: tr("You can use {name}, {amount}, {month}, {unit} and {building}. Each tenant gets the language set in their Details.") }),
+      mk("small", { className: "field-hint", text: tr("You can use {name}, {amount}, {month}, {unit} and {building}. Each owner gets the language set in their Details.") }),
       mk("div", { className: "settings-action" },
         mk("div", { className: "settings-action-text" }, mk("strong", { text: tr("LBP rate") }), mk("span", { id: "rateHistoryText" })),
         secondaryButton(tr("Edit"), openRateDialog))));
@@ -17224,7 +17214,7 @@ function emergencyEditor() {
   if (!rows.childElementCount) addRow();
   return mk("div", { id: "emergencyEditor", oninput: (e) => { e.currentTarget.dataset.dirty = "1"; } },
     mk("p", { className: "settings-section-header", text: tr("Emergency numbers") }),
-    note(tr("Shown to tenants and the concierge with a Call button.")),
+    note(tr("Shown to residents and the concierge with a Call button.")),
     rows,
     mk("div", { className: "button-row" }, secondaryButton(tr("+ Add a number"), () => { addRow(); document.querySelector("#emergencyEditor").dataset.dirty = "1"; })));
 }
@@ -17288,7 +17278,7 @@ function canReplyIssue(issue) {
 function messageAuthor(m, issue) {
   if (m.by === "owner") return tr("Building manager");
   if (m.by === "concierge") return tr("Concierge");
-  return issue.tenantId ? tenantName(issue.tenantId) || tr("Tenant") : tr("Tenant");
+  return issue.tenantId ? tenantName(issue.tenantId) || tr("Owner") : tr("Owner");
 }
 
 function issueThread(issue) {
@@ -18323,7 +18313,7 @@ function lateReminderSettings() {
 function buildLateReminderControls() {
   if (!isFixedMode()) return null;
   const s = lateReminderSettings();
-  const toggle = checkboxRow(tr("Remind late tenants automatically"), s.on);
+  const toggle = checkboxRow(tr("Remind late owners automatically"), s.on);
   const days = selectInput([3, 5, 7, 10, 15].map((n) => [String(n), tr("{n} days after the due day", { n })]), String(s.days));
   const save = () => {
     if (!canEditBuilding()) return;
@@ -18338,7 +18328,7 @@ function buildLateReminderControls() {
     toggle.row,
     field(tr("When"), days),
     note(dueDay
-      ? tr("Once a month, each tenant who still owes for a month whose due day has passed gets a polite phone notification, in their language.")
+      ? tr("Once a month, each owner who still owes for a month whose due day has passed gets a polite phone notification, in their language.")
       : tr("Set the due day in Settings first; reminders go out that many days after it."), dueDay ? "" : "is-warning"));
 }
 
@@ -19120,10 +19110,10 @@ function printMeetingPack(year, { balances = false } = {}) {
       [...p.rows.map((r) => [r.category, formatUsd(r.last), formatUsd(r.next)]),
         ...(p.reserveTopUp ? [[tr("Back up to the reserve target"), "", formatUsd(p.reserveTopUp)]] : []),
         [tr("Total"), formatUsd(p.base), formatUsd(p.yearly)]], [1, 2]) : null,
-    p.rows.length ? printTable([tr("Unit"), tr("Tenant"), tr("Proposed per month")], p.perFlat.map((f) => [f.unit, f.name, formatUsd(f.usd)]), [2]) : null,
+    p.rows.length ? printTable([tr("Unit"), tr("Owner"), tr("Proposed per month")], p.perFlat.map((f) => [f.unit, f.name, formatUsd(f.usd)]), [2]) : null,
     p.rows.length ? mk("p", { className: "print-note", text: tr("Includes a {n}% margin for rising prices. Generator and water are billed separately.", { n: p.marginPct }) }) : null,
     balances ? mk("h2", { className: "print-section-title", text: tr("5. Each flat's balance") }) : null,
-    balances ? printTable([tr("Unit"), tr("Tenant"), tr("Paid in the year"), tr("Balance (owes +)")], a.tenants.map((t) => [t.unit, t.name, formatUsd(t.paid), formatUsd(t.balance)]), [2, 3]) : null,
+    balances ? printTable([tr("Unit"), tr("Owner"), tr("Paid in the year"), tr("Balance (owes +)")], a.tenants.map((t) => [t.unit, t.name, formatUsd(t.paid), formatUsd(t.balance)]), [2, 3]) : null,
     mk("h2", { className: "print-section-title", text: tr("Signatures") }),
     mk("div", { className: "print-signatures" }, [tr("Building manager"), tr("Committee member")].map((who) => mk("div", {}, mk("span", { text: who }), mk("span", { className: "sign-line" })))));
   printPreparedPage(page);
@@ -19303,7 +19293,7 @@ function openOtherIncomeDialog() {
     showUndoToast(tr("Income recorded"), () => undoAddedTransactions([tx.id]));
   };
   openToolDialog(tr("Other income"),
-    note(tr("Money the building receives that isn't a tenant's dues: antenna rent, a parking space, a shop. It goes into the building's cash.")),
+    note(tr("Money the building receives that isn't an owner's dues: antenna rent, a parking space, a shop. It goes into the building's cash.")),
     field(tr("What for"), what),
     field(tr("From"), from),
     field(tr("Date"), date),
@@ -19332,7 +19322,7 @@ function openDepositDialog(tenantId = "") {
   const memo = textInput("", { maxlength: "120", placeholder: tr("e.g. Returned when they move out") });
   openToolDialog(tr("New deposit"),
     note(tr("A deposit stays the tenant's money: it is kept apart from the building's cash and returned when they leave.")),
-    field(tr("Tenant"), who),
+    field(tr("Owner"), who),
     mk("div", { className: "two-col" }, field(tr("Amount (USD)"), amount), field(tr("For"), kind)),
     field(tr("Received on"), date),
     field(tr("Note"), memo),
@@ -19588,7 +19578,7 @@ function openStatementImportDialog() {
   const draw = () => {
     const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
     list.replaceChildren(...(rows.length ? rows.map((r) => {
-      const pick = selectInput([["", tr("— not a tenant payment —")], ...tenants.map((t) => [t.id, unitLabel(t)])], r.tenantId);
+      const pick = selectInput([["", tr("— not a flat payment —")], ...tenants.map((t) => [t.id, unitLabel(t)])], r.tenantId);
       const dup = alreadyRecorded(r, r.tenantId);
       const tick = mk("input", { type: "checkbox", checked: Boolean(r.tenantId) && !dup });
       pick.addEventListener("change", () => { r.tenantId = pick.value; r.tick = Boolean(pick.value) && !alreadyRecorded(r, pick.value); draw(); });
@@ -19737,7 +19727,7 @@ function openAllStatementsDialog() {
   if (sessionMode !== "owner") return;
   const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
   openToolDialog(tr("Everyone's statement"),
-    note(tr("A statement picture for each tenant. Send each one on WhatsApp, or download them all at once.")),
+    note(tr("A statement picture for each flat. Send each one on WhatsApp, or download them all at once.")),
     mk("div", {}, tenants.map((t) => {
       const bal = roundUsd(getTenantBalance(t.id));
       return mk("div", { className: "breakdown-row" },
@@ -19757,7 +19747,7 @@ function openParkingDialog() {
   const tenants = state.tenants.filter((t) => t.active !== false).sort(byUnit);
   const inputs = tenants.map((t) => ({ t, input: textInput(t.parking || "", { maxlength: "40", placeholder: tr("e.g. P3, P4") }) }));
   openToolDialog(tr("Parking spaces"),
-    note(tr("Which spots belong to each flat. Tenants see theirs on their phone.")),
+    note(tr("Which spots belong to each flat. Residents see theirs on their phone.")),
     ...inputs.map(({ t, input }) => field(unitLabel(t), input)),
     mk("div", { className: "button-row" },
       primaryButton(tr("Save"), () => {
@@ -19782,7 +19772,7 @@ function installTenantToolButtons() {
   const host = document.querySelector("#inviteAllButton")?.parentElement;
   if (!host || host.querySelector(".tenant-tools-button")) return;
   const more = mk("button", { type: "button", className: "secondary-button owner-only tenant-tools-button", text: tr("More…") });
-  more.addEventListener("click", () => openToolDialog(tr("Tenants"),
+  more.addEventListener("click", () => openToolDialog(tr("Flats"),
     mk("div", { className: "tool-list" },
       secondaryButton(tr("Everyone's statement"), () => { closeToolDialog(); openAllStatementsDialog(); }),
       secondaryButton(tr("Deposits held"), () => { closeToolDialog(); openDepositsDialog(); }),
@@ -20080,7 +20070,7 @@ function maybeShowNudge() {
       title: tr("Notifications"),
       headline: tr("Know straight away"),
       body: sessionMode === "owner"
-        ? tr("Get a notification on this phone when a tenant says they paid, reports a problem or posts on the board.")
+        ? tr("Get a notification on this phone when a resident says they paid, reports a problem or posts on the board.")
         : tr("Get a notification on this phone for receipts, notices, replies and votes — like a WhatsApp message."),
       button: tr("Turn on"),
       illustration: notificationArt(),
@@ -20516,7 +20506,7 @@ function buildingRoleLabel(row) {
   if (row.role === "owner") return tr("Building manager");
   if (row.role === "viewer") return tr("View only");
   if (row.role === "concierge") return tr("Concierge");
-  return tr("Tenant");
+  return tr("Owner");
 }
 
 async function openBuildingsDialog() {
@@ -20543,7 +20533,7 @@ async function openBuildingsDialog() {
     list,
     canAdd ? mk("div", { className: "building-add" },
       mk("h3", { className: "building-add-head", text: tr("Add a building") }),
-      note(tr("It starts empty, with its own tenants, notices, concierge and helpers. Nothing is shared with your other buildings.")),
+      note(tr("It starts empty, with its own flats, notices, concierge and helpers. Nothing is shared with your other buildings.")),
       field(tr("Building name"), nameInput),
       addButton) : null);
   const rows = await loadMyBuildings();
@@ -21266,6 +21256,7 @@ function renderMoreGroups() {
   };
   retext(".buildings-menu-item", "Your buildings", "Switch building or add another one");
   retext(".ask-menu-item", "Ask the app", "Questions about the money, in your own words");
+  document.querySelectorAll(".tenant-tools-button").forEach((b) => { b.textContent = tr("More…"); });
   const settingsSub = menu.querySelector('.more-menu-item[data-view="settingsView"] .mm-text span');
   if (settingsSub) settingsSub.textContent = sessionMode === "owner" ? tr("Notifications, display, building & access") : tr("Notifications, display, app lock");
   if (typeof getComputedStyle !== "function") return;

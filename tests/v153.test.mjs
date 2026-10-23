@@ -34,7 +34,7 @@ test("data health lists coefficients, missing phones and possible duplicates", (
   const texts = app.dataHealthIssues().map((i) => i.text);
   assert.ok(texts.includes("Coefficients add up to 1100/1000 instead of 1000"));
   assert.ok(texts.includes("No coefficient for: c"));
-  assert.ok(texts.some((t) => t.startsWith("1 tenant has no phone number (b)")));
+  assert.ok(texts.some((t) => t.startsWith("1 owner has no phone number (b)")));
   assert.equal(texts.filter((t) => t.startsWith("Possible duplicate payment")).length, 1, "only the two payments two days apart");
 });
 
