@@ -6183,3 +6183,8 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
 .receipt-total-row td {
   font-weight: 700;
 }
+
+/* v184 — one invoice button (the phone's picker offers the camera too) */
+.invoice-source-row {
+  grid-template-columns: minmax(0, 1fr);
+}

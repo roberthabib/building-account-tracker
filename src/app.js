@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v183";
+const APP_VERSION = "v184";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -670,7 +670,7 @@ const I18N = {
     "tx.projectPh": "Type project",
     "tx.invoicePicture": "Invoice (photo or PDF)",
     "tx.useCamera": "Use Camera",
-    "tx.uploadPhoto": "Photo or PDF",
+    "tx.uploadPhoto": "Add a photo or PDF",
     "tx.noPhoto": "No file selected",
     "aria.showSuppliers": "Show saved suppliers",
     "aria.showCategories": "Show saved categories",
@@ -1066,7 +1066,7 @@ const I18N = {
     "tx.projectPh": "اكتب المشروع",
     "tx.invoicePicture": "الفاتورة (صورة أو PDF)",
     "tx.useCamera": "استخدام الكاميرا",
-    "tx.uploadPhoto": "صورة أو PDF",
+    "tx.uploadPhoto": "إضافة صورة أو PDF",
     "tx.noPhoto": "لم يتم اختيار ملف",
     "aria.showSuppliers": "إظهار المورّدين المحفوظين",
     "aria.showCategories": "إظهار الفئات المحفوظة",
@@ -2299,6 +2299,14 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Check the amounts, then add them. Untick anything that didn't happen this month.": "تحقّق من المبالغ ثم أضفها. ألغِ تحديد ما لم يحدث هذا الشهر.",
+  "kWh": "ك.و.س",
+  "$ / L": "$ / ليتر",
+  "Message Due": "مراسلة المتأخرين",
+  "Generator & water charges so far: {amount}": "رسوم المولّد والمياه حتى الآن: {amount}",
+  "Add": "إضافة",
+  "Repairs": "تصليحات",
+  "Building Account": "حساب المبنى",
   "Item": "البند",
   "This payment": "هذه الدفعة",
   "Monthly fee": "الرسم الشهري",
@@ -3429,12 +3437,14 @@ function getConversionRate() {
 function formatDateLabel(dateStr) {
   if (!dateStr) return "";
   const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  // Arabic: Lebanese month names, Western digits (like the rest of the app).
+  return new Date(y, m - 1, d).toLocaleDateString(currentLang === "ar" ? "ar-LB-u-nu-latn" : "en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
 
 function formatMonth(value) {
   if (!value) return "No month";
   const [year, month] = value.slice(0, 7).split("-");
+  if (currentLang === "ar") return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("ar-LB-u-nu-latn", { month: "long", year: "numeric" });
   return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
