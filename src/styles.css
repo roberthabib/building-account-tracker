@@ -6137,3 +6137,22 @@ a.mini-button {
 body.tenant-mode #settingsView > :not(.section-title):not(#phoneSettings) {
   display: none !important;
 }
+
+/* v178 — rentals */
+.rent-card .tech-trade {
+  font-size: 1rem;
+}
+
+.rent-period {
+  align-items: center;
+  gap: 10px;
+}
+
+.rent-period .status-pill {
+  white-space: nowrap;
+}
+
+.rent-line {
+  color: var(--primary) !important;
+  font-weight: 700;
+}

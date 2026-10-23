@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v177";
+const APP_VERSION = "v178";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -375,6 +375,9 @@ const I18N = {
     "tenantNotices.title": "From the building",
     "nav.notices": "Notices",
     "nav.help": "Help & videos",
+    "nav.rentals": "Rentals",
+    "more.rentalsSub": "Leases, rent, owners' statements",
+    "more.groupRentals": "Rentals",
     "more.groupMoney": "Money",
     "more.groupResidents": "Residents",
     "more.groupRepairs": "Repairs & upkeep",
@@ -768,6 +771,9 @@ const I18N = {
     "tenantNotices.title": "من إدارة المبنى",
     "nav.notices": "الإعلانات",
     "nav.help": "المساعدة والفيديوهات",
+    "nav.rentals": "الإيجارات",
+    "more.rentalsSub": "العقود، الإيجار، كشوف المالكين",
+    "more.groupRentals": "الإيجارات",
     "more.groupMoney": "المال",
     "more.groupResidents": "السكان",
     "more.groupRepairs": "التصليحات والصيانة",
@@ -2289,6 +2295,115 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Flat {unit}": "الشقة {unit}",
+  "The database update for rentals hasn't been applied yet.": "لم يُطبَّق بعد تحديث قاعدة البيانات الخاص بالإيجارات.",
+  "This lease was changed on another device. It was reloaded: please do that again.": "تغيّر هذا العقد على جهاز آخر. أُعيد تحميله: أعد الخطوة من فضلك.",
+  "Leases": "العقود",
+  "Owners": "المالكون",
+  "Ended": "منتهٍ",
+  "Paid until {date}": "مدفوع حتى {date}",
+  "Rent owed now": "الإيجار المستحق الآن",
+  "Late": "متأخر",
+  "Collected this month": "المقبوض هذا الشهر",
+  "Add a lease": "إضافة عقد إيجار",
+  "No rented flats yet. Add a lease for each flat that is rented: the tenant, the rent and when it's due.": "لا شقق مؤجّرة بعد. أضف عقداً لكل شقة مؤجّرة: المستأجر والإيجار وموعد استحقاقه.",
+  "{amount} · {period}": "{amount} · {period}",
+  "Your flat": "شقتك",
+  "Record payment": "تسجيل دفعة",
+  "Ended leases": "العقود المنتهية",
+  "{from} – {to}": "{from} – {to}",
+  "Unknown owner": "مالك غير معروف",
+  "Your own flats": "شققك الخاصة",
+  "Owners appear here once you add their flat's lease.": "يظهر المالكون هنا بعد إضافة عقد إيجار شققهم.",
+  "Collected {amount}": "المقبوض {amount}",
+  "your fee {amount}": "عمولتك {amount}",
+  "expenses {amount}": "مصاريف {amount}",
+  "handed over {amount}": "المسلَّم {amount}",
+  "Hand over": "تسليم",
+  "Add the flats first (Flats tab)": "أضف الشقق أولاً (تبويب الشقق)",
+  "Tenant's full name": "الاسم الكامل للمستأجر",
+  "This is my own flat (no fee, nothing to hand over)": "هذه شقتي الخاصة (بلا عمولة ولا تسليم)",
+  "% of the rent collected": "نسبة % من الإيجار المقبوض",
+  "Fixed amount per rent period": "مبلغ ثابت عن كل فترة إيجار",
+  "Enter the tenant's name": "أدخل اسم المستأجر",
+  "Enter the rent": "أدخل قيمة الإيجار",
+  "Enter the start date": "أدخل تاريخ البدء",
+  "The end date is before the start": "تاريخ الانتهاء قبل تاريخ البدء",
+  "Edit lease": "تعديل العقد",
+  "Tenant": "المستأجر",
+  "Language": "اللغة",
+  "Start": "البداية",
+  "End (optional)": "النهاية (اختياري)",
+  "Rent": "الإيجار",
+  "Yearly increase %": "الزيادة السنوية %",
+  "Late after (days)": "متأخر بعد (أيام)",
+  "Deposit": "التأمين",
+  "Deposit received on": "تاريخ قبض التأمين",
+  "The tenant also pays the flat's building charges. Rent is kept apart from the building's accounts: only you see it.": "يدفع المستأجر أيضاً رسوم المبنى عن الشقة. يبقى الإيجار منفصلاً عن حسابات المبنى: أنت وحدك تراه.",
+  "until {date}": "حتى {date}",
+  "+{pct}% a year": "+{pct}% سنوياً",
+  "The first rent is due on {date}.": "أول إيجار يستحق في {date}.",
+  "+ {amount} building charges": "+ {amount} رسوم المبنى",
+  "No payments yet.": "لا دفعات بعد.",
+  "to hand over {amount}": "للتسليم {amount}",
+  "Deposit: {amount}{returned}": "التأمين: {amount}{returned}",
+  " — returned {amount} on {date}": " — أُعيد {amount} في {date}",
+  "End lease": "إنهاء العقد",
+  "The tenant also paid the building charges of flat {unit}": "دفع المستأجر أيضاً رسوم المبنى عن الشقة {unit}",
+  "Building charges paid (USD)": "رسوم المبنى المدفوعة (دولار)",
+  "The flat owes {amount} to the building.": "على الشقة {amount} للمبنى.",
+  "The flat owes nothing to the building right now.": "لا شيء على الشقة للمبنى حالياً.",
+  "paid by tenant {name}": "دفعها المستأجر {name}",
+  "Payment recorded": "تم تسجيل الدفعة",
+  "Send a receipt?": "إرسال إيصال؟",
+  "Send {name} a receipt on WhatsApp.": "أرسل إيصالاً إلى {name} عبر واتساب.",
+  "Rent payment — {title}": "دفعة إيجار — {title}",
+  "Owed now: {amount}": "المستحق الآن: {amount}",
+  "Nothing owed right now; a payment counts toward the next rent.": "لا شيء مستحق حالياً؛ تُحتسب الدفعة للإيجار التالي.",
+  "Rent paid ({currency})": "الإيجار المدفوع ({currency})",
+  "How": "طريقة الدفع",
+  "Hand-over recorded": "تم تسجيل التسليم",
+  "Hand over to {name}": "تسليم إلى {name}",
+  "the owner": "المالك",
+  "To hand over now: {amount}": "للتسليم الآن: {amount}",
+  "e.g. Water heater repair in the flat": "مثلاً: تصليح سخّان المياه في الشقة",
+  "Say what it was and how much": "اذكر ما هو وكم كلّف",
+  "Expense paid for the owner": "مصروف دُفع عن المالك",
+  "Something you paid for the owner out of the rent, for example a repair inside the flat. It is taken off what you hand over.": "شيء دفعته عن المالك من الإيجار، مثلاً تصليح داخل الشقة. يُخصم مما تسلّمه.",
+  "What": "ماذا",
+  "Add the owner's phone number in the Flats tab first": "أضف رقم هاتف المالك في تبويب الشقق أولاً",
+  "Why part of the deposit was kept (optional)": "سبب الاحتفاظ بجزء من التأمين (اختياري)",
+  "Lease ended": "انتهى العقد",
+  "End lease — {title}": "إنهاء العقد — {title}",
+  "The tenant still owes {amount} of rent.": "لا يزال على المستأجر {amount} من الإيجار.",
+  "The rent is settled.": "الإيجار مسدَّد.",
+  "Last day": "آخر يوم",
+  "Deposit returned ({currency})": "التأمين المُعاد ({currency})",
+  "Deposit held: {amount}": "التأمين المحفوظ: {amount}",
+  "Delete this lease? Use this only for a lease added by mistake.": "حذف هذا العقد؟ استخدم هذا فقط لعقد أُضيف بالخطأ.",
+  "Lease deleted": "تم حذف العقد",
+  "Lease of {title} ends on {date}": "عقد {title} ينتهي في {date}",
+  "Rented to {name}": "مؤجّرة إلى {name}",
+  "Lease added": "تمت إضافة العقد",
+  "Lease updated": "تم تحديث العقد",
+  "Monthly": "شهرياً",
+  "Yearly": "سنوياً",
+  "{n} rent is late": "إيجار واحد متأخر",
+  "{n} rents are late": "{n} إيجارات متأخرة",
+  "Already handed over: {amount}": "سُلِّم سابقاً: {amount}",
+  "Building charges received: {amount}": "رسوم المبنى المقبوضة: {amount}",
+  "Building charges: {amount} due.": "رسوم المبنى: {amount} مستحقة.",
+  "Due to you now: {amount}": "المستحق لك الآن: {amount}",
+  "Flat {unit} · {name}": "الشقة {unit} · {name}",
+  "Hello {name}, a reminder from the building manager:": "مرحباً {name}، تذكير من مدير المبنى:",
+  "Hello {name}, rent statement for flat {unit} ({tenant}):": "مرحباً {name}، كشف الإيجار للشقة {unit} ({tenant}):",
+  "Management fee: {amount}": "عمولة الإدارة: {amount}",
+  "Receipt — {building}": "إيصال — {building}",
+  "Rent collected: {amount}": "الإيجار المقبوض: {amount}",
+  "Rent for flat {unit}: {amount} due.": "إيجار الشقة {unit}: {amount} مستحق.",
+  "Rent paid until {date}.": "الإيجار مدفوع حتى {date}.",
+  "Rent received: {amount} on {date}": "إيجار مقبوض: {amount} في {date}",
+  "Thank you.": "شكراً.",
   "Generator meter on the transfer date (optional)": "عداد المولّد بتاريخ النقل (اختياري)",
   "Transfer recorded": "تم تسجيل نقل الملكية",
   "Record the transfer": "تسجيل نقل الملكية",
@@ -3094,6 +3209,7 @@ const LUCIDE_ICONS = {
   truck: [["path", { d: "M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" }], ["path", { d: "M15 18H9" }], ["path", { d: "M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" }], ["circle", { cx: 17, cy: 18, r: 2 }], ["circle", { cx: 7, cy: 18, r: 2 }]],
   fileText: [["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" }], ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4" }], ["path", { d: "M10 9H8" }], ["path", { d: "M16 13H8" }], ["path", { d: "M16 17H8" }]],
   building: [["rect", { width: 16, height: 20, x: 4, y: 2, rx: 2 }], ["path", { d: "M9 22v-4h6v4" }], ["path", { d: "M8 6h.01" }], ["path", { d: "M16 6h.01" }], ["path", { d: "M12 6h.01" }], ["path", { d: "M12 10h.01" }], ["path", { d: "M12 14h.01" }], ["path", { d: "M16 10h.01" }], ["path", { d: "M16 14h.01" }], ["path", { d: "M8 10h.01" }], ["path", { d: "M8 14h.01" }]],
+  key: [["path", { d: "m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" }], ["path", { d: "m21 2-9.6 9.6" }], ["circle", { cx: 7.5, cy: 15.5, r: 5.5 }]],
   hammer: [["path", { d: "m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9" }], ["path", { d: "m18 15 4-4" }], ["path", { d: "m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5" }]],
   wrench: [["path", { d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" }]],
   barChart: [["path", { d: "M3 3v18h18" }], ["path", { d: "M18 17V9" }], ["path", { d: "M13 17V5" }], ["path", { d: "M8 17v-3" }]],
@@ -4959,6 +5075,7 @@ function enterAsOwner() {
   refreshTenantLinks();
   checkInvoiceReading();
   void refreshTechRequests();
+  void refreshRentals();
 }
 
 function hideLoginScreen() {
@@ -7967,10 +8084,10 @@ function renderAll() {
   renderV148();
 }
 
-const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView", "myFlatView", "techView"];
+const MORE_VIEWS = ["moreView", "projectsView", "servicesView", "pollsView", "settingsView", "noticesView", "issuesView", "reportsView", "maintenanceView", "suppliersView", "documentsView", "meetingsView", "helpView", "equipmentView", "staffView", "bookingsView", "boardView", "myFlatView", "techView", "rentalsView"];
 
 function setView(viewId) {
-  if (sessionMode === "tenant" && ["reportsView", "maintenanceView", "suppliersView", "documentsView", "techView"].includes(viewId)) viewId = "moreView";
+  if (sessionMode === "tenant" && ["reportsView", "maintenanceView", "suppliersView", "documentsView", "techView", "rentalsView"].includes(viewId)) viewId = "moreView";
   els.views.forEach((view) => view.classList.toggle("active", view.id === viewId));
   // Re-run the enter animation each time a view is shown.
   const active = document.getElementById(viewId);
@@ -7982,6 +8099,7 @@ function setView(viewId) {
   // Scroll back to top when switching views.
   window.scrollTo({ top: 0 });
   if (viewId === "techView") void openTechView();
+  if (viewId === "rentalsView") void openRentalsView();
 }
 
 // Inject a Lucide icon into each element carrying data-nav-icon (nav buttons,
@@ -13544,7 +13662,7 @@ function extraAttentionItems() {
   });
   const diesel = dieselEstimate();
   if (diesel.ready && diesel.low) items.push({ kind: "danger", text: tr("Diesel is low: about {n} litres left", { n: numberFormat.format(diesel.litres) }), view: "servicesView", key: `diesel:${localDateInput()}` });
-  items.push(...v167AttentionItems(), ...v167bAttentionItems(), ...v174AttentionItems());
+  items.push(...v167AttentionItems(), ...v167bAttentionItems(), ...v174AttentionItems(), ...v178AttentionItems());
   [currentMonthValue()].forEach((m) => {
     const late = lateTenants(m);
     if (late.length) items.push({ kind: "danger", text: tr(late.length === 1 ? "{n} owner is late for {month}" : "{n} owners are late for {month}", { n: late.length, month: formatMonth(m) }), view: "paymentsView", key: `late:${monthKey(m)}` });
@@ -13561,6 +13679,7 @@ function handleExtraAttentionAction(row) {
   if (row.dataset.action === "cashCheck") { openCashCheckDialog(); return true; }
   if (row.dataset.action === "approvals") { openApprovalsDialog(); return true; }
   if (row.dataset.action === "techRequests") { setView("techView"); return true; }
+  if (row.dataset.action === "rentals") { setView("rentalsView"); return true; }
   if (row.dataset.action === "helpVideo") { openHelpVideo(row.dataset.arg || "tour"); return true; }
   return false;
 }
@@ -13590,6 +13709,7 @@ function renderV148() {
   renderV167b();
   renderV173();
   renderV174();
+  renderV178();
   renderMoreGroups();
   renderMyFlat();
   if (lastSyncChipKind) decorateSyncChip(lastSyncChipKind);
@@ -21271,6 +21391,597 @@ function renderMoreGroups() {
   });
 }
 
+// ── v178 — rentals (the building manager's tools) ────────────────────────────
+// A lease per rented flat: the tenant, the rent (USD or LBP; monthly,
+// quarterly or yearly, with an optional yearly increase), the deposit, rent
+// payments, what was handed over to the flat's owner and the manager's fee
+// (none for the manager's own flats). Leases live in their own server table
+// (rpc list_leases / save_lease / delete_lease, supabase/phase2n-v178.sql),
+// never in the building's document, so rent never reaches the building's
+// cash, reports, backups or the view-only helpers. In a rented flat the tenant
+// also pays the building charges: recording a rent payment can record that
+// part as a normal building payment for the flat.
+const LEASE_PERIODS = [["monthly", "Monthly", 1], ["quarterly", "Every 3 months", 3], ["yearly", "Yearly", 12]];
+let rentalLeases = null;
+let rentalsTab = "leases";
+let rentalsLoading = false;
+let rentalsProblem = "";
+
+function isRentalsManager() {
+  return sessionMode === "owner" && isOwnerSession() && !isViewerSession();
+}
+
+function leaseStep(lease) {
+  return (LEASE_PERIODS.find(([v]) => v === lease?.period) || LEASE_PERIODS[0])[2];
+}
+
+function roundMoney(value, currency) {
+  return currency === "LBP" ? Math.round(Number(value) || 0) : roundUsd(Number(value) || 0);
+}
+
+function formatMoney(value, currency = "USD") {
+  return currency === "LBP" ? formatLbp(value) : formatUsd(value);
+}
+
+// Every rent period from the start up to today (or the lease's end), each due
+// on its first day, in advance; the rent goes up by the yearly increase on
+// each anniversary.
+function leasePeriods(lease, today = localDateInput()) {
+  if (!lease?.start || !(Number(lease.rent) > 0)) return [];
+  const step = leaseStep(lease);
+  const last = lease.status === "ended" && lease.endedOn ? lease.endedOn : lease.end && lease.end < today ? lease.end : today;
+  const grace = Math.max(0, Number(lease.graceDays ?? 5) || 0);
+  const increase = Number(lease.increasePct || 0) / 100;
+  const periods = [];
+  for (let i = 0; i < 600; i += 1) {
+    const start = addMonthsToDate(lease.start, i * step);
+    if (start > last) break;
+    const years = Math.floor((i * step) / 12);
+    periods.push({
+      start,
+      end: addDays(addMonthsToDate(lease.start, (i + 1) * step), -1),
+      amount: roundMoney(Number(lease.rent) * Math.pow(1 + increase, years), lease.currency),
+      lateFrom: addDays(start, grace),
+    });
+  }
+  return periods;
+}
+
+// Payments fill the oldest period first.
+function leaseStatus(lease, today = localDateInput()) {
+  const currency = lease?.currency || "USD";
+  const periods = leasePeriods(lease, today);
+  const paidTotal = roundMoney((lease?.payments || []).reduce((s, p) => s + Number(p.amount || 0), 0), currency);
+  let pool = paidTotal;
+  const rows = periods.map((p) => {
+    const paid = roundMoney(Math.min(p.amount, Math.max(0, pool)), currency);
+    pool = roundMoney(pool - paid, currency);
+    const left = roundMoney(p.amount - paid, currency);
+    const state_ = left <= 0.005 ? "paid" : today >= p.lateFrom ? "late" : paid > 0 ? "partial" : "due";
+    return { ...p, paid, left, state: state_ };
+  });
+  const dueTotal = roundMoney(rows.reduce((s, r) => s + r.amount, 0), currency);
+  const owed = roundMoney(Math.max(0, dueTotal - paidTotal), currency);
+  const late = rows.filter((r) => r.state === "late");
+  const firstOpen = rows.findIndex((r) => r.state !== "paid");
+  const lastPaid = firstOpen === -1 ? rows.at(-1) || null : firstOpen > 0 ? rows[firstOpen - 1] : null;
+  return {
+    currency,
+    periods: rows,
+    dueTotal,
+    paidTotal,
+    owed,
+    credit: roundMoney(Math.max(0, paidTotal - dueTotal), currency),
+    lateAmount: roundMoney(late.reduce((s, r) => s + r.left, 0), currency),
+    lateCount: late.length,
+    paidUntil: lastPaid ? lastPaid.end : null,
+  };
+}
+
+// What the flat's owner gets: rent collected, minus the manager's fee, minus
+// expenses paid for them, minus what was already handed over.
+function leaseOwnerAccount(lease, today = localDateInput()) {
+  const s = leaseStatus(lease, today);
+  const c = s.currency;
+  const sum = (list) => roundMoney((list || []).reduce((t, x) => t + Number(x.amount || 0), 0), c);
+  let fee = 0;
+  if (!lease.ownFlat && Number(lease.fee?.value) > 0) {
+    fee = lease.fee.kind === "fixed"
+      ? Number(lease.fee.value) * s.periods.filter((p) => p.state === "paid").length
+      : (s.paidTotal * Number(lease.fee.value)) / 100;
+  }
+  fee = roundMoney(fee, c);
+  const deductions = sum(lease.deductions);
+  const paidOut = sum(lease.payouts);
+  return {
+    currency: c,
+    collected: s.paidTotal,
+    fee,
+    deductions,
+    paidOut,
+    toHandOver: lease.ownFlat ? 0 : roundMoney(s.paidTotal - fee - deductions - paidOut, c),
+  };
+}
+
+function leaseFlat(lease) {
+  return state.tenants.find((t) => t.id === lease.flatId) || null;
+}
+
+function leaseTitle(lease) {
+  const flat = leaseFlat(lease);
+  return [flat?.unit ? tr("Flat {unit}", { unit: flat.unit }) : "", lease.tenant?.name || ""].filter(Boolean).join(" · ");
+}
+
+function leasePeriodLabel(lease, p) {
+  if (lease.period === "monthly" && p.start.endsWith("-01")) return formatMonth(p.start);
+  return tr("{from} – {to}", { from: formatDateLabel(p.start), to: formatDateLabel(p.end) });
+}
+
+function periodLabel(lease) {
+  return tr((LEASE_PERIODS.find(([v]) => v === lease.period) || LEASE_PERIODS[0])[1]);
+}
+
+// ── Loading and saving ──
+async function loadLeases() {
+  const res = await supabaseRequest("rpc/list_leases", { method: "POST", body: "{}" });
+  const rows = await res.json();
+  rentalLeases = (Array.isArray(rows) ? rows : []).map((r) => ({ id: r.id, rev: Number(r.rev || 0), ...r.data, flatId: r.flatId }));
+  return rentalLeases;
+}
+
+function rentalsMissingDb(error) {
+  return error?.status === 404 ? tr("The database update for rentals hasn't been applied yet.") : null;
+}
+
+async function saveLease(lease) {
+  const { rev = 0, ...data } = lease;
+  data.updatedAt = new Date().toISOString();
+  try {
+    const res = await supabaseRequest("rpc/save_lease", { method: "POST", body: JSON.stringify({ p_id: lease.id, p_flat_id: lease.flatId, p_data: data, p_rev: rev }) });
+    const next = Number(await res.json());
+    const saved = { ...data, id: lease.id, rev: next };
+    rentalLeases = [...(rentalLeases || []).filter((l) => l.id !== lease.id), saved];
+    renderRentalsView();
+    renderAttention();
+    return saved;
+  } catch (error) {
+    if (/changed-elsewhere/.test(error.message || "")) {
+      await loadLeases().catch(() => {});
+      showToast("This lease was changed on another device. It was reloaded: please do that again.", 7000);
+    } else {
+      showToast(rentalsMissingDb(error) || (error.status ? tr(error.message) : describeSyncProblem(error)), 6000);
+    }
+    renderRentalsView();
+    return null;
+  }
+}
+
+async function refreshRentals() {
+  if (!isRentalsManager() || cloudProvider() !== "supabase") return;
+  try { await loadLeases(); } catch { rentalLeases = null; }
+  if (v178AttentionItems().length) renderAttention();
+  decorateRentedFlats();
+}
+
+async function openRentalsView() {
+  if (!isRentalsManager()) { renderRentalsView(); return; }
+  rentalsLoading = true;
+  rentalsProblem = "";
+  renderRentalsView();
+  try {
+    await loadLeases();
+  } catch (error) {
+    rentalsProblem = rentalsMissingDb(error) || describeSyncProblem(error);
+  }
+  rentalsLoading = false;
+  renderRentalsView();
+}
+
+// ── The page: More → Rentals ──
+function rentalsTabButton(id, label, count = 0) {
+  return mk("button", { type: "button", className: `tech-tab${rentalsTab === id ? " is-active" : ""}`, "aria-pressed": rentalsTab === id ? "true" : "false", onclick: () => { rentalsTab = id; renderRentalsView(); } },
+    label, count ? mk("span", { className: "tech-tab-count", text: String(count) }) : null);
+}
+
+function moneyTotals(list, pick) {
+  const by = {};
+  list.forEach((l) => { const v = pick(l); if (!v) return; by[l.currency || "USD"] = (by[l.currency || "USD"] || 0) + v; });
+  const parts = Object.entries(by).map(([c, v]) => formatMoney(v, c));
+  return parts.length ? parts.join(" + ") : formatUsd(0);
+}
+
+function renderRentalsView() {
+  const body = document.querySelector("#rentalsBody");
+  if (!body) return;
+  if (!isRentalsManager()) { fillChildren(body, note(tr("Only the building manager uses this page."))); return; }
+  if (rentalsLoading && !rentalLeases) { fillChildren(body, note(tr("Loading…"))); return; }
+  if (rentalsProblem) { fillChildren(body, note(rentalsProblem, "is-warning"), mk("div", { className: "button-row" }, secondaryButton(tr("Try again"), () => openRentalsView()))); return; }
+  if (!rentalLeases) { fillChildren(body); return; }
+  const late = rentalLeases.filter((l) => l.status !== "ended" && leaseStatus(l).lateCount > 0).length;
+  fillChildren(body,
+    mk("div", { className: "tech-tabs", role: "group" },
+      rentalsTabButton("leases", tr("Leases"), late),
+      rentalsTabButton("owners", tr("Owners"))),
+    rentalsTab === "owners" ? renderRentalOwners() : renderRentalLeases());
+}
+
+function leasePill(lease, s = leaseStatus(lease)) {
+  if (lease.status === "ended") return mk("span", { className: "status-pill tech-status-done", text: tr("Ended") });
+  if (s.lateAmount > 0) return mk("span", { className: "status-pill tech-status-new", text: tr("Late · {amount}", { amount: formatMoney(s.lateAmount, s.currency) }) });
+  if (s.owed > 0) return mk("span", { className: "status-pill tech-status-sent", text: tr("{amount} due", { amount: formatMoney(s.owed, s.currency) }) });
+  return mk("span", { className: "status-pill tech-status-done", text: s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : tr("Up to date") });
+}
+
+function renderRentalLeases() {
+  const active = rentalLeases.filter((l) => l.status !== "ended").sort((a, b) => String(leaseFlat(a)?.unit || "").localeCompare(String(leaseFlat(b)?.unit || ""), undefined, { numeric: true }));
+  const ended = rentalLeases.filter((l) => l.status === "ended");
+  const stats = active.map((l) => ({ l, s: leaseStatus(l) }));
+  const month = localDateInput().slice(0, 7);
+  const collectedThisMonth = stats.map(({ l }) => ({ currency: l.currency || "USD", v: (l.payments || []).filter((p) => String(p.date).slice(0, 7) === month).reduce((t, p) => t + Number(p.amount || 0), 0) }));
+  return mk("div", {},
+    mk("div", { className: "tech-summary" },
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Rent owed now") }), mk("strong", { text: moneyTotals(stats.map(({ l, s }) => ({ currency: l.currency, owed: s.owed })), (x) => x.owed) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Late") }), mk("strong", { text: String(stats.filter(({ s }) => s.lateCount > 0).length) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Collected this month") }), mk("strong", { text: moneyTotals(collectedThisMonth.map((x) => ({ currency: x.currency, v: x.v })), (x) => x.v) }))),
+    mk("div", { className: "button-row" }, primaryButton(tr("Add a lease"), () => openLeaseEditor())),
+    active.length ? null : note(tr("No rented flats yet. Add a lease for each flat that is rented: the tenant, the rent and when it's due.")),
+    mk("div", { className: "tech-list" }, stats.map(({ l, s }) => {
+      const tenant = l.tenant || {};
+      return mk("article", { className: `tech-card rent-card${s.lateAmount > 0 ? " is-new" : ""}` },
+        mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: leaseTitle(l) }), leasePill(l, s)),
+        mk("p", { className: "tech-where", text: [tr("{amount} · {period}", { amount: formatMoney(leasePeriods(l).at(-1)?.amount || l.rent, l.currency), period: periodLabel(l) }), tr("since {date}", { date: formatDateLabel(l.start) }), l.ownFlat ? tr("Your flat") : ""].filter(Boolean).join(" · ") }),
+        mk("div", { className: "notice-actions" },
+          mk("button", { type: "button", className: "mini-button is-primary", text: tr("Record payment"), onclick: () => openRentPaymentDialog(l.id) }),
+          s.owed > 0 && tenant.phone ? miniButton(tr("Remind"), () => sendRentReminder(l)) : null,
+          tenant.phone ? mk("a", { className: "mini-button", href: `tel:${tenant.phone}`, text: tr("Call") }) : null,
+          miniButton(tr("Details"), () => openLeaseDetails(l.id))));
+    })),
+    ended.length ? reportsSection(tr("Ended leases"), mk("div", {}, ended.map((l) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("{from} – {to}", { from: formatDateLabel(l.start), to: formatDateLabel(l.endedOn || l.end || "") }) })),
+      mk("span", { className: "tech-person-actions" }, miniButton(tr("Details"), () => openLeaseDetails(l.id))))))) : null);
+}
+
+function renderRentalOwners() {
+  const groups = new Map();
+  rentalLeases.forEach((l) => {
+    const flat = leaseFlat(l);
+    const key = l.ownFlat ? "__mine" : (flat?.name || tr("Unknown owner")).trim().toLowerCase();
+    if (!groups.has(key)) groups.set(key, { name: l.ownFlat ? tr("Your own flats") : (flat?.name || tr("Unknown owner")), phone: flat?.phone || "", own: Boolean(l.ownFlat), leases: [] });
+    groups.get(key).leases.push(l);
+  });
+  if (!groups.size) return note(tr("Owners appear here once you add their flat's lease."));
+  const list = [...groups.values()].sort((a, b) => Number(a.own) - Number(b.own) || a.name.localeCompare(b.name));
+  return mk("div", {}, list.map((g) => reportsSection(g.name, mk("div", {}, g.leases.map((l) => {
+    const a = leaseOwnerAccount(l);
+    const lines = g.own
+      ? [tr("Collected {amount}", { amount: formatMoney(a.collected, a.currency) })]
+      : [tr("Collected {amount}", { amount: formatMoney(a.collected, a.currency) }), tr("your fee {amount}", { amount: formatMoney(a.fee, a.currency) }),
+        a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, a.currency) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, a.currency) })].filter(Boolean);
+    return mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: lines.join(" · ") })),
+      g.own ? null : mk("span", { className: "tech-person-actions" },
+        mk("strong", { className: "tech-due", text: formatMoney(a.toHandOver, a.currency) }),
+        miniButton(tr("Hand over"), () => openPayoutDialog(l.id)),
+        miniButton(tr("Expense"), () => openDeductionDialog(l.id)),
+        miniButton(tr("Statement"), () => sendOwnerStatement(l))));
+  })))));
+}
+
+// ── Lease editor ──
+function openLeaseEditor(id = null) {
+  const lease = id ? rentalLeases.find((l) => l.id === id) : null;
+  const flats = state.tenants.filter((t) => t.active !== false || t.id === lease?.flatId);
+  if (!flats.length) { showToast("Add the flats first (Flats tab)"); return; }
+  const flat = selectInput(flats.map((t) => [t.id, [t.unit ? tr("Flat {unit}", { unit: t.unit }) : "", t.name].filter(Boolean).join(" · ")]), lease?.flatId || flats[0].id);
+  const name = textInput(lease?.tenant?.name || "", { maxlength: "80", placeholder: tr("Tenant's full name") });
+  const phone = textInput(lease?.tenant?.phone || "", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
+  const lang = selectInput([["en", "English"], ["ar", "العربية"]], lease?.tenant?.language || state.settings.language || "en");
+  const start = mk("input", { type: "date", value: lease?.start || localDateInput() });
+  const end = mk("input", { type: "date", value: lease?.end || "" });
+  const rent = numberInput(lease?.rent || "");
+  const currency = selectInput([["USD", "USD"], ["LBP", "LBP"]], lease?.currency || "USD");
+  const period = selectInput(LEASE_PERIODS.map(([v, l]) => [v, tr(l)]), lease?.period || "monthly");
+  const increase = numberInput(lease?.increasePct ?? "");
+  const grace = numberInput(lease?.graceDays ?? 5);
+  const deposit = numberInput(lease?.deposit?.amount || "");
+  const depositOn = mk("input", { type: "date", value: lease?.deposit?.receivedOn || "" });
+  const own = checkboxRow(tr("This is my own flat (no fee, nothing to hand over)"), Boolean(lease?.ownFlat));
+  const feeKind = selectInput([["percent", tr("% of the rent collected")], ["fixed", tr("Fixed amount per rent period")]], lease?.fee?.kind || "percent");
+  const feeValue = numberInput(lease?.fee?.value ?? 10);
+  const feeBox = mk("div", { className: "tech-fee-row" }, field(tr("Your fee"), feeKind), field(tr("Amount"), feeValue));
+  const syncFee = () => feeBox.classList.toggle("hidden", own.input.checked);
+  own.input.addEventListener("change", syncFee);
+  syncFee();
+  const notes = mk("textarea", { rows: "2", maxlength: "500" });
+  notes.value = lease?.notes || "";
+  const save = primaryButton(tr("Save"), async () => {
+    if (!name.value.trim()) { showToast("Enter the tenant's name"); return; }
+    if (!(Number(rent.value) > 0)) { showToast("Enter the rent"); return; }
+    if (!start.value) { showToast("Enter the start date"); return; }
+    if (end.value && end.value < start.value) { showToast("The end date is before the start"); return; }
+    save.disabled = true;
+    const now = new Date().toISOString();
+    const next = {
+      ...(lease || { id: newId("lease"), rev: 0, payments: [], payouts: [], deductions: [], status: "active", createdAt: now }),
+      flatId: flat.value,
+      tenant: { name: name.value.trim(), phone: phone.value.trim(), language: lang.value },
+      start: start.value, end: end.value || "",
+      rent: Number(rent.value), currency: currency.value, period: period.value,
+      increasePct: Math.max(0, Number(increase.value) || 0), graceDays: Math.max(0, Number(grace.value) || 0),
+      deposit: { ...(lease?.deposit || {}), amount: Math.max(0, Number(deposit.value) || 0), receivedOn: depositOn.value || "" },
+      ownFlat: own.input.checked,
+      fee: own.input.checked ? null : { kind: feeKind.value, value: Math.max(0, Number(feeValue.value) || 0) },
+      tenantPaysCharges: true,
+      notes: notes.value.trim(),
+    };
+    const saved = await saveLease(next);
+    save.disabled = false;
+    if (!saved) return;
+    closeToolDialog();
+    showToast(lease ? "Lease updated" : "Lease added");
+  });
+  openToolDialog(lease ? tr("Edit lease") : tr("Add a lease"),
+    field(tr("Flat"), flat),
+    field(tr("Tenant"), name),
+    mk("div", { className: "two-col" }, field(tr("Phone (WhatsApp)"), phone), field(tr("Language"), lang)),
+    mk("div", { className: "two-col" }, field(tr("Start"), start), field(tr("End (optional)"), end)),
+    mk("div", { className: "tech-fee-row" }, field(tr("Rent"), rent), field(tr("Currency"), currency), field(tr("How often"), period)),
+    mk("div", { className: "two-col" }, field(tr("Yearly increase %"), increase), field(tr("Late after (days)"), grace)),
+    mk("div", { className: "two-col" }, field(tr("Deposit"), deposit), field(tr("Deposit received on"), depositOn)),
+    note(tr("The tenant also pays the flat's building charges. Rent is kept apart from the building's accounts: only you see it.")),
+    own.row,
+    feeBox,
+    field(tr("Notes"), notes),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Lease details ──
+function openLeaseDetails(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const s = leaseStatus(lease);
+  const a = leaseOwnerAccount(lease);
+  const tenant = lease.tenant || {};
+  const c = s.currency;
+  const recent = s.periods.slice(-12).reverse();
+  const payments = (lease.payments || []).slice().sort((x, y) => String(y.date).localeCompare(String(x.date)));
+  openToolDialog(leaseTitle(lease),
+    mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("{amount} · {period}", { amount: formatMoney(recent[0]?.amount || lease.rent, c), period: periodLabel(lease) }) }), leasePill(lease, s)),
+    mk("p", { className: "tech-where", text: [tr("since {date}", { date: formatDateLabel(lease.start) }), lease.end ? tr("until {date}", { date: formatDateLabel(lease.end) }) : "", lease.increasePct ? tr("+{pct}% a year", { pct: lease.increasePct }) : ""].filter(Boolean).join(" · ") }),
+    mk("div", { className: "notice-actions" },
+      tenant.phone ? mk("a", { className: "mini-button", href: `tel:${tenant.phone}`, text: tr("Call") }) : null,
+      tenant.phone ? mk("a", { className: "mini-button", href: whatsappLink(tenant.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }) : null,
+      lease.status !== "ended" ? mk("button", { type: "button", className: "mini-button is-primary", text: tr("Record payment"), onclick: () => openRentPaymentDialog(lease.id) }) : null),
+    reportsSection(tr("Rent"), mk("div", {}, recent.length ? recent.map((p) => mk("div", { className: "breakdown-row rent-period" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: leasePeriodLabel(lease, p) }), mk("small", { text: formatMoney(p.amount, c) })),
+      mk("span", { className: `status-pill ${p.state === "paid" ? "tech-status-done" : p.state === "late" ? "tech-status-new" : "tech-status-sent"}`, text: p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) }) }))) : note(tr("The first rent is due on {date}.", { date: formatDateLabel(lease.start) })))),
+    reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method), p.chargesUsd ? tr("+ {amount} building charges", { amount: formatUsd(p.chargesUsd) }) : ""].filter(Boolean).join(" · ") })),
+      mk("span", { className: "tech-person-actions" }, tenant.phone ? miniButton(tr("Receipt"), () => sendRentReceipt(lease, p)) : null)))) : note(tr("No payments yet."))),
+    lease.ownFlat ? null : reportsSection(tr("Owner"), mk("p", { className: "tech-where", text: [tr("Collected {amount}", { amount: formatMoney(a.collected, c) }), tr("your fee {amount}", { amount: formatMoney(a.fee, c) }), a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, c) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, c) }), tr("to hand over {amount}", { amount: formatMoney(a.toHandOver, c) })].filter(Boolean).join(" · ") })),
+    lease.deposit?.amount ? note(tr("Deposit: {amount}{returned}", { amount: formatMoney(lease.deposit.amount, c), returned: lease.deposit.returnedOn ? tr(" — returned {amount} on {date}", { amount: formatMoney(lease.deposit.returnedAmount || 0, c), date: formatDateLabel(lease.deposit.returnedOn) }) : "" })) : null,
+    mk("div", { className: "button-row" },
+      secondaryButton(tr("Edit"), () => openLeaseEditor(lease.id)),
+      lease.status !== "ended" ? secondaryButton(tr("End lease"), () => openEndLeaseDialog(lease.id)) : null,
+      !(lease.payments || []).length ? secondaryButton(tr("Delete"), () => deleteLease(lease.id)) : null));
+}
+
+// ── Rent payment (and, optionally, the flat's building charges) ──
+function openRentPaymentDialog(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const s = leaseStatus(lease);
+  const flat = leaseFlat(lease);
+  const c = s.currency;
+  const lastAmount = s.periods.at(-1)?.amount || lease.rent;
+  const amount = numberInput(s.owed > 0 ? s.owed : lastAmount);
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const method = selectInput(PAYMENT_METHODS.map(([v, l]) => [v, tr(l)]), (lease.payments || []).at(-1)?.method || "cash");
+  const chargesDue = flat ? roundUsd(Math.max(0, getTenantBalance(flat.id))) : 0;
+  const charges = checkboxRow(tr("The tenant also paid the building charges of flat {unit}", { unit: flat?.unit || "" }), false);
+  const chargesAmount = numberInput(chargesDue || "");
+  const chargesBox = mk("div", { className: "hidden" }, field(tr("Building charges paid (USD)"), chargesAmount, chargesDue ? tr("The flat owes {amount} to the building.", { amount: formatUsd(chargesDue) }) : tr("The flat owes nothing to the building right now.")));
+  charges.input.addEventListener("change", () => chargesBox.classList.toggle("hidden", !charges.input.checked));
+  const save = primaryButton(tr("Save"), async () => {
+    const value = roundMoney(Number(amount.value), c);
+    const chargesValue = charges.input.checked ? roundUsd(Number(chargesAmount.value) || 0) : 0;
+    if (!(value > 0) && !(chargesValue > 0)) { showToast("Enter the amount"); return; }
+    save.disabled = true;
+    const day = date.value || localDateInput();
+    const payment = { id: newId("rent"), date: day, amount: value, method: method.value, ...(chargesValue ? { chargesUsd: chargesValue } : {}) };
+    const saved = value > 0 ? await saveLease({ ...lease, payments: [...(lease.payments || []), payment] }) : lease;
+    if (!saved) { save.disabled = false; return; }
+    // The building charges are a normal building payment for the flat.
+    if (chargesValue > 0 && flat) {
+      const groupId = `pay-${Date.now()}-r`;
+      const tx = {
+        id: `${groupId}-01`, category: "Payments", description: `${flat.name} — ${tr("paid by tenant {name}", { name: lease.tenant?.name || "" })}`, tenantId: flat.id,
+        forMonth: oldestUnpaidMonth(flat.id), project: "", date: day, supplier: "", invoice: "", expenseCategory: "", serviceType: "", servicePart: "",
+        debitUsd: 0, debitLbp: 0, creditUsd: chargesValue, creditLbp: 0, balanceUsd: chargesValue, balanceLbp: 0,
+        invoiceAttachment: null, sourceRow: null, paymentGroupId: groupId, method: method.value, paidByTenant: lease.tenant?.name || "",
+      };
+      tx.receiptRef = nextReceiptReference(day);
+      state.transactions.push(tx);
+      if (saveState()) renderAll();
+    }
+    closeToolDialog();
+    showToast("Payment recorded");
+    if (lease.tenant?.phone) openToolDialog(tr("Send a receipt?"),
+      note(tr("Send {name} a receipt on WhatsApp.", { name: lease.tenant.name })),
+      mk("div", { className: "button-row" }, primaryButton(tr("Send on WhatsApp"), () => { sendRentReceipt(saved, value > 0 ? payment : { ...payment, amount: 0 }); closeToolDialog(); }), secondaryButton(tr("Not now"), closeToolDialog)));
+  });
+  openToolDialog(tr("Rent payment — {title}", { title: leaseTitle(lease) }),
+    s.owed > 0 ? note(tr("Owed now: {amount}", { amount: formatMoney(s.owed, c) })) : note(tr("Nothing owed right now; a payment counts toward the next rent.")),
+    mk("div", { className: "two-col" }, field(tr("Rent paid ({currency})", { currency: c }), amount), field(tr("Date"), date)),
+    field(tr("How"), method),
+    flat ? charges.row : null,
+    chargesBox,
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Owner: hand over, expenses paid for them, statement ──
+function openPayoutDialog(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const a = leaseOwnerAccount(lease);
+  const amount = numberInput(a.toHandOver > 0 ? a.toHandOver : "");
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const method = selectInput(PAYMENT_METHODS.map(([v, l]) => [v, tr(l)]), "cash");
+  const save = primaryButton(tr("Save"), async () => {
+    const value = roundMoney(Number(amount.value), a.currency);
+    if (!(value > 0)) { showToast("Enter the amount"); return; }
+    save.disabled = true;
+    const saved = await saveLease({ ...lease, payouts: [...(lease.payouts || []), { id: newId("out"), date: date.value || localDateInput(), amount: value, method: method.value }] });
+    save.disabled = false;
+    if (saved) { closeToolDialog(); showToast("Hand-over recorded"); }
+  });
+  openToolDialog(tr("Hand over to {name}", { name: leaseFlat(lease)?.name || tr("the owner") }),
+    note(tr("To hand over now: {amount}", { amount: formatMoney(a.toHandOver, a.currency) })),
+    mk("div", { className: "two-col" }, field(tr("Amount ({currency})", { currency: a.currency }), amount), field(tr("Date"), date)),
+    field(tr("How"), method),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openDeductionDialog(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const c = lease.currency || "USD";
+  const description = textInput("", { maxlength: "120", placeholder: tr("e.g. Water heater repair in the flat") });
+  const amount = numberInput("");
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const save = primaryButton(tr("Save"), async () => {
+    const value = roundMoney(Number(amount.value), c);
+    if (!description.value.trim() || !(value > 0)) { showToast("Say what it was and how much"); return; }
+    save.disabled = true;
+    const saved = await saveLease({ ...lease, deductions: [...(lease.deductions || []), { id: newId("ded"), date: date.value || localDateInput(), amount: value, description: description.value.trim() }] });
+    save.disabled = false;
+    if (saved) { closeToolDialog(); showToast("Saved"); }
+  });
+  openToolDialog(tr("Expense paid for the owner"),
+    note(tr("Something you paid for the owner out of the rent, for example a repair inside the flat. It is taken off what you hand over.")),
+    field(tr("What"), description),
+    mk("div", { className: "two-col" }, field(tr("Amount ({currency})", { currency: c }), amount), field(tr("Date"), date)),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function ownerStatementText(lease) {
+  const flat = leaseFlat(lease);
+  const lang = tenantLanguage(flat || {});
+  const a = leaseOwnerAccount(lease);
+  const c = a.currency;
+  const lines = [
+    trIn(lang, "Hello {name}, rent statement for flat {unit} ({tenant}):", { name: flat?.name || "", unit: flat?.unit || "", tenant: lease.tenant?.name || "" }),
+    trIn(lang, "Rent collected: {amount}", { amount: formatMoney(a.collected, c) }),
+    trIn(lang, "Management fee: {amount}", { amount: formatMoney(a.fee, c) }),
+  ];
+  (lease.deductions || []).forEach((d) => lines.push(`• ${formatDateLabel(d.date)} — ${d.description}: ${formatMoney(d.amount, c)}`));
+  lines.push(trIn(lang, "Already handed over: {amount}", { amount: formatMoney(a.paidOut, c) }));
+  lines.push(trIn(lang, "Due to you now: {amount}", { amount: formatMoney(a.toHandOver, c) }));
+  return lines.join("\n");
+}
+
+function sendOwnerStatement(lease) {
+  const flat = leaseFlat(lease);
+  if (!flat?.phone) { showToast("Add the owner's phone number in the Flats tab first"); return; }
+  window.open(whatsappLink(flat.phone, ownerStatementText(lease)), "_blank", "noopener");
+}
+
+// ── Tenant: reminder and receipt ──
+function rentReminderText(lease) {
+  const s = leaseStatus(lease);
+  const flat = leaseFlat(lease);
+  const lang = lease.tenant?.language || "en";
+  const lines = [trIn(lang, "Hello {name}, a reminder from the building manager:", { name: lease.tenant?.name || "" }),
+    trIn(lang, "Rent for flat {unit}: {amount} due.", { unit: flat?.unit || "", amount: formatMoney(s.owed, s.currency) })];
+  const charges = flat ? roundUsd(Math.max(0, getTenantBalance(flat.id))) : 0;
+  if (charges > 0.005) lines.push(trIn(lang, "Building charges: {amount} due.", { amount: formatUsd(charges) }));
+  if (state.settings.paymentInstructions) lines.push(state.settings.paymentInstructions);
+  lines.push(trIn(lang, "Thank you."));
+  return lines.join("\n");
+}
+
+function sendRentReminder(lease) {
+  window.open(whatsappLink(lease.tenant.phone, rentReminderText(lease)), "_blank", "noopener");
+}
+
+function sendRentReceipt(lease, payment) {
+  const flat = leaseFlat(lease);
+  const lang = lease.tenant?.language || "en";
+  const lines = [trIn(lang, "Receipt — {building}", { building: state.building?.name || "" }),
+    trIn(lang, "Flat {unit} · {name}", { unit: flat?.unit || "", name: lease.tenant?.name || "" })];
+  if (Number(payment.amount) > 0) lines.push(trIn(lang, "Rent received: {amount} on {date}", { amount: formatMoney(payment.amount, lease.currency), date: formatDateLabel(payment.date) }));
+  if (payment.chargesUsd) lines.push(trIn(lang, "Building charges received: {amount}", { amount: formatUsd(payment.chargesUsd) }));
+  const s = leaseStatus(lease);
+  if (s.paidUntil) lines.push(trIn(lang, "Rent paid until {date}.", { date: formatDateLabel(s.paidUntil) }));
+  lines.push(trIn(lang, "Thank you."));
+  window.open(whatsappLink(lease.tenant.phone, lines.join("\n")), "_blank", "noopener");
+}
+
+// ── End or delete a lease ──
+function openEndLeaseDialog(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const c = lease.currency || "USD";
+  const endOn = mk("input", { type: "date", value: localDateInput() });
+  const returned = numberInput(lease.deposit?.amount || "");
+  const kept = textInput("", { maxlength: "200", placeholder: tr("Why part of the deposit was kept (optional)") });
+  const save = primaryButton(tr("End lease"), async () => {
+    save.disabled = true;
+    const saved = await saveLease({
+      ...lease, status: "ended", endedOn: endOn.value || localDateInput(),
+      deposit: { ...(lease.deposit || {}), ...(lease.deposit?.amount ? { returnedOn: endOn.value || localDateInput(), returnedAmount: roundMoney(Number(returned.value) || 0, c), keptReason: kept.value.trim() } : {}) },
+    });
+    save.disabled = false;
+    if (saved) { closeToolDialog(); showToast("Lease ended"); }
+  });
+  const s = leaseStatus({ ...lease, status: "ended", endedOn: localDateInput() });
+  openToolDialog(tr("End lease — {title}", { title: leaseTitle(lease) }),
+    s.owed > 0 ? note(tr("The tenant still owes {amount} of rent.", { amount: formatMoney(s.owed, s.currency) }), "is-warning") : note(tr("The rent is settled.")),
+    field(tr("Last day"), endOn),
+    lease.deposit?.amount ? mk("div", {}, field(tr("Deposit returned ({currency})", { currency: c }), returned, tr("Deposit held: {amount}", { amount: formatMoney(lease.deposit.amount, c) })), field(tr("Reason"), kept)) : null,
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+async function deleteLease(id) {
+  if (!window.confirm(tr("Delete this lease? Use this only for a lease added by mistake."))) return;
+  try {
+    await supabaseRequest("rpc/delete_lease", { method: "POST", body: JSON.stringify({ p_id: id }) });
+    rentalLeases = (rentalLeases || []).filter((l) => l.id !== id);
+    closeToolDialog();
+    renderRentalsView();
+    showToast("Lease deleted");
+  } catch (error) {
+    showToast(rentalsMissingDb(error) || describeSyncProblem(error), 6000);
+  }
+}
+
+// ── Needs Attention, and the Flats tab ──
+function v178AttentionItems() {
+  if (!isRentalsManager() || !Array.isArray(rentalLeases)) return [];
+  const items = [];
+  const active = rentalLeases.filter((l) => l.status !== "ended");
+  const late = active.filter((l) => leaseStatus(l).lateCount > 0);
+  if (late.length) items.push({ kind: "warn", text: tr(late.length === 1 ? "{n} rent is late" : "{n} rents are late", { n: late.length }), action: "rentals", key: `rentLate:${late.map((l) => l.id).join(",")}:${localDateInput().slice(0, 7)}` });
+  const soon = addDays(localDateInput(), 60);
+  active.filter((l) => l.end && l.end <= soon && l.end >= localDateInput()).forEach((l) => items.push({ kind: "info", text: tr("Lease of {title} ends on {date}", { title: leaseTitle(l), date: formatDateLabel(l.end) }), action: "rentals", key: `leaseEnd:${l.id}:${l.end}` }));
+  return items;
+}
+
+function decorateRentedFlats() {
+  document.querySelectorAll(".rent-line").forEach((n) => n.remove());
+  if (!isRentalsManager() || !Array.isArray(rentalLeases)) return;
+  document.querySelectorAll(".moveout-tenant-button[data-tenant-id]").forEach((btn) => {
+    const lease = rentalLeases.find((l) => l.flatId === btn.dataset.tenantId && l.status !== "ended");
+    const where = btn.closest("article, .tenant-card, .card")?.querySelector(".tenant-id-text");
+    if (lease && where) where.append(mk("span", { className: "tenant-link-line rent-line", text: tr("Rented to {name}", { name: lease.tenant?.name || "" }) }));
+  });
+}
+
+function renderV178() {
+  if (document.querySelector("#rentalsView.active")) renderRentalsView();
+  decorateRentedFlats();
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -21483,6 +22194,9 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  leasePeriods,
+  leaseStatus,
+  leaseOwnerAccount,
   jobFee,
   technicianStats,
   techStatementText,

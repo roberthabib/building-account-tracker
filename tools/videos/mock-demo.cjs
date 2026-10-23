@@ -13,6 +13,7 @@ const log = [];
 const UPLOADS = [];
 const REQUESTS = [];               // technician requests (v174)
 let BOOK = { data: {}, rev: 0 };    // the manager's technicians notebook (v174)
+const LEASES = new Map();         // rentals (v178): id -> { id, flatId, data, rev }
 const EXTRA = new Map();           // other buildings (v173): id -> { name, state, since }
 let anonGen = 1;
 
@@ -67,7 +68,7 @@ http.createServer((req, res) => {
     if (path === "/__state") return send(200, STATE);
     if (path === "/__put" && req.method === "POST") { STATE = b; touch(); return send(200, { ok: true }); }
     if (path === "/__uploads") return send(200, UPLOADS);
-    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); EXTRA.clear(); REQUESTS.length = 0; BOOK = { data: {}, rev: 0 }; anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
+    if (path === "/__reset") { STATE = demoState(url.searchParams.get("lang") || "en"); codes.clear(); EXTRA.clear(); LEASES.clear(); REQUESTS.length = 0; BOOK = { data: {}, rev: 0 }; anonProfile.clear(); conciergeTokens.clear(); adminCodes.clear(); log.length = 0; return send(200, { ok: true }); }
     if (path === "/__reset_log") { log.length = 0; return send(200, []); }
     log.push(`${req.method} ${path.replace(/^\/(rest|auth|storage)\/v1\//, "")} as ${tok.slice(0, 9)}`);
     const isOwner = tok.startsWith("demo-owner");
@@ -301,6 +302,24 @@ http.createServer((req, res) => {
     }
     if (path === "/__book" && req.method === "POST") { BOOK = { data: b, rev: BOOK.rev + 1 }; return send(200, { ok: true }); }
     if (path === "/__requests" && req.method === "POST") { REQUESTS.push(...b); return send(200, { ok: true }); }
+    if (path === "/rest/v1/rpc/list_leases") {
+      if (!isOwner) return send(400, { message: "Only the building manager can see rentals" });
+      return send(200, [...LEASES.values()].map((l) => ({ id: l.id, flatId: l.flatId, rev: l.rev, data: l.data })));
+    }
+    if (path === "/rest/v1/rpc/save_lease") {
+      if (!isOwner) return send(400, { message: "Only the building manager can change rentals" });
+      const cur = LEASES.get(b.p_id);
+      if (cur && cur.rev !== Number(b.p_rev)) return send(400, { message: "changed-elsewhere" });
+      const rev = cur ? cur.rev + 1 : 1;
+      LEASES.set(b.p_id, { id: b.p_id, flatId: b.p_flat_id, data: b.p_data, rev });
+      return send(200, rev);
+    }
+    if (path === "/rest/v1/rpc/delete_lease") {
+      if (!isOwner) return send(400, { message: "Only the building manager can change rentals" });
+      if (!LEASES.delete(b.p_id)) return send(400, { message: "That lease no longer exists" });
+      return send(204);
+    }
+    if (path === "/__leases" && req.method === "POST") { b.forEach((l) => LEASES.set(l.id, { id: l.id, flatId: l.flatId, data: l, rev: 1 })); return send(200, { ok: true }); }
     if (path === "/rest/v1/rpc/my_buildings") {
       if (isOwner) return send(200, [{ id: "building", name: STATE.building.name, role: "owner", tenant_id: null, since: "2026-01-01T00:00:00Z" },
         ...[...EXTRA].map(([id, x]) => ({ id, name: x.state.building?.name || x.name, role: "owner", tenant_id: null, since: x.since }))]);

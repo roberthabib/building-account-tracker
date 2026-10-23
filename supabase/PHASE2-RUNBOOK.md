@@ -148,6 +148,7 @@ app's auth), then reload.
 | v170 tenants see the concierge's invoice photos (`phase2k-v170.sql`) | ✅ applied 2026-10-21; 6/6 live checks (`phase2k-checks.sql`, rolled back) |
 | v173 more than one building (`phase2l-v173.sql`): memberships, x-building header, per-building codes/invites/push/backups/reminders, `b/<id>/` photo folders, `create_building` / `my_buildings`, "building manager" wording | ✅ applied 2026-10-22 (run by Claude in the dashboard); 41/41 live checks (`phase2l-checks.sql`, rolled back); 7 accounts carried over into memberships |
 | v174 trusted technicians (`phase2m-v174.sql`): residents ask for a technician, the manager's private notebook, request photos | ✅ applied 2026-10-22 (run by Claude in the dashboard); 27/27 live checks (`phase2m-checks.sql`, rolled back) |
+| v178 rentals (`phase2n-v178.sql`): private `leases` table + list/save/delete RPCs for the building manager | ⏳ waiting for the OK; rehearsed locally (2i–2m as before, 2n 19/19); live checks `phase2n-checks.sql` (rolled back) |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.

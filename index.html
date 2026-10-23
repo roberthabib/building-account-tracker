@@ -316,6 +316,10 @@
             <button class="more-menu-item" type="button" data-view="servicesView" data-nav-icon="zap">
               <span class="mm-text"><strong data-i18n="nav.services">Services</strong><span data-i18n="more.servicesSub">Generator &amp; water bills</span></span>
             </button>
+            <p class="more-group" data-i18n="more.groupRentals">Rentals</p>
+            <button class="more-menu-item owner-only" type="button" data-view="rentalsView" data-nav-icon="key">
+              <span class="mm-text"><strong data-i18n="nav.rentals">Rentals</strong><span data-i18n="more.rentalsSub">Leases, rent, owners' statements</span></span>
+            </button>
             <p class="more-group" data-i18n="more.groupResidents">Residents</p>
             <button class="more-menu-item" type="button" data-view="noticesView" data-nav-icon="megaphone">
               <span class="mm-text"><strong data-i18n="nav.notices">Notices</strong><span data-i18n="more.noticesSub">News for the residents</span></span>
@@ -484,6 +488,17 @@
             </div>
           </div>
           <div id="techBody"></div>
+        </section>
+
+        <section class="view sub-view" id="rentalsView" aria-labelledby="rentalsViewTitle">
+          <div class="section-title sub-header">
+            <button class="back-btn" type="button" data-back-to="moreView" aria-label="Back" data-i18n-aria="aria.back"></button>
+            <div>
+              <p class="eyebrow" data-i18n="more.title">More</p>
+              <h2 id="rentalsViewTitle" data-i18n="nav.rentals">Rentals</h2>
+            </div>
+          </div>
+          <div id="rentalsBody"></div>
         </section>
 
         <section class="view sub-view" id="bookingsView" aria-labelledby="bookingsViewTitle">
