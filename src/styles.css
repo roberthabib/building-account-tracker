@@ -6311,3 +6311,217 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   flex-wrap: wrap;
   justify-content: flex-start;
 }
+
+/* v193 — rentals, clearer */
+.rent-card-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.rent-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 8px 0 4px;
+}
+
+.rent-dot {
+  display: inline-grid;
+  place-items: center;
+  min-width: 21px;
+  height: 22px;
+  padding: 0 3px;
+  border-radius: 7px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.rent-dot.is-paid {
+  background: var(--green-tint-bg);
+  color: var(--green-tint-text);
+}
+
+.rent-dot.is-due {
+  background: #fdf0d5;
+  color: #8a5312;
+}
+
+.rent-dot.is-late {
+  background: var(--red-tint-bg);
+  color: var(--red-tint-text);
+}
+
+.rent-money-line {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.rent-money-line.is-owed {
+  color: var(--red);
+}
+
+.rent-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 4px;
+}
+
+.rent-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rent-filter span {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.rent-filter.is-active {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #fff;
+}
+
+.rent-filter.is-active span {
+  color: var(--soft, #cfe3db);
+}
+
+.tech-summary-cell small {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.tech-summary-cell.is-owed strong {
+  color: var(--red);
+}
+
+.rent-status-table {
+  display: grid;
+}
+
+.rent-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--line-inner);
+}
+
+/* A small status dot before the period name. */
+.rent-status-main strong::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-inline-end: 8px;
+  border-radius: 50%;
+  vertical-align: 2px;
+  background: var(--line);
+}
+
+.rent-status-row.is-paid .rent-status-main strong::before {
+  background: var(--accent-green);
+}
+
+.rent-status-row.is-due .rent-status-main strong::before {
+  background: #e0a63a;
+}
+
+.rent-status-row.is-late .rent-status-main strong::before {
+  background: var(--red);
+}
+
+.rent-status-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rent-status-main small {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.rent-status-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex: none;
+}
+
+.rent-show-all {
+  margin: 8px 0 0;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.rent-coverage {
+  margin: -4px 0 8px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* v193 — date fields never overflow their column */
+#toolDialog input[type="date"],
+.two-col input,
+.two-col select,
+.tech-fee-row input,
+.tech-fee-row select {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rent-pay-row {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line-inner);
+}
+
+.rent-pay-row:last-child {
+  border-bottom: 0;
+}
+
+.rent-pay-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.rent-pay-head small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: end;
+}

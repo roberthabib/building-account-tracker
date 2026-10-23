@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v192";
+const APP_VERSION = "v193";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,35 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "paid on {date}": "دُفع في {date}",
+  "paid {amount} on {date}": "دُفع {amount} في {date}",
+  "{paid} of {due}": "{paid} من {due}",
+  "Covers {periods}": "تغطي {periods}",
+  "{amount} toward {period}": "{amount} على حساب {period}",
+  "{amount} left": "يتبقى {amount}",
+  "Rent periods": "فترات الإيجار",
+  "next {amount} on {date}": "التالي {amount} في {date}",
+  "Remind the late ones": "تذكير المتأخرين",
+  "Owing": "عليهم مبالغ",
+  "No lease here.": "لا عقود هنا.",
+  "Each button opens WhatsApp with that tenant's reminder.": "كل زر يفتح واتساب مع تذكير ذلك المستأجر.",
+  "{amount} on {date}": "{amount} في {date}",
+  "Show all {n} periods": "عرض كل الفترات ({n})",
+  "Owed now": "المستحق الآن",
+  "In advance": "مدفوع مسبقاً",
+  "Paid until": "مدفوع حتى",
+  "Next rent": "الإيجار التالي",
+  "Payment status": "حالة الدفع",
+  "Payment corrected": "تم تصحيح الدفعة",
+  "Delete this payment of {amount}? Its receipt will show as not found.": "حذف هذه الدفعة بقيمة {amount}؟ سيظهر إيصالها كغير موجود.",
+  "Payment deleted": "تم حذف الدفعة",
+  "Correct a mistake in this payment, or delete it if it didn't happen.": "صحّح خطأً في هذه الدفعة، أو احذفها إن لم تحصل.",
+  "Rent statement — {name}": "كشف الإيجار — {name}",
+  "Every rent period, what was paid and when, and what is owed now.": "كل فترة إيجار، ما دُفع ومتى، وما المستحق الآن.",
+  "Picture (for WhatsApp)": "صورة (لواتساب)",
+  "Lease from {date}": "العقد من {date}",
+  "Rent paid in total": "مجموع الإيجار المدفوع",
+  "Balance": "الرصيد",
   "This flat is already rented for those dates": "هذه الشقة مؤجّرة أصلاً في هذه التواريخ",
   "Flat {unit} is rented to {name} until {date}. Start this lease after that, or end that lease first.": "الشقة {unit} مؤجّرة إلى {name} حتى {date}. ابدأ هذا العقد بعد ذلك، أو أنهِ ذلك العقد أولاً.",
   "Flat {unit} is already rented to {name}. End that lease first.": "الشقة {unit} مؤجّرة أصلاً إلى {name}. أنهِ ذلك العقد أولاً.",
@@ -21849,34 +21878,6 @@ function leasePill(lease, s = leaseStatus(lease)) {
   return mk("span", { className: "status-pill tech-status-done", text: s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : tr("Up to date") });
 }
 
-function renderRentalLeases() {
-  const active = rentalLeases.filter((l) => l.status !== "ended").sort((a, b) => String(leaseFlat(a)?.unit || "").localeCompare(String(leaseFlat(b)?.unit || ""), undefined, { numeric: true }));
-  const ended = rentalLeases.filter((l) => l.status === "ended");
-  const stats = active.map((l) => ({ l, s: leaseStatus(l) }));
-  const month = localDateInput().slice(0, 7);
-  const collectedThisMonth = stats.map(({ l }) => ({ currency: l.currency || "USD", v: (l.payments || []).filter((p) => String(p.date).slice(0, 7) === month).reduce((t, p) => t + Number(p.amount || 0), 0) }));
-  return mk("div", {},
-    mk("div", { className: "tech-summary" },
-      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Rent owed now") }), mk("strong", { text: moneyTotals(stats.map(({ l, s }) => ({ currency: l.currency, owed: s.owed })), (x) => x.owed) })),
-      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Late") }), mk("strong", { text: String(stats.filter(({ s }) => s.lateCount > 0).length) })),
-      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Collected this month") }), mk("strong", { text: moneyTotals(collectedThisMonth.map((x) => ({ currency: x.currency, v: x.v })), (x) => x.v) }))),
-    mk("div", { className: "button-row" }, primaryButton(tr("Add a lease"), () => openLeaseEditor())),
-    active.length ? null : note(tr("No rented flats yet. Add a lease for each flat that is rented: the tenant, the rent and when it's due.")),
-    mk("div", { className: "tech-list" }, stats.map(({ l, s }) => {
-      const tenant = l.tenant || {};
-      return mk("article", { className: `tech-card rent-card${s.lateAmount > 0 ? " is-new" : ""}` },
-        mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: leaseTitle(l) }), leasePill(l, s)),
-        mk("p", { className: "tech-where", text: [tr("{amount} · {period}", { amount: formatMoney(leasePeriods(l).at(-1)?.amount || l.rent, l.currency), period: periodLabel(l) }), tr("since {date}", { date: formatDateLabel(l.start) }), l.ownFlat ? tr("Your flat") : ""].filter(Boolean).join(" · ") }),
-        mk("div", { className: "notice-actions" },
-          mk("button", { type: "button", className: "mini-button is-primary", text: tr("Record payment"), onclick: () => openRentPaymentDialog(l.id) }),
-          s.owed > 0 && tenant.phone ? miniButton(tr("Remind"), () => sendRentReminder(l)) : null,
-          tenant.phone ? mk("a", { className: "mini-button", href: `tel:${tenant.phone}`, text: tr("Call") }) : null,
-          miniButton(tr("Details"), () => openLeaseDetails(l.id))));
-    })),
-    ended.length ? reportsSection(tr("Ended leases"), mk("div", {}, ended.map((l) => mk("div", { className: "breakdown-row tech-person" },
-      mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("{from} – {to}", { from: formatDateLabel(l.start), to: formatDateLabel(l.endedOn || l.end || "") }) })),
-      mk("span", { className: "tech-person-actions" }, miniButton(tr("Details"), () => openLeaseDetails(l.id))))))) : null);
-}
 
 function renderRentalOwners() {
   const groups = new Map();
@@ -21993,41 +21994,6 @@ function openLeaseEditor(id = null, prefill = null) {
 }
 
 // ── Lease details ──
-function openLeaseDetails(id) {
-  const lease = rentalLeases.find((l) => l.id === id);
-  if (!lease) return;
-  const s = leaseStatus(lease);
-  const a = leaseOwnerAccount(lease);
-  const tenant = lease.tenant || {};
-  const c = s.currency;
-  const recent = s.periods.slice(-12).reverse();
-  const payments = (lease.payments || []).slice().sort((x, y) => String(y.date).localeCompare(String(x.date)));
-  openToolDialog(leaseTitle(lease),
-    mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("{amount} · {period}", { amount: formatMoney(leaseCurrentRent(lease), c), period: periodLabel(lease) }) }), leasePill(lease, s)),
-    mk("p", { className: "tech-where", text: [tr("since {date}", { date: formatDateLabel(lease.start) }), lease.end ? tr("until {date}", { date: formatDateLabel(lease.end) }) : "", lease.increasePct ? tr("+{pct}% a year", { pct: lease.increasePct }) : ""].filter(Boolean).join(" · ") }),
-    mk("div", { className: "notice-actions" },
-      tenant.phone ? mk("a", { className: "mini-button", href: `tel:${tenant.phone}`, text: tr("Call") }) : null,
-      tenant.phone ? mk("a", { className: "mini-button", href: whatsappLink(tenant.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }) : null,
-      lease.status !== "ended" ? mk("button", { type: "button", className: "mini-button is-primary", text: tr("Record payment"), onclick: () => openRentPaymentDialog(lease.id) }) : null),
-    rentDeclarationsSection(lease),
-    reportsSection(tr("Rent"), mk("div", {}, recent.length ? recent.map((p) => mk("div", { className: "breakdown-row rent-period" },
-      mk("span", { className: "tech-person-main" }, mk("strong", { text: leasePeriodLabel(lease, p) }), mk("small", { text: rentPeriodAmountText(p, c) })),
-      mk("span", { className: `status-pill ${p.state === "paid" ? "tech-status-done" : p.state === "late" ? "tech-status-new" : "tech-status-sent"}`, text: p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) }) }), p.lateFee && p.state !== "paid" ? miniButton(tr("Waive fee"), () => { void waiveLateFee(lease.id, p.start); }) : null)) : note(tr("The first rent is due on {date}.", { date: formatDateLabel(lease.start) })))),
-    reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "breakdown-row tech-person" },
-      mk("span", { className: "tech-person-main" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method), p.chargesUsd ? tr("+ {amount} building charges", { amount: formatUsd(p.chargesUsd) }) : ""].filter(Boolean).join(" · ") })),
-      mk("span", { className: "tech-person-actions" }, miniButton(tr("PDF"), () => shareRentReceiptPdf(lease, p)), tenant.phone ? miniButton("WhatsApp", () => sendRentReceipt(lease, p)) : null)))) : note(tr("No payments yet."))),
-    leaseDocumentsSection(lease),
-    leaseInspectionsSection(lease),
-    leaseRenewalsNote(lease),
-    lease.ownFlat ? null : reportsSection(tr("Owner"), mk("p", { className: "tech-where", text: [tr("Collected {amount}", { amount: formatMoney(a.collected, c) }), tr("your fee {amount}", { amount: formatMoney(a.fee, c) }), a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, c) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, c) }), tr("to hand over {amount}", { amount: formatMoney(a.toHandOver, c) })].filter(Boolean).join(" · ") })),
-    lease.deposit?.amount ? note(tr("Deposit: {amount}{returned}", { amount: formatMoney(lease.deposit.amount, c), returned: lease.deposit.returnedOn ? tr(" — returned {amount} on {date}", { amount: formatMoney(lease.deposit.returnedAmount || 0, c), date: formatDateLabel(lease.deposit.returnedOn) }) : "" })) : null,
-    mk("div", { className: "button-row" },
-      lease.status !== "ended" ? secondaryButton(tr("Invite to the app"), () => { void inviteRenter(lease); }) : null,
-      lease.status !== "ended" ? secondaryButton(tr("Renew"), () => openRenewLeaseDialog(lease.id)) : null,
-      secondaryButton(tr("Edit"), () => openLeaseEditor(lease.id)),
-      lease.status !== "ended" ? secondaryButton(tr("End lease"), () => openEndLeaseDialog(lease.id)) : null,
-      !(lease.payments || []).length ? secondaryButton(tr("Delete"), () => deleteLease(lease.id)) : null));
-}
 
 // ── Rent payment (and, optionally, the flat's building charges) ──
 function openRentPaymentDialog(id, declaration = null) {
@@ -22038,6 +22004,10 @@ function openRentPaymentDialog(id, declaration = null) {
   const c = s.currency;
   const lastAmount = leaseCurrentRent(lease);
   const amount = numberInput(declaration ? declaration.amount : s.owed > 0 ? s.owed : lastAmount);
+  const coverage = mk("p", { className: "field-hint rent-coverage" });
+  const showCoverage = () => { coverage.textContent = rentCoverageText(lease, amount.value); };
+  amount.addEventListener("input", showCoverage);
+  showCoverage();
   const date = mk("input", { type: "date", value: declaration?.date || localDateInput() });
   const method = selectInput(PAYMENT_METHODS.map(([v, l]) => [v, tr(l)]), declaration?.method || (lease.payments || []).at(-1)?.method || "cash");
   const chargesDue = flat ? roundUsd(Math.max(0, getTenantBalance(flat.id))) : 0;
@@ -22079,6 +22049,7 @@ function openRentPaymentDialog(id, declaration = null) {
     declaration ? note(tr("The tenant says they paid {amount} on {date}. Check you received it, then save.", { amount: formatMoney(declaration.amount, c), date: formatDateLabel(declaration.date) })) : null,
     s.owed > 0 ? note(tr("Owed now: {amount}", { amount: formatMoney(s.owed, c) })) : note(tr("Nothing owed right now; a payment counts toward the next rent.")),
     mk("div", { className: "two-col" }, field(tr("Rent paid ({currency})", { currency: c }), amount), field(tr("Date"), date)),
+    coverage,
     field(tr("How"), method),
     flat ? charges.row : null,
     chargesBox,
@@ -22282,21 +22253,6 @@ function renterRentCard() {
       miniButton(tr("Rent payments"), openMyRentPayments)));
 }
 
-function openMyRentPayments() {
-  const lease = state.myLease;
-  if (!lease) return;
-  const s = leaseStatus(lease);
-  const c = s.currency;
-  const payments = (lease.payments || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  openToolDialog(tr("Your rent"),
-    mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("{amount} · {period}", { amount: formatMoney(leaseCurrentRent(lease), c), period: periodLabel(lease) }) }), leasePill(lease, s)),
-    reportsSection(tr("Rent"), mk("div", {}, s.periods.slice(-6).reverse().map((p) => mk("div", { className: "breakdown-row rent-period" },
-      mk("span", { className: "tech-person-main" }, mk("strong", { text: leasePeriodLabel(lease, p) }), mk("small", { text: rentPeriodAmountText(p, c) })),
-      mk("span", { className: `status-pill ${p.state === "paid" ? "tech-status-done" : p.state === "late" ? "tech-status-new" : "tech-status-sent"}`, text: p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) }) }))))),
-    reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "breakdown-row tech-person" },
-      mk("span", { className: "tech-person-main" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method)].filter(Boolean).join(" · ") })), miniButton(tr("Receipt"), () => shareRentReceiptPdf(lease, p))))) : note(tr("No payments yet."))),
-    lease.deposit?.amount ? note(tr("Deposit paid: {amount}", { amount: formatMoney(lease.deposit.amount, c) })) : null);
-}
 
 function renterLeaseCard() {
   const lease = state.myLease;
@@ -23385,8 +23341,9 @@ function openVacancyEditor(id = null) {
   });
   openToolDialog(v ? tr("Edit — flat for rent") : tr("A flat for rent"),
     field(tr("Flat"), flat),
-    mk("div", { className: "tech-fee-row" }, field(tr("Asking rent (monthly)"), rent), field(tr("Currency"), currency), field(tr("Available from"), from)),
-    mk("div", { className: "two-col" }, field(tr("Bedrooms"), rooms), field(tr("Size (m²)"), size)),
+    mk("div", { className: "two-col" }, field(tr("Asking rent (monthly)"), rent), field(tr("Currency"), currency)),
+    mk("div", { className: "two-col" }, field(tr("Available from"), from), field(tr("Bedrooms"), rooms)),
+    field(tr("Size (m²)"), size),
     field(tr("Description"), description),
     field(tr("Phone for viewings"), contact, tr("Shown on the listing picture.")),
     mk("div", {}, mk("span", { className: "field-label", text: tr("Photos") }), photoRow),
@@ -23399,7 +23356,7 @@ function openViewingsDialog(id) {
   const name = textInput("", { maxlength: "80", placeholder: tr("Name") });
   const phone = textInput("", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
   const date = mk("input", { type: "date", value: localDateInput() });
-  const notes = textInput("", { maxlength: "200", placeholder: tr("e.g. Couple, wants to move in December") });
+  const notes = mk("textarea", { rows: "3", maxlength: "500", placeholder: tr("e.g. Couple, wants to move in December") });
   const add = primaryButton(tr("Add"), async () => {
     if (!name.value.trim()) { showToast("Enter the name"); return; }
     add.disabled = true;
@@ -23422,7 +23379,8 @@ function openViewingsDialog(id) {
         miniButton(tr("Make the lease"), () => vacancyToLease(id, w.id)))))) : note(tr("No viewings yet.")),
     reportsSection(tr("Add a viewing"), mk("div", {},
       mk("div", { className: "two-col" }, field(tr("Name"), name), field(tr("Phone"), phone)),
-      mk("div", { className: "two-col" }, field(tr("Date"), date), field(tr("Notes"), notes)),
+      field(tr("Date"), date),
+      field(tr("Notes"), notes),
       mk("div", { className: "button-row" }, add, secondaryButton(tr("Close"), closeToolDialog)))));
 }
 
@@ -23537,6 +23495,439 @@ function leaseClash(leases, { id = null, flatId, start, end = "" }) {
   const last = (l) => (l.status === "ended" ? l.endedOn || l.end || l.start : l.end || "9999-12-31");
   return (leases || []).find((l) => l.id !== id && l.flatId === flatId
     && String(l.start) <= String(end || "9999-12-31") && String(start) <= String(last(l))) || null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// v193 — rentals, clearer: payment status at a glance, rent statements
+// ═══════════════════════════════════════════════════════════════════════════
+// Each lease card shows its last 12 rent periods as coloured squares, what is
+// owed and the next due date; the Leases tab filters late / owing / paid up
+// and reminds every late tenant in turn. The lease page leads with a summary
+// (owed now, paid until, next rent), then a payment-status table where each
+// period says when and how it was paid. A rent statement (PDF, or a picture
+// for WhatsApp) can be sent to the tenant and opened on the tenant's phone.
+// Rent payments can be corrected or deleted, and the payment form says which
+// periods a payment covers.
+let rentalsFilter = "all";
+
+// Every rent period with the payments that paid it (oldest first, the oldest
+// period filled first) and what is still open on it.
+function rentStatementRows(lease, today = localDateInput()) {
+  const s = leaseStatus(lease, today);
+  const c = s.currency;
+  const pays = (lease.payments || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.id).localeCompare(String(b.id)));
+  let i = 0;
+  let left = Number(pays[0]?.amount || 0);
+  const rows = s.periods.map((p) => {
+    let need = p.amount;
+    const paidBy = [];
+    while (need > 0.005 && i < pays.length) {
+      const take = roundMoney(Math.min(need, left), c);
+      if (take > 0) paidBy.push({ date: pays[i].date, method: pays[i].method, amount: take, paymentId: pays[i].id });
+      need = roundMoney(need - take, c);
+      left = roundMoney(left - take, c);
+      if (left <= 0.005) { i += 1; left = Number(pays[i]?.amount || 0); }
+    }
+    return { ...p, paidBy };
+  });
+  return { rows, status: s };
+}
+
+// The next rent to pay: today's open period if something is owed, else the
+// next period's start and amount.
+function nextRentDue(lease, today = localDateInput()) {
+  const s = leaseStatus(lease, today);
+  if (lease.status === "ended") return null;
+  if (s.owed > 0.005) {
+    const open = s.periods.find((p) => p.state !== "paid");
+    return { date: open?.start || today, amount: s.owed, now: true };
+  }
+  const coming = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 14)).filter((p) => p.start > today);
+  let credit = s.credit;
+  for (const p of coming) {
+    if (credit >= p.amount - 0.005) { credit = roundMoney(credit - p.amount, s.currency); continue; }
+    return { date: p.start, amount: roundMoney(p.amount - credit, s.currency), now: false };
+  }
+  return null;
+}
+
+// What a new payment would pay, oldest open period first.
+function rentCoverageText(lease, amount, today = localDateInput()) {
+  const value = Number(amount) || 0;
+  if (!(value > 0)) return "";
+  const c = lease.currency || "USD";
+  const horizon = addMonthsToDate(today, 36);
+  const periods = withLateFees(lease, leasePeriods({ ...lease, status: "active" }, horizon), today);
+  let before = (lease.payments || []).reduce((t, p) => t + Number(p.amount || 0), 0);
+  let left = value;
+  const full = [];
+  let part = null;
+  for (const p of periods) {
+    const covered = Math.min(p.amount, Math.max(0, before));
+    before -= covered;
+    const open = roundMoney(p.amount - covered, c);
+    if (open <= 0.005) continue;
+    if (left <= 0.005) break;
+    if (left >= open - 0.005) { full.push(leasePeriodLabel(lease, p)); left = roundMoney(left - open, c); } else { part = { label: leasePeriodLabel(lease, p), amount: roundMoney(left, c) }; left = 0; break; }
+  }
+  const bits = [];
+  if (full.length) bits.push(tr("Covers {periods}", { periods: full.length > 3 ? `${full[0]} → ${full.at(-1)}` : full.join(", ") }));
+  if (part) bits.push(tr("{amount} toward {period}", { amount: formatMoney(part.amount, c), period: part.label }));
+  if (left > 0.005) bits.push(tr("{amount} in advance", { amount: formatMoney(left, c) }));
+  return bits.join(" · ");
+}
+
+function rentStateClass(state) {
+  return state === "paid" ? "is-paid" : state === "late" ? "is-late" : "is-due";
+}
+
+function rentStateText(p, c) {
+  return p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : p.paid > 0 ? tr("{amount} left", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) });
+}
+
+// Twelve little squares: the last rent periods, coloured by status.
+function rentPeriodStrip(lease, s = leaseStatus(lease)) {
+  const periods = s.periods.slice(-12);
+  if (!periods.length) return null;
+  return mk("div", { className: "rent-strip", "aria-label": tr("Rent periods") },
+    ...periods.map((p) => mk("span", { className: `rent-dot ${rentStateClass(p.state)}`, title: `${leasePeriodLabel(lease, p)} · ${rentStateText(p, s.currency)}`, text: lease.period === "yearly" ? p.start.slice(2, 4) : String(Number(p.start.slice(5, 7))) })));
+}
+
+function leaseMoneyLine(lease, s = leaseStatus(lease)) {
+  const c = s.currency;
+  const next = nextRentDue(lease);
+  return [
+    s.owed > 0.005 ? tr("Owes {amount}", { amount: formatMoney(s.owed, c) }) : s.credit > 0.005 ? tr("{amount} in advance", { amount: formatMoney(s.credit, c) }) : tr("Up to date"),
+    s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : "",
+    next && !next.now ? tr("next {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) }) : "",
+  ].filter(Boolean).join(" · ");
+}
+
+// ── The Leases tab ──
+function renderRentalLeases() {
+  const all = rentalLeases.filter((l) => l.status !== "ended").map((l) => ({ l, s: leaseStatus(l) }));
+  const ended = rentalLeases.filter((l) => l.status === "ended");
+  const lateList = all.filter(({ s }) => s.lateCount > 0);
+  const owing = all.filter(({ s }) => s.owed > 0.005);
+  const paidUp = all.filter(({ s }) => s.owed <= 0.005);
+  const month = localDateInput().slice(0, 7);
+  const collectedThisMonth = all.map(({ l }) => ({ currency: l.currency || "USD", v: (l.payments || []).filter((p) => String(p.date).slice(0, 7) === month).reduce((t, p) => t + Number(p.amount || 0), 0) }));
+  const shown = (rentalsFilter === "late" ? lateList : rentalsFilter === "owing" ? owing : rentalsFilter === "paid" ? paidUp : all)
+    .sort((a, b) => b.s.lateAmount - a.s.lateAmount || b.s.owed - a.s.owed || String(leaseFlat(a.l)?.unit || "").localeCompare(String(leaseFlat(b.l)?.unit || ""), undefined, { numeric: true }));
+  const chip = (id, label, n) => mk("button", { type: "button", className: `rent-filter${rentalsFilter === id ? " is-active" : ""}`, onclick: () => { rentalsFilter = id; renderRentalsView(); } }, label, n != null ? mk("span", { text: String(n) }) : null);
+  return mk("div", {},
+    mk("div", { className: "tech-summary" },
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Rent owed now") }), mk("strong", { text: moneyTotals(all.map(({ l, s }) => ({ currency: l.currency, owed: s.owed })), (x) => x.owed) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Late") }), mk("strong", { text: String(lateList.length) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Collected this month") }), mk("strong", { text: moneyTotals(collectedThisMonth, (x) => x.v) }))),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Add a lease"), () => openLeaseEditor()),
+      lateList.length ? secondaryButton(tr("Remind the late ones"), () => openRemindLateDialog()) : null),
+    all.length ? mk("div", { className: "rent-filters" }, chip("all", tr("All"), all.length), chip("late", tr("Late"), lateList.length), chip("owing", tr("Owing"), owing.length), chip("paid", tr("Paid up"), paidUp.length)) : null,
+    all.length ? null : note(tr("No rented flats yet. Add a lease for each flat that is rented: the tenant, the rent and when it's due.")),
+    all.length && !shown.length ? note(tr("No lease here.")) : null,
+    mk("div", { className: "tech-list" }, shown.map(({ l, s }) => {
+      const tenant = l.tenant || {};
+      return mk("article", { className: `tech-card rent-card${s.lateAmount > 0 ? " is-new" : ""}` },
+        mk("button", { type: "button", className: "rent-card-open", onclick: () => openLeaseDetails(l.id) },
+          mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: leaseTitle(l) }), leasePill(l, s)),
+          mk("p", { className: "tech-where", text: [tr("{amount} · {period}", { amount: formatMoney(leaseCurrentRent(l), l.currency), period: periodLabel(l) }), l.ownFlat ? tr("Your flat") : ""].filter(Boolean).join(" · ") }),
+          rentPeriodStrip(l, s),
+          mk("p", { className: `rent-money-line${s.owed > 0.005 ? " is-owed" : ""}`, text: leaseMoneyLine(l, s) })),
+        mk("div", { className: "notice-actions" },
+          mk("button", { type: "button", className: "mini-button is-primary", text: tr("Record payment"), onclick: () => openRentPaymentDialog(l.id) }),
+          s.owed > 0 && tenant.phone ? miniButton(tr("Remind"), () => sendRentReminder(l)) : null,
+          miniButton(tr("Statement"), () => openRentStatementChoice(l)),
+          miniButton(tr("Details"), () => openLeaseDetails(l.id))));
+    })),
+    ended.length ? reportsSection(tr("Ended leases"), mk("div", {}, ended.map((l) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("{from} – {to}", { from: formatDateLabel(l.start), to: formatDateLabel(l.endedOn || l.end || "") }) })),
+      mk("span", { className: "tech-person-actions" }, miniButton(tr("Statement"), () => openRentStatementChoice(l)), miniButton(tr("Details"), () => openLeaseDetails(l.id))))))) : null);
+}
+
+function openRemindLateDialog() {
+  const late = rentalLeases.filter((l) => l.status !== "ended" && leaseStatus(l).lateCount > 0);
+  openToolDialog(tr("Remind the late ones"),
+    note(tr("Each button opens WhatsApp with that tenant's reminder.")),
+    mk("div", {}, late.map((l) => {
+      const s = leaseStatus(l);
+      return mk("div", { className: "breakdown-row tech-person" },
+        mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("Late · {amount}", { amount: formatMoney(s.owed, s.currency) }) })),
+        l.tenant?.phone ? miniButton("WhatsApp", (e) => { e.currentTarget.classList.add("is-done"); sendRentReminder(l); }) : mk("small", { text: tr("No phone number") }));
+    })),
+    mk("div", { className: "button-row" }, secondaryButton(tr("Done"), closeToolDialog)));
+}
+
+// ── The lease page ──
+function rentStatusTable(lease, { limit = 12, manager = false } = {}) {
+  const { rows, status: s } = rentStatementRows(lease);
+  const c = s.currency;
+  const list = rows.slice().reverse();
+  const body = mk("div", { className: "rent-status-table" });
+  const draw = (n) => fillChildren(body, ...list.slice(0, n).map((p) => mk("div", { className: `rent-status-row ${rentStateClass(p.state)}` },
+    mk("span", { className: "rent-status-main" },
+      mk("strong", { text: leasePeriodLabel(lease, p) }),
+      mk("small", { text: [rentPeriodAmountText(p, c), ...p.paidBy.map((x) => (Math.abs(x.amount - p.amount) < 0.005 ? tr("paid on {date}", { date: formatDateLabel(x.date) }) : tr("paid {amount} on {date}", { amount: formatMoney(x.amount, c), date: formatDateLabel(x.date) })))].join(" · ") })),
+    mk("span", { className: "rent-status-side" },
+      mk("span", { className: `status-pill ${p.state === "paid" ? "tech-status-done" : p.state === "late" ? "tech-status-new" : "tech-status-sent"}`, text: rentStateText(p, c) }),
+      manager && p.lateFee && p.state !== "paid" ? miniButton(tr("Waive fee"), () => { void waiveLateFee(lease.id, p.start); }) : null))),
+    list.length > n ? mk("button", { type: "button", className: "rent-show-all", text: tr("Show all {n} periods", { n: list.length }), onclick: () => draw(list.length) }) : null);
+  draw(limit);
+  return list.length ? body : note(tr("The first rent is due on {date}.", { date: formatDateLabel(lease.start) }));
+}
+
+function leaseSummaryCells(lease, s = leaseStatus(lease)) {
+  const c = s.currency;
+  const next = nextRentDue(lease);
+  return mk("div", { className: "tech-summary" },
+    mk("div", { className: `tech-summary-cell${s.owed > 0.005 ? " is-owed" : ""}` }, mk("span", { text: s.owed > 0.005 ? tr("Owed now") : s.credit > 0.005 ? tr("In advance") : tr("Owed now") }), mk("strong", { text: formatMoney(s.owed > 0.005 ? s.owed : s.credit, c) })),
+    mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Paid until") }), mk("strong", { text: s.paidUntil ? formatDateLabel(s.paidUntil) : "—" })),
+    mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Next rent") }), mk("strong", { text: next ? formatMoney(next.amount, c) : "—" }), mk("small", { text: next ? (next.now ? tr("now") : formatDateLabel(next.date)) : "" })));
+}
+
+function openLeaseDetails(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const s = leaseStatus(lease);
+  const a = leaseOwnerAccount(lease);
+  const tenant = lease.tenant || {};
+  const c = s.currency;
+  const payments = (lease.payments || []).slice().sort((x, y) => String(y.date).localeCompare(String(x.date)));
+  openToolDialog(leaseTitle(lease),
+    mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("{amount} · {period}", { amount: formatMoney(leaseCurrentRent(lease), c), period: periodLabel(lease) }) }), leasePill(lease, s)),
+    mk("p", { className: "tech-where", text: [tr("since {date}", { date: formatDateLabel(lease.start) }), lease.end ? tr("until {date}", { date: formatDateLabel(lease.end) }) : "", lease.increasePct ? tr("+{pct}% a year", { pct: lease.increasePct }) : "", tenant.phone || ""].filter(Boolean).join(" · ") }),
+    leaseSummaryCells(lease, s),
+    mk("div", { className: "notice-actions" },
+      lease.status !== "ended" ? mk("button", { type: "button", className: "mini-button is-primary", text: tr("Record payment"), onclick: () => openRentPaymentDialog(lease.id) }) : null,
+      s.owed > 0 && tenant.phone ? miniButton(tr("Remind"), () => sendRentReminder(lease)) : null,
+      miniButton(tr("Statement"), () => openRentStatementChoice(lease)),
+      tenant.phone ? mk("a", { className: "mini-button", href: `tel:${tenant.phone}`, text: tr("Call") }) : null,
+      tenant.phone ? mk("a", { className: "mini-button", href: whatsappLink(tenant.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }) : null),
+    rentDeclarationsSection(lease),
+    reportsSection(tr("Payment status"), rentStatusTable(lease, { manager: true })),
+    reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "rent-pay-row" },
+      mk("div", { className: "rent-pay-head" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method), p.chargesUsd ? tr("+ {amount} building charges", { amount: formatUsd(p.chargesUsd) }) : ""].filter(Boolean).join(" · ") })),
+      mk("div", { className: "notice-actions" },
+        miniButton(tr("Receipt"), () => shareRentReceiptPdf(lease, p)),
+        tenant.phone ? miniButton("WhatsApp", () => sendRentReceipt(lease, p)) : null,
+        miniButton(tr("Edit"), () => openRentPaymentEditDialog(lease.id, p.id)))))) : note(tr("No payments yet."))),
+    leaseDocumentsSection(lease),
+    leaseInspectionsSection(lease),
+    leaseRenewalsNote(lease),
+    lease.ownFlat ? null : reportsSection(tr("Owner"), mk("p", { className: "tech-where", text: [tr("Collected {amount}", { amount: formatMoney(a.collected, c) }), tr("your fee {amount}", { amount: formatMoney(a.fee, c) }), a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, c) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, c) }), tr("to hand over {amount}", { amount: formatMoney(a.toHandOver, c) })].filter(Boolean).join(" · ") })),
+    lease.deposit?.amount ? note(tr("Deposit: {amount}{returned}", { amount: formatMoney(lease.deposit.amount, c), returned: lease.deposit.returnedOn ? tr(" — returned {amount} on {date}", { amount: formatMoney(lease.deposit.returnedAmount || 0, c), date: formatDateLabel(lease.deposit.returnedOn) }) : "" })) : null,
+    mk("div", { className: "button-row" },
+      lease.status !== "ended" ? secondaryButton(tr("Invite to the app"), () => { void inviteRenter(lease); }) : null,
+      lease.status !== "ended" ? secondaryButton(tr("Renew"), () => openRenewLeaseDialog(lease.id)) : null,
+      secondaryButton(tr("Edit"), () => openLeaseEditor(lease.id)),
+      lease.status !== "ended" ? secondaryButton(tr("End lease"), () => openEndLeaseDialog(lease.id)) : null,
+      !(lease.payments || []).length ? secondaryButton(tr("Delete"), () => deleteLease(lease.id)) : null));
+}
+
+// ── Correct or delete a rent payment ──
+function openRentPaymentEditDialog(leaseId, paymentId) {
+  const lease = rentalLeases.find((l) => l.id === leaseId);
+  const payment = lease?.payments?.find((p) => p.id === paymentId);
+  if (!payment) return;
+  const c = lease.currency || "USD";
+  const amount = numberInput(payment.amount);
+  const date = mk("input", { type: "date", value: payment.date || localDateInput() });
+  const method = selectInput(PAYMENT_METHODS.map(([v, l]) => [v, tr(l)]), payment.method || "cash");
+  const back = () => { closeToolDialog(); openLeaseDetails(leaseId); };
+  const save = primaryButton(tr("Save"), async () => {
+    const value = roundMoney(Number(amount.value), c);
+    if (!(value > 0)) { showToast("Enter the amount"); return; }
+    save.disabled = true;
+    const saved = await saveLease({ ...lease, payments: lease.payments.map((p) => (p.id === paymentId ? { ...p, amount: value, date: date.value || p.date, method: method.value, editedAt: new Date().toISOString() } : p)) });
+    save.disabled = false;
+    if (saved) { back(); showToast("Payment corrected"); }
+  });
+  const remove = secondaryButton(tr("Delete"), async () => {
+    if (!window.confirm(tr("Delete this payment of {amount}? Its receipt will show as not found.", { amount: formatMoney(payment.amount, c) }))) return;
+    const saved = await saveLease({ ...lease, payments: lease.payments.filter((p) => p.id !== paymentId) });
+    if (saved) { back(); showToast("Payment deleted"); }
+  });
+  openToolDialog(tr("Rent payment — {title}", { title: leaseTitle(lease) }),
+    note(tr("Correct a mistake in this payment, or delete it if it didn't happen.")),
+    mk("div", { className: "two-col" }, field(tr("Rent paid ({currency})", { currency: c }), amount), field(tr("Date"), date)),
+    field(tr("How"), method),
+    mk("div", { className: "button-row" }, save, remove, secondaryButton(tr("Cancel"), back)));
+}
+
+// ── The tenant's rent statement ──
+function openRentStatementChoice(lease) {
+  const isTenant = isRenterPhone();
+  openToolDialog(tr("Rent statement — {name}", { name: lease.tenant?.name || "" }),
+    note(tr("Every rent period, what was paid and when, and what is owed now.")),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Picture (for WhatsApp)"), () => { closeToolDialog(); void shareRentStatementPicture(lease); }),
+      secondaryButton("PDF", () => { closeToolDialog(); shareRentStatementPdf(lease); }),
+      isTenant ? null : secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function buildRentStatementPdf(lease) {
+  const c = lease.currency || "USD";
+  const flat = leaseFlat(lease);
+  const { rows, status: s } = rentStatementRows(lease);
+  const payments = (lease.payments || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const left = 50;
+  const right = 545;
+  const pages = [];
+  let commands;
+  let y;
+  const start = (first) => {
+    if (commands) pages.push(`${commands.join("\n")}\n`);
+    commands = ["0.2 w"];
+    y = 800;
+    if (first) {
+      commands.push(pdfTextCommand(state.building?.name || "", left, y, 11));
+      commands.push(pdfTextCommand("Rent statement", left, y - 28, 20, true));
+      commands.push(pdfTextCommand(tr("{name} | Unit {unit}", { name: lease.tenant?.name || "", unit: flat?.unit || "" }), left, y - 48, 11));
+      commands.push(pdfTextCommand(tr("Date: {date}", { date: localDateInput() }), 380, y, 10));
+      commands.push(pdfTextCommand(tr("Lease from {date}", { date: formatDateLabel(lease.start) }), 380, y - 16, 10));
+      commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 32, 9));
+      commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+      y -= 92;
+    } else {
+      commands.push(pdfTextCommand(tr("{name} | Unit {unit} - statement (continued)", { name: lease.tenant?.name || "", unit: flat?.unit || "" }), left, y, 10, true));
+      commands.push(pdfLineCommand(left, y - 10, right, y - 10));
+      y -= 34;
+    }
+  };
+  start(true);
+  const boxes = [
+    ["Rent", `${formatMoney(leaseCurrentRent(lease), c)} · ${periodLabel(lease)}`],
+    [s.owed > 0.005 ? "Owed now" : s.credit > 0.005 ? "In advance" : "Owed now", formatMoney(s.owed > 0.005 ? s.owed : s.credit, c)],
+    ["Paid until", s.paidUntil ? formatDateLabel(s.paidUntil) : "-"],
+    ["Rent paid in total", formatMoney(s.paidTotal, c)],
+    ...(lease.deposit?.amount ? [["Deposit held", formatMoney(lease.deposit.returnedOn ? 0 : lease.deposit.amount, c)]] : []),
+  ];
+  boxes.forEach(([label, value], index) => {
+    const x = left + (index % 2) * 256;
+    const by = y - Math.floor(index / 2) * 52 - 44;
+    commands.push(pdfRectCommand(x, by, 238, 44));
+    commands.push(pdfTextCommand(label, x + 8, by + 26, 8));
+    commands.push(pdfTextCommand(pdfClip(value, 40), x + 8, by + 10, 12, true));
+  });
+  y -= Math.ceil(boxes.length / 2) * 52 + 24;
+  const cols = [["Period", 190], ["Rent due", 75], ["Paid", 75], ["Balance", 75], ["Status", 80]];
+  const header = () => {
+    let x = left;
+    cols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; });
+    y -= 22;
+  };
+  commands.push(pdfTextCommand("Rent periods", left, y, 13, true));
+  y -= 20;
+  header();
+  rows.forEach((p) => {
+    if (y < 80) { start(false); header(); }
+    let x = left;
+    [leasePeriodLabel(lease, p), formatMoney(p.amount, c), formatMoney(p.paid, c), formatMoney(p.left, c), p.state === "paid" ? "Paid" : p.state === "late" ? "Late" : p.paid > 0 ? "Partial" : "Due"]
+      .forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, Math.floor(cols[i][1] / 4.6)), x + 5, y - 4, 8, i === 4 && p.state === "late")); x += cols[i][1]; });
+    y -= 22;
+  });
+  if (y < 140) start(false); else y -= 18;
+  commands.push(pdfTextCommand("Payments received", left, y, 13, true));
+  y -= 20;
+  const pcols = [["Date", 130], ["Amount", 110], ["How", 120], ["Receipt", 135]];
+  const pheader = () => { let x = left; pcols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; }); y -= 22; };
+  pheader();
+  if (!payments.length) { commands.push(pdfTextCommand("No payments yet.", left + 5, y - 4, 8)); y -= 22; }
+  payments.forEach((p) => {
+    if (y < 80) { start(false); pheader(); }
+    let x = left;
+    [formatDateLabel(p.date), formatMoney(p.amount, c), methodLabel(p.method) || "-", String(p.id).toUpperCase()].forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, pcols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, 30), x + 5, y - 4, 8)); x += pcols[i][1]; });
+    y -= 22;
+  });
+  commands.push(pdfTextCommand("Rent is applied to the oldest unpaid period first.", left, Math.max(48, y - 18), 9));
+  pages.push(`${commands.join("\n")}\n`);
+  return buildMultiPagePdf(pages);
+}
+
+function shareRentStatementPdf(lease) {
+  const flat = leaseFlat(lease);
+  void sharePdfFile(buildRentStatementPdf(lease), `Rent-statement_${safeFilePart(flat?.unit || "flat", "flat")}_${localDateInput()}.pdf`, tr("Rent statement — {name}", { name: lease.tenant?.name || "" }));
+}
+
+function drawRentStatementCanvas(lease) {
+  const rtl = currentLang === "ar";
+  const C = { green: "#163832", soft: "#cfe3db", white: "#ffffff", ink: "#14211f", muted: "#61706b", tint: "#eef4ef", line: "#e4e9e4", red: "#a23b3b", accent: "#1f6b5a", amber: "#9a6a12" };
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const { rows, status: s } = rentStatementRows(lease);
+  const c = s.currency;
+  const list = rows.slice(-10);
+  const flat = leaseFlat(lease);
+  const W = 1080;
+  const PAD = 64;
+  const H = 700 + list.length * 96 + 140;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const X = (x) => (rtl ? W - x : x);
+  const box = (x, y, w, h, color, radius = 0) => { ctx.fillStyle = color; ctx.beginPath(); const lx = rtl ? W - x - w : x; if (radius && typeof ctx.roundRect === "function") ctx.roundRect(lx, y, w, h, radius); else ctx.rect(lx, y, w, h); ctx.fill(); };
+  const text = (value, x, y, { size = 30, weight = 400, color = C.ink, align = "start" } = {}) => { ctx.font = `${weight} ${size}px ${FONT}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(String(value ?? ""), X(x), y); };
+  box(0, 0, W, H, C.white);
+  box(0, 0, W, 250, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Rent statement"), PAD, 160, { size: 64, weight: 800, color: C.white });
+  text(`${lease.tenant?.name || ""} · ${tr("Unit {unit}", { unit: flat?.unit || "" })} · ${formatDateLabel(localDateInput())}`, PAD, 212, { size: 30, color: C.soft });
+  box(PAD, 300, W - PAD * 2, 210, C.tint, 26);
+  const owes = s.owed > 0.005;
+  text(owes ? tr("Owed now") : s.credit > 0.005 ? tr("In advance") : tr("All paid"), PAD + 36, 360, { size: 30, color: C.muted });
+  text(owes || s.credit > 0.005 ? formatMoney(owes ? s.owed : s.credit, c) : "✓", PAD + 36, 440, { size: 72, weight: 800, color: owes ? C.red : C.accent });
+  text([`${formatMoney(leaseCurrentRent(lease), c)} · ${periodLabel(lease)}`, s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : ""].filter(Boolean).join(" · "), PAD + 36, 486, { size: 28, color: C.muted });
+  let y = 590;
+  text(tr("Period"), PAD, y, { size: 28, weight: 700, color: C.muted });
+  text(tr("Paid"), W - PAD, y, { size: 28, weight: 700, color: C.muted, align: "end" });
+  y += 24;
+  box(PAD, y, W - PAD * 2, 2, C.line);
+  y += 60;
+  list.slice().reverse().forEach((p) => {
+    text(leasePeriodLabel(lease, p), PAD, y, { size: 32 });
+    const color = p.state === "paid" ? C.accent : p.state === "late" ? C.red : C.amber;
+    text(tr("{paid} of {due}", { paid: formatMoney(p.paid, c), due: formatMoney(p.amount, c) }), W - PAD, y, { size: 32, weight: 700, color, align: "end" });
+    const when = p.paidBy.map((x) => formatDateLabel(x.date)).join(", ");
+    text([rentStateText(p, c), when].filter(Boolean).join(" · "), PAD, y + 38, { size: 24, color: C.muted });
+    y += 96;
+  });
+  text(tr("Generated by Building Account Tracker"), PAD, H - 52, { size: 24, color: C.muted });
+  return canvas;
+}
+
+async function shareRentStatementPicture(lease) {
+  const canvas = drawRentStatementCanvas(lease);
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  const flat = leaseFlat(lease);
+  const fileName = `Rent-statement_${safeFilePart(flat?.unit || "flat", "flat")}_${localDateInput()}.png`;
+  const title = tr("Rent statement — {name}", { name: lease.tenant?.name || "" });
+  try {
+    if (typeof navigator.share === "function" && typeof File === "function") {
+      const file = new File([blob], fileName, { type: "image/png" });
+      if (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title, text: title }); return; }
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(blob, "image/png", fileName);
+}
+
+// ── The tenant's phone: the same status table and statement ──
+function openMyRentPayments() {
+  const lease = state.myLease;
+  if (!lease) return;
+  const s = leaseStatus(lease);
+  const c = s.currency;
+  const payments = (lease.payments || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  openToolDialog(tr("Your rent"),
+    mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("{amount} · {period}", { amount: formatMoney(leaseCurrentRent(lease), c), period: periodLabel(lease) }) }), leasePill(lease, s)),
+    leaseSummaryCells(lease, s),
+    mk("div", { className: "notice-actions" }, mk("button", { type: "button", className: "mini-button is-primary", text: tr("Rent statement"), onclick: () => openRentStatementChoice(lease) })),
+    reportsSection(tr("Payment status"), rentStatusTable(lease, { limit: 6 })),
+    reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "breakdown-row tech-person" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method)].filter(Boolean).join(" · ") })), miniButton(tr("Receipt"), () => shareRentReceiptPdf(lease, p))))) : note(tr("No payments yet."))),
+    lease.deposit?.amount ? note(tr("Deposit paid: {amount}", { amount: formatMoney(lease.deposit.amount, c) })) : null);
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.
@@ -23752,6 +24143,9 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  rentStatementRows,
+  nextRentDue,
+  rentCoverageText,
   leaseClash,
   rentalsOverviewData,
   ownerStatementMonths,
