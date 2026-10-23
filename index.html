@@ -927,15 +927,15 @@
         </label>
 
         <div class="invoice-file-field hidden">
-          <span class="field-label" data-i18n="tx.invoicePicture">Invoice picture</span>
+          <span class="field-label" data-i18n="tx.invoicePicture">Invoice (photo or PDF)</span>
           <div class="invoice-source-row">
             <button class="secondary-button" id="takeInvoicePhotoButton" type="button" data-i18n="tx.useCamera">Use Camera</button>
-            <button class="secondary-button" id="uploadInvoicePhotoButton" type="button" data-i18n="tx.uploadPhoto">Upload Photo</button>
+            <button class="secondary-button" id="uploadInvoicePhotoButton" type="button" data-i18n="tx.uploadPhoto">Photo or PDF</button>
           </div>
           <input id="transactionInvoiceCameraFile" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
-          <input id="transactionInvoiceFile" class="file-input-hidden" type="file" accept="image/*" />
-          <span class="file-selection-status" id="invoiceFileSelectionStatus" data-i18n="tx.noPhoto">No photo selected</span>
-          <button class="secondary-button hidden" id="readInvoiceButton" type="button" data-i18n="tx.readInvoice">Fill in from the photo</button>
+          <input id="transactionInvoiceFile" class="file-input-hidden" type="file" accept="image/*,application/pdf,.pdf" />
+          <span class="file-selection-status" id="invoiceFileSelectionStatus" data-i18n="tx.noPhoto">No file selected</span>
+          <button class="secondary-button hidden" id="readInvoiceButton" type="button" data-i18n="tx.readInvoice">Fill in from the invoice</button>
         </div>
         <div class="attachment-status hidden" id="invoiceAttachmentStatus"></div>
         <label class="checkbox-row hidden" id="recurringExpenseRow">

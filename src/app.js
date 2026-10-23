@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v180";
+const APP_VERSION = "v181";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -351,6 +351,10 @@ const EXPENSE_INVOICE_PREFIX = "INV";
 const INVOICE_IMAGE_MAX_EDGE = 1800;
 const INVOICE_IMAGE_QUALITY = 0.82;
 const INVOICE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024;
+// PDF invoices are stored as they are (no compression).
+const INVOICE_PDF_MAX_BYTES = 10 * 1024 * 1024;
+// What /api/read-invoice accepts in one request.
+const INVOICE_READ_MAX_BYTES = 3 * 1024 * 1024;
 
 // ---------------------------------------------------------------------------
 // Internationalization (English / Arabic) with right-to-left support.
@@ -409,7 +413,7 @@ const I18N = {
     "ten.inviteAll": "Invite all",
     "pay.whoPaid": "Who paid?",
     "tx.paidBy": "Paid by",
-    "tx.readInvoice": "Fill in from the photo",
+    "tx.readInvoice": "Fill in from the invoice",
     "tx.paidFrom": "Paid from",
     "opt.cash": "Cash",
     "opt.bank": "Bank transfer",
@@ -664,10 +668,10 @@ const I18N = {
     "tx.splitDistribution": "Split Distribution",
     "tx.project": "Project",
     "tx.projectPh": "Type project",
-    "tx.invoicePicture": "Invoice picture",
+    "tx.invoicePicture": "Invoice (photo or PDF)",
     "tx.useCamera": "Use Camera",
-    "tx.uploadPhoto": "Upload Photo",
-    "tx.noPhoto": "No photo selected",
+    "tx.uploadPhoto": "Photo or PDF",
+    "tx.noPhoto": "No file selected",
     "aria.showSuppliers": "Show saved suppliers",
     "aria.showCategories": "Show saved categories",
     "aria.showProjects": "Show saved projects",
@@ -805,7 +809,7 @@ const I18N = {
     "ten.inviteAll": "دعوة الجميع",
     "pay.whoPaid": "من دفع؟",
     "tx.paidBy": "طريقة الدفع",
-    "tx.readInvoice": "تعبئة البيانات من الصورة",
+    "tx.readInvoice": "تعبئة البيانات من الفاتورة",
     "tx.paidFrom": "دُفع من",
     "opt.cash": "نقداً",
     "opt.bank": "تحويل مصرفي",
@@ -1060,10 +1064,10 @@ const I18N = {
     "tx.splitDistribution": "توزيع التقسيم",
     "tx.project": "المشروع",
     "tx.projectPh": "اكتب المشروع",
-    "tx.invoicePicture": "صورة الفاتورة",
+    "tx.invoicePicture": "الفاتورة (صورة أو PDF)",
     "tx.useCamera": "استخدام الكاميرا",
-    "tx.uploadPhoto": "رفع صورة",
-    "tx.noPhoto": "لم يتم اختيار صورة",
+    "tx.uploadPhoto": "صورة أو PDF",
+    "tx.noPhoto": "لم يتم اختيار ملف",
     "aria.showSuppliers": "إظهار المورّدين المحفوظين",
     "aria.showCategories": "إظهار الفئات المحفوظة",
     "aria.showProjects": "إظهار المشاريع المحفوظة",
@@ -2295,6 +2299,9 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "This PDF is too large (10 MB at most).": "ملف PDF كبير جداً (10 ميغابايت كحد أقصى).",
+  "Choose a photo or a PDF of the invoice": "اختر صورة أو ملف PDF للفاتورة",
+  "This PDF is too large to read (3 MB at most). Fill in the numbers yourself.": "ملف PDF كبير جداً لقراءته (3 ميغابايت كحد أقصى). أدخل الأرقام بنفسك.",
   "Scan the QR code to check this receipt.": "امسح رمز QR للتحقق من هذا الإيصال.",
   "Check this receipt: {url}": "للتحقق من هذا الإيصال: {url}",
   "Your rent": "إيجارك",
@@ -7580,7 +7587,7 @@ function renderLedger() {
       chip.type = "button";
       chip.className = "ledger-photo-chip";
       chip.setAttribute("aria-label", tr("See the invoice"));
-      chip.append(lucide("camera", { size: 18 }));
+      chip.append(lucide(isImageAttachment(transaction.invoiceAttachment) ? "camera" : "fileText", { size: 18 }));
       chip.addEventListener("click", (e) => { e.stopPropagation(); openInvoicePhoto(transaction.invoiceAttachment); });
       item.querySelector(".ledger-amount").before(chip);
     }
@@ -8498,14 +8505,24 @@ function safeFilePart(value, fallback = "invoice") {
   return cleaned || fallback;
 }
 
-function invoiceFileName(transaction) {
+function invoiceFileName(transaction, extension = "jpg") {
   const invoice = safeFilePart(transaction.invoice || transaction.id, "invoice");
   const description = safeFilePart(transaction.description, "expense");
-  return `${transaction.date || localDateInput()}_${invoice}_${description}.jpg`;
+  return `${transaction.date || localDateInput()}_${invoice}_${description}.${extension}`;
 }
 
-async function prepareInvoiceUpload(transaction, file) {
-  if (!file.type.startsWith("image/")) throw new Error("Choose an invoice picture file");
+function isPdfFile(file) {
+  return file?.type === PDF_MIME || /\.pdf$/i.test(file?.name || "");
+}
+
+// Expense invoices may also be PDFs (allowPdf): those are kept as they are.
+async function prepareInvoiceUpload(transaction, file, { allowPdf = false } = {}) {
+  if (allowPdf && isPdfFile(file)) {
+    if (file.size > INVOICE_PDF_MAX_BYTES) throw new Error(tr("This PDF is too large (10 MB at most)."));
+    const dataBase64 = (await readFileAsDataUrl(file)).split(",")[1] || "";
+    return { dataBase64, fileName: invoiceFileName(transaction, "pdf"), mimeType: PDF_MIME, size: file.size };
+  }
+  if (!file.type.startsWith("image/")) throw new Error(allowPdf ? "Choose a photo or a PDF of the invoice" : "Choose an invoice picture file");
   const source = await readFileAsDataUrl(file);
   const image = await loadImage(source);
   const scale = Math.min(1, INVOICE_IMAGE_MAX_EDGE / Math.max(image.naturalWidth, image.naturalHeight));
@@ -8655,7 +8672,7 @@ async function uploadInvoiceThroughScript(transaction, prepared, folderId) {
 }
 
 async function uploadExpenseInvoice(transaction, file) {
-  const prepared = await prepareInvoiceUpload(transaction, file);
+  const prepared = await prepareInvoiceUpload(transaction, file, { allowPdf: true });
   // Supabase Storage is the current home for invoice photos. The Google Drive
   // paths below remain only for buildings still on the legacy Sheet setup.
   if (cloudProvider() === "supabase") {
@@ -9870,6 +9887,8 @@ async function invoicePhotoLink(attachment) {
 }
 
 function isImageAttachment(attachment) {
+  // The concierge's uploads are labelled JPEG by the server; the path tells PDFs apart.
+  if (/\.pdf$/i.test(String(attachment?.storagePath || ""))) return false;
   const name = String(attachment?.fileName || attachment?.storagePath || "").toLowerCase();
   if (String(attachment?.mimeType || "").startsWith("image/")) return true;
   if (/.(pdf|docx?|xlsx?|zip)$/.test(name)) return false;
@@ -12933,10 +12952,11 @@ function issueStatusPill(status) {
   return mk("span", { className: `status-pill issue-${status || "open"}`, text: tr(label) });
 }
 
-async function uploadPhotoUnder(prefix, file) {
+async function uploadPhotoUnder(prefix, file, { allowPdf = false } = {}) {
   if (cloudProvider() !== "supabase" || !authSession) throw new Error("Photos need the cloud. Send the photo to the building manager on WhatsApp instead.");
-  const prepared = await prepareInvoiceUpload({ id: "photo", invoice: "photo", description: "photo", date: localDateInput() }, file);
-  const path = buildingPath(`${prefix}/${Date.now()}-${randomToken()}.jpg`);
+  const prepared = await prepareInvoiceUpload({ id: "photo", invoice: "photo", description: "photo", date: localDateInput() }, file, { allowPdf });
+  const extension = prepared.mimeType === PDF_MIME ? "pdf" : "jpg";
+  const path = buildingPath(`${prefix}/${Date.now()}-${randomToken()}.${extension}`);
   const c = cloudConfig();
   await ensureFreshSession();
   const res = await fetch(`${c.supabaseUrl}/storage/v1/object/${SUPABASE_INVOICE_BUCKET}/${encodeURI(path)}`, {
@@ -12945,7 +12965,7 @@ async function uploadPhotoUnder(prefix, file) {
     body: base64ToBytes(prepared.dataBase64),
   });
   if (!res.ok) throw Object.assign(new Error(tr("Photo upload failed ({status})", { status: res.status })), { status: res.status });
-  return { fileName: "photo.jpg", mimeType: prepared.mimeType, storagePath: path, uploadedAt: new Date().toISOString() };
+  return { fileName: `${extension === "pdf" ? "invoice" : "photo"}.${extension}`, mimeType: prepared.mimeType, storagePath: path, uploadedAt: new Date().toISOString() };
 }
 
 function openIssueDialog() {
@@ -15330,12 +15350,14 @@ async function readInvoiceIntoForm() {
   button.disabled = true;
   button.textContent = tr("Reading the photo…");
   try {
-    const prepared = await prepareInvoiceUpload({ id: "read", invoice: "read", description: "invoice", date: localDateInput() }, file);
+    const prepared = await prepareInvoiceUpload({ id: "read", invoice: "read", description: "invoice", date: localDateInput() }, file, { allowPdf: true });
+    const pdf = prepared.mimeType === PDF_MIME;
+    if (pdf && prepared.size > INVOICE_READ_MAX_BYTES) throw new Error(tr("This PDF is too large to read (3 MB at most). Fill in the numbers yourself."));
     await ensureFreshSession();
     const res = await fetch("/api/read-invoice", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${authBearer()}` },
-      body: JSON.stringify({ image: prepared.dataBase64 }),
+      body: JSON.stringify(pdf ? { pdf: prepared.dataBase64 } : { image: prepared.dataBase64 }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(body.error || tr("Invoice reading failed ({status})", { status: res.status }));
@@ -15353,7 +15375,7 @@ async function readInvoiceIntoForm() {
     showToast(error instanceof TypeError ? "Can't reach the server. Check your connection." : error.message, 6000);
   } finally {
     button.disabled = false;
-    button.textContent = tr("Fill in from the photo");
+    button.textContent = t("tx.readInvoice");
   }
 }
 
@@ -17271,7 +17293,7 @@ async function conciergeSubmitExpense() {
   setTransactionFormBusy(true);
   try {
     const file = selectedInvoiceFile();
-    const uploaded = file ? await uploadPhotoUnder(`concierge/${localDateInput().slice(0, 4)}`, file) : null;
+    const uploaded = file ? await uploadPhotoUnder(`concierge/${localDateInput().slice(0, 4)}`, file, { allowPdf: true }) : null;
     await supabaseRequest("rpc/concierge_add_expense", { method: "POST", body: JSON.stringify({ p_entry: {
       description, date: els.transactionDate.value || localDateInput(), amountUsd: amountLbp > 0 ? 0 : amountUsd, amountLbp,
       supplier: els.transactionSupplier.value.trim(), expenseCategory: els.transactionExpenseCategory.value.trim(),

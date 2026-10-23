@@ -9,7 +9,7 @@ const Anthropic = AnthropicModule.default || AnthropicModule.Anthropic || Anthro
 // caller's own Supabase session), so the API key can't be used by anyone else.
 //
 // GET  -> { configured }  (the app hides the button until a key is set)
-// POST { image: <base64 JPEG> } with "Authorization: Bearer <owner session>"
+// POST { image: <base64 JPEG> } or { pdf: <base64 PDF> } with "Authorization: Bearer <owner session>"
 //      -> { amount, currency, date, supplier, invoiceNumber, description }
 //
 // Needs ANTHROPIC_API_KEY in the Vercel environment.
@@ -31,7 +31,7 @@ const INVOICE_SCHEMA = {
   additionalProperties: false,
 };
 
-const PROMPT = "This is a photo of an invoice or receipt for a residential building's expenses in Lebanon. "
+const PROMPT = "This is an invoice or receipt (a photo or a PDF) for a residential building's expenses in Lebanon. "
   + "Read the total amount due, its currency, the date, the supplier, the invoice number and a short description of what it is for. "
   + "If the invoice shows totals in both USD and LBP, give the USD total. Leave a field empty rather than guessing.";
 
@@ -86,14 +86,21 @@ module.exports = async function handler(req, res) {
   }
 
   let image;
+  let pdf;
   try {
-    image = String((await readBody(req)).image || "");
+    const body = await readBody(req);
+    image = String(body.image || "");
+    pdf = String(body.pdf || "");
   } catch {
     return sendJson(res, 400, { error: "bad request" });
   }
-  if (!image || !/^[A-Za-z0-9+/=]+$/.test(image) || image.length * 0.75 > MAX_IMAGE_BYTES) {
-    return sendJson(res, 400, { error: "Send one JPEG photo (3.5 MB at most)" });
+  const data = image || pdf;
+  if (!data || (image && pdf) || !/^[A-Za-z0-9+/=]+$/.test(data) || data.length * 0.75 > MAX_IMAGE_BYTES) {
+    return sendJson(res, 400, { error: "Send one JPEG photo or PDF (3.5 MB at most)" });
   }
+  const source = pdf
+    ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: pdf } }
+    : { type: "image", source: { type: "base64", media_type: "image/jpeg", data: image } };
 
   const client = new Anthropic();
   try {
@@ -106,7 +113,7 @@ module.exports = async function handler(req, res) {
       messages: [{
         role: "user",
         content: [
-          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: image } },
+          source,
           { type: "text", text: PROMPT },
         ],
       }],
