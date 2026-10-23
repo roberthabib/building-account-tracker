@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v175";
+const APP_VERSION = "v176";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,7 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a tenant says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ مستأجر أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "of {amount} · incl. {services} generator & water": "من {amount} · منها {services} للمولّد والمياه",
   "Notifications, display, building & access": "الإشعارات، العرض، المبنى والوصول",
   "Notifications, display, app lock": "الإشعارات، العرض، قفل التطبيق",
   "Choose…": "اختر…",
@@ -3622,9 +3623,12 @@ function isFixedMode() {
   return state?.settings?.collectionMode === "fixed";
 }
 
+// What a tenant owes for one month: the fixed amount (or, without one, their
+// share of that month's expenses) plus their generator and water share for
+// that month (v176). Paid/Late, "paid until" and late reminders all use this.
 function getMonthlyDueForTenant(tenantId, month) {
-  if (isFixedMode()) return roundUsd(getExpectedForTenant(tenantId, month));
-  return getTenantExpenseShare(tenantId, month);
+  const base = isFixedMode() ? getExpectedForTenant(tenantId, month) : getTenantExpenseShare(tenantId, month);
+  return roundUsd(base + getTenantServicesDue(tenantId, { month }));
 }
 
 function getTenantFixedDueTotal(tenantId) {
@@ -6029,6 +6033,14 @@ function buildTenantPaymentRowBase({ tenant, paidStr, ofStr, pct, barClass, stat
   return row;
 }
 
+// "of $128.50 · incl. $28.50 generator & water" when the month has a service share.
+function monthServicesNote(tenantId, month, expected) {
+  const services = roundUsd(getTenantServicesDue(tenantId, { month }));
+  return services > 0.005
+    ? tr("of {amount} · incl. {services} generator & water", { amount: formatUsd(expected), services: formatUsd(services) })
+    : tr("of {amount}", { amount: formatUsd(expected) });
+}
+
 function renderPaymentsFixed() {
   const collection = getMonthCollection(selectedMonth);
   els.paymentMonthRate.textContent = `${collection.rate}%`;
@@ -6063,7 +6075,7 @@ function renderPaymentsFixed() {
       const row = buildTenantPaymentRowBase({
         tenant,
         paidStr: formatUsd(status.paid),
-        ofStr: tr("of {amount}", { amount: formatUsd(status.expected) }),
+        ofStr: monthServicesNote(tenant.id, selectedMonth, status.expected),
         pct,
         barClass: settled ? "is-green" : "is-gold",
         statusClass: due > 0 ? "due" : "paid",
@@ -21410,6 +21422,7 @@ export const __test = {
   tenantOccupiesMonth,
   occupantsOn,
   getExpectedForTenant,
+  getMonthlyDueForTenant,
   getPreviousMeterReading,
   expectedCashOn,
   extraAttentionItems,
