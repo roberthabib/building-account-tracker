@@ -184,3 +184,13 @@ test("9. statement rows match the overall balance, in fixed and in actual mode",
   assert.equal(due, 30 + 150);
   assert.equal(app.getTenantBalance("a"), 180 - 140);
 });
+
+test("10. v183: each statement row is broken down into fee, generator and water", () => {
+  const tx = [gen("f8", AUG, 40), gen("f9", SEP, 80), water("w9", SEP, 30, 20), pay("p1", "a", AUG, 90), pay("p2", "a", SEP, 50)];
+  app.setState(fixedState(tx, [reading(AUG), reading(SEP)], [AUG, SEP]));
+  const byMonth = Object.fromEntries(app.tenantStatementRows("a").rows.map((r) => [r.month, r]));
+  for (const r of Object.values(byMonth)) assert.equal(Math.round((r.fee + r.generator + r.water) * 100) / 100, r.due);
+  assert.ok(byMonth[SEP].generator > 0);
+  assert.equal(byMonth[SEP].water, 30);
+  assert.equal(byMonth[SEP].fee, app.getExpectedForTenant("a", SEP));
+});

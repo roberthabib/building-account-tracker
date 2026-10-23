@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v182";
+const APP_VERSION = "v183";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -6441,7 +6441,11 @@ function tenantStatementRows(tenantId) {
         return reference;
       })
       .filter(Boolean);
-    return { month, due, paid, outstanding, status: status.label, receipts };
+    // v183: what the month's due is made of (fee or expense share + services).
+    const generator = roundUsd(getTenantServicesDue(tenantId, { serviceType: "generator", month }));
+    const water = roundUsd(getTenantServicesDue(tenantId, { serviceType: "water", month }));
+    const fee = roundUsd(due - generator - water);
+    return { month, due, fee, generator, water, paid, outstanding, status: status.label, receipts };
   });
   const totals = rows.reduce(
     (acc, row) => {
@@ -6479,7 +6483,9 @@ function printTenantStatement(tenantId) {
     return;
   }
 
-  const { rows, totals, receiptChanged } = tenantStatementRows(tenant.id);
+  const statement = tenantStatementRows(tenant.id);
+  const { rows, totals } = statement;
+  let { receiptChanged } = statement;
   const tenantTotals = getTenantTotals(tenant.id);
   const projectRows = state.transactions
     .filter((transaction) => isProjectPayment(transaction) && transaction.tenantId === tenant.id)
@@ -6537,31 +6543,20 @@ function printTenantStatement(tenantId) {
   table.className = "print-table";
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
-  ["Month", "Due USD", "Paid USD", "Outstanding USD", "Status", "Receipts"].forEach((heading, index) =>
-    appendHeaderCell(headerRow, heading, index > 0 && index < 4 ? "numeric" : ""),
-  );
+  const monthCols = statementMonthColumns(rows, totals);
+  monthCols.forEach((col) => appendHeaderCell(headerRow, col.heading, col.numeric ? "numeric" : ""));
   thead.append(headerRow);
 
   const tbody = document.createElement("tbody");
   rows.forEach((entry) => {
     const row = document.createElement("tr");
-    appendCell(row, formatMonth(entry.month));
-    appendCell(row, formatMonthly(entry.due), "numeric");
-    appendCell(row, formatMonthly(entry.paid), "numeric");
-    appendCell(row, formatMonthly(entry.outstanding), "numeric");
-    appendCell(row, entry.status);
-    appendCell(row, entry.receipts.join(", "));
+    monthCols.forEach((col) => appendCell(row, col.cell(entry), col.numeric ? "numeric" : ""));
     tbody.append(row);
   });
 
   const tfoot = document.createElement("tfoot");
   const totalRow = document.createElement("tr");
-  appendCell(totalRow, "Total");
-  appendCell(totalRow, formatMonthly(totals.due), "numeric");
-  appendCell(totalRow, formatMonthly(totals.paid), "numeric");
-  appendCell(totalRow, formatMonthly(totals.outstanding), "numeric");
-  appendCell(totalRow, "");
-  appendCell(totalRow, "");
+  monthCols.forEach((col, index) => appendCell(totalRow, index === 0 ? "Total" : col.total ? col.total() : "", col.numeric ? "numeric" : ""));
   tfoot.append(totalRow);
   table.append(thead, tbody, tfoot);
 
@@ -7247,11 +7242,11 @@ function buildTenantStatementPdf(tenantId) {
     });
     y -= ROW_H;
   }
-  function drawRow(cells, cols, boldFirst) {
+  function drawRow(cells, cols, boldFirst, size = 8) {
     x = left;
     cols.forEach((col, index) => {
       commands.push(pdfRectCommand(x, y - 16, col.width, ROW_H));
-      commands.push(pdfTextCommand(pdfClip(cells[index], Math.floor(col.width / 5.5)), x + 5, y - 4, 8, Boolean(boldFirst) && index === 0));
+      commands.push(pdfTextCommand(pdfClip(cells[index], Math.floor(col.width / (size * 0.66))), x + 4, y - 4, size, Boolean(boldFirst) && (index === 0 || size < 8)));
       x += col.width;
     });
     y -= ROW_H;
@@ -7289,14 +7284,8 @@ function buildTenantStatementPdf(tenantId) {
   y -= Math.ceil(summaryItems.length / 2) * (boxHeight + 8) + 18;
 
   // Monthly Dues table
-  const monthCols = [
-    { heading: "Month", width: 80 },
-    { heading: "Due USD", width: 80 },
-    { heading: "Paid USD", width: 80 },
-    { heading: "Outstanding USD", width: 80 },
-    { heading: "Status", width: 60 },
-    { heading: "Receipts", width: 115 },
-  ];
+  const monthCols = statementMonthColumns(rows, totals);
+  monthCols.at(-1).width = right - left - monthCols.slice(0, -1).reduce((s, c) => s + c.width, 0);
   sectionTitle("Monthly Dues");
   drawColHeader(monthCols);
   if (!rows.length) {
@@ -7305,24 +7294,10 @@ function buildTenantStatementPdf(tenantId) {
   }
   rows.forEach((entry) => {
     ensureSpace(ROW_H, () => drawColHeader(monthCols));
-    drawRow(
-      [
-        formatMonth(entry.month),
-        formatMonthly(entry.due),
-        formatMonthly(entry.paid),
-        formatMonthly(entry.outstanding),
-        entry.status,
-        entry.receipts.join(", "),
-      ],
-      monthCols,
-    );
+    drawRow(monthCols.map((col) => col.cell(entry)), monthCols, false, 7);
   });
   ensureSpace(ROW_H, () => drawColHeader(monthCols));
-  drawRow(
-    ["Total", formatMonthly(totals.due), formatMonthly(totals.paid), formatMonthly(totals.outstanding), "", ""],
-    monthCols,
-    true,
-  );
+  drawRow(monthCols.map((col, index) => (index === 0 ? "Total" : col.total ? col.total() : "")), monthCols, true, 7);
 
   // Project payments table
   if (projectRows.length) {
@@ -15893,7 +15868,11 @@ function drawStatementCanvas(tenant) {
   const rows = tenantMonthlyHistory(tenant.id, 8);
   const W = 1080;
   const PAD = 64;
-  const H = 640 + rows.length * 70 + 180;
+  // v183: months with generator or water get a line with the breakdown.
+  const partsLine = (r) => (r.generator > 0.005 || r.water > 0.005)
+    ? [`${tr(isFixedMode() ? "Monthly fee" : "Expenses")} ${formatUsd(r.fee)}`, r.generator > 0.005 ? `${tr("Generator")} ${formatUsd(r.generator)}` : "", r.water > 0.005 ? `${tr("Water")} ${formatUsd(r.water)}` : ""].filter(Boolean).join(" · ")
+    : "";
+  const H = 640 + rows.reduce((h, r) => h + (partsLine(r) ? 108 : 70), 0) + 180;
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -15934,7 +15913,9 @@ function drawStatementCanvas(tenant) {
     text(formatMonth(r.month), PAD, y, { size: 32 });
     text(formatUsd(r.due), W - PAD - 260, y, { size: 32, weight: 600, align: "end" });
     text(formatUsd(r.paid), W - PAD, y, { size: 32, weight: 700, color: r.paid + 0.005 >= r.due ? C.accent : C.red, align: "end" });
-    y += 70;
+    const parts = partsLine(r);
+    if (parts) text(parts, PAD, y + 40, { size: 24, color: C.muted });
+    y += parts ? 108 : 70;
   });
   if (!rows.length) text(tr("No dues recorded yet."), PAD, y, { size: 30, color: C.muted });
   const services = roundUsd(getTenantServicesDue(tenant.id));
@@ -22334,6 +22315,29 @@ function receiptBreakdownRows(data) {
     }
   });
   return rows;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// v183 — statements show what each month was made of
+// ═══════════════════════════════════════════════════════════════════════════
+// The monthly dues table (statement PDF and printed statement) breaks the due
+// into the monthly fee (or expense share), the generator and the water; a
+// services column only shows when that service was used. Widths are PDF
+// points; the last column takes what is left.
+function statementMonthColumns(rows, totals) {
+  const sum = (key) => roundUsd(rows.reduce((s, r) => s + (r[key] || 0), 0));
+  const money = (key) => ({ cell: (r) => formatMonthly(r[key]), total: () => formatMonthly(totals[key] ?? sum(key)), numeric: true });
+  return [
+    { heading: "Month", width: 55, cell: (r) => formatMonth(r.month) },
+    { heading: isFixedMode() ? "Monthly fee" : "Expenses", width: 54, ...money("fee") },
+    rows.some((r) => r.generator > 0.005) ? { heading: "Generator", width: 54, ...money("generator") } : null,
+    rows.some((r) => r.water > 0.005) ? { heading: "Water", width: 48, ...money("water") } : null,
+    { heading: "Due", width: 54, ...money("due") },
+    { heading: "Paid", width: 54, ...money("paid") },
+    { heading: "Outstanding", width: 56, ...money("outstanding") },
+    { heading: "Status", width: 44, cell: (r) => r.status },
+    { heading: "Receipts", width: 0, cell: (r) => r.receipts.map((no) => String(no).replace(/^RCT-/, "")).join(", ") },
+  ].filter(Boolean);
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.
