@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v210";
+const APP_VERSION = "v211";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2301,7 +2301,7 @@ const DYN_AR = {
   "Turn off": "إيقاف",
   "Lock the app": "قفل التطبيق",
   "Back to the sign-in page; Enter brings you back": "العودة إلى صفحة الدخول؛ «دخول» يعيدك",
-  "Residents join with the invite code the building manager sends them. After that, this phone stays signed in.": "ينضم السكان برمز الدعوة الذي يرسله مدير المبنى. بعد ذلك يبقى هذا الهاتف مسجّلاً.",
+  "Residents and the concierge join with the invite code the building manager sends them. After that, this phone stays signed in.": "ينضم السكان والناطور برمز الدعوة الذي يرسله مدير المبنى. بعد ذلك يبقى هذا الهاتف مسجّلاً.",
   "to owners · collected this month {amount}": "للمالكين · المقبوض هذا الشهر {amount}",
   "Nobody is late": "لا أحد متأخر",
   "Collected this month: {amount}": "المقبوض هذا الشهر: {amount}",
@@ -5474,6 +5474,9 @@ function renderOwnerLoginForm() {
   join?.classList.remove("login-submit-btn");
   join?.classList.add("login-link-btn");
   const accounts = usesOwnerAccounts();
+  // v211: the manager never joins with a code (Google or email only); codes
+  // are for residents and the concierge, on the Resident tab.
+  if (!els.loginOwnerForm.classList.contains("hidden")) join?.classList.toggle("hidden", accounts);
   const signedIn = accounts && ownerLoginMode !== "device" && isAdminSession();
   const mode = !accounts ? "device" : signedIn ? "signedIn" : ownerLoginMode;
   const show = (el, on) => el.classList.toggle("hidden", !on);
@@ -10372,7 +10375,7 @@ function renderTenantLoginForm() {
   els.loginPinInput.classList.toggle("hidden", linked || codesOnly);
   let howTo = document.querySelector("#loginTenantHowTo");
   if (!howTo) { howTo = mk("p", { id: "loginTenantHowTo", className: "login-account" }); els.loginTenantForm.append(howTo); }
-  howTo.textContent = tr("Residents join with the invite code the building manager sends them. After that, this phone stays signed in.");
+  howTo.textContent = tr("Residents and the concierge join with the invite code the building manager sends them. After that, this phone stays signed in.");
   howTo.classList.toggle("hidden", linked || !codesOnly);
   els.loginUnlinkBtn.classList.toggle("hidden", !linked || !onTab);
   if (onTab) {
@@ -10384,6 +10387,7 @@ function renderTenantLoginForm() {
   const join = document.querySelector("#connectBuildingButton");
   join?.classList.toggle("login-submit-btn", main);
   join?.classList.toggle("login-link-btn", !main);
+  if (onTab) join?.classList.remove("hidden");
 }
 
 function enterAsLinkedTenant() {
