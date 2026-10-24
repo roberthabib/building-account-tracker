@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v203";
+const APP_VERSION = "v204";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,9 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Open ›": "فتح ‹",
+  "Your rentals": "إيجاراتك",
+  "Kept apart from the building's accounts": "منفصلة عن حسابات المبنى",
   "Send & share": "مشاركة",
   "{amount} paid so far": "دُفع حتى الآن {amount}",
   "This month": "هذا الشهر",
@@ -25185,20 +25188,29 @@ function rentalsDashData(leases = rentalLeases || [], today = localDateInput()) 
 
 function renderRentalsDashCard() {
   if (typeof document === "undefined" || !document.querySelector) return;
-  const anchor = document.querySelector("#declarationsPanel");
+  // v204: at the end of the dashboard, under its own heading: rent is the
+  // manager's business with owners and tenants, kept apart from the building's money.
+  const anchor = document.querySelector("#monthSection");
+  let block = document.querySelector("#rentalsDashBlock");
   let card = document.querySelector("#rentalsDashCard");
   const show = isRentalsManager() && Array.isArray(rentalLeases) && rentalLeases.some((l) => l.status !== "ended");
-  if (!show) { card?.remove(); return; }
+  if (!show) { block?.remove(); return; }
   if (!card) {
     if (!anchor) return;
     card = mk("section", { id: "rentalsDashCard", className: "panel owner-only rentals-dash", role: "button", tabindex: "0" });
     card.addEventListener("click", () => setView("rentalsView"));
     card.addEventListener("keydown", (e) => { if (e.key === "Enter") setView("rentalsView"); });
-    anchor.before(card);
+    block = mk("div", { id: "rentalsDashBlock", className: "owner-only" },
+      mk("div", { className: "section-title month-section-title" },
+        mk("div", {}, mk("p", { className: "eyebrow", text: tr("Your rentals") }), mk("p", { className: "rentals-dash-note", text: tr("Kept apart from the building's accounts") }))),
+      card);
+    anchor.after(block);
   }
+  block.querySelector(".eyebrow").textContent = tr("Your rentals");
+  block.querySelector(".rentals-dash-note").textContent = tr("Kept apart from the building's accounts");
   const d = rentalsDashData();
   card.replaceChildren(
-    mk("div", { className: "panel-header" }, mk("h3", { text: tr("Rentals") }), mk("span", { className: "panel-note", text: d.count === 1 ? tr("1 rented flat") : tr("{n} rented flats", { n: d.count }) })),
+    mk("div", { className: "panel-header" }, mk("h3", { text: d.count === 1 ? tr("1 rented flat") : tr("{n} rented flats", { n: d.count }) }), mk("span", { className: "panel-note", text: tr("Open ›") })),
     mk("div", { className: "tech-summary" },
       mk("div", { className: `tech-summary-cell${Object.values(d.owed).some((v) => v > 0.005) ? " is-owed" : ""}` }, mk("span", { text: tr("Rent owed now") }), mk("strong", { text: moneyListText(d.owed) })),
       mk("div", { className: `tech-summary-cell${d.late ? " is-owed" : ""}` }, mk("span", { text: tr("Late") }), mk("strong", { text: String(d.late) })),

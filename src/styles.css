@@ -6941,3 +6941,14 @@ body.rtl .owner-flat-arrow {
 .rentals-dash .tech-summary-cell span {
   white-space: nowrap;
 }
+
+/* v204 — rentals at the end of the dashboard, under their own heading */
+.rentals-dash-note {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+#rentalsDashBlock {
+  margin-top: 8px;
+}
