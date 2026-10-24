@@ -6943,11 +6943,6 @@ body.rtl .owner-flat-arrow {
 }
 
 /* v204 — rentals at the end of the dashboard, under their own heading */
-.rentals-dash-note {
-  margin: 2px 0 0;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
 
 #rentalsDashBlock {
   margin-top: 8px;

@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v204";
+const APP_VERSION = "v205";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2301,7 +2301,6 @@ const DYN_AR = {
   "Turn off": "إيقاف",
   "Open ›": "فتح ‹",
   "Your rentals": "إيجاراتك",
-  "Kept apart from the building's accounts": "منفصلة عن حسابات المبنى",
   "Send & share": "مشاركة",
   "{amount} paid so far": "دُفع حتى الآن {amount}",
   "This month": "هذا الشهر",
@@ -25202,12 +25201,11 @@ function renderRentalsDashCard() {
     card.addEventListener("keydown", (e) => { if (e.key === "Enter") setView("rentalsView"); });
     block = mk("div", { id: "rentalsDashBlock", className: "owner-only" },
       mk("div", { className: "section-title month-section-title" },
-        mk("div", {}, mk("p", { className: "eyebrow", text: tr("Your rentals") }), mk("p", { className: "rentals-dash-note", text: tr("Kept apart from the building's accounts") }))),
+        mk("div", {}, mk("p", { className: "eyebrow", text: tr("Your rentals") }))),
       card);
     anchor.after(block);
   }
   block.querySelector(".eyebrow").textContent = tr("Your rentals");
-  block.querySelector(".rentals-dash-note").textContent = tr("Kept apart from the building's accounts");
   const d = rentalsDashData();
   card.replaceChildren(
     mk("div", { className: "panel-header" }, mk("h3", { text: d.count === 1 ? tr("1 rented flat") : tr("{n} rented flats", { n: d.count }) }), mk("span", { className: "panel-note", text: tr("Open ›") })),
