@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v196";
+const APP_VERSION = "v197";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2499,6 +2499,7 @@ const DYN_AR = {
   "{amount} · incl. late fee {fee}": "{amount} · تشمل غرامة تأخير {fee}",
   "Waive fee": "إلغاء الغرامة",
   "No late fee": "بدون غرامة تأخير",
+  "Percent (%)": "النسبة (%)",
   "Fixed amount": "مبلغ ثابت",
   "% of the rent": "% من الإيجار",
   "Remind the tenant on their phone (3 days before, and when late)": "تذكير المستأجر على هاتفه (قبل 3 أيام، وعند التأخير)",
@@ -21998,7 +21999,11 @@ function openLeaseEditor(id = null, prefill = null) {
   const grace = numberInput(lease?.graceDays ?? 5);
   const deposit = numberInput(lease?.deposit?.amount || "");
   const depositOn = mk("input", { type: "date", value: lease?.deposit?.receivedOn || "" });
-  const advance = numberInput(lease ? leaseAdvanceMonths(lease) : 3);
+  // v197: a short list (0–12, plus a larger value an older lease already has).
+  const advanceNow = lease ? leaseAdvanceMonths(lease) : 3;
+  const advanceChoices = [...new Set([...Array(13).keys(), advanceNow])].sort((a, b) => a - b);
+  const advance = selectInput(advanceChoices.map((n) => [String(n), String(n)]), String(advanceNow));
+  advance.classList.add("narrow-select");
   const firstPayment = mk("small", { className: "field-hint rent-coverage" });
   const advanceField = field(tr("Months paid in advance"), advance);
   advanceField.append(firstPayment);
@@ -22025,7 +22030,19 @@ function openLeaseEditor(id = null, prefill = null) {
   syncFee();
   const lateKind = selectInput([["none", tr("No late fee")], ["fixed", tr("Fixed amount")], ["percent", tr("% of the rent")]], lease?.lateFee?.kind || "none");
   const lateValue = numberInput(lease?.lateFee?.value ?? "");
-  const lateBox = mk("div", { className: "two-col" }, field(tr("Late fee"), lateKind), field(tr("Amount"), lateValue));
+  const lateKindField = field(tr("Late fee"), lateKind);
+  const lateValueField = field(tr("Amount"), lateValue);
+  const lateBox = mk("div", { className: "two-col" }, lateKindField, lateValueField);
+  // v197: the value box only shows when there is a fee, labelled for its kind.
+  const syncLateFee = () => {
+    const none = lateKind.value === "none";
+    lateValueField.classList.toggle("hidden", none);
+    lateKindField.style.gridColumn = none ? "1 / -1" : "";
+    lateValueField.firstChild.textContent = lateKind.value === "percent" ? tr("Percent (%)") : tr("Amount");
+    lateValue.placeholder = lateKind.value === "percent" ? "10" : "";
+  };
+  lateKind.addEventListener("change", syncLateFee);
+  syncLateFee();
   const auto = checkboxRow(tr("Remind the tenant on their phone (3 days before, and when late)"), lease?.autoReminders !== false);
   const notes = mk("textarea", { rows: "2", maxlength: "500" });
   notes.value = lease?.notes || "";

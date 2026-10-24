@@ -6560,3 +6560,9 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   box-shadow: inset 0 0 0 2px #e0a63a;
   color: #8a5312;
 }
+
+/* v197 — small number pickers stay small */
+select.narrow-select {
+  width: 7.5rem;
+  max-width: 100%;
+}
