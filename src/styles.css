@@ -7064,3 +7064,10 @@ body.rtl .owner-flat-arrow {
 .rentals-dash .panel-header {
   margin-bottom: 10px;
 }
+
+/* v209 — no pull-to-refresh: swiping down at the top no longer reloads the
+   app (it syncs by itself; the sync chip fetches the latest). */
+html,
+body {
+  overscroll-behavior-y: none;
+}
