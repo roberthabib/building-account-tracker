@@ -6549,3 +6549,9 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   font-size: 1rem;
   color: var(--primary);
 }
+
+/* v195 — ended leases (under the Ended filter) */
+.ended-title {
+  display: block;
+  margin-bottom: 6px;
+}

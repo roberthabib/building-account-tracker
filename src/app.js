@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v194";
+const APP_VERSION = "v195";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,12 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Next rent on {date}: {left} left to pay ({paid} already paid)": "الإيجار التالي في {date}: يتبقى {left} (دُفع {paid})",
+  "Months paid in advance": "عدد الأشهر المدفوعة مسبقاً",
+  "At signing: {amount} ({from} – {to})": "عند التوقيع: {amount} ({from} – {to})",
+  "then {amount} on the 1st of each month, from {date}": "ثم {amount} في أول كل شهر، ابتداءً من {date}",
+  "No lease ended in the last 12 months.": "لم ينتهِ أي عقد في آخر 12 شهراً.",
+  "Show older ({n})": "عرض الأقدم ({n})",
   "Pay now: {amount}": "للدفع الآن: {amount}",
   "Rent due so far": "الإيجار المستحق حتى الآن",
   "…and {n} earlier payments (see the PDF).": "…و{n} دفعات سابقة (راجع ملف PDF).",
@@ -21697,6 +21703,7 @@ function formatMoney(value, currency = "USD") {
 // each anniversary.
 function leasePeriods(lease, today = localDateInput()) {
   if (!lease?.start || !(Number(lease.rent) > 0)) return [];
+  if ((lease.period || "monthly") === "monthly") return monthlyLeasePeriods(lease, today);
   const step = leaseStep(lease);
   const last = lease.status === "ended" && lease.endedOn ? lease.endedOn : lease.end && lease.end < today ? lease.end : today;
   const grace = Math.max(0, Number(lease.graceDays ?? 5) || 0);
@@ -21713,6 +21720,39 @@ function leasePeriods(lease, today = localDateInput()) {
       amount: roundMoney(base.rent * Math.pow(1 + increase, years), lease.currency),
       lateFrom: addDays(start, grace),
     });
+  }
+  return periods;
+}
+
+// v195: monthly rent follows calendar months. The first payment, due on the
+// day the lease starts, covers the rest of that month (by the days left) and
+// lease.advanceMonths more months (1 when not set); after that, rent is due on
+// the 1st of each month, the same amount whatever the month's length.
+function leaseAdvanceMonths(lease) {
+  return Math.max(0, Math.min(24, Math.round(Number(lease?.advanceMonths ?? 1) || 0)));
+}
+
+function monthlyLeasePeriods(lease, today = localDateInput()) {
+  const hardEnd = lease.status === "ended" && lease.endedOn ? lease.endedOn : lease.end || "9999-12-31";
+  const grace = Math.max(0, Number(lease.graceDays ?? 5) || 0);
+  const increase = Number(lease.increasePct || 0) / 100;
+  const advance = leaseAdvanceMonths(lease);
+  const periods = [];
+  let monthStart = `${lease.start.slice(0, 7)}-01`;
+  for (let i = 0; i < 600; i += 1) {
+    const start = i === 0 ? lease.start : monthStart;
+    if (start > hardEnd) break;
+    const due = i <= advance ? lease.start : monthStart;
+    if (due > today) break;
+    const base = leaseRentBase(lease, start);
+    const years = Math.floor(monthsBetween(base.since, monthStart) / 12);
+    let amount = base.rent * Math.pow(1 + increase, years);
+    if (i === 0 && start !== monthStart) {
+      const days = Number(addDays(addMonthsToDate(monthStart, 1), -1).slice(8));
+      amount = (amount * (days - Number(start.slice(8)) + 1)) / days;
+    }
+    periods.push({ start, end: addDays(addMonthsToDate(monthStart, 1), -1), due, amount: roundMoney(amount, lease.currency), lateFrom: addDays(due, grace) });
+    monthStart = addMonthsToDate(monthStart, 1);
   }
   return periods;
 }
@@ -21741,7 +21781,7 @@ function leaseStatus(lease, today = localDateInput()) {
   const ahead = [];
   let creditLeft = credit;
   if (credit > 0.005 && lease?.status !== "ended") {
-    const coming = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 120)).filter((p) => p.start > today);
+    const coming = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 120)).filter((p) => (p.due || p.start) > today);
     for (const p of coming) {
       if (creditLeft < p.amount - 0.005) break;
       creditLeft = roundMoney(creditLeft - p.amount, currency);
@@ -21950,6 +21990,24 @@ function openLeaseEditor(id = null, prefill = null) {
   const grace = numberInput(lease?.graceDays ?? 5);
   const deposit = numberInput(lease?.deposit?.amount || "");
   const depositOn = mk("input", { type: "date", value: lease?.deposit?.receivedOn || "" });
+  const advance = numberInput(lease ? leaseAdvanceMonths(lease) : 3);
+  const firstPayment = mk("small", { className: "field-hint rent-coverage" });
+  const advanceField = field(tr("Months paid in advance"), advance);
+  advanceField.append(firstPayment);
+  const showFirstPayment = () => {
+    const monthly = period.value === "monthly";
+    advanceField.classList.toggle("hidden", !monthly);
+    if (!monthly || !start.value || !(Number(rent.value) > 0)) { firstPayment.textContent = ""; return; }
+    const draft = { start: start.value, rent: Number(rent.value), currency: currency.value, period: "monthly", advanceMonths: Number(advance.value) || 0, increasePct: Number(increase.value) || 0, graceDays: 0 };
+    const first = leasePeriods(draft, start.value).filter((p) => p.due === start.value);
+    const nextDue = leasePeriods(draft, addMonthsToDate(start.value, 30)).find((p) => p.due > start.value);
+    firstPayment.textContent = [
+      tr("At signing: {amount} ({from} – {to})", { amount: formatMoney(first.reduce((t, p) => t + p.amount, 0), currency.value), from: formatDateLabel(start.value), to: formatDateLabel(first.at(-1)?.end || start.value) }),
+      nextDue ? tr("then {amount} on the 1st of each month, from {date}", { amount: formatMoney(nextDue.amount, currency.value), date: formatDateLabel(nextDue.due) }) : "",
+    ].filter(Boolean).join(" · ");
+  };
+  [advance, start, rent, currency, period, increase].forEach((el) => { el.addEventListener("input", showFirstPayment); el.addEventListener("change", showFirstPayment); });
+  showFirstPayment();
   const own = checkboxRow(tr("This is my own flat (no fee, nothing to hand over)"), Boolean(lease?.ownFlat));
   const feeKind = selectInput([["percent", tr("% of the rent collected")], ["fixed", tr("Fixed amount per rent period")]], lease?.fee?.kind || "percent");
   const feeValue = numberInput(lease?.fee?.value ?? 10);
@@ -21988,6 +22046,7 @@ function openLeaseEditor(id = null, prefill = null) {
       ownFlat: own.input.checked,
       fee: own.input.checked ? null : { kind: feeKind.value, value: Math.max(0, Number(feeValue.value) || 0) },
       tenantPaysCharges: true,
+      advanceMonths: Math.max(0, Math.min(24, Math.round(Number(advance.value) || 0))),
       lateFee: lateKind.value === "none" || !(Number(lateValue.value) > 0) ? null
         : { kind: lateKind.value, value: Number(lateValue.value), since: lease?.lateFee?.since || localDateInput() },
       autoReminders: auto.input.checked,
@@ -22006,6 +22065,7 @@ function openLeaseEditor(id = null, prefill = null) {
     mk("div", { className: "two-col" }, field(tr("Phone (WhatsApp)"), phone), field(tr("Language"), lang)),
     mk("div", { className: "two-col" }, field(tr("Start"), start), field(tr("End (optional)"), end)),
     mk("div", { className: "tech-fee-row" }, field(tr("Rent"), rent), field(tr("Currency"), currency), field(tr("How often"), period)),
+    advanceField,
     mk("div", { className: "two-col" }, field(tr("Yearly increase %"), increase), field(tr("Late after (days)"), grace)),
     lateBox,
     auto.row,
@@ -22567,13 +22627,13 @@ function leaseSchedule(lease, today = localDateInput()) {
   const s = leaseStatus(lease, today);
   const c = s.currency;
   const current = s.periods.at(-1) || null;
-  const future = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 26)).filter((p) => p.start > today).slice(0, 24);
+  const future = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 26)).filter((p) => (p.due || p.start) > today).slice(0, 24);
   return {
     asOf: today,
     currency: c,
     dueBefore: roundMoney(s.periods.slice(0, -1).reduce((t, p) => t + p.amount, 0), c),
     paid: s.paidTotal,
-    periods: [current, ...future].filter(Boolean).map((p) => ({ start: p.start, lateFrom: p.lateFrom, amount: p.amount })),
+    periods: [current, ...future].filter(Boolean).map((p) => ({ start: p.due || p.start, lateFrom: p.lateFrom, amount: p.amount })),
   };
 }
 
@@ -23565,13 +23625,13 @@ function nextRentDue(lease, today = localDateInput()) {
   if (lease.status === "ended") return null;
   if (s.owed > 0.005) {
     const open = s.periods.find((p) => p.state !== "paid");
-    return { date: open?.start || today, amount: s.owed, now: true };
+    return { date: open?.due || open?.start || today, amount: s.owed, now: true };
   }
-  const coming = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 14)).filter((p) => p.start > today);
+  const coming = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 14)).filter((p) => (p.due || p.start) > today);
   let credit = s.credit;
   for (const p of coming) {
     if (credit >= p.amount - 0.005) { credit = roundMoney(credit - p.amount, s.currency); continue; }
-    return { date: p.start, amount: roundMoney(p.amount - credit, s.currency), now: false };
+    return { date: p.due || p.start, amount: roundMoney(p.amount - credit, s.currency), now: false };
   }
   return null;
 }
@@ -23624,8 +23684,9 @@ function leaseMoneyLine(lease, s = leaseStatus(lease)) {
   if (s.owed > 0.005) return [tr("Owes {amount}", { amount: formatMoney(s.owed, c) }), s.paidUntil ? tr("paid until {date}", { date: formatDateLabel(s.paidUntil) }) : ""].filter(Boolean).join(" · ");
   const next = nextRentDue(lease);
   if (!next) return tr("Nothing more to pay on this lease");
-  return [tr("Next rent: {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) }),
-    s.creditLeft > 0.005 ? tr("{amount} of it already paid", { amount: formatMoney(s.creditLeft, c) }) : ""].filter(Boolean).join(" · ");
+  return s.creditLeft > 0.005
+    ? tr("Next rent on {date}: {left} left to pay ({paid} already paid)", { date: formatDateLabel(next.date), left: formatMoney(next.amount, c), paid: formatMoney(s.creditLeft, c) })
+    : tr("Next rent: {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) });
 }
 
 // ── The Leases tab ──
@@ -23637,7 +23698,9 @@ function renderRentalLeases() {
   const paidUp = all.filter(({ s }) => s.owed <= 0.005);
   const month = localDateInput().slice(0, 7);
   const collectedThisMonth = all.map(({ l }) => ({ currency: l.currency || "USD", v: (l.payments || []).filter((p) => String(p.date).slice(0, 7) === month).reduce((t, p) => t + Number(p.amount || 0), 0) }));
-  const shown = (rentalsFilter === "late" ? lateList : rentalsFilter === "owing" ? owing : rentalsFilter === "paid" ? paidUp : all)
+  // v195: ended leases only show under their own filter.
+  if (rentalsFilter === "ended" && !ended.length) rentalsFilter = "all";
+  const shown = (rentalsFilter === "ended" ? [] : rentalsFilter === "late" ? lateList : rentalsFilter === "owing" ? owing : rentalsFilter === "paid" ? paidUp : all)
     .sort((a, b) => b.s.lateAmount - a.s.lateAmount || b.s.owed - a.s.owed || String(leaseFlat(a.l)?.unit || "").localeCompare(String(leaseFlat(b.l)?.unit || ""), undefined, { numeric: true }));
   const chip = (id, label, n) => mk("button", { type: "button", className: `rent-filter${rentalsFilter === id ? " is-active" : ""}`, onclick: () => { rentalsFilter = id; renderRentalsView(); } }, label, n != null ? mk("span", { text: String(n) }) : null);
   return mk("div", {},
@@ -23648,9 +23711,9 @@ function renderRentalLeases() {
     mk("div", { className: "button-row" },
       primaryButton(tr("Add a lease"), () => openLeaseEditor()),
       lateList.length ? secondaryButton(tr("Remind the late ones"), () => openRemindLateDialog()) : null),
-    all.length ? mk("div", { className: "rent-filters" }, chip("all", tr("All"), all.length), chip("late", tr("Late"), lateList.length), chip("owing", tr("Owing"), owing.length), chip("paid", tr("Paid up"), paidUp.length)) : null,
-    all.length ? null : note(tr("No rented flats yet. Add a lease for each flat that is rented: the tenant, the rent and when it's due.")),
-    all.length && !shown.length ? note(tr("No lease here.")) : null,
+    all.length || ended.length ? mk("div", { className: "rent-filters" }, chip("all", tr("All"), all.length), chip("late", tr("Late"), lateList.length), chip("owing", tr("Owing"), owing.length), chip("paid", tr("Paid up"), paidUp.length), ended.length ? chip("ended", tr("Ended"), ended.length) : null) : null,
+    all.length || rentalsFilter === "ended" ? null : note(tr("No rented flats yet. Add a lease for each flat that is rented: the tenant, the rent and when it's due.")),
+    all.length && !shown.length && rentalsFilter !== "ended" ? note(tr("No lease here.")) : null,
     mk("div", { className: "tech-list" }, shown.map(({ l, s }) => {
       const tenant = l.tenant || {};
       return mk("article", { className: `tech-card rent-card${s.lateAmount > 0 ? " is-new" : ""}` },
@@ -23665,9 +23728,31 @@ function renderRentalLeases() {
           miniButton(tr("Statement"), () => openRentStatementChoice(l)),
           miniButton(tr("Details"), () => openLeaseDetails(l.id))));
     })),
-    ended.length ? reportsSection(tr("Ended leases"), mk("div", {}, ended.map((l) => mk("div", { className: "breakdown-row tech-person" },
-      mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("{from} – {to}", { from: formatDateLabel(l.start), to: formatDateLabel(l.endedOn || l.end || "") }) })),
-      mk("span", { className: "tech-person-actions" }, miniButton(tr("Statement"), () => openRentStatementChoice(l)), miniButton(tr("Details"), () => openLeaseDetails(l.id))))))) : null);
+    rentalsFilter === "ended" ? endedLeasesSection(ended) : null);
+}
+
+// v195: ended leases are history (statements, deposit, the owner's account):
+// shown only under the Ended filter, the last 12 months first; a lease with no
+// payments (a test or a mistake) can be removed in one tap.
+let endedLeasesOlder = false;
+function endedLeasesSection(ended) {
+  if (!ended.length) return null;
+  const sorted = ended.slice().sort((a, b) => String(b.endedOn || b.end || "").localeCompare(String(a.endedOn || a.end || "")));
+  const cutoff = addMonthsToDate(localDateInput(), -12);
+  const recent = sorted.filter((l) => String(l.endedOn || l.end || "") >= cutoff);
+  const older = sorted.filter((l) => String(l.endedOn || l.end || "") < cutoff);
+  const shown = endedLeasesOlder ? sorted : recent;
+  return mk("section", { className: "panel ended-leases" },
+    mk("strong", { className: "ended-title", text: tr("Ended leases") }),
+    shown.length ? null : note(tr("No lease ended in the last 12 months.")),
+    ...shown.map((l) => mk("div", { className: "rent-pay-row" },
+      mk("div", { className: "rent-pay-head" },
+        mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: tr("{from} – {to}", { from: formatDateLabel(l.start), to: formatDateLabel(l.endedOn || l.end || "") }) }))),
+      mk("div", { className: "notice-actions" },
+        miniButton(tr("Statement"), () => openRentStatementChoice(l)),
+        miniButton(tr("Details"), () => openLeaseDetails(l.id)),
+        (l.payments || []).length ? null : miniButton(tr("Remove"), () => { void deleteLease(l.id); })))),
+    older.length && !endedLeasesOlder ? mk("button", { type: "button", className: "rent-show-all", text: tr("Show older ({n})", { n: older.length }), onclick: () => { endedLeasesOlder = true; renderRentalsView(); } }) : null);
 }
 
 function openRemindLateDialog() {
@@ -24203,6 +24288,7 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  leaseAdvanceMonths,
   rentStatementRows,
   nextRentDue,
   rentCoverageText,

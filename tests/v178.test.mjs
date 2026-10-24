@@ -8,11 +8,12 @@ const TODAY = "2026-10-23";
 const base = (extra = {}) => ({ id: "lease-t1", flatId: "a", start: "2026-08-01", rent: 600, currency: "USD", period: "monthly", graceDays: 5, payments: [], payouts: [], deductions: [], ...extra });
 const pay = (amount, date = "2026-08-02") => ({ id: `p${amount}${date}`, date, amount, method: "cash" });
 
-test("monthly periods start on the lease's day and run up to today", () => {
+test("monthly periods follow calendar months (v195); quarterly and yearly from the start day", () => {
+  // Starts 15 August, one month in advance: 15–31 Aug by the days + September at signing, then October on the 1st.
   const p = app.leasePeriods(base({ start: "2026-08-15" }), TODAY);
-  assert.deepEqual(p.map((x) => x.start), ["2026-08-15", "2026-09-15", "2026-10-15"]);
-  assert.equal(p[0].end, "2026-09-14");
-  assert.equal(p[0].lateFrom, "2026-08-20");
+  assert.deepEqual(p.map((x) => [x.start, x.due, x.amount]), [["2026-08-15", "2026-08-15", 329.03], ["2026-09-01", "2026-08-15", 600], ["2026-10-01", "2026-10-01", 600]]);
+  assert.equal(p[0].end, "2026-08-31");
+  assert.equal(p[1].lateFrom, "2026-08-20");
   assert.equal(app.leasePeriods(base({ period: "quarterly", start: "2026-01-10" }), TODAY).length, 4);
   assert.equal(app.leasePeriods(base({ period: "yearly", start: "2025-03-01" }), TODAY).length, 2);
   assert.deepEqual(app.leasePeriods(base({ start: "2026-11-01" }), TODAY), []);
