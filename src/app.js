@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v197";
+const APP_VERSION = "v198";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2500,6 +2500,11 @@ const DYN_AR = {
   "Waive fee": "إلغاء الغرامة",
   "No late fee": "بدون غرامة تأخير",
   "Percent (%)": "النسبة (%)",
+  "{from}–{to} {month}": "{from}–{to} {month}",
+  "{first} + 1 month in advance": "{first} + شهر مسبقاً",
+  "{first} + {n} months in advance": "{first} + {n} أشهر مسبقاً",
+  "Due at signing: {amount} ({what})": "المستحق عند التوقيع: {amount} ({what})",
+  "Left to pay from signing: {amount} ({what})": "الباقي من دفعة التوقيع: {amount} ({what})",
   "Fixed amount": "مبلغ ثابت",
   "% of the rent": "% من الإيجار",
   "Remind the tenant on their phone (3 days before, and when late)": "تذكير المستأجر على هاتفه (قبل 3 أيام، وعند التأخير)",
@@ -22024,9 +22029,16 @@ function openLeaseEditor(id = null, prefill = null) {
   const own = checkboxRow(tr("This is my own flat (no fee, nothing to hand over)"), Boolean(lease?.ownFlat));
   const feeKind = selectInput([["percent", tr("% of the rent collected")], ["fixed", tr("Fixed amount per rent period")]], lease?.fee?.kind || "percent");
   const feeValue = numberInput(lease?.fee?.value ?? 10);
-  const feeBox = mk("div", { className: "tech-fee-row" }, field(tr("Your fee"), feeKind), field(tr("Amount"), feeValue));
-  const syncFee = () => feeBox.classList.toggle("hidden", own.input.checked);
+  // v198: the fee list gets the full width (its choices are long); the value
+  // sits below it, labelled for the kind of fee.
+  const feeValueField = field(tr("Amount"), feeValue);
+  const feeBox = mk("div", { className: "field-stack" }, field(tr("Your fee"), feeKind), mk("div", { className: "two-col" }, feeValueField));
+  const syncFee = () => {
+    feeBox.classList.toggle("hidden", own.input.checked);
+    feeValueField.firstChild.textContent = feeKind.value === "percent" ? tr("Percent (%)") : tr("Amount");
+  };
   own.input.addEventListener("change", syncFee);
+  feeKind.addEventListener("change", syncFee);
   syncFee();
   const lateKind = selectInput([["none", tr("No late fee")], ["fixed", tr("Fixed amount")], ["percent", tr("% of the rent")]], lease?.lateFee?.kind || "none");
   const lateValue = numberInput(lease?.lateFee?.value ?? "");
@@ -23704,9 +23716,27 @@ function rentPeriodStrip(lease, s = leaseStatus(lease)) {
     ...periods.map((p) => mk("span", { className: `rent-dot ${rentStateClass(p.state)}${p.ahead ? " is-ahead" : ""}`, title: `${leasePeriodLabel(lease, p)} · ${rentStateText(p, s.currency)}`, text: lease.period === "yearly" ? p.start.slice(2, 4) : String(Number(p.start.slice(5, 7))) })));
 }
 
+// v198: what is still open is only the payment due at signing (not late):
+// "Due at signing: $3,258.06 (24–31 October 2026 + 3 months in advance)".
+function signingDueText(lease, s = leaseStatus(lease)) {
+  if ((lease.period || "monthly") !== "monthly" || s.lateCount > 0 || !(s.owed > 0.005)) return "";
+  const open = s.periods.filter((p) => p.state !== "paid");
+  if (!open.length || open.some((p) => p.due !== lease.start)) return "";
+  const signing = s.periods.filter((p) => p.due === lease.start);
+  const first = signing[0];
+  const firstText = first.start.slice(8) === "01" ? formatMonth(first.start)
+    : tr("{from}–{to} {month}", { from: Number(first.start.slice(8)), to: Number(first.end.slice(8)), month: formatMonth(first.start) });
+  const n = signing.length - 1;
+  const what = n === 0 ? firstText : n === 1 ? tr("{first} + 1 month in advance", { first: firstText }) : tr("{first} + {n} months in advance", { first: firstText, n });
+  const amount = formatMoney(s.owed, s.currency);
+  return s.paidTotal > 0.005 ? tr("Left to pay from signing: {amount} ({what})", { amount, what }) : tr("Due at signing: {amount} ({what})", { amount, what });
+}
+
 function leaseMoneyLine(lease, s = leaseStatus(lease)) {
   const c = s.currency;
   if (lease.status === "ended") return "";
+  const signing = signingDueText(lease, s);
+  if (signing) return signing;
   if (s.owed > 0.005) return [tr("Owes {amount}", { amount: formatMoney(s.owed, c) }), s.paidUntil ? tr("paid until {date}", { date: formatDateLabel(s.paidUntil) }) : ""].filter(Boolean).join(" · ");
   const next = nextRentDue(lease);
   if (!next) return tr("Nothing more to pay on this lease");
@@ -23843,6 +23873,7 @@ function openLeaseDetails(id) {
     mk("div", { className: "tech-card-head" }, mk("span", { className: "tech-trade", text: tr("{amount} · {period}", { amount: formatMoney(leaseCurrentRent(lease), c), period: periodLabel(lease) }) }), leasePill(lease, s)),
     mk("p", { className: "tech-where", text: [tr("since {date}", { date: formatDateLabel(lease.start) }), lease.end ? tr("until {date}", { date: formatDateLabel(lease.end) }) : "", lease.increasePct ? tr("+{pct}% a year", { pct: lease.increasePct }) : "", tenant.phone || ""].filter(Boolean).join(" · ") }),
     leaseSummaryCells(lease, s),
+    signingDueText(lease, s) ? mk("p", { className: "field-hint rent-coverage", text: signingDueText(lease, s) }) : null,
     mk("div", { className: "notice-actions" },
       lease.status !== "ended" ? mk("button", { type: "button", className: "mini-button is-primary", text: tr("Record payment"), onclick: () => openRentPaymentDialog(lease.id) }) : null,
       s.owed > 0 && tenant.phone ? miniButton(tr("Remind"), () => sendRentReminder(lease)) : null,
@@ -24325,6 +24356,7 @@ export const __test = {
   pendingApprovals,
   v167bAttentionItems,
   leaseAdvanceMonths,
+  signingDueText,
   rentStatementRows,
   nextRentDue,
   rentCoverageText,

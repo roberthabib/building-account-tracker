@@ -6566,3 +6566,13 @@ select.narrow-select {
   width: 7.5rem;
   max-width: 100%;
 }
+
+/* v198 — a long list on its own line, its value below */
+.field-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.field-stack.hidden {
+  display: none;
+}
