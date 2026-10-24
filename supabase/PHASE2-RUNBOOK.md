@@ -157,6 +157,7 @@ app's auth), then reload.
 | v190 one lease at a time per flat (`phase2t-v190.sql`): `save_lease` refuses overlapping leases | ✅ applied 2026-10-24 (run by Claude in the dashboard); 10/10 live checks (`phase2t-checks.sql`, rolled back) |
 | v194 re-let on the day a lease ended (`phase2u-v194.sql`): `lease_last` of an ended lease = the day before it ended | ✅ applied 2026-10-24 (run by Claude in the dashboard); 11/11 live checks (`phase2u-checks.sql`, rolled back) |
 | v199 hand-over receipts can be checked (`phase2v-v199.sql`): `verify_receipt` kind `handover` (payouts sharing a receipt number + code across an owner's flats; deleted = `voidedAt` → cancelled) | ✅ applied 2026-10-24 (run by Claude in the dashboard); 8/8 live checks (`phase2v-checks.sql`, rolled back) |
+| v201 the owner hears about a hand-over (`phase2w-v201.sql`): `notify_flat_owner` (manager only) → push target `owner` (the flat's owner, never its tenant) | ⏳ to apply |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.

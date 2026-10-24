@@ -6829,3 +6829,106 @@ body.rtl .owner-flat-arrow {
   direction: ltr;
   unicode-bidi: isolate;
 }
+
+/* v201 — flats cards: one balance line, the rest behind More… */
+.tenant-balance {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 2px 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.tenant-balance .tb-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tenant-balance .tb-amount {
+  justify-self: end;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.tenant-balance .tb-sub {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.tenant-balance.is-due {
+  background: #f8ecec;
+}
+
+.tenant-balance.is-due .tb-label,
+.tenant-balance.is-due .tb-amount {
+  color: var(--red-tint-text);
+}
+
+.tenant-balance.is-paid .tb-amount,
+.tenant-balance.is-credit .tb-amount,
+.tenant-balance.is-paid .tb-label,
+.tenant-balance.is-credit .tb-label {
+  color: #166a4a;
+}
+
+.tenant-balance.is-paid,
+.tenant-balance.is-credit {
+  background: #eaf3ee;
+}
+
+.tenant-more-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  padding-top: 10px;
+}
+
+/* v201 — ledger: the chips are the category filter */
+#categoryFilter {
+  display: none;
+}
+
+/* v201 — reports in tabs; rules in Settings */
+.reports-tabs {
+  margin-bottom: 12px;
+}
+
+.building-rules:empty {
+  display: none;
+}
+
+/* v201 — rentals on the dashboard */
+.rentals-dash {
+  cursor: pointer;
+}
+
+.rentals-dash .tech-summary {
+  margin-bottom: 0;
+}
+
+.settlement-rows {
+  margin: 4px 0 6px;
+}
+
+#ledgerView .filters {
+  grid-template-columns: 1fr auto;
+  align-items: start;
+}
+
+#ledgerView .filters #expenseCategoryFilter:not(.hidden) {
+  grid-column: 1 / -1;
+}
+
+#ledgerView .filters .date-range-filter {
+  grid-column: auto;
+}
+
+#ledgerView .filters .date-range-filter:has(.date-range-inputs:not(.hidden)) {
+  grid-column: 1 / -1;
+}

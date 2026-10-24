@@ -61,7 +61,7 @@ test("owner account: collected − fee − expenses − handed over", () => {
     deductions: [{ id: "d1", date: "2026-09-05", amount: 50, description: "Tap" }],
     payouts: [{ id: "o1", date: "2026-09-06", amount: 500 }],
   });
-  assert.deepEqual(app.leaseOwnerAccount(lease, TODAY), { currency: "USD", collected: 900, fee: 90, deductions: 50, paidOut: 500, toHandOver: 260 });
+  assert.deepEqual(app.leaseOwnerAccount(lease, TODAY), { currency: "USD", collected: 900, fee: 90, deductions: 50, paidOut: 500, depositKept: 0, toHandOver: 260 });
   // A fixed fee counts once per fully paid period.
   assert.equal(app.leaseOwnerAccount({ ...lease, fee: { kind: "fixed", value: 20 } }, TODAY).fee, 20);
   // The manager's own flat: no fee, nothing to hand over.

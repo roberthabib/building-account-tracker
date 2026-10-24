@@ -31,7 +31,7 @@ test("one card per owner (same name, any case), own flats last; settled owners m
   const groups = app.rentalOwnerGroups(leases, flats, TODAY);
   assert.deepEqual(groups.map((g) => [g.name, g.leases.length, g.settled]), [["Omar T.", 2, false], ["Sami K.", 1, true], ["Your own flats", 1, false]]);
   assert.equal(groups[0].phone, "70 111 222");
-  assert.deepEqual(groups[0].account.USD, { collected: 1500, fee: 150, deductions: 0, paidOut: 0, toHandOver: 1350, deposit: 600 });
+  assert.deepEqual(groups[0].account.USD, { collected: 1500, fee: 150, deductions: 0, paidOut: 0, depositKept: 0, toHandOver: 1350, deposit: 600 });
   const sum = app.ownersSummary(groups, TODAY);
   assert.deepEqual([sum.toHandOver.USD, sum.feesMonth.USD, sum.feesYear.USD], [1350, 150, 160]);
 });

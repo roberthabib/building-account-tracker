@@ -600,6 +600,7 @@
           </div>
           <p class="settings-group-title building-settings-title" data-i18n="set.buildingGroup">Building</p>
           <section class="panel">
+            <div class="hidden" id="legacyAccessControl">
             <p class="settings-section-header" data-i18n="set.accessControl">Access Control</p>
             <label>
               <span data-i18n="set.ownerPassword">Manager password</span>
@@ -607,6 +608,7 @@
             </label>
             <button class="mini-button hidden" id="removeOwnerPasswordButton" type="button" data-i18n="set.removePassword">Remove current password</button>
             <p class="settings-note" style="margin:0 0 4px" data-i18n="set.passwordNote">Owners use a PIN set per flat (in the Flats tab). Passwords and PINs are stored as salted hashes. Leave the field blank to keep the current password.</p>
+            </div>
 
             <p class="settings-section-header" data-i18n="set.buildingDetails">Building Details</p>
             <label>
@@ -641,6 +643,9 @@
             </label>
             <p class="settings-note" data-i18n="set.lbpRateNote">A new rate applies to new entries. Past entries keep the rate they were recorded at.</p>
 
+          </section>
+          <div id="buildingRules" class="building-rules owner-only"></div>
+          <section class="panel">
             <p class="settings-section-header" data-i18n="set.cloudDb">Cloud database</p>
             <p class="settings-note" id="cloudDbNote" data-i18n="set.cloudDbBuiltIn">Connected to the building's cloud database. Data and invoice photos sync automatically — nothing to set up on this device.</p>
             <div class="button-row">

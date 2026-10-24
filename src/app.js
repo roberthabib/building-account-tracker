@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v200";
+const APP_VERSION = "v201";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,83 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Send & share": "مشاركة",
+  "{amount} paid so far": "دُفع حتى الآن {amount}",
+  "This month": "هذا الشهر",
+  "The year": "السنة",
+  "Checks": "التدقيق",
+  "Rentals": "الإيجارات",
+  "1 rented flat": "شقة مؤجّرة واحدة",
+  "{n} rented flats": "{n} شقق مؤجّرة",
+  "— not rent —": "— ليس إيجاراً —",
+  "Add a lease first": "أضف عقداً أولاً",
+  "{n} rent payment recorded with its receipt": "سُجّلت دفعة إيجار واحدة مع إيصالها",
+  "{n} rent payments recorded with their receipts": "سُجّلت {n} دفعات إيجار مع إيصالاتها",
+  "Import rent from a statement": "استيراد الإيجار من كشف",
+  "Download the statement from your bank or Whish as a CSV or Excel file. The app finds the money that came in and suggests which tenant sent it; you check each line.": "نزّل الكشف من مصرفك أو من Whish كملف CSV أو Excel. يجد التطبيق المبالغ الواردة ويقترح المستأجر الذي أرسلها؛ وأنت تتحقق من كل سطر.",
+  "Your flats' rent — {year}": "إيجار شققك — {year}",
+  "Rent received in {year}": "الإيجار المقبوض في {year}",
+  "Still owed now: {amount}": "ما زال مستحقاً الآن: {amount}",
+  "No rent received this year yet.": "لم يُقبض أي إيجار هذه السنة بعد.",
+  "Received": "المقبوض",
+  "Year report": "تقرير السنة",
+  "{amount} on {date}. The receipt is in the app under Your rented flat.": "{amount} بتاريخ {date}. الإيصال في التطبيق تحت «شقتك المؤجّرة».",
+  "Rent handed over to you": "سُلِّم إليك الإيجار",
+  "Take the unpaid rent from the deposit": "اقتطاع الإيجار غير المدفوع من التأمين",
+  "e.g. Broken door, cleaning": "مثلاً: باب مكسور، تنظيف",
+  "The tenant still owes": "المستأجر ما زال مديناً بـ",
+  "To give back to the tenant": "يُعاد إلى المستأجر",
+  "Rent due up to the last day": "الإيجار المستحق حتى آخر يوم",
+  "Rent paid": "الإيجار المدفوع",
+  "Rent unpaid": "الإيجار غير المدفوع",
+  "Rent paid for after the last day": "إيجار مدفوع عن فترة بعد آخر يوم",
+  "Unpaid rent taken from the deposit": "إيجار غير مدفوع اقتُطع من التأمين",
+  "Kept for damages": "محتجز للأضرار",
+  "Taken from the deposit": "اقتُطع من التأمين",
+  "Rent paid for after the last day, given back": "إيجار مدفوع عن فترة بعد آخر يوم، أُعيد",
+  "The app works out the rent up to the last day and what happens to the deposit. Check it, then end the lease.": "يحسب التطبيق الإيجار حتى آخر يوم وما يحصل بالتأمين. تحقّق منه ثم أنهِ العقد.",
+  "Kept for damages ({currency})": "محتجز للأضرار ({currency})",
+  "Move-out — {building}, flat {unit}": "الخروج — {building}، الشقة {unit}",
+  "Last day: {date}": "آخر يوم: {date}",
+  "Rent due: {due} · paid: {paid}": "الإيجار المستحق: {due} · المدفوع: {paid}",
+  "Deposit: {amount}": "التأمين: {amount}",
+  "Unpaid rent taken from the deposit: {amount}": "إيجار غير مدفوع اقتُطع من التأمين: {amount}",
+  "Kept for damages: {amount}{reason}": "محتجز للأضرار: {amount}{reason}",
+  "You still owe: {amount}": "ما زلت مديناً بـ: {amount}",
+  "Given back to you: {amount}": "أُعيد إليك: {amount}",
+  "Move-out settlement — {title}": "تسوية الخروج — {title}",
+  "The tenant still owes {amount}.": "المستأجر ما زال مديناً بـ {amount}.",
+  "Give back {amount} to the tenant.": "أعِد {amount} إلى المستأجر.",
+  "Move-out settlement": "تسوية الخروج",
+  "Kept from the deposit for damages": "محتجز من التأمين للأضرار",
+  "From the deposit": "من التأمين",
+  "Given back": "مُعاد",
+  "Lease contract": "عقد الإيجار",
+  "Lease agreement": "عقد إيجار",
+  "The owner: {name}": "المالك: {name}",
+  "The tenant: {name}{phone}": "المستأجر: {name}{phone}",
+  "Managed by the building manager for the owner.": "يديره مدير المبنى نيابةً عن المالك.",
+  "The owner (or the building manager)": "المالك (أو مدير المبنى)",
+  "The tenant": "المستأجر",
+  "1. The flat: flat {unit} in the {building} building.": "1. المأجور: الشقة {unit} في مبنى {building}.",
+  "2. The term: from {start}{end}.": "2. المدة: من {start}{end}.",
+  " to {date}": " حتى {date}",
+  ", until either side gives notice": "، إلى أن يُبلغ أحد الطرفين الآخر بالإنهاء",
+  "3. The rent: {amount} {period}, the same amount every period.": "3. بدل الإيجار: {amount} {period}، المبلغ نفسه في كل فترة.",
+  "one month": "شهراً واحداً",
+  "{n} months": "{n} أشهر",
+  "4. At signing the tenant pays {amount} for the first month. After that the rent is paid on the 1st of each month.": "4. عند التوقيع يدفع المستأجر {amount} عن الشهر الأول. بعد ذلك يُدفع الإيجار في أول كل شهر.",
+  "4. At signing the tenant pays {amount} for the rest of the first month, by the days. After that the rent is paid on the 1st of each month.": "4. عند التوقيع يدفع المستأجر {amount} عمّا تبقّى من الشهر الأول بحسب الأيام. بعد ذلك يُدفع الإيجار في أول كل شهر.",
+  "4. At signing the tenant pays {amount}: the first month and {months} in advance. After that the rent is paid on the 1st of each month.": "4. عند التوقيع يدفع المستأجر {amount}: الشهر الأول و{months} مسبقاً. بعد ذلك يُدفع الإيجار في أول كل شهر.",
+  "4. At signing the tenant pays {amount}: the rest of the first month by the days, and {months} in advance. After that the rent is paid on the 1st of each month.": "4. عند التوقيع يدفع المستأجر {amount}: ما تبقّى من الشهر الأول بحسب الأيام، و{months} مسبقاً. بعد ذلك يُدفع الإيجار في أول كل شهر.",
+  "4. The rent is paid at the start of each period, in advance.": "4. يُدفع الإيجار مسبقاً في بداية كل فترة.",
+  "5. The rent is late {days} days after it is due.{fee}": "5. يُعتبر الإيجار متأخراً بعد {days} أيام من استحقاقه.{fee}",
+  " A late fee of {amount} is then added.": " وتُضاف عندها غرامة تأخير قدرها {amount}.",
+  " A late fee of {pct}% of the rent is then added.": " وتُضاف عندها غرامة تأخير قدرها {pct}% من الإيجار.",
+  "6. The rent goes up by {pct}% each year on the lease's anniversary.": "6. يزداد الإيجار بنسبة {pct}% كل سنة في ذكرى بدء العقد.",
+  "7. Deposit: {amount}, given back when the tenant leaves, less any unpaid rent and the cost of damages.": "7. التأمين: {amount}، يُعاد عند خروج المستأجر بعد حسم أي إيجار غير مدفوع وكلفة الأضرار.",
+  "8. The tenant also pays the flat's monthly building charges (building fee, generator, water) to the building manager.": "8. يدفع المستأجر أيضاً رسوم المبنى الشهرية للشقة (رسم المبنى، المولّد، المياه) إلى مدير المبنى.",
+  "9. Every payment is recorded in the building's app and the tenant receives a receipt that can be checked.": "9. تُسجَّل كل دفعة في تطبيق المبنى ويحصل المستأجر على إيصال يمكن التحقق منه.",
   "Part paid ahead": "دُفع جزء منه مسبقاً",
   "Rent is applied to the oldest unpaid period first; the rest pays the next months in advance.": "يُطبَّق الإيجار على أقدم فترة غير مدفوعة أولاً؛ والباقي يدفع الأشهر التالية مسبقاً.",
   "{period} (part)": "{period} (جزء)",
@@ -3706,13 +3783,19 @@ function saveSyncMeta(meta) {
   localStorage.setItem(SYNC_META_KEY, JSON.stringify(meta));
 }
 
+// v201: in Arabic an amount is isolated left-to-right, so it reads "$1,550.00"
+// (not "1,550.00$") inside Arabic text on every screen.
+function ltrAmount(text) {
+  return currentLang === "ar" ? `\u2066${text}\u2069` : text;
+}
+
 function formatLbp(value) {
-  return `${numberFormat.format(Math.round(value || 0))} LL`;
+  return ltrAmount(`${numberFormat.format(Math.round(value || 0))} LL`);
 }
 
 function formatUsd(value) {
   // Real cents; "|| 0" turns a rounded -0 into 0 so it never prints "-$0.00".
-  return usdFormat.format(roundUsd(value) || 0);
+  return ltrAmount(usdFormat.format(roundUsd(value) || 0));
 }
 
 function formatMonthly(value) {
@@ -6643,14 +6726,13 @@ function renderTenants() {
           </div>
           <button class="tenant-trash-btn delete-tenant-button" type="button" aria-label="Delete flat"></button>
         </div>
-        <div class="tenant-metrics">
-          <div class="metric metric-paid"><span></span><b></b></div>
-          <div class="metric metric-advance"><span></span><b></b></div>
-          <div class="metric metric-due"><span></span><b></b></div>
-        </div>
+        <div class="tenant-balance"><span class="tb-label"></span><b class="tb-amount tnum"></b><small class="tb-sub"></small></div>
         <div class="tenant-card-footer">
-          <button class="text-link-btn edit-tenant-button" type="button"></button>
           <button class="text-link-btn print-statement-button" type="button"></button>
+          <button class="text-link-btn tenant-more-button owner-only" type="button" aria-expanded="false"></button>
+        </div>
+        <div class="tenant-more-actions hidden">
+          <button class="text-link-btn edit-tenant-button" type="button"></button>
           <button class="text-link-btn invite-tenant-button owner-only" type="button"></button>
           <button class="text-link-btn moveout-tenant-button owner-only" type="button"></button>
           <button class="text-link-btn details-tenant-button owner-only" type="button"></button>
@@ -6660,10 +6742,7 @@ function renderTenants() {
       const trashBtn = card.querySelector(".delete-tenant-button");
       trashBtn.setAttribute("aria-label", tr("Delete flat"));
       trashBtn.appendChild(lucide("trash", { size: 17, color: "var(--label-muted)" }));
-      const metricLabels = card.querySelectorAll(".metric span");
-      metricLabels[0].textContent = `✓ ${tr("Paid")}`;
-      metricLabels[1].textContent = tr("Advance");
-      metricLabels[2].textContent = tr("Due");
+      card.querySelector(".tenant-more-button").textContent = tr("More…");
       card.querySelector(".edit-tenant-button").textContent = tr("Edit");
       card.querySelector(".print-statement-button").textContent = tr("Statement");
       card.querySelector(".invite-tenant-button").textContent = tr("Invite");
@@ -6689,11 +6768,14 @@ function renderTenants() {
       const untilText = paidUntilText(tenant.id);
       if (untilText) card.querySelector(".tenant-id-text").append(mk("span", { className: "tenant-paid-until", text: `✓ ${untilText}` }));
       if (tenant.movedOutOn && canEditBuilding()) card.querySelector(".tenant-card-footer").append(mk("button", { type: "button", className: "text-link-btn settlement-button", text: tenant.settlement?.settled ? tr("Settlement ✓") : tr("Settlement"), onclick: (e) => { e.stopPropagation(); openSettlementDialog(tenant.id); } }));
-      const metrics = card.querySelectorAll(".metric b");
-      metrics[0].textContent = formatMonthly(totals.paidUsd);
-      metrics[1].textContent = formatUsd(totals.advanceUsd);
-      metrics[2].textContent = formatMonthly(totals.dueUsd);
-      if (totals.dueUsd > 0.005) card.querySelector(".metric-due").classList.add("has-due");
+      // v201: one line: owes / in credit / paid up, and what was paid so far.
+      const balance = card.querySelector(".tenant-balance");
+      const owes = totals.dueUsd > 0.005;
+      const credit = !owes && totals.advanceUsd > 0.005;
+      balance.classList.add(owes ? "is-due" : credit ? "is-credit" : "is-paid");
+      balance.querySelector(".tb-label").textContent = owes ? tr("Owes") : credit ? tr("In credit") : tr("Paid up");
+      balance.querySelector(".tb-amount").textContent = owes ? formatMonthly(totals.dueUsd) : credit ? formatUsd(totals.advanceUsd) : "✓";
+      balance.querySelector(".tb-sub").textContent = tr("{amount} paid so far", { amount: formatUsd(totals.paidUsd) });
       card.querySelector(".edit-tenant-button").dataset.tenantId = tenant.id;
       card.dataset.tenantId = tenant.id;
       card.querySelector(".print-statement-button").dataset.tenantId = tenant.id;
@@ -7346,7 +7428,10 @@ function pdfTextCommand(text, x, y, size = 10, bold = false, style = null) {
   // Labels are written in English in the builders; in Arabic, exact labels
   // ("Monthly Dues", "Paid", …) translate here. Data (names, amounts) has no
   // dictionary entry and passes through unchanged.
-  const shown = pdfSafeText(currentLang === "ar" ? tr(String(text ?? "")) : text);
+  const raw = pdfSafeText(currentLang === "ar" ? tr(String(text ?? "")) : text);
+  // An amount alone is plain text again; inside Arabic the isolates keep it in order.
+  const plain = raw.replace(/[\u2066-\u2069]/g, "");
+  const shown = pdfNeedsImage(plain) ? raw : plain;
   if (pdfNeedsImage(shown)) return pdfTextImageCommand(shown, x, y, size, bold, style);
   const op = `BT /${bold ? "F2" : "F1"} ${size} Tf ${x} ${y} Td (${pdfEscape(shown)}) Tj ET`;
   return style?.color ? `q ${pdfColor(style.color)} rg ${op} Q` : op;
@@ -11909,6 +11994,13 @@ function attachEvents() {
     showToast("Owner PIN removed");
   });
   els.tenantList.addEventListener("click", (event) => {
+    const moreBtn = event.target.closest(".tenant-more-button");
+    if (moreBtn) {
+      const actions = moreBtn.closest(".tenant-card")?.querySelector(".tenant-more-actions");
+      const open = actions?.classList.toggle("hidden") === false;
+      moreBtn.setAttribute("aria-expanded", String(open));
+      return;
+    }
     const detailsBtn = event.target.closest(".details-tenant-button[data-tenant-id]");
     if (detailsBtn) { openUnitDetailsDialog(detailsBtn.dataset.tenantId); return; }
     const moveBtn = event.target.closest(".moveout-tenant-button[data-tenant-id]");
@@ -13823,6 +13915,8 @@ function reportsSection(title, ...children) {
   return mk("section", { className: "panel report-section" }, mk("div", { className: "panel-header" }, mk("h3", { text: title })), ...children);
 }
 
+let reportsTab = "month";
+
 function renderReports() {
   if (!els.reportsBody) return;
   if (sessionMode !== "owner") { els.reportsBody.replaceChildren(); return; }
@@ -13854,44 +13948,61 @@ function renderReports() {
     c.note ? mk("div", { className: "history-by", text: c.note }) : null,
     miniButton(tr("Delete"), () => deleteCashCheck(c.id), "danger-mini"))));
 
+  // v201: the page is split in tabs; the rules (reminders, approvals, reserve) live in Settings.
+  const sections = {
+    month: [
+      reportsSection(tr("Monthly report"),
+        note(tr("A one-page summary of the month for the residents: money in and out, where it went, and what's still owed. The generator part only appears when the building used it that month.")),
+        field(tr("Month"), monthSelect),
+        mk("div", { className: "button-row" }, primaryButton(tr("Share PDF"), () => shareMonthlyReport(monthSelect.value)))),
+      reportsSection(tr("Money in and out"), buildMoneyFlowChart()),
+      reportsSection(tr("Invoice photos missing"), buildMissingInvoiceSection()),
+    ],
+    year: [
+      reportsSection(tr("Annual report"),
+        note(tr("Everything for the yearly owners' meeting: money in and out, where it went, the reserve, and who still owes.")),
+        field(tr("Year"), yearSelect),
+        mk("div", { className: "button-row" },
+          primaryButton(tr("PDF"), () => printAnnualReport(yearSelect.value)),
+          secondaryButton(tr("Excel"), () => downloadAnnualWorkbook(yearSelect.value)))),
+      reportsSection(tr("Spending by year"), buildSpendingTrends(), samePeriodNote()),
+      reportsSection(tr("Budget"), buildBudgetSection()),
+      reportsSection(tr("Next year's budget"), buildBudgetProposalSection()),
+      reportsSection(tr("Owners' meeting pack"), buildMeetingPackSection()),
+      reportsSection(tr("Close the year"), buildCloseYearSection()),
+    ],
+    checks: [
+      reportsSection(tr("Data health"),
+        note(tr("Problems the app found in your data, each with a shortcut to fix it.")),
+        buildDataHealthSection()),
+      reportsSection(tr("Cash check"),
+        note(tr("Once a month, type what's actually in the cash box and the bank. Missing or unrecorded money shows up straight away.")),
+        primaryButton(tr("Count the cash"), openCashCheckDialog),
+        cashRows),
+      reportsSection(tr("Close the month"),
+        note(tr("Once you've sent a month's balances, close it. Its figures can't change by accident; to edit them you reopen the month first.")),
+        monthRows),
+      reportsSection(tr("Change history"),
+        note(tr("{n} changes recorded. Every addition, change and deletion, with the date and who made it — and an Undo for mistakes.", { n: (state.auditLog || []).length })),
+        secondaryButton(tr("Open the history"), () => { historyShown = 40; openHistoryDialog(); })),
+    ],
+    share: [
+      reportsSection(tr("Monthly newsletter"), buildNewsletterSection()),
+      reportsSection(tr("For the accountant"), buildAccountantSection()),
+      reportsSection(tr("Calendar"), note(tr("Maintenance dates, due days, warranties and votes in your phone's calendar.")), mk("div", { className: "button-row" }, primaryButton(tr("Download calendar file"), downloadCalendar))),
+    ],
+  };
+  const tab = (id, label) => mk("button", { type: "button", className: `tech-tab${reportsTab === id ? " is-active" : ""}`, "aria-pressed": reportsTab === id ? "true" : "false", onclick: () => { reportsTab = id; renderReports(); } }, label);
   els.reportsBody.replaceChildren(
-    reportsSection(tr("Monthly report"),
-      note(tr("A one-page summary of the month for the residents: money in and out, where it went, and what's still owed. The generator part only appears when the building used it that month.")),
-      field(tr("Month"), monthSelect),
-      mk("div", { className: "button-row" }, primaryButton(tr("Share PDF"), () => shareMonthlyReport(monthSelect.value)))),
-    reportsSection(tr("Data health"),
-      note(tr("Problems the app found in your data, each with a shortcut to fix it.")),
-      buildDataHealthSection()),
-    reportsSection(tr("Automatic reminders"), buildAutoNoticeSection()),
-    reportsSection(tr("Approval for big expenses"), buildApprovalSettings()),
-    reportsSection(tr("Budget"), buildBudgetSection()),
-    reportsSection(tr("Next year's budget"), buildBudgetProposalSection()),
-    reportsSection(tr("Owners' meeting pack"), buildMeetingPackSection()),
-    reportsSection(tr("Reserve target"), buildReserveSection(), reserveForecastText() ? note(reserveForecastText()) : null),
-    reportsSection(tr("Close the year"), buildCloseYearSection()),
-    reportsSection(tr("Annual report"),
-      note(tr("Everything for the yearly owners' meeting: money in and out, where it went, the reserve, and who still owes.")),
-      field(tr("Year"), yearSelect),
-      mk("div", { className: "button-row" },
-        primaryButton(tr("PDF"), () => printAnnualReport(yearSelect.value)),
-        secondaryButton(tr("Excel"), () => downloadAnnualWorkbook(yearSelect.value)))),
-    reportsSection(tr("Spending by year"), buildSpendingTrends(), samePeriodNote()),
-    reportsSection(tr("Cash check"),
-      note(tr("Once a month, type what's actually in the cash box and the bank. Missing or unrecorded money shows up straight away.")),
-      primaryButton(tr("Count the cash"), openCashCheckDialog),
-      cashRows),
-    reportsSection(tr("Close the month"),
-      note(tr("Once you've sent a month's balances, close it. Its figures can't change by accident; to edit them you reopen the month first.")),
-      monthRows),
-    reportsSection(tr("Change history"),
-      note(tr("{n} changes recorded. Every addition, change and deletion, with the date and who made it — and an Undo for mistakes.", { n: (state.auditLog || []).length })),
-      secondaryButton(tr("Open the history"), () => { historyShown = 40; openHistoryDialog(); })),
-    reportsSection(tr("For the accountant"), buildAccountantSection()),
-    reportsSection(tr("Money in and out"), buildMoneyFlowChart()),
-    reportsSection(tr("Invoice photos missing"), buildMissingInvoiceSection()),
-    reportsSection(tr("Monthly newsletter"), buildNewsletterSection()),
-    reportsSection(tr("Calendar"), note(tr("Maintenance dates, due days, warranties and votes in your phone's calendar.")), mk("div", { className: "button-row" }, primaryButton(tr("Download calendar file"), downloadCalendar))),
-  );
+    mk("div", { className: "tech-tabs reports-tabs", role: "group" }, tab("month", tr("Month")), tab("year", tr("Year")), tab("checks", tr("Checks")), tab("share", tr("Send & share"))),
+    ...(sections[reportsTab] || sections.month));
+  const rules = document.querySelector("#buildingRules");
+  if (rules) {
+    rules.replaceChildren(
+      reportsSection(tr("Automatic reminders"), buildAutoNoticeSection()),
+      reportsSection(tr("Approval for big expenses"), buildApprovalSettings()),
+      reportsSection(tr("Reserve target"), buildReserveSection(), reserveForecastText() ? note(reserveForecastText()) : null));
+  }
 }
 
 // ── Workbook packaging shared by the full export and the annual report ─────
@@ -14037,6 +14148,7 @@ function handleExtraAttentionAction(row) {
 }
 
 function renderV148() {
+  renderRentalsDashCard();
   renderNotices();
   renderIssues();
   renderReports();
@@ -14902,6 +15014,8 @@ const PAYMENT_METHODS = [["cash", "Cash"], ["bank", "Bank transfer"], ["omt", "O
 const METHOD_ACCOUNT = { cash: "cash", omt: "cash", bank: "bank", whish: "bank", cheque: "bank" };
 
 function methodLabel(method) {
+  if (method === "deposit") return tr("From the deposit");
+  if (method === "refund") return tr("Given back");
   return tr((PAYMENT_METHODS.find(([v]) => v === method) || [null, method])[1] || "");
 }
 
@@ -16001,7 +16115,7 @@ function openExpensesThisYear() {
   openToolDialog(tr("Expenses in {year}", { year }),
     rows.length ? mk("div", {}, rows.map(([cat, usd]) => breakdownRow(cat, formatUsd(usd)))) : note(tr("No expenses recorded yet.")),
     rows.length ? breakdownRow(tr("Total"), formatUsd(expensesThisYearUsd(year))) : null,
-    sessionMode === "owner" ? mk("div", { className: "button-row" }, secondaryButton(tr("Open Reports"), () => { closeToolDialog(); setView("reportsView"); })) : null);
+    sessionMode === "owner" ? mk("div", { className: "button-row" }, secondaryButton(tr("Open Reports"), () => { closeToolDialog(); reportsTab = "year"; renderReports(); setView("reportsView"); })) : null);
 }
 
 function openOutstandingList() {
@@ -16096,7 +16210,8 @@ function decorateLedger() {
     els.ledgerList.before(chips);
   }
   const current = els.categoryFilter.value || "All";
-  const options = [["All", tr("All")], ["Payments", tr("Payments")], ["Expenses", tr("Expenses")], ["Services Expenses", tr("Generator & water")]];
+  const options = [["All", tr("All")], ["Payments", tr("Payments")], ["Expenses", tr("Expenses")], ["Services Expenses", tr("Generator & water")],
+    ...([...els.categoryFilter.options].some((o) => o.value === "Opening Balance") ? [["Opening Balance", tr("Opening Balance")]] : [])];
   chips.replaceChildren(...options.map(([value, label]) => {
     const chip = mk("button", { type: "button", className: `quick-filter${current === value ? " is-active" : ""}`, text: label });
     chip.addEventListener("click", () => {
@@ -16843,6 +16958,7 @@ function searchEverything(query) {
   (state.announcements || []).forEach((n) => { if (has(n.title, n.body)) results.push({ kind: "notice", id: n.id, title: n.title, sub: tr("Notice") }); });
   (state.issues || []).forEach((i) => { if (has(i.title, i.details)) results.push({ kind: "issue", id: i.id, title: i.title, sub: tr("Problem") }); });
   (state.meetings || []).forEach((m) => { if (has(m.title, m.notes, ...(m.decisions || []))) results.push({ kind: "meeting", id: m.id, title: m.title, sub: tr("Meeting") }); });
+  if (isRentalsManager() && Array.isArray(rentalLeases)) results.push(...searchLeases(q));
   state.transactions
     .filter((t) => has(t.description, t.supplier, t.invoice, t.receiptRef, t.expenseCategory, t.tenantId ? tenantName(t.tenantId) : ""))
     .sort((a, b) => String(transactionDateValue(b)).localeCompare(String(transactionDateValue(a))))
@@ -16861,6 +16977,7 @@ function openSearch() {
     else if (r.kind === "notice") setView("noticesView");
     else if (r.kind === "issue") setView("issuesView");
     else if (r.kind === "meeting") setView("meetingsView");
+    else if (r.kind === "lease") { setView("rentalsView"); openLeaseDetails(r.id); }
     else {
       setView("ledgerView");
       els.ledgerSearch.value = r.query;
@@ -20263,7 +20380,10 @@ function installTenantToolButtons() {
 
 function installPaymentToolButtons() {
   const who = document.querySelector("#whoPaidButton");
-  if (!who || document.querySelector("#importStatementButton")) return;
+  const existing = document.querySelector("#importStatementButton");
+  // v201: made once at start-up, so its words follow the language on each render.
+  if (existing) { existing.textContent = tr("Import statement"); return; }
+  if (!who) return;
   const b = mk("button", { type: "button", id: "importStatementButton", className: "secondary-button owner-only", text: tr("Import statement") });
   b.addEventListener("click", openStatementImportDialog);
   who.after(b);
@@ -21916,13 +22036,16 @@ function leaseOwnerAccount(lease, today = localDateInput()) {
   fee = roundMoney(fee, c);
   const deductions = sum(lease.deductions);
   const paidOut = sum(livePayouts(lease));
+  // v201: what was kept from the deposit for damages is the owner's.
+  const depositKept = lease.ownFlat ? 0 : roundMoney(Number(lease.deposit?.keptAmount || 0), c);
   return {
     currency: c,
     collected: s.paidTotal,
     fee,
     deductions,
     paidOut,
-    toHandOver: lease.ownFlat ? 0 : roundMoney(s.paidTotal - fee - deductions - paidOut, c),
+    depositKept,
+    toHandOver: lease.ownFlat ? 0 : roundMoney(s.paidTotal - fee - deductions - paidOut + depositKept, c),
   };
 }
 
@@ -21984,6 +22107,7 @@ async function saveLease(lease) {
 async function refreshRentals() {
   if (!isRentalsManager() || cloudProvider() !== "supabase") return;
   try { await loadLeases(); } catch { rentalLeases = null; }
+  renderRentalsDashCard();
   if (v178AttentionItems().length || v185AttentionItems().length) renderAttention();
   decorateRentedFlats();
 }
@@ -22248,7 +22372,7 @@ function openPayoutDialog(id) {
     const ref = newId("HO").toUpperCase();
     const saved = await saveLease({ ...lease, payouts: [...(lease.payouts || []), { id: newId("out"), receipt: ref, verifyCode: newVerifyCode(), date: date.value || localDateInput(), amount: value, method: method.value }] });
     save.disabled = false;
-    if (saved) { closeToolDialog(); showToast("Hand-over recorded"); openHandOverReceipt(ref); }
+    if (saved) { closeToolDialog(); showToast("Hand-over recorded"); notifyOwnerOfHandOver(ref); openHandOverReceipt(ref); }
   });
   openToolDialog(tr("Hand over to {name}", { name: leaseFlat(lease)?.name || tr("the owner") }),
     note(tr("To hand over now: {amount}", { amount: formatMoney(a.toHandOver, a.currency) })),
@@ -22337,30 +22461,6 @@ function sendRentReceipt(lease, payment) {
 }
 
 // ── End or delete a lease ──
-function openEndLeaseDialog(id) {
-  const lease = rentalLeases.find((l) => l.id === id);
-  if (!lease) return;
-  const c = lease.currency || "USD";
-  const endOn = mk("input", { type: "date", value: localDateInput() });
-  const returned = numberInput(lease.deposit?.amount || "");
-  const kept = textInput("", { maxlength: "200", placeholder: tr("Why part of the deposit was kept (optional)") });
-  const save = primaryButton(tr("End lease"), async () => {
-    save.disabled = true;
-    const saved = await saveLease({
-      ...lease, status: "ended", endedOn: endOn.value || localDateInput(),
-      deposit: { ...(lease.deposit || {}), ...(lease.deposit?.amount ? { returnedOn: endOn.value || localDateInput(), returnedAmount: roundMoney(Number(returned.value) || 0, c), keptReason: kept.value.trim() } : {}) },
-    });
-    save.disabled = false;
-    if (saved) { closeToolDialog(); showToast("Lease ended"); }
-  });
-  const s = leaseStatus({ ...lease, status: "ended", endedOn: localDateInput() });
-  openToolDialog(tr("End lease — {title}", { title: leaseTitle(lease) }),
-    s.owed > 0 ? note(tr("The tenant still owes {amount} of rent.", { amount: formatMoney(s.owed, s.currency) }), "is-warning") : note(tr("The rent is settled.")),
-    field(tr("Last day"), endOn),
-    lease.deposit?.amount ? mk("div", {}, field(tr("Deposit returned ({currency})", { currency: c }), returned, tr("Deposit held: {amount}", { amount: formatMoney(lease.deposit.amount, c) })), field(tr("Reason"), kept)) : null,
-    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
-}
-
 async function deleteLease(id) {
   if (!window.confirm(tr("Delete this lease? Use this only for a lease added by mistake."))) return;
   try {
@@ -23848,6 +23948,7 @@ function renderRentalLeases() {
       mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Collected this month") }), mk("strong", { text: moneyTotals(collectedThisMonth, (x) => x.v) }))),
     mk("div", { className: "button-row" },
       primaryButton(tr("Add a lease"), () => openLeaseEditor()),
+      all.length ? secondaryButton(tr("Import statement"), () => openRentStatementImport()) : null,
       lateList.length ? secondaryButton(tr("Remind the late ones"), () => openRemindLateDialog()) : null),
     all.length || ended.length ? mk("div", { className: "rent-filters" }, chip("all", tr("All"), all.length), chip("late", tr("Late"), lateList.length), chip("owing", tr("Owing"), owing.length), chip("paid", tr("Paid up"), paidUp.length), ended.length ? chip("ended", tr("Ended"), ended.length) : null) : null,
     all.length || rentalsFilter === "ended" ? null : note(tr("No rented flats yet. Add a lease for each flat that is rented: the tenant, the rent and when it's due.")),
@@ -23957,8 +24058,8 @@ function openLeaseDetails(id) {
     reportsSection(tr("Payments"), payments.length ? mk("div", {}, payments.map((p) => mk("div", { className: "rent-pay-row" },
       mk("div", { className: "rent-pay-head" }, mk("strong", { text: formatMoney(p.amount, c) }), mk("small", { text: [formatDateLabel(p.date), methodLabel(p.method), p.chargesUsd ? tr("+ {amount} building charges", { amount: formatUsd(p.chargesUsd) }) : ""].filter(Boolean).join(" · ") })),
       mk("div", { className: "notice-actions" },
-        miniButton(tr("Receipt"), () => shareRentReceiptPdf(lease, p)),
-        tenant.phone ? miniButton("WhatsApp", () => sendRentReceipt(lease, p)) : null,
+        Number(p.amount) > 0 ? miniButton(tr("Receipt"), () => shareRentReceiptPdf(lease, p)) : null,
+        tenant.phone && Number(p.amount) > 0 ? miniButton("WhatsApp", () => sendRentReceipt(lease, p)) : null,
         miniButton(tr("Edit"), () => openRentPaymentEditDialog(lease.id, p.id)))))) : note(tr("No payments yet."))),
     leaseDocumentsSection(lease),
     leaseInspectionsSection(lease),
@@ -23968,6 +24069,8 @@ function openLeaseDetails(id) {
     mk("div", { className: "button-row" },
       lease.status !== "ended" ? secondaryButton(tr("Invite to the app"), () => { void inviteRenter(lease); }) : null,
       lease.status !== "ended" ? secondaryButton(tr("Renew"), () => openRenewLeaseDialog(lease.id)) : null,
+      secondaryButton(tr("Lease contract"), () => shareLeaseContract(lease)),
+      lease.settlement ? secondaryButton(tr("Move-out settlement"), () => openSettlementShare(lease.id)) : null,
       secondaryButton(tr("Edit"), () => openLeaseEditor(lease.id)),
       lease.status !== "ended" ? secondaryButton(tr("End lease"), () => openEndLeaseDialog(lease.id)) : null,
       !(lease.payments || []).length ? secondaryButton(tr("Delete"), () => deleteLease(lease.id)) : null));
@@ -24263,8 +24366,8 @@ function ownerGroupAccount(leases, today = localDateInput()) {
   const by = {};
   leases.forEach((l) => {
     const a = leaseOwnerAccount(l, today);
-    const t = by[a.currency] || (by[a.currency] = { collected: 0, fee: 0, deductions: 0, paidOut: 0, toHandOver: 0, deposit: 0 });
-    ["collected", "fee", "deductions", "paidOut", "toHandOver"].forEach((k) => { t[k] = roundMoney(t[k] + a[k], a.currency); });
+    const t = by[a.currency] || (by[a.currency] = { collected: 0, fee: 0, deductions: 0, paidOut: 0, depositKept: 0, toHandOver: 0, deposit: 0 });
+    ["collected", "fee", "deductions", "paidOut", "depositKept", "toHandOver"].forEach((k) => { t[k] = roundMoney(t[k] + a[k], a.currency); });
     t.deposit = roundMoney(t.deposit + leaseDepositHeld(l), a.currency);
   });
   return by;
@@ -24413,6 +24516,7 @@ function ownerAccountRows(t, c) {
     t.fee ? breakdownRow(tr("Your fee"), `−${formatMoney(t.fee, c)}`) : null,
     t.deductions ? breakdownRow(tr("Expenses paid for the owner"), `−${formatMoney(t.deductions, c)}`) : null,
     t.paidOut ? breakdownRow(tr("Already handed over"), `−${formatMoney(t.paidOut, c)}`) : null,
+    t.depositKept ? breakdownRow(tr("Kept from the deposit for damages"), `+${formatMoney(t.depositKept, c)}`) : null,
     total,
     deposit);
 }
@@ -24442,7 +24546,8 @@ function ownFlatsCard(g) {
       shown.map((l) => mk("button", { type: "button", className: "owner-flat-row", onclick: () => openLeaseDetails(l.id) },
         mk("span", {}, mk("strong", { text: leaseTitle(l) }), mk("small", { text: leaseMoneyLine(l) })),
         mk("span", { className: "owner-flat-arrow", "aria-hidden": "true", text: "›" }))),
-      ended ? mk("small", { className: "owner-muted", text: ended === 1 ? tr("+ 1 ended lease") : tr("+ {n} ended leases", { n: ended }) }) : null));
+      ended ? mk("small", { className: "owner-muted", text: ended === 1 ? tr("+ 1 ended lease") : tr("+ {n} ended leases", { n: ended }) }) : null),
+    mk("div", { className: "notice-actions" }, miniButton(tr("Year report"), () => openOwnRentYear())));
 }
 
 // ── Hand-overs and expenses: the list, corrections ──
@@ -24628,6 +24733,7 @@ function openOwnerHandOverDialog(key) {
     closeToolDialog();
     if (done < parts.length) { showToast("Only part of the hand-over was saved: check the list and try again.", 7000); return; }
     showToast("Hand-over recorded");
+    notifyOwnerOfHandOver(ref);
     openHandOverReceipt(ref);
   });
   openToolDialog(tr("Hand over to {name}", { name: g.name }),
@@ -24985,9 +25091,9 @@ function openFeesReport(year = Number(localDateInput().slice(0, 4))) {
   const partsText = (r) => r.parts.map((x) => `${leaseFlat(x.lease)?.unit || ""} ${formatMoney(x.fee, x.c)}`).join(" · ");
   openToolDialog(tr("Your fees — {year}", { year }),
     mk("div", { className: "fees-year" },
-      miniButton("‹", () => openFeesReport(year - 1)),
+      miniButton(currentLang === "ar" ? "›" : "‹", () => openFeesReport(year - 1)),
       mk("strong", { text: String(year) }),
-      year < Number(localDateInput().slice(0, 4)) ? miniButton("›", () => openFeesReport(year + 1)) : mk("span")),
+      year < Number(localDateInput().slice(0, 4)) ? miniButton(currentLang === "ar" ? "‹" : "›", () => openFeesReport(year + 1)) : mk("span")),
     mk("div", { className: "tech-summary-cell fees-total" }, mk("span", { text: tr("Fees earned in {year}", { year }) }), mk("strong", { text: moneyListText(d.total) })),
     d.rows.some((r) => r.parts.length)
       ? mk("div", {}, d.rows.slice().reverse().filter((r) => r.parts.length).map((r) => breakdownRow(formatMonth(`${r.month}-01`), moneyListText(r.total), partsText(r))))
@@ -25054,6 +25160,451 @@ function ownerPhoneHandOvers(lease) {
   return reportsSection(tr("Handed over to you"), mk("div", {}, handed.map((e) => mk("div", { className: "breakdown-row" },
     mk("span", {}, mk("strong", { text: formatMoney(e.amount, e.c) }), mk("small", { text: [formatDateLabel(e.date), methodLabel(e.method)].filter(Boolean).join(" · ") })),
     miniButton(tr("Receipt"), () => openHandOverReceipt(e.ref, state.myRentals || []))))));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// v201 — rentals on the dashboard, rent statement import, own flats' year,
+// owner notified of hand-overs, move-out settlement, lease contract
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Dashboard: one rentals card ──
+function rentalsDashData(leases = rentalLeases || [], today = localDateInput()) {
+  const active = leases.filter((l) => l.status !== "ended");
+  const owed = {};
+  let late = 0;
+  active.forEach((l) => {
+    const s = leaseStatus(l, today);
+    addMoneyTo(owed, s.currency, s.owed);
+    if (s.lateCount > 0) late += 1;
+  });
+  const handOver = ownersSummary(rentalOwnerGroups(leases, state.tenants, today), today).toHandOver;
+  return { count: active.length, owed, late, handOver };
+}
+
+function renderRentalsDashCard() {
+  if (typeof document === "undefined" || !document.querySelector) return;
+  const anchor = document.querySelector("#declarationsPanel");
+  let card = document.querySelector("#rentalsDashCard");
+  const show = isRentalsManager() && Array.isArray(rentalLeases) && rentalLeases.some((l) => l.status !== "ended");
+  if (!show) { card?.remove(); return; }
+  if (!card) {
+    if (!anchor) return;
+    card = mk("section", { id: "rentalsDashCard", className: "panel owner-only rentals-dash", role: "button", tabindex: "0" });
+    card.addEventListener("click", () => setView("rentalsView"));
+    card.addEventListener("keydown", (e) => { if (e.key === "Enter") setView("rentalsView"); });
+    anchor.before(card);
+  }
+  const d = rentalsDashData();
+  card.replaceChildren(
+    mk("div", { className: "panel-header" }, mk("h3", { text: tr("Rentals") }), mk("span", { className: "panel-note", text: d.count === 1 ? tr("1 rented flat") : tr("{n} rented flats", { n: d.count }) })),
+    mk("div", { className: "tech-summary" },
+      mk("div", { className: `tech-summary-cell${Object.values(d.owed).some((v) => v > 0.005) ? " is-owed" : ""}` }, mk("span", { text: tr("Rent owed now") }), mk("strong", { text: moneyListText(d.owed) })),
+      mk("div", { className: `tech-summary-cell${d.late ? " is-owed" : ""}` }, mk("span", { text: tr("Late") }), mk("strong", { text: String(d.late) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("To hand over") }), mk("strong", { text: moneyListText(d.handOver) }))));
+}
+
+// ── Search: leases too ──
+function searchLeases(q, leases = rentalLeases || []) {
+  const has = (...values) => values.some((v) => String(v || "").toLowerCase().includes(q));
+  return leases.filter((l) => has(l.tenant?.name, l.tenant?.phone, leaseFlat(l)?.unit, ...(l.payments || []).map((p) => p.id), ...(l.payouts || []).map((p) => p.receipt)))
+    .map((l) => ({ kind: "lease", id: l.id, title: leaseTitle(l), sub: [tr("Lease"), l.status === "ended" ? tr("Ended") : formatMoney(leaseCurrentRent(l), l.currency || "USD")].join(" · ") }));
+}
+
+// ── Rent from a bank or Whish statement ──
+function matchRentStatementRow(row, leases) {
+  const text = normalizeForMatch(row.text);
+  const digits = String(row.text || "").replace(/\D/g, "");
+  let best = null;
+  leases.forEach((l) => {
+    let score = 0;
+    normalizeForMatch(l.tenant?.name).split(/\s+/).filter((w) => w.length >= 3).forEach((w) => { if (text.includes(w)) score += 3; });
+    const phone = String(l.tenant?.phone || "").replace(/\D/g, "").slice(-6);
+    if (phone.length === 6 && digits.includes(phone)) score += 4;
+    const s = leaseStatus(l);
+    if (Math.abs(row.amount - leaseCurrentRent(l)) < 0.01) score += 1;
+    if (s.owed > 0 && Math.abs(row.amount - s.owed) < 0.01) score += 1;
+    if (score > (best?.score || 0)) best = { leaseId: l.id, score };
+  });
+  return best && best.score >= 3 ? best.leaseId : "";
+}
+
+function rentAlreadyRecorded(row, lease) {
+  if (!lease || !row.date) return null;
+  const at = Date.parse(row.date);
+  return (lease.payments || []).find((p) => Math.abs(Number(p.amount || 0) - row.amount) < 0.01 && Math.abs(Date.parse(p.date || "") - at) <= 5 * 86400000) || null;
+}
+
+function openRentStatementImport() {
+  const leases = (rentalLeases || []).filter((l) => l.status !== "ended");
+  if (!leases.length) { showToast("Add a lease first"); return; }
+  const file = mk("input", { type: "file", accept: ".csv,.txt,.tsv,.xlsx,text/csv" });
+  const paste = mk("textarea", { rows: "4", placeholder: tr("…or paste the statement lines here") });
+  const method = selectInput([["bank", tr("Bank transfer")], ["whish", "Whish"], ["omt", "OMT"]], "bank");
+  const list = mk("div", { className: "import-rows" });
+  let rows = [];
+  const draw = () => {
+    list.replaceChildren(...(rows.length ? rows.map((r) => {
+      const pick = selectInput([["", tr("— not rent —")], ...leases.map((l) => [l.id, leaseTitle(l)])], r.leaseId);
+      const dup = rentAlreadyRecorded(r, leases.find((l) => l.id === r.leaseId));
+      const tick = mk("input", { type: "checkbox", checked: Boolean(r.leaseId) && !dup });
+      pick.addEventListener("change", () => { r.leaseId = pick.value; draw(); });
+      tick.addEventListener("change", () => { r.tick = tick.checked; });
+      r.tick = tick.checked;
+      return mk("div", { className: `import-row${dup ? " is-dup" : ""}` },
+        mk("label", { className: "checkbox-row" }, tick, mk("span", {}, mk("strong", { text: `${formatUsd(r.amount)} · ${r.date ? formatDateLabel(r.date) : "?"}` }), mk("small", { text: r.text }))),
+        pick,
+        dup ? mk("small", { className: "import-dup", text: tr("Already recorded on {date}", { date: formatDateLabel(dup.date) }) }) : null);
+    }) : [note(tr("No incoming payments found yet."))]));
+  };
+  const load = (table) => { rows = statementRowsFromTable(table).map((r) => ({ ...r, leaseId: matchRentStatementRow(r, leases) })); draw(); };
+  file.addEventListener("change", async () => {
+    const f = file.files?.[0];
+    if (!f) return;
+    try {
+      if (/\.xlsx$/i.test(f.name)) load(await tableFromXlsx(new Uint8Array(await f.arrayBuffer())));
+      else load(parseCsvText(await f.text()));
+    } catch (error) {
+      showToast(tr("Could not read that file: {msg}", { msg: error.message }), 6000);
+    }
+  });
+  paste.addEventListener("input", () => load(parseCsvText(paste.value)));
+  const save = primaryButton(tr("Record ticked payments"), async () => {
+    const chosen = rows.filter((r) => r.tick && r.leaseId);
+    if (!chosen.length) { showToast("Tick at least one payment"); return; }
+    save.disabled = true;
+    let done = 0;
+    for (const id of [...new Set(chosen.map((r) => r.leaseId))]) {
+      const lease = rentalLeases.find((l) => l.id === id);
+      const added = chosen.filter((r) => r.leaseId === id).map((r) => ({ id: newId("rent"), date: r.date || localDateInput(), amount: roundMoney(r.amount, lease.currency), method: method.value, verifyCode: newVerifyCode(), importedFrom: r.text.slice(0, 120) }));
+      const saved = await saveLease({ ...lease, payments: [...(lease.payments || []), ...added] });
+      if (!saved) break;
+      done += added.length;
+      notifyTenants(lease.flatId, tr("Rent received"), tr("{amount} recorded — thank you.", { amount: formatMoney(added.reduce((t, p) => t + p.amount, 0), lease.currency || "USD") }));
+    }
+    save.disabled = false;
+    if (!done) return;
+    closeToolDialog();
+    showToast(tr(done === 1 ? "{n} rent payment recorded with its receipt" : "{n} rent payments recorded with their receipts", { n: done }));
+  });
+  openToolDialog(tr("Import rent from a statement"),
+    note(tr("Download the statement from your bank or Whish as a CSV or Excel file. The app finds the money that came in and suggests which tenant sent it; you check each line.")),
+    field(tr("Statement file"), file),
+    paste,
+    field(tr("Paid by"), method),
+    list,
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── Your own flats: the year's rent ──
+function ownRentYearData(year, leases = rentalLeases || [], today = localDateInput()) {
+  const own = leases.filter((l) => l.ownFlat);
+  const rows = [];
+  for (let m = 1; m <= 12; m += 1) {
+    const key = `${year}-${String(m).padStart(2, "0")}`;
+    if (key > today.slice(0, 7)) break;
+    const parts = own.map((l) => ({ lease: l, c: l.currency || "USD", amount: roundMoney((l.payments || []).filter((p) => String(p.date).startsWith(key)).reduce((t, p) => t + Number(p.amount || 0), 0), l.currency || "USD") })).filter((x) => Math.abs(x.amount) > 0.005);
+    const total = {};
+    parts.forEach((x) => addMoneyTo(total, x.c, x.amount));
+    rows.push({ month: key, total, parts });
+  }
+  const total = {};
+  rows.forEach((r) => Object.entries(r.total).forEach(([c, v]) => addMoneyTo(total, c, v)));
+  const byFlat = own.map((l) => ({ lease: l, c: l.currency || "USD", amount: roundMoney(rows.reduce((t, r) => t + (r.parts.find((x) => x.lease === l)?.amount || 0), 0), l.currency || "USD") })).filter((x) => Math.abs(x.amount) > 0.005);
+  const owed = {};
+  own.filter((l) => l.status !== "ended").forEach((l) => { const s = leaseStatus(l, today); addMoneyTo(owed, s.currency, s.owed); });
+  return { year: String(year), rows, total, byFlat, owed };
+}
+
+function openOwnRentYear(year = Number(localDateInput().slice(0, 4))) {
+  const d = ownRentYearData(year);
+  openToolDialog(tr("Your flats' rent — {year}", { year }),
+    mk("div", { className: "fees-year" },
+      miniButton(currentLang === "ar" ? "›" : "‹", () => openOwnRentYear(year - 1)),
+      mk("strong", { text: String(year) }),
+      year < Number(localDateInput().slice(0, 4)) ? miniButton(currentLang === "ar" ? "‹" : "›", () => openOwnRentYear(year + 1)) : mk("span")),
+    mk("div", { className: "tech-summary-cell fees-total" }, mk("span", { text: tr("Rent received in {year}", { year }) }), mk("strong", { text: moneyListText(d.total) }),
+      Object.values(d.owed).some((v) => v > 0.005) ? mk("small", { text: tr("Still owed now: {amount}", { amount: moneyListText(d.owed) }) }) : null),
+    d.byFlat.length ? mk("div", {}, d.byFlat.map((x) => breakdownRow(leaseTitle(x.lease), formatMoney(x.amount, x.c)))) : null,
+    d.rows.some((r) => r.parts.length)
+      ? reportsSection(tr("Month by month"), mk("div", {}, d.rows.slice().reverse().filter((r) => r.parts.length).map((r) => breakdownRow(formatMonth(`${r.month}-01`), moneyListText(r.total), r.parts.map((x) => `${leaseFlat(x.lease)?.unit || ""} ${formatMoney(x.amount, x.c)}`).join(" · ")))))
+      : note(tr("No rent received this year yet.")),
+    mk("div", { className: "button-row" },
+      primaryButton("PDF", () => { void sharePdfFile(buildOwnRentYearPdf(d), `Rent_${d.year}.pdf`, tr("Your flats' rent — {year}", { year: d.year })); }),
+      secondaryButton(tr("Close"), closeToolDialog)));
+}
+
+function buildOwnRentYearPdf(d) {
+  const left = 50;
+  const right = 545;
+  const commands = ["0.2 w"];
+  let y = 800;
+  commands.push(pdfTextCommand(state.building?.name || "", left, y, 11));
+  commands.push(pdfTextCommand(tr("Your flats' rent — {year}", { year: d.year }), left, y - 28, 20, true));
+  commands.push(pdfTextCommand(tr("Date: {date}", { date: localDateInput() }), 380, y, 10));
+  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 16, 9));
+  commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+  y -= 100;
+  const table = (cols, lines) => {
+    let x = left;
+    cols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; });
+    y -= 22;
+    lines.forEach((cells, row) => {
+      x = left;
+      cells.forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, Math.floor(cols[i][1] / 4.6)), x + 5, y - 4, 8, row === lines.length - 1)); x += cols[i][1]; });
+      y -= 22;
+    });
+    y -= 20;
+  };
+  table([[tr("Flat"), 300], [tr("Rent received"), 195]], [...d.byFlat.map((x) => [leaseTitle(x.lease), formatMoney(x.amount, x.c)]), [tr("Total"), moneyListText(d.total)]]);
+  table([[tr("Month"), 120], [tr("Received"), 110], [tr("Flats"), 265]], [...d.rows.filter((r) => r.parts.length).map((r) => [formatMonth(`${r.month}-01`), moneyListText(r.total), r.parts.map((x) => `${leaseFlat(x.lease)?.unit || ""} ${formatMoney(x.amount, x.c)}`).join(", ")]), [tr("Total"), moneyListText(d.total), ""]]);
+  if (Object.values(d.owed).some((v) => v > 0.005)) commands.push(pdfTextCommand(tr("Still owed now: {amount}", { amount: moneyListText(d.owed) }), left, y, 10));
+  return buildPdfDocument(`${commands.join("\n")}\n`);
+}
+
+// ── The owner hears about a hand-over ──
+function notifyFlatOwner(flatId, title, body) {
+  if (!isOwnerSession() || !hasCloudConfig() || !flatId) return;
+  supabaseRequest("rpc/notify_flat_owner", { method: "POST", body: JSON.stringify({ p_tenant_id: flatId, p_title: title, p_body: body || "" }) }).catch(() => {});
+}
+
+function notifyOwnerOfHandOver(ref) {
+  const r = handOverReceiptData(ref);
+  if (!r) return;
+  const parts = handOverParts(ref);
+  const flat = leaseFlat(parts[0].lease);
+  const lang = tenantLanguage(flat || {});
+  const body = trIn(lang, "{amount} on {date}. The receipt is in the app under Your rented flat.", { amount: formatMoney(r.total, r.currency), date: formatDateLabel(r.date) });
+  [...new Set(parts.map((p) => p.lease.flatId))].forEach((flatId) => notifyFlatOwner(flatId, trIn(lang, "Rent handed over to you"), body));
+}
+
+// ── Move-out settlement ──
+// When a lease ends: the rent up to the last day, the deposit, what is kept
+// for damages, what goes back to the tenant (or what they still owe).
+function leaseSettlement(lease, endOn, { takeRentFromDeposit = true, damages = 0 } = {}) {
+  const c = lease.currency || "USD";
+  const s = leaseStatus({ ...lease, status: "ended", endedOn: endOn }, endOn);
+  const deposit = leaseDepositHeld(lease);
+  const kept = roundMoney(Math.max(0, Math.min(Number(damages) || 0, deposit)), c);
+  const rentFromDeposit = takeRentFromDeposit ? roundMoney(Math.min(s.owed, Math.max(0, deposit - kept)), c) : 0;
+  const stillOwed = roundMoney(s.owed - rentFromDeposit, c);
+  const depositBack = roundMoney(deposit - kept - rentFromDeposit, c);
+  const rentBack = s.owed > 0.005 ? 0 : roundMoney(s.credit, c);
+  return { currency: c, endOn, owed: s.owed, credit: s.credit, deposit, kept, rentFromDeposit, stillOwed, depositBack, rentBack, toTenant: roundMoney(depositBack + rentBack, c), paidTotal: s.paidTotal, dueTotal: s.dueTotal };
+}
+
+function openEndLeaseDialog(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const c = lease.currency || "USD";
+  const endOn = mk("input", { type: "date", value: localDateInput() });
+  const takeRent = checkboxRow(tr("Take the unpaid rent from the deposit"), true);
+  const damages = numberInput("");
+  const reason = textInput("", { maxlength: "200", placeholder: tr("e.g. Broken door, cleaning") });
+  const box = mk("div", { className: "owner-rows settlement-rows" });
+  const current = () => leaseSettlement(lease, endOn.value || localDateInput(), { takeRentFromDeposit: takeRent.input.checked, damages: damages.value });
+  const draw = () => {
+    const st = current();
+    const total = st.stillOwed > 0.005
+      ? breakdownRow(tr("The tenant still owes"), formatMoney(st.stillOwed, c))
+      : breakdownRow(tr("To give back to the tenant"), formatMoney(st.toTenant, c));
+    total.classList.add("is-total");
+    fillChildren(box,
+      breakdownRow(tr("Rent due up to the last day"), formatMoney(st.dueTotal, c)),
+      breakdownRow(tr("Rent paid"), formatMoney(st.paidTotal, c)),
+      st.owed > 0.005 ? breakdownRow(tr("Rent unpaid"), formatMoney(st.owed, c)) : null,
+      st.rentBack > 0.005 ? breakdownRow(tr("Rent paid for after the last day"), formatMoney(st.rentBack, c)) : null,
+      st.deposit ? breakdownRow(tr("Deposit held"), formatMoney(st.deposit, c)) : null,
+      st.rentFromDeposit ? breakdownRow(tr("Unpaid rent taken from the deposit"), `−${formatMoney(st.rentFromDeposit, c)}`) : null,
+      st.kept ? breakdownRow(tr("Kept for damages"), `−${formatMoney(st.kept, c)}`) : null,
+      total);
+  };
+  [endOn, damages].forEach((el) => { el.addEventListener("input", draw); el.addEventListener("change", draw); });
+  takeRent.input.addEventListener("change", draw);
+  draw();
+  const save = primaryButton(tr("End lease"), async () => {
+    const st = current();
+    const day = st.endOn;
+    const extra = [];
+    if (st.rentFromDeposit > 0.005) extra.push({ id: newId("rent"), date: day, amount: st.rentFromDeposit, method: "deposit", verifyCode: newVerifyCode(), note: tr("Taken from the deposit") });
+    if (st.rentBack > 0.005) extra.push({ id: newId("rent"), date: day, amount: -st.rentBack, method: "refund", note: tr("Rent paid for after the last day, given back") });
+    save.disabled = true;
+    const saved = await saveLease({
+      ...lease, status: "ended", endedOn: day,
+      payments: [...(lease.payments || []), ...extra],
+      deposit: { ...(lease.deposit || {}), ...(st.deposit ? { returnedOn: day, returnedAmount: st.depositBack, keptAmount: st.kept, keptReason: reason.value.trim(), rentFromDeposit: st.rentFromDeposit } : {}) },
+      settlement: { ...st, reason: reason.value.trim(), at: new Date().toISOString() },
+    });
+    save.disabled = false;
+    if (!saved) return;
+    closeToolDialog();
+    showToast("Lease ended");
+    openSettlementShare(saved.id);
+  });
+  openToolDialog(tr("End lease — {title}", { title: leaseTitle(lease) }),
+    note(tr("The app works out the rent up to the last day and what happens to the deposit. Check it, then end the lease.")),
+    field(tr("Last day"), endOn),
+    leaseDepositHeld(lease) ? mk("div", {}, takeRent.row, mk("div", { className: "two-col" }, field(tr("Kept for damages ({currency})", { currency: c }), damages), field(tr("Reason"), reason))) : null,
+    box,
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function settlementText(lease, lang = lease.tenant?.language || currentLang) {
+  const st = lease.settlement;
+  if (!st) return "";
+  const c = st.currency || lease.currency || "USD";
+  const flat = leaseFlat(lease);
+  const lines = [
+    trIn(lang, "Move-out — {building}, flat {unit}", { building: state.building?.name || "", unit: flat?.unit || "" }),
+    trIn(lang, "Last day: {date}", { date: formatDateLabel(st.endOn) }),
+    trIn(lang, "Rent due: {due} · paid: {paid}", { due: formatMoney(st.dueTotal, c), paid: formatMoney(st.paidTotal, c) }),
+  ];
+  if (st.deposit) lines.push(trIn(lang, "Deposit: {amount}", { amount: formatMoney(st.deposit, c) }));
+  if (st.rentFromDeposit) lines.push(trIn(lang, "Unpaid rent taken from the deposit: {amount}", { amount: formatMoney(st.rentFromDeposit, c) }));
+  if (st.kept) lines.push(trIn(lang, "Kept for damages: {amount}{reason}", { amount: formatMoney(st.kept, c), reason: st.reason ? ` (${st.reason})` : "" }));
+  lines.push(st.stillOwed > 0.005 ? trIn(lang, "You still owe: {amount}", { amount: formatMoney(st.stillOwed, c) }) : trIn(lang, "Given back to you: {amount}", { amount: formatMoney(st.toTenant, c) }));
+  return lines.join("\n");
+}
+
+function openSettlementShare(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease?.settlement) return;
+  const st = lease.settlement;
+  const c = st.currency || lease.currency || "USD";
+  openToolDialog(tr("Move-out settlement — {title}", { title: leaseTitle(lease) }),
+    note(st.stillOwed > 0.005 ? tr("The tenant still owes {amount}.", { amount: formatMoney(st.stillOwed, c) }) : tr("Give back {amount} to the tenant.", { amount: formatMoney(st.toTenant, c) })),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Picture (for WhatsApp)"), () => { closeToolDialog(); void shareCanvasPicture(drawSettlementLeaseCanvas(lease), `Move-out_${safeFilePart(leaseFlat(lease)?.unit || "flat", "flat")}.png`, tr("Move-out settlement")); }),
+      lease.tenant?.phone ? secondaryButton("WhatsApp", () => window.open(whatsappLink(lease.tenant.phone, settlementText(lease)), "_blank", "noopener")) : null,
+      secondaryButton(tr("Rent statement"), () => openRentStatementChoice(lease)),
+      secondaryButton(tr("Close"), closeToolDialog)));
+}
+
+function drawSettlementLeaseCanvas(lease) {
+  const st = lease.settlement;
+  const c = st.currency || lease.currency || "USD";
+  const rows = [
+    [tr("Rent due up to the last day"), formatMoney(st.dueTotal, c)],
+    [tr("Rent paid"), formatMoney(st.paidTotal, c)],
+    ...(st.rentBack > 0.005 ? [[tr("Rent paid for after the last day"), formatMoney(st.rentBack, c)]] : []),
+    ...(st.deposit ? [[tr("Deposit held"), formatMoney(st.deposit, c)]] : []),
+    ...(st.rentFromDeposit ? [[tr("Unpaid rent taken from the deposit"), `−${formatMoney(st.rentFromDeposit, c)}`]] : []),
+    ...(st.kept ? [[tr("Kept for damages") + (st.reason ? ` (${st.reason})` : ""), `−${formatMoney(st.kept, c)}`]] : []),
+  ];
+  const W = 1080;
+  const PAD = 64;
+  const H = 560 + rows.length * 80 + 120;
+  const { canvas, C, box, text } = ownerCanvas(W, H);
+  box(0, 0, W, 250, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Move-out settlement"), PAD, 160, { size: 60, weight: 800, color: C.white });
+  text(`${lease.tenant?.name || ""} · ${tr("Unit {unit}", { unit: leaseFlat(lease)?.unit || "" })} · ${tr("Last day: {date}", { date: formatDateLabel(st.endOn) })}`, PAD, 212, { size: 28, color: C.soft });
+  const owes = st.stillOwed > 0.005;
+  box(PAD, 290, W - PAD * 2, 180, C.tint, 26);
+  text(owes ? tr("The tenant still owes") : tr("To give back to the tenant"), PAD + 36, 350, { size: 30, color: C.muted });
+  text(formatMoney(owes ? st.stillOwed : st.toTenant, c), PAD + 36, 430, { size: 72, weight: 800, color: owes ? C.red : C.accent });
+  let y = 540;
+  rows.forEach(([label, value]) => {
+    text(label, PAD, y, { size: 30 });
+    text(value, W - PAD, y, { size: 30, weight: 800, align: "end" });
+    box(PAD, y + 26, W - PAD * 2, 2, C.line);
+    y += 80;
+  });
+  text(tr("Generated by Building Account Tracker"), PAD, H - 52, { size: 24, color: C.muted });
+  return canvas;
+}
+
+// ── Lease contract (English and Arabic) ──
+function leaseContractClauses(lease, lang) {
+  const c = lease.currency || "USD";
+  const flat = leaseFlat(lease);
+  const T = (en, p) => trIn(lang, en, p);
+  const money = (v) => formatMoney(v, c);
+  const monthly = (lease.period || "monthly") === "monthly";
+  const first = monthly ? leasePeriods({ ...lease, status: "active" }, lease.start).filter((p) => p.due === lease.start) : [];
+  const firstTotal = first.reduce((t, p) => t + p.amount, 0);
+  const clauses = [
+    T("1. The flat: flat {unit} in the {building} building.", { unit: flat?.unit || "", building: state.building?.name || "" }),
+    T("2. The term: from {start}{end}.", { start: formatDateLabel(lease.start), end: lease.end ? T(" to {date}", { date: formatDateLabel(lease.end) }) : T(", until either side gives notice") }),
+    T("3. The rent: {amount} {period}, the same amount every period.", { amount: money(leaseCurrentRent(lease)), period: T((LEASE_PERIODS.find(([v]) => v === lease.period) || LEASE_PERIODS[0])[1]).toLowerCase() }),
+  ];
+  if (monthly && first.length) {
+    const n = Math.max(0, first.length - 1);
+    const months = n === 1 ? T("one month") : T("{n} months", { n });
+    const onFirst = lease.start.endsWith("-01");
+    const text = n === 0
+      ? (onFirst ? "4. At signing the tenant pays {amount} for the first month. After that the rent is paid on the 1st of each month." : "4. At signing the tenant pays {amount} for the rest of the first month, by the days. After that the rent is paid on the 1st of each month.")
+      : (onFirst ? "4. At signing the tenant pays {amount}: the first month and {months} in advance. After that the rent is paid on the 1st of each month." : "4. At signing the tenant pays {amount}: the rest of the first month by the days, and {months} in advance. After that the rent is paid on the 1st of each month.");
+    clauses.push(T(text, { amount: money(firstTotal), months }));
+  } else {
+    clauses.push(T("4. The rent is paid at the start of each period, in advance."));
+  }
+  clauses.push(T("5. The rent is late {days} days after it is due.{fee}", { days: Number(lease.graceDays ?? 5), fee: lease.lateFee?.kind === "fixed" ? T(" A late fee of {amount} is then added.", { amount: money(lease.lateFee.value) }) : lease.lateFee?.kind === "percent" ? T(" A late fee of {pct}% of the rent is then added.", { pct: lease.lateFee.value }) : "" }));
+  if (Number(lease.increasePct) > 0) clauses.push(T("6. The rent goes up by {pct}% each year on the lease's anniversary.", { pct: lease.increasePct }));
+  if (Number(lease.deposit?.amount) > 0) clauses.push(T("7. Deposit: {amount}, given back when the tenant leaves, less any unpaid rent and the cost of damages.", { amount: money(lease.deposit.amount) }));
+  if (lease.tenantPaysCharges !== false) clauses.push(T("8. The tenant also pays the flat's monthly building charges (building fee, generator, water) to the building manager."));
+  clauses.push(T("9. Every payment is recorded in the building's app and the tenant receives a receipt that can be checked."));
+  return clauses;
+}
+
+function pdfMeasure(text, size, bold = false) {
+  if (!pdfNeedsImage(text)) return pdfTextWidth(text, size, bold);
+  const ctx = document.createElement("canvas").getContext("2d");
+  ctx.font = `${bold ? 700 : 400} ${size}px Tahoma, "Segoe UI", "Noto Sans Arabic", "Noto Naskh Arabic", Arial, sans-serif`;
+  return ctx.measureText(text).width;
+}
+
+function pdfWrapLines(text, size, width) {
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let line = "";
+  words.forEach((w) => {
+    const next = line ? `${line} ${w}` : w;
+    if (line && pdfMeasure(next, size) > width) { lines.push(line); line = w; } else line = next;
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function buildLeaseContractPdf(lease) {
+  const flat = leaseFlat(lease);
+  const left = 60;
+  const right = 535;
+  const pages = [];
+  const appLang = currentLang;
+  // Each page in its own language: labels, dates and amounts follow it.
+  ["en", "ar"].forEach((lang) => { currentLang = lang; try { contractPage(lang); } finally { currentLang = appLang; } });
+  return buildMultiPagePdf(pages);
+
+  function contractPage(lang) {
+    const rtl = lang === "ar";
+    const at = (text, size) => (rtl ? right - pdfMeasure(text, size) : left);
+    const T = (en, p) => trIn(lang, en, p);
+    const commands = ["0.2 w"];
+    let y = 790;
+    const line = (text, size = 10, bold = false, gap = 16) => { commands.push(pdfTextCommand(text, at(text, size), y, size, bold)); y -= gap; };
+    line(state.building?.name || "", 11);
+    y -= 8;
+    line(T("Lease agreement"), 20, true, 30);
+    line(T("The owner: {name}", { name: flat?.name || "" }), 11, false, 18);
+    line(T("The tenant: {name}{phone}", { name: lease.tenant?.name || "", phone: lease.tenant?.phone ? ` · ${lease.tenant.phone}` : "" }), 11, false, 18);
+    line(T("Managed by the building manager for the owner."), 9, false, 14);
+    commands.push(pdfLineCommand(left, y, right, y));
+    y -= 26;
+    leaseContractClauses(lease, lang).forEach((clause) => {
+      pdfWrapLines(clause, 10, right - left).forEach((l) => line(l, 10, false, 15));
+      y -= 8;
+    });
+    y -= 30;
+    const sign = (label, x) => { commands.push(pdfLineCommand(x, y, x + 200, y)); commands.push(pdfTextCommand(label, rtl ? x + 200 - pdfMeasure(label, 9) : x, y - 14, 9)); };
+    sign(T("The owner (or the building manager)"), rtl ? right - 200 : left);
+    sign(T("The tenant"), rtl ? left : right - 200);
+    commands.push(pdfTextCommand(T("Date: {date}", { date: formatDateLabel(localDateInput()) }), at(T("Date: {date}", { date: formatDateLabel(localDateInput()) }), 9), 70, 9));
+    pages.push(`${commands.join("\n")}\n`);
+  }
+}
+
+function shareLeaseContract(lease) {
+  void sharePdfFile(buildLeaseContractPdf(lease), `Lease_${safeFilePart(leaseFlat(lease)?.unit || "flat", "flat")}_${safeFilePart(lease.tenant?.name || "tenant", "tenant")}.pdf`, tr("Lease agreement"));
 }
 
 // Guard against one bad cloud write cascading into data loss on every device.
@@ -25269,6 +25820,14 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  rentalsDashData,
+  searchLeases,
+  matchRentStatementRow,
+  rentAlreadyRecorded,
+  ownRentYearData,
+  leaseSettlement,
+  leaseContractClauses,
+  ltrAmount,
   rentAllocationState,
   livePayouts,
   leaseFeesBetween,
