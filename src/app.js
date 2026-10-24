@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v209";
+const APP_VERSION = "v210";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -506,7 +506,7 @@ const I18N = {
     "sync.error": "Error",
     "sync.offline": "Offline",
     "aria.syncStatus": "Sync status",
-    "aria.logout": "Logout",
+    "aria.logout": "Lock",
     "aria.add": "Add transaction",
     "aria.prevMonth": "Previous month",
     "aria.nextMonth": "Next month",
@@ -902,7 +902,7 @@ const I18N = {
     "sync.error": "خطأ",
     "sync.offline": "غير متصل",
     "aria.syncStatus": "حالة المزامنة",
-    "aria.logout": "خروج",
+    "aria.logout": "قفل",
     "aria.add": "إضافة عملية",
     "aria.prevMonth": "الشهر السابق",
     "aria.nextMonth": "الشهر التالي",
@@ -2299,6 +2299,9 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Lock the app": "قفل التطبيق",
+  "Back to the sign-in page; Enter brings you back": "العودة إلى صفحة الدخول؛ «دخول» يعيدك",
+  "Residents join with the invite code the building manager sends them. After that, this phone stays signed in.": "ينضم السكان برمز الدعوة الذي يرسله مدير المبنى. بعد ذلك يبقى هذا الهاتف مسجّلاً.",
   "to owners · collected this month {amount}": "للمالكين · المقبوض هذا الشهر {amount}",
   "Nobody is late": "لا أحد متأخر",
   "Collected this month: {amount}": "المقبوض هذا الشهر: {amount}",
@@ -5448,7 +5451,7 @@ function showLoginScreen() {
     }),
   );
   const hasTenants = tenantsWithPin.length > 0;
-  els.loginTenantTab.classList.toggle("hidden", !hasTenants && !isTenantSession());
+  els.loginTenantTab.classList.toggle("hidden", !hasTenants && !isTenantSession() && !usesOwnerAccounts());
   renderTenantLoginForm();
   if (isTenantSession() && !els.loginTenantTab.classList.contains("active")) els.loginTenantTab.click();
   renderOwnerLoginForm();
@@ -5467,6 +5470,9 @@ let ownerLoginMode = "google";
 // Owner states: already signed in on this device (just press Enter), one of
 // the three modes above, or — without Supabase — the device password alone.
 function renderOwnerLoginForm() {
+  const join = document.querySelector("#connectBuildingButton");
+  join?.classList.remove("login-submit-btn");
+  join?.classList.add("login-link-btn");
   const accounts = usesOwnerAccounts();
   const signedIn = accounts && ownerLoginMode !== "device" && isAdminSession();
   const mode = !accounts ? "device" : signedIn ? "signedIn" : ownerLoginMode;
@@ -5480,7 +5486,7 @@ function renderOwnerLoginForm() {
   if (!els.loginOwnerForm.classList.contains("hidden")) show(els.loginSubmitBtn, mode !== "google");
   show(els.loginSwitchAccountBtn, mode === "signedIn");
   show(els.loginEmailModeBtn, mode === "google");
-  show(els.loginDeviceFallbackBtn, accounts && (mode === "google" || mode === "email"));
+  show(els.loginDeviceFallbackBtn, false);
   show(els.loginBackToAccountBtn, accounts && (mode === "email" || mode === "device"));
   const hasPassword = Boolean(state.settings.ownerPasswordHash);
   const hint = mode === "google" && pendingAdminInvite()
@@ -10358,9 +10364,26 @@ function renderTenantLoginForm() {
       ? tr("Linked as {name} — Unit {unit}", { name: me.name, unit: me.unit || "" })
       : tr("This phone is linked to a flat");
   }
-  els.loginTenantSelect.classList.toggle("hidden", linked);
-  els.loginPinInput.classList.toggle("hidden", linked);
-  els.loginUnlinkBtn.classList.toggle("hidden", !linked || els.loginTenantForm.classList.contains("hidden"));
+  // v210: with the cloud, a resident's phone only ever joins with an invite
+  // code (then stays linked): no flat list, no PIN, no manager links here.
+  const codesOnly = usesOwnerAccounts();
+  const onTab = !els.loginTenantForm.classList.contains("hidden");
+  els.loginTenantSelect.classList.toggle("hidden", linked || codesOnly);
+  els.loginPinInput.classList.toggle("hidden", linked || codesOnly);
+  let howTo = document.querySelector("#loginTenantHowTo");
+  if (!howTo) { howTo = mk("p", { id: "loginTenantHowTo", className: "login-account" }); els.loginTenantForm.append(howTo); }
+  howTo.textContent = tr("Residents join with the invite code the building manager sends them. After that, this phone stays signed in.");
+  howTo.classList.toggle("hidden", linked || !codesOnly);
+  els.loginUnlinkBtn.classList.toggle("hidden", !linked || !onTab);
+  if (onTab) {
+    els.loginSubmitBtn.classList.toggle("hidden", !linked && codesOnly);
+    [els.loginSwitchAccountBtn, els.loginEmailModeBtn, els.loginDeviceFallbackBtn, els.loginBackToAccountBtn].forEach((b) => b.classList.add("hidden"));
+    els.loginHint.classList.add("hidden");
+  }
+  const main = onTab && !linked && codesOnly;
+  const join = document.querySelector("#connectBuildingButton");
+  join?.classList.toggle("login-submit-btn", main);
+  join?.classList.toggle("login-link-btn", !main);
 }
 
 function enterAsLinkedTenant() {
@@ -12469,7 +12492,7 @@ function attachEvents() {
     els.loginError.classList.add("hidden");
     els.loginSubmitBtn.classList.remove("hidden");
     renderTenantLoginForm();
-    if (!isTenantSession()) els.loginPinInput.focus();
+    if (!isTenantSession() && !usesOwnerAccounts()) els.loginPinInput.focus();
   });
   els.loginSubmitBtn.addEventListener("click", attemptLogin);
   els.loginPasswordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
@@ -14157,7 +14180,27 @@ function handleExtraAttentionAction(row) {
   return false;
 }
 
+// v210: the manager locks from More (the top bar has no room): back to the
+// sign-in page, still signed in — Enter brings them straight back.
+function installLockMenuItem() {
+  const settings = document.querySelector("#moreMenu .more-menu-item[data-view=\"settingsView\"]");
+  let item = document.querySelector("#lockMenuItem");
+  const show = sessionMode === "owner" && usesOwnerAccounts() && isAdminSession();
+  if (!settings) return;
+  if (!item) {
+    item = mk("button", { type: "button", id: "lockMenuItem", className: "more-menu-item" },
+      mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("key", { size: 22 })),
+      mk("span", { className: "mm-text" }, mk("strong"), mk("span")));
+    item.addEventListener("click", () => { setView("dashboardView"); logout(); });
+    settings.after(item);
+  }
+  item.querySelector("strong").textContent = tr("Lock the app");
+  item.querySelector(".mm-text > span").textContent = tr("Back to the sign-in page; Enter brings you back");
+  item.classList.toggle("hidden", !show);
+}
+
 function renderV148() {
+  installLockMenuItem();
   renderRentalsDashCard();
   renderNotices();
   renderIssues();
