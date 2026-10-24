@@ -6555,3 +6555,8 @@ body.renter-phone .more-menu-item[data-view="meetingsView"] {
   display: block;
   margin-bottom: 6px;
 }
+
+.rent-dot.is-due.is-ahead {
+  box-shadow: inset 0 0 0 2px #e0a63a;
+  color: #8a5312;
+}

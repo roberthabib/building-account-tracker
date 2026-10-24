@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v195";
+const APP_VERSION = "v196";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,7 +2299,10 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
-  "Next rent on {date}: {left} left to pay ({paid} already paid)": "الإيجار التالي في {date}: يتبقى {left} (دُفع {paid})",
+  "{paid} paid ahead · {left} left": "دُفع مسبقاً {paid} · يتبقى {left}",
+  "{month}: {paid} of {rent} paid · {left} left, due {date}": "{month}: دُفع {paid} من {rent} · يتبقى {left}، يستحق في {date}",
+  "due {date}": "يستحق في {date}",
+  "{paid} of {rent} already paid": "دُفع {paid} من {rent}",
   "Months paid in advance": "عدد الأشهر المدفوعة مسبقاً",
   "At signing: {amount} ({from} – {to})": "عند التوقيع: {amount} ({from} – {to})",
   "then {amount} on the 1st of each month, from {date}": "ثم {amount} في أول كل شهر، ابتداءً من {date}",
@@ -21783,11 +21786,16 @@ function leaseStatus(lease, today = localDateInput()) {
   if (credit > 0.005 && lease?.status !== "ended") {
     const coming = leasePeriods({ ...lease, status: "active" }, addMonthsToDate(today, 120)).filter((p) => (p.due || p.start) > today);
     for (const p of coming) {
-      if (creditLeft < p.amount - 0.005) break;
+      if (creditLeft < p.amount - 0.005) {
+        // v196: the next month, partly paid ahead, shows too.
+        if (creditLeft > 0.005) ahead.push({ ...p, paid: creditLeft, left: roundMoney(p.amount - creditLeft, currency), state: "partial", ahead: true });
+        break;
+      }
       creditLeft = roundMoney(creditLeft - p.amount, currency);
       ahead.push({ ...p, paid: p.amount, left: 0, state: "paid", ahead: true });
     }
   }
+  const fullAhead = ahead.filter((p) => p.state === "paid");
   return {
     currency,
     periods: rows,
@@ -21799,7 +21807,7 @@ function leaseStatus(lease, today = localDateInput()) {
     creditLeft,
     lateAmount: roundMoney(late.reduce((s, r) => s + r.left, 0), currency),
     lateCount: late.length,
-    paidUntil: ahead.length ? ahead.at(-1).end : lastPaid ? lastPaid.end : null,
+    paidUntil: fullAhead.length ? fullAhead.at(-1).end : lastPaid ? lastPaid.end : null,
   };
 }
 
@@ -23667,7 +23675,8 @@ function rentStateClass(state) {
 }
 
 function rentStateText(p, c) {
-  return p.ahead ? tr("Paid ahead") : p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : p.paid > 0 ? tr("{amount} left", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) });
+  if (p.ahead) return p.left > 0.005 ? tr("{paid} paid ahead · {left} left", { paid: formatMoney(p.paid, c), left: formatMoney(p.left, c) }) : tr("Paid ahead");
+  return p.state === "paid" ? tr("Paid") : p.state === "late" ? tr("Late · {amount}", { amount: formatMoney(p.left, c) }) : p.paid > 0 ? tr("{amount} left", { amount: formatMoney(p.left, c) }) : tr("{amount} due", { amount: formatMoney(p.left, c) });
 }
 
 // Twelve little squares: the last rent periods, coloured by status.
@@ -23685,8 +23694,18 @@ function leaseMoneyLine(lease, s = leaseStatus(lease)) {
   const next = nextRentDue(lease);
   if (!next) return tr("Nothing more to pay on this lease");
   return s.creditLeft > 0.005
-    ? tr("Next rent on {date}: {left} left to pay ({paid} already paid)", { date: formatDateLabel(next.date), left: formatMoney(next.amount, c), paid: formatMoney(s.creditLeft, c) })
+    ? partPaidRentText(next, s)
     : tr("Next rent: {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) });
+}
+
+// The next month when part of it is already paid: "December: $461.29 of
+// $650.00 paid · $188.71 left, due 1 December 2026".
+function partPaidRentText(next, s) {
+  const c = s.currency;
+  return tr("{month}: {paid} of {rent} paid · {left} left, due {date}", {
+    month: formatMonth(next.date), paid: formatMoney(s.creditLeft, c), rent: formatMoney(roundMoney(next.amount + s.creditLeft, c), c),
+    left: formatMoney(next.amount, c), date: formatDateLabel(next.date),
+  });
 }
 
 // ── The Leases tab ──
@@ -23792,7 +23811,7 @@ function leaseSummaryCells(lease, s = leaseStatus(lease)) {
   return mk("div", { className: "tech-summary" },
     mk("div", { className: `tech-summary-cell${s.owed > 0.005 ? " is-owed" : ""}` }, mk("span", { text: tr("Owed now") }), mk("strong", { text: formatMoney(s.owed, c) })),
     mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Paid until") }), mk("strong", { text: s.paidUntil ? formatDateLabel(s.paidUntil) : "—" })),
-    mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Next rent") }), mk("strong", { text: next ? formatMoney(next.amount, c) : "—" }), mk("small", { text: next ? (next.now ? tr("now") : [formatDateLabel(next.date), s.creditLeft > 0.005 ? tr("{amount} of it already paid", { amount: formatMoney(s.creditLeft, c) }) : ""].filter(Boolean).join(" · ")) : "" })));
+    mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Next rent") }), mk("strong", { text: next ? formatMoney(next.amount, c) : "—" }), mk("small", { text: next ? (next.now ? tr("now") : [tr("due {date}", { date: formatDateLabel(next.date) }), s.creditLeft > 0.005 ? tr("{paid} of {rent} already paid", { paid: formatMoney(s.creditLeft, c), rent: formatMoney(roundMoney(next.amount + s.creditLeft, c), c) }) : ""].filter(Boolean).join(" · ")) : "" })));
 }
 
 function openLeaseDetails(id) {
@@ -23932,7 +23951,7 @@ function buildRentStatementPdf(lease) {
   rows.forEach((p) => {
     if (y < 80) { start(false); header(); }
     let x = left;
-    [leasePeriodLabel(lease, p), formatMoney(p.amount, c), formatMoney(p.paid, c), formatMoney(p.left, c), p.ahead ? "Paid ahead" : p.state === "paid" ? "Paid" : p.state === "late" ? "Late" : p.paid > 0 ? "Partial" : "Due"]
+    [leasePeriodLabel(lease, p), formatMoney(p.amount, c), formatMoney(p.paid, c), formatMoney(p.left, c), p.ahead && p.left <= 0.005 ? "Paid ahead" : p.state === "paid" ? "Paid" : p.state === "late" ? "Late" : p.paid > 0 ? "Partial" : "Due"]
       .forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, Math.floor(cols[i][1] / 4.6)), x + 5, y - 4, 8, i === 4 && p.state === "late")); x += cols[i][1]; });
     y -= 22;
   });
@@ -23994,7 +24013,7 @@ function drawRentStatementCanvas(lease) {
   text(owes ? tr("Owed now") : tr("All paid"), PAD + 36, 350, { size: 30, color: C.muted });
   text(owes ? formatMoney(s.owed, c) : "✓", PAD + 36, 430, { size: 72, weight: 800, color: owes ? C.red : C.accent });
   text(s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : "", PAD + 36, 480, { size: 30, weight: 700, color: C.ink });
-  text(next ? (next.now ? tr("Pay now: {amount}", { amount: formatMoney(next.amount, c) }) : tr("Next rent: {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) })) : "", PAD + 36, 520, { size: 28, color: C.muted });
+  text(next ? (next.now ? tr("Pay now: {amount}", { amount: formatMoney(next.amount, c) }) : s.creditLeft > 0.005 ? partPaidRentText(next, s) : tr("Next rent: {amount} on {date}", { amount: formatMoney(next.amount, c), date: formatDateLabel(next.date) })) : "", PAD + 36, 520, { size: 28, color: C.muted });
   // Lease and totals.
   text([`${formatMoney(leaseCurrentRent(lease), c)} · ${periodLabel(lease)}`, tr("since {date}", { date: formatDateLabel(lease.start) })].join(" · "), PAD, 600, { size: 28, color: C.muted });
   const cell = (i, label, value, color = C.ink) => {
