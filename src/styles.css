@@ -6947,3 +6947,31 @@ body.rtl .owner-flat-arrow {
 #rentalsDashBlock {
   margin-top: 8px;
 }
+
+/* v206 — rentals on the dashboard: due (not late yet), late, to hand over */
+.rentals-money-row b {
+  font-size: 1.05rem;
+}
+
+.rentals-money-row.is-due b {
+  color: var(--amber-text, #9a6a12);
+}
+
+.rentals-money-row.is-late b,
+.rentals-money-row.is-late strong {
+  color: var(--red-tint-text);
+}
+
+/* v206 — Rentals: the action buttons wrap instead of squeezing */
+#rentalsBody .button-row {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+#rentalsBody .button-row > button {
+  white-space: nowrap;
+}
+
+#rentalsBody .button-row .primary-button {
+  flex: 1 1 100%;
+}

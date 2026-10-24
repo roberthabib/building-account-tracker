@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v205";
+const APP_VERSION = "v206";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,11 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Due, not late yet": "مستحق، غير متأخر بعد",
+  "nobody": "لا أحد",
+  "1 tenant": "مستأجر واحد",
+  "{n} tenants": "{n} مستأجرين",
+  "To hand over to owners": "للتسليم إلى المالكين",
   "Open ›": "فتح ‹",
   "Your rentals": "إيجاراتك",
   "Send & share": "مشاركة",
@@ -23947,8 +23952,8 @@ function renderRentalLeases() {
   const chip = (id, label, n) => mk("button", { type: "button", className: `rent-filter${rentalsFilter === id ? " is-active" : ""}`, onclick: () => { rentalsFilter = id; renderRentalsView(); } }, label, n != null ? mk("span", { text: String(n) }) : null);
   return mk("div", {},
     mk("div", { className: "tech-summary" },
-      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Rent owed now") }), mk("strong", { text: moneyTotals(all.map(({ l, s }) => ({ currency: l.currency, owed: s.owed })), (x) => x.owed) })),
-      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Late") }), mk("strong", { text: String(lateList.length) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Due, not late yet") }), mk("strong", { text: moneyTotals(all.map(({ l, s }) => ({ currency: l.currency, v: Math.max(0, s.owed - s.lateAmount) })), (x) => x.v) }), mk("small", { text: tenantsCountText(all.filter(({ s }) => s.owed - s.lateAmount > 0.005).length) })),
+      mk("div", { className: `tech-summary-cell${lateList.length ? " is-owed" : ""}` }, mk("span", { text: tr("Late") }), mk("strong", { text: moneyTotals(all.map(({ l, s }) => ({ currency: l.currency, v: s.lateAmount })), (x) => x.v) }), mk("small", { text: tenantsCountText(lateList.length) })),
       mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Collected this month") }), mk("strong", { text: moneyTotals(collectedThisMonth, (x) => x.v) }))),
     mk("div", { className: "button-row" },
       primaryButton(tr("Add a lease"), () => openLeaseEditor()),
@@ -25175,14 +25180,22 @@ function ownerPhoneHandOvers(lease) {
 function rentalsDashData(leases = rentalLeases || [], today = localDateInput()) {
   const active = leases.filter((l) => l.status !== "ended");
   const owed = {};
+  // v206: what is due is split: still within the grace days, or late.
+  const dueNotLate = {};
+  const lateAmount = {};
   let late = 0;
+  let due = 0;
   active.forEach((l) => {
     const s = leaseStatus(l, today);
     addMoneyTo(owed, s.currency, s.owed);
-    if (s.lateCount > 0) late += 1;
+    const notLate = roundMoney(s.owed - s.lateAmount, s.currency);
+    addMoneyTo(dueNotLate, s.currency, Math.max(0, notLate));
+    addMoneyTo(lateAmount, s.currency, s.lateAmount);
+    if (s.lateAmount > 0.005) late += 1;
+    if (notLate > 0.005) due += 1;
   });
   const handOver = ownersSummary(rentalOwnerGroups(leases, state.tenants, today), today).toHandOver;
-  return { count: active.length, owed, late, handOver };
+  return { count: active.length, owed, late, due, dueNotLate, lateAmount, handOver };
 }
 
 function renderRentalsDashCard() {
@@ -25209,10 +25222,19 @@ function renderRentalsDashCard() {
   const d = rentalsDashData();
   card.replaceChildren(
     mk("div", { className: "panel-header" }, mk("h3", { text: d.count === 1 ? tr("1 rented flat") : tr("{n} rented flats", { n: d.count }) }), mk("span", { className: "panel-note", text: tr("Open ›") })),
-    mk("div", { className: "tech-summary" },
-      mk("div", { className: `tech-summary-cell${Object.values(d.owed).some((v) => v > 0.005) ? " is-owed" : ""}` }, mk("span", { text: tr("Rent owed now") }), mk("strong", { text: moneyListText(d.owed) })),
-      mk("div", { className: `tech-summary-cell${d.late ? " is-owed" : ""}` }, mk("span", { text: tr("Late") }), mk("strong", { text: String(d.late) })),
-      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("To hand over") }), mk("strong", { text: moneyListText(d.handOver) }))));
+    rentalsMoneyRow(tr("Due, not late yet"), tenantsCountText(d.due), moneyListText(d.dueNotLate), d.due ? "is-due" : ""),
+    rentalsMoneyRow(tr("Late"), tenantsCountText(d.late), moneyListText(d.lateAmount), d.late ? "is-late" : ""),
+    rentalsMoneyRow(tr("To hand over to owners"), "", moneyListText(d.handOver), ""));
+}
+
+function tenantsCountText(n) {
+  return n === 0 ? tr("nobody") : n === 1 ? tr("1 tenant") : tr("{n} tenants", { n });
+}
+
+function rentalsMoneyRow(label, sub, amount, state) {
+  return mk("div", { className: `breakdown-row rentals-money-row ${state}`.trim() },
+    mk("span", {}, mk("strong", { text: label }), sub ? mk("small", { text: sub }) : null),
+    mk("b", { className: "tnum", text: amount }));
 }
 
 // ── Search: leases too ──
