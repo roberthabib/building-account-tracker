@@ -52,6 +52,7 @@ test("a rent receipt lists the periods that payment paid", () => {
   const first = app.rentPaymentAllocation(lease, "p-2026-08-02", TODAY);
   assert.deepEqual(first.rows.map((r) => [r.period.start, r.applied, r.done]), [["2026-08-01", 600, true]]);
   const big = app.rentPaymentAllocation(base({ lateFee: null, payments: [pay(2000, "2026-08-02")] }), "p-2026-08-02", TODAY);
-  assert.deepEqual(big.rows.map((r) => r.applied), [600, 600, 600]);
-  assert.equal(big.credit, 200);
+  // v200: what is beyond the periods due pays the next one in advance.
+  assert.deepEqual(big.rows.map((r) => [r.applied, Boolean(r.ahead)]), [[600, false], [600, false], [600, false], [200, true]]);
+  assert.equal(big.credit, 0);
 });

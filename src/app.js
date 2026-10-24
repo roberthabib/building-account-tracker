@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v199";
+const APP_VERSION = "v200";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,10 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Part paid ahead": "دُفع جزء منه مسبقاً",
+  "Rent is applied to the oldest unpaid period first; the rest pays the next months in advance.": "يُطبَّق الإيجار على أقدم فترة غير مدفوعة أولاً؛ والباقي يدفع الأشهر التالية مسبقاً.",
+  "{period} (part)": "{period} (جزء)",
+  "For: {periods}": "عن: {periods}",
   "Leases ended and nothing left to hand over.": "انتهت العقود ولم يبقَ شيء للتسليم.",
   "owners owe you {amount}": "المالكون مدينون لك بـ {amount}",
   "Your fees this month": "عمولتك هذا الشهر",
@@ -22321,6 +22325,8 @@ function sendRentReceipt(lease, payment) {
   const lines = [trIn(lang, "Receipt — {building}", { building: state.building?.name || "" }),
     trIn(lang, "Flat {unit} · {name}", { unit: flat?.unit || "", name: lease.tenant?.name || "" })];
   if (Number(payment.amount) > 0) lines.push(trIn(lang, "Rent received: {amount} on {date}", { amount: formatMoney(payment.amount, lease.currency), date: formatDateLabel(payment.date) }));
+  const covers = Number(payment.amount) > 0 ? rentAllocationText(lease, payment.id, lang) : "";
+  if (covers) lines.push(trIn(lang, "For: {periods}", { periods: covers }));
   if (payment.chargesUsd) lines.push(trIn(lang, "Building charges received: {amount}", { amount: formatUsd(payment.chargesUsd) }));
   const s = leaseStatus(lease);
   if (s.paidUntil) lines.push(trIn(lang, "Rent paid until {date}.", { date: formatDateLabel(s.paidUntil) }));
@@ -22729,13 +22735,25 @@ function leaseSchedule(lease, today = localDateInput()) {
 }
 
 // Which rent periods one payment paid (payments fill the oldest period first).
+function rentAllocationState(r) {
+  return r.done ? (r.ahead ? "Paid ahead" : "Paid") : (r.ahead ? "Part paid ahead" : "Partial");
+}
+
+// "Nov 2026, Dec 2026 (part)": the periods one payment went to.
+function rentAllocationText(lease, paymentId, lang = currentLang) {
+  const { rows } = rentPaymentAllocation(lease, paymentId);
+  return rows.map((r) => (r.done ? leasePeriodLabel(lease, r.period) : trIn(lang, "{period} (part)", { period: leasePeriodLabel(lease, r.period) }))).join(", ");
+}
+
 function rentPaymentAllocation(lease, paymentId, today = localDateInput()) {
   const payments = (lease.payments || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.id).localeCompare(String(b.id)));
   const me = payments.find((p) => p.id === paymentId);
   if (!me) return { rows: [], credit: 0 };
   const c = lease.currency || "USD";
-  const horizon = String(me.date) > today ? String(me.date) : today;
-  const periods = withLateFees(lease, leasePeriods(lease, horizon), horizon);
+  // v200: money beyond what is due pays the coming periods, in order (up to
+  // three years ahead): the receipt names them instead of "extra (credit)".
+  const asOf = String(me.date) > today ? String(me.date) : today;
+  const periods = withLateFees(lease, leasePeriods(lease, addMonthsToDate(asOf, 36)), asOf);
   let before = payments.slice(0, payments.indexOf(me)).reduce((s, p) => s + Number(p.amount || 0), 0);
   let left = Number(me.amount || 0);
   const rows = [];
@@ -22747,7 +22765,7 @@ function rentPaymentAllocation(lease, paymentId, today = localDateInput()) {
     if (open <= 0.005) continue;
     const take = roundMoney(Math.min(open, left), c);
     left = roundMoney(left - take, c);
-    rows.push({ period: p, applied: take, done: take >= open - 0.005 });
+    rows.push({ period: p, applied: take, done: take >= open - 0.005, ahead: (p.due || p.start) > asOf });
   }
   return { rows, credit: roundMoney(Math.max(0, left), c) };
 }
@@ -22796,11 +22814,11 @@ function buildRentReceiptPdf(lease, payment) {
   commands.push(pdfTextCommand("Rent periods paid", left, y, 13, true));
   y -= 20;
   // Periods that don't start on the 1st show two full dates: give them room.
-  const cols = [["Period", 215], ["Rent", 70], ["Late fee", 60], ["This payment", 80], ["Status", 70]];
+  const cols = [["Period", 185], ["Rent", 70], ["Late fee", 55], ["This payment", 80], ["Status", 105]];
   let x = left;
   cols.forEach(([heading, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(heading, x + 5, y - 4, 8, true)); x += w; });
   y -= 22;
-  const lines = rows.map((r) => [leasePeriodLabel(lease, r.period), formatMoney(r.period.rent ?? r.period.amount, c), r.period.lateFee ? formatMoney(r.period.lateFee, c) : "-", formatMoney(r.applied, c), r.done ? "Paid" : "Partial"]);
+  const lines = rows.map((r) => [leasePeriodLabel(lease, r.period), formatMoney(r.period.rent ?? r.period.amount, c), r.period.lateFee ? formatMoney(r.period.lateFee, c) : "-", formatMoney(r.applied, c), rentAllocationState(r)]);
   if (credit > 0.005) lines.push(["Extra (credit)", "", "", formatMoney(credit, c), ""]);
   lines.slice(0, 20).forEach((cells) => {
     x = left;
@@ -22808,7 +22826,7 @@ function buildRentReceiptPdf(lease, payment) {
     y -= 22;
   });
   y -= 18;
-  commands.push(pdfTextCommand("Rent is applied to the oldest unpaid period first.", left, Math.max(52, y), 9));
+  commands.push(pdfTextCommand(tr("Rent is applied to the oldest unpaid period first; the rest pays the next months in advance."), left, Math.max(52, y), 9));
   if (payment.chargesUsd) commands.push(pdfTextCommand(tr("Building charges received with it: {amount} (separate receipt).", { amount: formatUsd(payment.chargesUsd) }), left, Math.max(40, y - 13), 9));
   return buildPdfDocument(`${commands.join("\n")}\n`);
 }
@@ -25251,6 +25269,7 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  rentAllocationState,
   livePayouts,
   leaseFeesBetween,
   ownerGroupAccount,
