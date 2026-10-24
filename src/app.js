@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v207";
+const APP_VERSION = "v208";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,9 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "to owners · collected this month {amount}": "للمالكين · المقبوض هذا الشهر {amount}",
+  "Nobody is late": "لا أحد متأخر",
+  "Collected this month: {amount}": "المقبوض هذا الشهر: {amount}",
   "Due, not late yet": "مستحق، غير متأخر بعد",
   "nobody": "لا أحد",
   "1 tenant": "مستأجر واحد",
@@ -25195,7 +25198,9 @@ function rentalsDashData(leases = rentalLeases || [], today = localDateInput()) 
     if (notLate > 0.005) due += 1;
   });
   const handOver = ownersSummary(rentalOwnerGroups(leases, state.tenants, today), today).toHandOver;
-  return { count: active.length, owed, late, due, dueNotLate, lateAmount, handOver };
+  const collectedMonth = {};
+  leases.forEach((l) => addMoneyTo(collectedMonth, l.currency || "USD", (l.payments || []).filter((p) => String(p.date).slice(0, 7) === today.slice(0, 7)).reduce((t, p) => t + Number(p.amount || 0), 0)));
+  return { count: active.length, owed, late, due, dueNotLate, lateAmount, handOver, collectedMonth };
 }
 
 function renderRentalsDashCard() {
@@ -25222,19 +25227,24 @@ function renderRentalsDashCard() {
   const d = rentalsDashData();
   card.replaceChildren(
     mk("div", { className: "panel-header" }, mk("h3", { text: d.count === 1 ? tr("1 Rented Flat") : tr("{n} Rented Flats", { n: d.count }) }), mk("span", { className: "panel-note", text: tr("Open ›") })),
-    rentalsMoneyRow(tr("Due, not late yet"), tenantsCountText(d.due), moneyListText(d.dueNotLate), d.due ? "is-due" : ""),
-    rentalsMoneyRow(tr("Late"), tenantsCountText(d.late), moneyListText(d.lateAmount), d.late ? "is-late" : ""),
-    rentalsMoneyRow(tr("To hand over to owners"), "", moneyListText(d.handOver), ""));
+    mk("div", { className: "rentals-tiles" },
+      rentalsMoneyRow(tr("Due, not late yet"), tenantsCountText(d.due), moneyListText(d.dueNotLate), d.due ? "is-due" : "is-zero", "clock"),
+      d.late
+        ? rentalsMoneyRow(tr("Late"), tenantsCountText(d.late), moneyListText(d.lateAmount), "is-late", "alert")
+        : rentalsMoneyRow(tr("Nobody is late"), "", "", "is-ok", "check"),
+      rentalsMoneyRow(tr("To hand over"), tr("to owners · collected this month {amount}", { amount: moneyListText(d.collectedMonth) }), moneyListText(d.handOver), Object.values(d.handOver).some((v) => v > 0.005) ? "is-handover" : "is-zero", "wallet")));
 }
 
 function tenantsCountText(n) {
   return n === 0 ? tr("nobody") : n === 1 ? tr("1 tenant") : tr("{n} tenants", { n });
 }
 
-function rentalsMoneyRow(label, sub, amount, state) {
-  return mk("div", { className: `breakdown-row rentals-money-row ${state}`.trim() },
-    mk("span", {}, mk("strong", { text: label }), sub ? mk("small", { text: sub }) : null),
-    mk("b", { className: "tnum", text: amount }));
+// v208: one tinted tile per figure, with an icon; quiet when it is zero.
+function rentalsMoneyRow(label, sub, amount, state, icon) {
+  return mk("div", { className: `rentals-tile ${state}`.trim() },
+    mk("span", { className: "rentals-tile-icon", "aria-hidden": "true" }, lucide(icon, { size: 18 })),
+    mk("span", { className: "rentals-tile-text" }, mk("strong", { text: label }), sub ? mk("small", { text: sub }) : null),
+    amount ? mk("b", { className: "tnum", text: amount }) : null);
 }
 
 // ── Search: leases too ──

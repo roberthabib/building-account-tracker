@@ -6975,3 +6975,92 @@ body.rtl .owner-flat-arrow {
 #rentalsBody .button-row .primary-button {
   flex: 1 1 100%;
 }
+
+/* v208 — the dashboard's rentals card: tinted tiles with icons */
+.rentals-tiles {
+  display: grid;
+  gap: 8px;
+}
+
+.rentals-tile {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.rentals-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.rentals-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rentals-tile-text strong {
+  font-size: 0.95rem;
+}
+
+.rentals-tile-text small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.rentals-tile b {
+  font-size: 1.1rem;
+  font-weight: 800;
+  white-space: nowrap;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.rentals-tile.is-due {
+  background: color-mix(in srgb, var(--amber) 13%, var(--surface));
+}
+
+.rentals-tile.is-due .rentals-tile-icon,
+.rentals-tile.is-due b {
+  color: var(--amber);
+}
+
+.rentals-tile.is-late {
+  background: var(--red-tint-bg);
+}
+
+.rentals-tile.is-late .rentals-tile-icon,
+.rentals-tile.is-late b,
+.rentals-tile.is-late strong {
+  color: var(--red-tint-text);
+}
+
+.rentals-tile.is-ok,
+.rentals-tile.is-handover {
+  background: var(--green-tint-bg);
+}
+
+.rentals-tile.is-ok .rentals-tile-icon,
+.rentals-tile.is-ok strong,
+.rentals-tile.is-handover .rentals-tile-icon,
+.rentals-tile.is-handover b {
+  color: var(--green-tint-text);
+}
+
+.rentals-tile.is-zero b {
+  color: var(--muted);
+}
+
+.rentals-dash .panel-header {
+  margin-bottom: 10px;
+}
