@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v206";
+const APP_VERSION = "v207";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2312,8 +2312,8 @@ const DYN_AR = {
   "The year": "السنة",
   "Checks": "التدقيق",
   "Rentals": "الإيجارات",
-  "1 rented flat": "شقة مؤجّرة واحدة",
-  "{n} rented flats": "{n} شقق مؤجّرة",
+  "1 Rented Flat": "شقة مؤجّرة واحدة",
+  "{n} Rented Flats": "{n} شقق مؤجّرة",
   "— not rent —": "— ليس إيجاراً —",
   "Add a lease first": "أضف عقداً أولاً",
   "{n} rent payment recorded with its receipt": "سُجّلت دفعة إيجار واحدة مع إيصالها",
@@ -25221,7 +25221,7 @@ function renderRentalsDashCard() {
   block.querySelector(".eyebrow").textContent = tr("Your rentals");
   const d = rentalsDashData();
   card.replaceChildren(
-    mk("div", { className: "panel-header" }, mk("h3", { text: d.count === 1 ? tr("1 rented flat") : tr("{n} rented flats", { n: d.count }) }), mk("span", { className: "panel-note", text: tr("Open ›") })),
+    mk("div", { className: "panel-header" }, mk("h3", { text: d.count === 1 ? tr("1 Rented Flat") : tr("{n} Rented Flats", { n: d.count }) }), mk("span", { className: "panel-note", text: tr("Open ›") })),
     rentalsMoneyRow(tr("Due, not late yet"), tenantsCountText(d.due), moneyListText(d.dueNotLate), d.due ? "is-due" : ""),
     rentalsMoneyRow(tr("Late"), tenantsCountText(d.late), moneyListText(d.lateAmount), d.late ? "is-late" : ""),
     rentalsMoneyRow(tr("To hand over to owners"), "", moneyListText(d.handOver), ""));
