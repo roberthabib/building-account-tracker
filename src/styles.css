@@ -6932,3 +6932,12 @@ body.rtl .owner-flat-arrow {
 #ledgerView .filters .date-range-filter:has(.date-range-inputs:not(.hidden)) {
   grid-column: 1 / -1;
 }
+
+/* v202 — the dashboard's rentals card: "Rent owed now" on one line */
+.rentals-dash .tech-summary {
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.55fr) minmax(0, 1.15fr);
+}
+
+.rentals-dash .tech-summary-cell span {
+  white-space: nowrap;
+}
