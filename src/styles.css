@@ -6576,3 +6576,256 @@ select.narrow-select {
 .field-stack.hidden {
   display: none;
 }
+
+/* v199 — the owners tab */
+.owners-summary-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: -4px 2px 14px;
+}
+
+.owners-summary-foot small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.owner-card {
+  display: grid;
+  gap: 12px;
+}
+
+.owner-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.owner-name {
+  font-size: 1.1rem;
+}
+
+.owner-due {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: none;
+  text-align: end;
+}
+
+.owner-due small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.owner-due strong {
+  font-size: 1.3rem;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.owner-due.is-negative strong {
+  color: var(--red);
+}
+
+.owner-due.is-zero strong,
+.owner-due.is-own strong {
+  color: var(--ink, inherit);
+}
+
+.owner-contact {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.owner-contact small {
+  margin-inline-end: auto;
+}
+
+.owner-muted {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.owner-rows {
+  padding: 2px 14px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.owner-rows .breakdown-row {
+  padding: 9px 0;
+}
+
+.owner-rows .breakdown-row strong {
+  font-weight: 500;
+}
+
+.owner-rows .breakdown-row.is-total {
+  border-top: 2px solid var(--line);
+}
+
+.owner-rows .breakdown-row.is-total strong,
+.owner-rows .breakdown-row.is-total b {
+  font-weight: 800;
+}
+
+.owner-rows > .owner-muted {
+  padding: 10px 0;
+}
+
+.owner-deposit {
+  margin: 0;
+  padding: 8px 0 10px;
+  border-top: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.owner-flats {
+  display: grid;
+  gap: 6px;
+}
+
+.owner-flat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.owner-flat-row > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.owner-flat-row small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.owner-flat-arrow {
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+body.rtl .owner-flat-arrow {
+  transform: scaleX(-1);
+}
+
+.owner-history summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 0;
+}
+
+.owner-history-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-inner);
+}
+
+.owner-history-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.owner-history-main small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.owner-history-row > b {
+  white-space: nowrap;
+}
+
+.owner-history-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+.fees-year {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.fees-total {
+  margin-bottom: 8px;
+}
+
+.owners-settled > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.owners-settled > summary::-webkit-details-marker {
+  display: none;
+}
+
+.owners-settled > summary::after {
+  content: "▾";
+  margin-inline-start: auto;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+
+.owners-settled[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+.owners-settled[open] {
+  display: grid;
+  gap: 12px;
+}
+
+.owners-settled-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+}
+
+/* Amounts keep "−$380.00" in Arabic too. */
+.owner-rows b,
+.owner-history-row > b,
+.owner-due strong,
+.owners-summary .tech-summary-cell strong {
+  direction: ltr;
+  unicode-bidi: isolate;
+}

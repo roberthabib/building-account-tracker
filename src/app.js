@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v198";
+const APP_VERSION = "v199";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -2299,6 +2299,86 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "Leases ended and nothing left to hand over.": "انتهت العقود ولم يبقَ شيء للتسليم.",
+  "owners owe you {amount}": "المالكون مدينون لك بـ {amount}",
+  "Your fees this month": "عمولتك هذا الشهر",
+  "Your fees this year": "عمولتك هذه السنة",
+  "Expenses paid for owners this year: {amount}": "مصاريف دفعتها عن المالكين هذه السنة: {amount}",
+  "Fees report": "تقرير العمولات",
+  "Nothing to hand over": "لا شيء للتسليم",
+  "Due to owner": "مستحق للمالك",
+  "Owner owes you": "المالك مدين لك",
+  "1 flat": "شقة واحدة",
+  "{n} flats": "{n} شقق",
+  "+ {n} ended leases, settled": "+ {n} عقود منتهية ومُسوّاة",
+  "+ 1 ended lease, settled": "+ عقد منتهٍ ومُسوّى",
+  "+ 1 ended lease": "+ عقد منتهٍ",
+  "Deposit held for the tenant: {amount} (it goes back to the tenant, not to the owner)": "تأمين محفوظ للمستأجر: {amount} (يُعاد للمستأجر، لا للمالك)",
+  "No rent collected yet.": "لم يُقبض أي إيجار بعد.",
+  "Expenses paid for the owner": "مصاريف دُفعت عن المالك",
+  "owner owes you {amount}": "المالك مدين لك بـ {amount}",
+  "due {amount}": "مستحق {amount}",
+  "Nothing collected yet": "لم يُقبض شيء بعد",
+  "collected {amount}": "مقبوض {amount}",
+  "No fee, nothing to hand over": "بلا عمولة ولا تسليم",
+  "Rent collected in {year}": "الإيجار المقبوض في {year}",
+  "+ {n} ended leases": "+ {n} عقود منتهية",
+  "Hand-overs and expenses ({n})": "التسليمات والمصاريف ({n})",
+  "Hand-overs and expenses": "التسليمات والمصاريف",
+  "expense": "مصروف",
+  "Which flat?": "أي شقة؟",
+  "Owner: {name}": "المالك: {name}",
+  "Lease": "العقد",
+  "Delete this expense of {amount}?": "حذف هذا المصروف بقيمة {amount}؟",
+  "Hand-over — {date}": "تسليم — {date}",
+  "Correct a mistake in this hand-over, or delete it if it didn't happen.": "صحّح خطأً في هذا التسليم، أو احذفه إن لم يحصل.",
+  "{flat} ({currency})": "{flat} ({currency})",
+  "Delete this hand-over of {amount}? Its receipt will show as cancelled.": "حذف هذا التسليم بقيمة {amount}؟ سيظهر إيصاله ملغى.",
+  "Hand-over corrected": "تم تصحيح التسليم",
+  "Hand-over deleted": "تم حذف التسليم",
+  "Enter the phone number": "أدخل رقم الهاتف",
+  "Phone number saved": "تم حفظ رقم الهاتف",
+  "{name}'s phone": "هاتف {name}",
+  "Saved on their flats (Flats tab), for WhatsApp statements and receipts.": "يُحفظ على شققه (تبويب الشقق)، لكشوف الحساب والإيصالات عبر واتساب.",
+  "Due to {name} now: {amount}": "المستحق لـ {name} الآن: {amount}",
+  "Nothing is due to {name} now.": "لا شيء مستحق لـ {name} الآن.",
+  "One hand-over for the {n} flats: the app shares it between them.": "تسليم واحد للشقق الـ {n}: يوزّعه التطبيق بينها.",
+  "Only part of the hand-over was saved: check the list and try again.": "حُفظ جزء من التسليم فقط: راجع القائمة وحاول مجدداً.",
+  "Hand-over receipt": "إيصال تسليم",
+  "{amount} handed over to {name} on {date}. Send them the receipt: they can check it with the QR code.": "سُلِّم {amount} إلى {name} بتاريخ {date}. أرسل له الإيصال: يمكنه التحقق منه برمز QR.",
+  "Handed over to {name}": "سُلِّم إلى {name}",
+  "rent collected for you, after the fee and expenses": "إيجار قُبض لك، بعد العمولة والمصاريف",
+  "Scan to check this receipt": "امسح للتحقق من هذا الإيصال",
+  "The check shows the building, the flats and the amount.": "يُظهر التحقق المبنى والشقق والمبلغ.",
+  "Handed over to": "سُلِّم إلى",
+  "Rent collected for you by the building manager, after the fee and expenses.": "إيجار قبضه مدير المبنى لك، بعد العمولة والمصاريف.",
+  "Received by (signature)": "استلمه (التوقيع)",
+  "This year": "هذه السنة",
+  "Last year": "السنة الماضية",
+  "Since the first lease": "منذ أول عقد",
+  "Choose dates": "اختيار التواريخ",
+  "Statement — {name}": "كشف حساب — {name}",
+  "Rent collected, your fee, expenses and hand-overs for the period, and what is due to the owner now.": "الإيجار المقبوض وعمولتك والمصاريف والتسليمات خلال الفترة، وما يستحق للمالك الآن.",
+  "Owner statement": "كشف حساب المالك",
+  "WhatsApp text": "نص واتساب",
+  "Hello {name}, rent statement from {from} to {to}:": "مرحباً {name}، كشف الإيجار من {from} إلى {to}:",
+  "Handed over to you: {amount}": "سُلِّم إليك: {amount}",
+  "You owe the building manager: {amount}": "أنت مدين لمدير المبنى بـ: {amount}",
+  "Tenant's deposit held: {amount} (to give back to the tenant)": "تأمين المستأجر المحفوظ: {amount} (يُعاد للمستأجر)",
+  "You owe the building manager": "أنت مدين لمدير المبنى",
+  "Fee and expenses": "العمولة والمصاريف",
+  "For the period above; \"due to you now\" counts everything since the start.": "للفترة أعلاه؛ «المستحق لك الآن» يحتسب كل شيء منذ البداية.",
+  "Nothing in this period.": "لا شيء في هذه الفترة.",
+  "fee {amount}": "عمولة {amount}",
+  "None in this period.": "لا شيء في هذه الفترة.",
+  "Period: {from} - {to}": "الفترة: {from} - {to}",
+  "{name} - statement (continued)": "{name} - كشف حساب (تابع)",
+  "Handed over to you": "سُلِّم إليك",
+  "Tenant's deposit held": "تأمين المستأجر المحفوظ",
+  "Your fees — {year}": "عمولتك — {year}",
+  "Fees earned in {year}": "العمولات المكتسبة في {year}",
+  "No fees this year yet.": "لا عمولات هذه السنة بعد.",
+  "Picture": "صورة",
   "{paid} paid ahead · {left} left": "دُفع مسبقاً {paid} · يتبقى {left}",
   "{month}: {paid} of {rent} paid · {left} left, due {date}": "{month}: دُفع {paid} من {rent} · يتبقى {left}، يستحق في {date}",
   "due {date}": "يستحق في {date}",
@@ -21831,7 +21911,7 @@ function leaseOwnerAccount(lease, today = localDateInput()) {
   }
   fee = roundMoney(fee, c);
   const deductions = sum(lease.deductions);
-  const paidOut = sum(lease.payouts);
+  const paidOut = sum(livePayouts(lease));
   return {
     currency: c,
     collected: s.paidTotal,
@@ -21955,34 +22035,6 @@ function leasePill(lease, s = leaseStatus(lease)) {
   return mk("span", { className: "status-pill tech-status-done", text: s.paidUntil ? tr("Paid until {date}", { date: formatDateLabel(s.paidUntil) }) : tr("Up to date") });
 }
 
-
-function renderRentalOwners() {
-  const groups = new Map();
-  rentalLeases.forEach((l) => {
-    const flat = leaseFlat(l);
-    const key = l.ownFlat ? "__mine" : (flat?.name || tr("Unknown owner")).trim().toLowerCase();
-    if (!groups.has(key)) groups.set(key, { name: l.ownFlat ? tr("Your own flats") : (flat?.name || tr("Unknown owner")), phone: flat?.phone || "", own: Boolean(l.ownFlat), leases: [] });
-    groups.get(key).leases.push(l);
-  });
-  if (!groups.size) return note(tr("Owners appear here once you add their flat's lease."));
-  const list = [...groups.values()].sort((a, b) => Number(a.own) - Number(b.own) || a.name.localeCompare(b.name));
-  return mk("div", {}, list.map((g) => reportsSection(g.name, mk("div", {}, g.leases.map((l) => {
-    const a = leaseOwnerAccount(l);
-    const lines = g.own
-      ? [tr("Collected {amount}", { amount: formatMoney(a.collected, a.currency) })]
-      : [tr("Collected {amount}", { amount: formatMoney(a.collected, a.currency) }), tr("your fee {amount}", { amount: formatMoney(a.fee, a.currency) }),
-        a.deductions ? tr("expenses {amount}", { amount: formatMoney(a.deductions, a.currency) }) : "", tr("handed over {amount}", { amount: formatMoney(a.paidOut, a.currency) })].filter(Boolean);
-    return mk("div", { className: "rent-pay-row" },
-      mk("div", { className: "rent-pay-head" },
-        mk("span", { className: "tech-person-main" }, mk("strong", { text: leaseTitle(l) }), mk("small", { text: lines.join(" · ") })),
-        g.own ? null : mk("span", { className: "rent-owner-due" }, mk("small", { text: tr("To hand over") }), mk("strong", { text: formatMoney(a.toHandOver, a.currency) }))),
-      g.own ? null : mk("div", { className: "notice-actions" },
-        miniButton(tr("Hand over"), () => openPayoutDialog(l.id)),
-        miniButton(tr("Expense"), () => openDeductionDialog(l.id)),
-        miniButton(tr("Statement"), () => sendOwnerStatement(l)),
-        miniButton("PDF", () => shareOwnerStatementPdf(l))));
-  })))));
-}
 
 // ── Lease editor ──
 function openLeaseEditor(id = null, prefill = null) {
@@ -22189,9 +22241,10 @@ function openPayoutDialog(id) {
     const value = roundMoney(Number(amount.value), a.currency);
     if (!(value > 0)) { showToast("Enter the amount"); return; }
     save.disabled = true;
-    const saved = await saveLease({ ...lease, payouts: [...(lease.payouts || []), { id: newId("out"), date: date.value || localDateInput(), amount: value, method: method.value }] });
+    const ref = newId("HO").toUpperCase();
+    const saved = await saveLease({ ...lease, payouts: [...(lease.payouts || []), { id: newId("out"), receipt: ref, verifyCode: newVerifyCode(), date: date.value || localDateInput(), amount: value, method: method.value }] });
     save.disabled = false;
-    if (saved) { closeToolDialog(); showToast("Hand-over recorded"); }
+    if (saved) { closeToolDialog(); showToast("Hand-over recorded"); openHandOverReceipt(ref); }
   });
   openToolDialog(tr("Hand over to {name}", { name: leaseFlat(lease)?.name || tr("the owner") }),
     note(tr("To hand over now: {amount}", { amount: formatMoney(a.toHandOver, a.currency) })),
@@ -22419,6 +22472,7 @@ function openOwnerRentalSheet(id) {
       ...(lease.deductions || []).map((d) => breakdownRow(d.description, `−${formatMoney(d.amount, c)}`, formatDateLabel(d.date))),
       breakdownRow(tr("Already handed over"), `−${formatMoney(a.paidOut, c)}`),
       breakdownRow(tr("Due to you now"), formatMoney(a.toHandOver, c)))),
+    ownerPhoneHandOvers(lease),
     reportsSection(tr("Rent payments"), payments.length ? mk("div", {}, payments.map((p) => breakdownRow(formatDateLabel(p.date), formatMoney(p.amount, c)))) : note(tr("No payments yet."))),
     mk("div", { className: "button-row" }, primaryButton(tr("Statement PDF"), () => shareOwnerStatementPdf(lease))));
 }
@@ -22520,7 +22574,7 @@ function receiptCheckLink({ ref, code, amount, kind = "building", lang = state.s
   if (!ref || !code) return "";
   const origin = typeof location !== "undefined" && /^https?:/.test(location.origin || "") ? location.origin : APP_HOME;
   const q = new URLSearchParams({ b: currentBuildingId(), r: ref, c: code, a: String(Math.round(Number(amount || 0) * 100) / 100), l: lang === "ar" ? "ar" : "en" });
-  if (kind === "rent") q.set("k", "rent");
+  if (kind !== "building") q.set("k", kind);
   return `${origin}/verify?${q}`;
 }
 
@@ -23319,7 +23373,7 @@ function ownerStatementMonths(lease, year) {
     const due = s.periods.filter((p) => p.start.slice(0, 7) === key).reduce((t, p) => t + p.amount, 0);
     const collected = sum(lease.payments);
     const fee = roundMoney(pct ? (collected * pct) / 100 : fixed * s.periods.filter((p) => p.start.slice(0, 7) === key && p.state === "paid").length, c);
-    const row = { month: key, due: roundMoney(due, c), collected: roundMoney(collected, c), fee, expenses: roundMoney(sum(lease.deductions), c), handedOver: roundMoney(sum(lease.payouts), c) };
+    const row = { month: key, due: roundMoney(due, c), collected: roundMoney(collected, c), fee, expenses: roundMoney(sum(lease.deductions), c), handedOver: roundMoney(sum(livePayouts(lease)), c) };
     if (row.due || row.collected || row.expenses || row.handedOver) rows.push(row);
   }
   return rows;
@@ -24142,6 +24196,848 @@ function openMyRentPayments() {
     lease.deposit?.amount ? note(tr("Deposit paid: {amount}", { amount: formatMoney(lease.deposit.amount, c) })) : null);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// v199 — the owners tab
+// ═══════════════════════════════════════════════════════════════════════════
+// One card per owner (all their flats): what is due to them in clear rows,
+// their phone, the hand-overs and expenses (each can be corrected), one
+// hand-over for all their flats with a receipt the owner can check, and the
+// tenant's deposit kept apart. On top: what you hand over in all and your
+// fees. Owners whose leases ended and who are paid fold away under Settled.
+// A deleted hand-over keeps its line with voidedAt, so its receipt says
+// cancelled (verify_receipt kind "handover", supabase/phase2v-v199.sql).
+let ownersSettledOpen = false;
+const ownersHistoryOpen = new Set();
+
+function livePayouts(lease) {
+  return (lease?.payouts || []).filter((p) => !p.voidedAt);
+}
+
+// Your fee on the rent received between two dates (fixed fee: per rent
+// period paid that falls due in them).
+function leaseFeesBetween(lease, from, to, today = localDateInput()) {
+  if (lease.ownFlat || !(Number(lease.fee?.value) > 0)) return 0;
+  const c = lease.currency || "USD";
+  const inRange = (d) => String(d || "") >= from && String(d || "") <= to;
+  if (lease.fee.kind === "fixed") {
+    return roundMoney(Number(lease.fee.value) * leaseStatus(lease, today).periods.filter((p) => p.state === "paid" && inRange(p.due || p.start)).length, c);
+  }
+  const paid = (lease.payments || []).filter((p) => inRange(p.date)).reduce((t, p) => t + Number(p.amount || 0), 0);
+  return roundMoney((paid * Number(lease.fee.value)) / 100, c);
+}
+
+function leaseDepositHeld(lease) {
+  return lease.deposit?.amount && !lease.deposit.returnedOn ? Number(lease.deposit.amount) || 0 : 0;
+}
+
+// Money kept per currency: { USD: 12.5 } → "$12.50" (several: "$12.50 + 1,000 LBP").
+function addMoneyTo(map, currency, value) {
+  map[currency] = roundMoney((map[currency] || 0) + (Number(value) || 0), currency);
+  return map;
+}
+
+function moneyListText(map) {
+  const parts = Object.entries(map).filter(([, v]) => Math.abs(v) > 0.005).map(([c, v]) => formatMoney(v, c));
+  return parts.length ? parts.join(" + ") : formatMoney(0, Object.keys(map)[0] || "USD");
+}
+
+function ownerGroupAccount(leases, today = localDateInput()) {
+  const by = {};
+  leases.forEach((l) => {
+    const a = leaseOwnerAccount(l, today);
+    const t = by[a.currency] || (by[a.currency] = { collected: 0, fee: 0, deductions: 0, paidOut: 0, toHandOver: 0, deposit: 0 });
+    ["collected", "fee", "deductions", "paidOut", "toHandOver"].forEach((k) => { t[k] = roundMoney(t[k] + a[k], a.currency); });
+    t.deposit = roundMoney(t.deposit + leaseDepositHeld(l), a.currency);
+  });
+  return by;
+}
+
+// The flat's owner groups the leases (an owner with two flats = one card).
+function rentalOwnerGroups(leases = rentalLeases || [], flats = state.tenants, today = localDateInput()) {
+  const groups = new Map();
+  leases.forEach((l) => {
+    const flat = flats.find((t) => t.id === l.flatId) || null;
+    const name = String(flat?.name || "").trim() || tr("Unknown owner");
+    const key = l.ownFlat ? "__mine" : name.toLowerCase();
+    if (!groups.has(key)) groups.set(key, { key, name: l.ownFlat ? tr("Your own flats") : name, own: Boolean(l.ownFlat), leases: [], flats: [] });
+    const g = groups.get(key);
+    g.leases.push(l);
+    if (flat && !g.flats.includes(flat)) g.flats.push(flat);
+  });
+  const unit = (l) => String(flats.find((t) => t.id === l.flatId)?.unit || "");
+  return [...groups.values()].map((g) => {
+    g.leases.sort((x, y) => unit(x).localeCompare(unit(y), undefined, { numeric: true }) || String(x.start).localeCompare(String(y.start)));
+    g.flats.sort((x, y) => String(x.unit || "").localeCompare(String(y.unit || ""), undefined, { numeric: true }));
+    const account = ownerGroupAccount(g.leases, today);
+    const settled = g.leases.every((l) => l.status === "ended") && Object.values(account).every((t) => Math.abs(t.toHandOver) <= 0.005);
+    return { ...g, phone: g.flats.map((f) => f.phone).find(Boolean) || "", account, settled };
+  }).sort((a, b) => Number(a.own) - Number(b.own) || Number(a.settled) - Number(b.settled) || a.name.localeCompare(b.name));
+}
+
+function ownersSummary(groups, today = localDateInput()) {
+  const month = today.slice(0, 7);
+  const year = today.slice(0, 4);
+  const out = { toHandOver: {}, ownersOwe: {}, feesMonth: {}, feesYear: {}, expensesYear: {} };
+  groups.filter((g) => !g.own).forEach((g) => {
+    Object.entries(g.account).forEach(([c, t]) => {
+      addMoneyTo(out.toHandOver, c, Math.max(0, t.toHandOver));
+      addMoneyTo(out.ownersOwe, c, Math.max(0, -t.toHandOver));
+    });
+    g.leases.forEach((l) => {
+      const c = l.currency || "USD";
+      addMoneyTo(out.feesMonth, c, leaseFeesBetween(l, `${month}-01`, `${month}-31`, today));
+      addMoneyTo(out.feesYear, c, leaseFeesBetween(l, `${year}-01-01`, `${year}-12-31`, today));
+      addMoneyTo(out.expensesYear, c, (l.deductions || []).filter((d) => String(d.date).startsWith(year)).reduce((t, d) => t + Number(d.amount || 0), 0));
+    });
+  });
+  return out;
+}
+
+// A hand-over shared by several flats: the biggest amounts due first; what is
+// more than is due goes to the first flat.
+function splitHandOver(leases, value, today = localDateInput()) {
+  const c = leases[0]?.currency || "USD";
+  const due = leases.map((l) => ({ leaseId: l.id, due: Math.max(0, leaseOwnerAccount(l, today).toHandOver), active: l.status !== "ended" }))
+    .sort((a, b) => b.due - a.due || Number(b.active) - Number(a.active));
+  let left = roundMoney(value, c);
+  const parts = [];
+  due.forEach((d) => {
+    const take = roundMoney(Math.min(left, d.due), c);
+    if (take > 0.005) { parts.push({ leaseId: d.leaseId, amount: take }); left = roundMoney(left - take, c); }
+  });
+  if (left > 0.005 && due.length) {
+    if (!parts.length) parts.push({ leaseId: (due.find((d) => d.active) || due[0]).leaseId, amount: 0 });
+    parts[0].amount = roundMoney(parts[0].amount + left, c);
+  }
+  return parts;
+}
+
+function flatUnitLabel(lease) {
+  const unit = leaseFlat(lease)?.unit;
+  return unit ? tr("Flat {unit}", { unit }) : "";
+}
+
+// ── The tab ──
+function renderRentalOwners() {
+  const groups = rentalOwnerGroups();
+  if (!groups.length) return note(tr("Owners appear here once you add their flat's lease."));
+  const active = groups.filter((g) => !g.settled);
+  const settled = groups.filter((g) => g.settled);
+  let fold = null;
+  if (settled.length) {
+    fold = mk("details", { className: "panel owners-settled" },
+      mk("summary", {}, mk("strong", { text: tr("Settled") }), mk("span", { className: "owners-settled-count", text: String(settled.length) })),
+      note(tr("Leases ended and nothing left to hand over.")),
+      ...settled.map((g) => (g.own ? ownFlatsCard(g) : ownerCard(g))));
+    fold.open = ownersSettledOpen;
+    fold.addEventListener("toggle", () => { ownersSettledOpen = fold.open; });
+  }
+  return mk("div", {}, ownersSummaryBlock(ownersSummary(groups)), ...active.map((g) => (g.own ? ownFlatsCard(g) : ownerCard(g))), fold);
+}
+
+function ownersSummaryBlock(sum) {
+  const owe = Object.values(sum.ownersOwe).some((v) => v > 0.005);
+  return mk("div", { className: "owners-summary" },
+    mk("div", { className: "tech-summary" },
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("To hand over") }), mk("strong", { text: moneyListText(sum.toHandOver) }),
+        owe ? mk("small", { text: tr("owners owe you {amount}", { amount: moneyListText(sum.ownersOwe) }) }) : null),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Your fees this month") }), mk("strong", { text: moneyListText(sum.feesMonth) })),
+      mk("div", { className: "tech-summary-cell" }, mk("span", { text: tr("Your fees this year") }), mk("strong", { text: moneyListText(sum.feesYear) }))),
+    mk("div", { className: "owners-summary-foot" },
+      mk("small", { text: tr("Expenses paid for owners this year: {amount}", { amount: moneyListText(sum.expensesYear) }) }),
+      miniButton(tr("Fees report"), () => openFeesReport())));
+}
+
+function ownerDueLabel(t) {
+  if (!t || Math.abs(t.toHandOver) <= 0.005) return tr("Nothing to hand over");
+  return t.toHandOver > 0 ? tr("Due to owner") : tr("Owner owes you");
+}
+
+function ownerCard(g) {
+  const [mainC, main] = Object.entries(g.account).sort((a, b) => Math.abs(b[1].toHandOver) - Math.abs(a[1].toHandOver))[0] || ["USD", null];
+  const zero = !main || Math.abs(main.toHandOver) <= 0.005;
+  const shown = g.settled ? g.leases : g.leases.filter((l) => l.status !== "ended" || Math.abs(leaseOwnerAccount(l).toHandOver) > 0.005);
+  const hiddenEnded = g.leases.length - shown.length;
+  return mk("section", { className: "panel owner-card" },
+    mk("div", { className: "owner-card-head" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { className: "owner-name", text: g.name }),
+        mk("small", { text: g.flats.length === 1 ? tr("1 flat") : tr("{n} flats", { n: g.flats.length }) })),
+      mk("span", { className: `owner-due${zero ? " is-zero" : main.toHandOver < 0 ? " is-negative" : ""}` },
+        mk("small", { text: ownerDueLabel(main) }), mk("strong", { text: formatMoney(main ? Math.abs(main.toHandOver) : 0, mainC) }))),
+    ownerContactRow(g),
+    ...Object.entries(g.account).map(([c, t]) => ownerAccountRows(t, c)),
+    mk("div", { className: "owner-flats" },
+      shown.map((l) => ownerFlatRow(l)),
+      hiddenEnded ? mk("small", { className: "owner-muted", text: hiddenEnded === 1 ? tr("+ 1 ended lease, settled") : tr("+ {n} ended leases, settled", { n: hiddenEnded }) }) : null),
+    mk("div", { className: "notice-actions" },
+      g.settled ? null : mk("button", { type: "button", className: `mini-button${zero || main.toHandOver < 0 ? "" : " is-primary"}`, text: tr("Hand over"), onclick: () => openOwnerHandOverDialog(g.key) }),
+      g.settled ? null : miniButton(tr("Expense"), () => pickOwnerLease(g, (id) => openDeductionDialog(id))),
+      miniButton(tr("Statement"), () => openOwnerStatementDialog(g.key))),
+    ownerHistory(g));
+}
+
+function ownerContactRow(g) {
+  if (!g.phone) {
+    return mk("div", { className: "owner-contact" }, mk("small", { className: "owner-muted", text: tr("No phone number") }), miniButton(tr("Add phone"), () => openOwnerPhoneDialog(g.key)));
+  }
+  return mk("div", { className: "owner-contact" }, mk("small", { className: "owner-muted tnum", text: g.phone }),
+    mk("a", { className: "mini-button", href: `tel:${g.phone}`, text: tr("Call") }),
+    mk("a", { className: "mini-button", href: whatsappLink(g.phone, ""), target: "_blank", rel: "noopener", text: "WhatsApp" }));
+}
+
+function ownerAccountRows(t, c) {
+  const deposit = t.deposit ? mk("p", { className: "owner-deposit", text: tr("Deposit held for the tenant: {amount} (it goes back to the tenant, not to the owner)", { amount: formatMoney(t.deposit, c) }) }) : null;
+  if (!(t.collected > 0.005) && !t.deductions && !t.paidOut) return mk("div", { className: "owner-rows" }, mk("p", { className: "owner-muted", text: tr("No rent collected yet.") }), deposit);
+  const total = breakdownRow(t.toHandOver < -0.005 ? tr("Owner owes you") : tr("Due to owner"), formatMoney(Math.abs(t.toHandOver), c));
+  total.classList.add("is-total");
+  return mk("div", { className: "owner-rows" },
+    breakdownRow(tr("Rent collected"), formatMoney(t.collected, c)),
+    t.fee ? breakdownRow(tr("Your fee"), `−${formatMoney(t.fee, c)}`) : null,
+    t.deductions ? breakdownRow(tr("Expenses paid for the owner"), `−${formatMoney(t.deductions, c)}`) : null,
+    t.paidOut ? breakdownRow(tr("Already handed over"), `−${formatMoney(t.paidOut, c)}`) : null,
+    total,
+    deposit);
+}
+
+function ownerFlatRow(l) {
+  const a = leaseOwnerAccount(l);
+  const c = a.currency;
+  const due = a.toHandOver < -0.005 ? tr("owner owes you {amount}", { amount: formatMoney(-a.toHandOver, c) }) : tr("due {amount}", { amount: formatMoney(a.toHandOver, c) });
+  const text = !(a.collected > 0.005) && !a.deductions ? tr("Nothing collected yet")
+    : [l.status === "ended" ? tr("Ended") : "", tr("collected {amount}", { amount: formatMoney(a.collected, c) }), due].filter(Boolean).join(" · ");
+  return mk("button", { type: "button", className: "owner-flat-row", onclick: () => openOwnerLeaseAccount(l.id) },
+    mk("span", {}, mk("strong", { text: leaseTitle(l) }), mk("small", { text })),
+    mk("span", { className: "owner-flat-arrow", "aria-hidden": "true", text: "›" }));
+}
+
+function ownFlatsCard(g) {
+  const year = localDateInput().slice(0, 4);
+  const collected = {};
+  g.leases.forEach((l) => addMoneyTo(collected, l.currency || "USD", (l.payments || []).filter((p) => String(p.date).startsWith(year)).reduce((t, p) => t + Number(p.amount || 0), 0)));
+  const shown = g.leases.filter((l) => l.status !== "ended");
+  const ended = g.leases.length - shown.length;
+  return mk("section", { className: "panel owner-card" },
+    mk("div", { className: "owner-card-head" },
+      mk("span", { className: "tech-person-main" }, mk("strong", { className: "owner-name", text: g.name }), mk("small", { text: tr("No fee, nothing to hand over") })),
+      mk("span", { className: "owner-due is-own" }, mk("small", { text: tr("Rent collected in {year}", { year }) }), mk("strong", { text: moneyListText(collected) }))),
+    mk("div", { className: "owner-flats" },
+      shown.map((l) => mk("button", { type: "button", className: "owner-flat-row", onclick: () => openLeaseDetails(l.id) },
+        mk("span", {}, mk("strong", { text: leaseTitle(l) }), mk("small", { text: leaseMoneyLine(l) })),
+        mk("span", { className: "owner-flat-arrow", "aria-hidden": "true", text: "›" }))),
+      ended ? mk("small", { className: "owner-muted", text: ended === 1 ? tr("+ 1 ended lease") : tr("+ {n} ended leases", { n: ended }) }) : null));
+}
+
+// ── Hand-overs and expenses: the list, corrections ──
+function ownerHistoryEntries(leases) {
+  const list = [];
+  leases.forEach((l) => (l.deductions || []).forEach((d) => list.push({ kind: "expense", lease: l, item: d, date: d.date, amount: Number(d.amount || 0), c: l.currency || "USD" })));
+  const receipts = new Map();
+  leases.forEach((l) => livePayouts(l).forEach((p) => {
+    const ref = p.receipt || p.id;
+    const r = receipts.get(ref) || { kind: "handover", ref, date: p.date, method: p.method, amount: 0, c: l.currency || "USD", parts: [] };
+    r.amount = roundMoney(r.amount + Number(p.amount || 0), r.c);
+    r.parts.push({ lease: l, item: p });
+    receipts.set(ref, r);
+  }));
+  return [...list, ...receipts.values()].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+}
+
+function ownerHistory(g) {
+  const entries = ownerHistoryEntries(g.leases);
+  if (!entries.length) return null;
+  const box = mk("details", { className: "owner-history" },
+    mk("summary", { text: tr("Hand-overs and expenses ({n})", { n: entries.length }) }),
+    ...entries.map((e) => ownerHistoryRow(e)));
+  box.open = ownersHistoryOpen.has(g.key);
+  box.addEventListener("toggle", () => { if (box.open) ownersHistoryOpen.add(g.key); else ownersHistoryOpen.delete(g.key); });
+  return box;
+}
+
+function ownerHistoryRow(e) {
+  const where = e.kind === "handover" ? (e.parts.length > 1 ? tr("{n} flats", { n: e.parts.length }) : flatUnitLabel(e.parts[0].lease)) : flatUnitLabel(e.lease);
+  return mk("div", { className: "owner-history-row" },
+    mk("span", { className: "owner-history-main" },
+      mk("strong", { text: e.kind === "handover" ? tr("Handed over") : e.item.description }),
+      mk("small", { text: [formatDateLabel(e.date), where, e.kind === "handover" ? methodLabel(e.method) : tr("expense")].filter(Boolean).join(" · ") })),
+    mk("b", { className: "tnum", text: e.kind === "handover" ? formatMoney(e.amount, e.c) : `−${formatMoney(e.amount, e.c)}` }),
+    mk("span", { className: "owner-history-actions" },
+      e.kind === "handover" ? miniButton(tr("Receipt"), () => openHandOverReceipt(e.ref)) : null,
+      miniButton(tr("Edit"), () => (e.kind === "handover" ? openHandOverEditDialog(e.ref) : openDeductionEditDialog(e.lease.id, e.item.id)))));
+}
+
+function pickOwnerLease(g, then) {
+  const leases = g.leases.filter((l) => l.status !== "ended");
+  const choices = leases.length ? leases : g.leases;
+  if (choices.length === 1) { then(choices[0].id); return; }
+  openToolDialog(tr("Which flat?"),
+    mk("div", { className: "owner-flats" }, choices.map((l) => mk("button", { type: "button", className: "owner-flat-row", onclick: () => { closeToolDialog(); then(l.id); } },
+      mk("span", {}, mk("strong", { text: leaseTitle(l) })), mk("span", { className: "owner-flat-arrow", "aria-hidden": "true", text: "›" })))),
+    mk("div", { className: "button-row" }, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openOwnerLeaseAccount(id) {
+  const lease = rentalLeases.find((l) => l.id === id);
+  if (!lease) return;
+  const c = lease.currency || "USD";
+  const entries = ownerHistoryEntries([lease]);
+  openToolDialog(leaseTitle(lease),
+    mk("p", { className: "tech-where", text: [tr("Owner: {name}", { name: leaseFlat(lease)?.name || "" }), tr("{amount} · {period}", { amount: formatMoney(leaseCurrentRent(lease), c), period: periodLabel(lease) })].join(" · ") }),
+    ownerAccountRows(ownerGroupAccount([lease])[c] || { collected: 0, fee: 0, deductions: 0, paidOut: 0, toHandOver: 0, deposit: 0 }, c),
+    entries.length ? reportsSection(tr("Hand-overs and expenses"), mk("div", {}, entries.map((e) => ownerHistoryRow(e)))) : null,
+    mk("div", { className: "button-row" },
+      lease.status !== "ended" ? secondaryButton(tr("Expense"), () => openDeductionDialog(lease.id)) : null,
+      secondaryButton(tr("Lease"), () => openLeaseDetails(lease.id)),
+      secondaryButton(tr("Close"), closeToolDialog)));
+}
+
+function openDeductionEditDialog(leaseId, itemId) {
+  const lease = rentalLeases.find((l) => l.id === leaseId);
+  const item = lease?.deductions?.find((d) => d.id === itemId);
+  if (!item) return;
+  const c = lease.currency || "USD";
+  const description = textInput(item.description || "", { maxlength: "120" });
+  const amount = numberInput(item.amount);
+  const date = mk("input", { type: "date", value: item.date || localDateInput() });
+  const save = primaryButton(tr("Save"), async () => {
+    const value = roundMoney(Number(amount.value), c);
+    if (!description.value.trim() || !(value > 0)) { showToast("Say what it was and how much"); return; }
+    save.disabled = true;
+    const saved = await saveLease({ ...lease, deductions: lease.deductions.map((d) => (d.id === itemId ? { ...d, description: description.value.trim(), amount: value, date: date.value || d.date, editedAt: new Date().toISOString() } : d)) });
+    save.disabled = false;
+    if (saved) { closeToolDialog(); showToast("Saved"); }
+  });
+  const remove = secondaryButton(tr("Delete"), async () => {
+    if (!window.confirm(tr("Delete this expense of {amount}?", { amount: formatMoney(item.amount, c) }))) return;
+    const saved = await saveLease({ ...lease, deductions: lease.deductions.filter((d) => d.id !== itemId) });
+    if (saved) { closeToolDialog(); showToast("Deleted"); }
+  });
+  openToolDialog(tr("Expense paid for the owner"),
+    field(tr("What"), description),
+    mk("div", { className: "two-col" }, field(tr("Amount ({currency})", { currency: c }), amount), field(tr("Date"), date)),
+    mk("div", { className: "button-row" }, save, remove, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function handOverParts(ref, leases = rentalLeases || []) {
+  const parts = [];
+  leases.forEach((l) => livePayouts(l).forEach((p) => { if ((p.receipt || p.id) === ref) parts.push({ lease: l, item: p }); }));
+  return parts;
+}
+
+function openHandOverEditDialog(ref) {
+  const parts = handOverParts(ref);
+  if (!parts.length) return;
+  const c = parts[0].lease.currency || "USD";
+  const first = parts[0].item;
+  const amounts = parts.map((p) => numberInput(p.item.amount));
+  const date = mk("input", { type: "date", value: first.date || localDateInput() });
+  const method = selectInput(PAYMENT_METHODS.map(([v, l]) => [v, tr(l)]), first.method || "cash");
+  const applyTo = async (change) => {
+    for (const part of parts) {
+      const lease = rentalLeases.find((l) => l.id === part.lease.id);
+      const saved = await saveLease({ ...lease, payouts: (lease.payouts || []).map((p) => (p.id === part.item.id ? change(p, parts.indexOf(part)) : p)) });
+      if (!saved) return false;
+    }
+    return true;
+  };
+  const save = primaryButton(tr("Save"), async () => {
+    const values = amounts.map((a) => roundMoney(Number(a.value), c));
+    if (values.some((v) => !(v > 0))) { showToast("Enter the amount"); return; }
+    save.disabled = true;
+    const ok = await applyTo((p, i) => ({ ...p, amount: values[i], date: date.value || p.date, method: method.value, editedAt: new Date().toISOString() }));
+    save.disabled = false;
+    if (ok) { closeToolDialog(); showToast("Hand-over corrected"); }
+  });
+  const total = parts.reduce((t, p) => t + Number(p.item.amount || 0), 0);
+  const remove = secondaryButton(tr("Delete"), async () => {
+    if (!window.confirm(tr("Delete this hand-over of {amount}? Its receipt will show as cancelled.", { amount: formatMoney(total, c) }))) return;
+    const at = new Date().toISOString();
+    if (await applyTo((p) => ({ ...p, voidedAt: at }))) { closeToolDialog(); showToast("Hand-over deleted"); }
+  });
+  openToolDialog(tr("Hand-over — {date}", { date: formatDateLabel(first.date) }),
+    note(tr("Correct a mistake in this hand-over, or delete it if it didn't happen.")),
+    parts.map((p, i) => field(parts.length > 1 ? tr("{flat} ({currency})", { flat: leaseTitle(p.lease), currency: c }) : tr("Amount ({currency})", { currency: c }), amounts[i])),
+    mk("div", { className: "two-col" }, field(tr("Date"), date), field(tr("How"), method)),
+    mk("div", { className: "button-row" }, save, remove, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function openOwnerPhoneDialog(key) {
+  const g = rentalOwnerGroups().find((x) => x.key === key);
+  if (!g) return;
+  const phone = textInput("", { inputmode: "tel", maxlength: "40", placeholder: "03 123 456" });
+  const save = primaryButton(tr("Save"), () => {
+    const value = phone.value.trim();
+    if (!value) { showToast("Enter the phone number"); return; }
+    const now = new Date().toISOString();
+    g.flats.forEach((f) => { if (!f.phone) { f.phone = value; f.detailsAt = now; } });
+    if (!saveState()) return;
+    closeToolDialog();
+    renderAll();
+    renderRentalsView();
+    showToast("Phone number saved");
+  });
+  openToolDialog(tr("{name}'s phone", { name: g.name }),
+    note(tr("Saved on their flats (Flats tab), for WhatsApp statements and receipts.")),
+    field(tr("Phone (WhatsApp)"), phone),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+// ── One hand-over for all an owner's flats, with a receipt ──
+function openOwnerHandOverDialog(key) {
+  const g = rentalOwnerGroups().find((x) => x.key === key);
+  if (!g) return;
+  const c = Object.keys(g.account).sort((a, b) => g.account[b].toHandOver - g.account[a].toHandOver)[0] || "USD";
+  const leases = g.leases.filter((l) => (l.currency || "USD") === c);
+  const due = g.account[c]?.toHandOver || 0;
+  const amount = numberInput(due > 0 ? due : "");
+  const date = mk("input", { type: "date", value: localDateInput() });
+  const method = selectInput(PAYMENT_METHODS.map(([v, l]) => [v, tr(l)]), "cash");
+  const save = primaryButton(tr("Save"), async () => {
+    const value = roundMoney(Number(amount.value), c);
+    if (!(value > 0)) { showToast("Enter the amount"); return; }
+    const ref = newId("HO").toUpperCase();
+    const code = newVerifyCode();
+    const parts = splitHandOver(leases, value);
+    save.disabled = true;
+    let done = 0;
+    for (const part of parts) {
+      const lease = rentalLeases.find((l) => l.id === part.leaseId);
+      const saved = await saveLease({ ...lease, payouts: [...(lease.payouts || []), { id: newId("out"), receipt: ref, verifyCode: code, date: date.value || localDateInput(), amount: part.amount, method: method.value }] });
+      if (!saved) break;
+      done += 1;
+    }
+    save.disabled = false;
+    if (!done) return;
+    closeToolDialog();
+    if (done < parts.length) { showToast("Only part of the hand-over was saved: check the list and try again.", 7000); return; }
+    showToast("Hand-over recorded");
+    openHandOverReceipt(ref);
+  });
+  openToolDialog(tr("Hand over to {name}", { name: g.name }),
+    note(due > 0 ? tr("Due to {name} now: {amount}", { name: g.name, amount: formatMoney(due, c) }) : tr("Nothing is due to {name} now.", { name: g.name })),
+    leases.length > 1 ? note(tr("One hand-over for the {n} flats: the app shares it between them.", { n: leases.length })) : null,
+    mk("div", { className: "two-col" }, field(tr("Amount ({currency})", { currency: c }), amount), field(tr("Date"), date)),
+    field(tr("How"), method),
+    mk("div", { className: "button-row" }, save, secondaryButton(tr("Cancel"), closeToolDialog)));
+}
+
+function handOverReceiptData(ref, leases = rentalLeases || []) {
+  const parts = handOverParts(ref, leases);
+  if (!parts.length) return null;
+  const c = parts[0].lease.currency || "USD";
+  const first = parts[0].item;
+  const flat = leaseFlat(parts[0].lease);
+  return {
+    ref, code: first.verifyCode || "", date: first.date, method: first.method, currency: c,
+    owner: flat?.name || "", phone: flat?.phone || "",
+    total: roundMoney(parts.reduce((t, p) => t + Number(p.item.amount || 0), 0), c),
+    lines: parts.map((p) => ({ unit: leaseFlat(p.lease)?.unit || "", tenant: p.lease.tenant?.name || "", amount: Number(p.item.amount || 0) })),
+  };
+}
+
+function openHandOverReceipt(ref, leases = rentalLeases || []) {
+  const r = handOverReceiptData(ref, leases);
+  if (!r) return;
+  openToolDialog(tr("Hand-over receipt"),
+    note(tr("{amount} handed over to {name} on {date}. Send them the receipt: they can check it with the QR code.", { amount: formatMoney(r.total, r.currency), name: r.owner, date: formatDateLabel(r.date) })),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Picture (for WhatsApp)"), () => { closeToolDialog(); void shareCanvasPicture(drawHandOverReceiptCanvas(r), `Hand-over_${safeFilePart(r.ref, "receipt")}.png`, tr("Hand-over receipt")); }),
+      secondaryButton("PDF", () => { closeToolDialog(); void sharePdfFile(buildHandOverReceiptPdf(r), `Hand-over_${safeFilePart(r.ref, "receipt")}.pdf`, tr("Hand-over receipt")); }),
+      secondaryButton(tr("Close"), closeToolDialog)));
+}
+
+async function shareCanvasPicture(canvas, fileName, title) {
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  try {
+    if (typeof navigator.share === "function" && typeof File === "function") {
+      const file = new File([blob], fileName, { type: "image/png" });
+      if (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title, text: title }); return; }
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+  downloadBlob(blob, "image/png", fileName);
+}
+
+// Canvas helpers shared by the owner's pictures (same look as the rent statement).
+function ownerCanvas(W, H) {
+  const rtl = currentLang === "ar";
+  const C = { green: "#163832", soft: "#cfe3db", white: "#ffffff", ink: "#14211f", muted: "#61706b", tint: "#eef4ef", line: "#e4e9e4", red: "#a23b3b", accent: "#1f6b5a", amber: "#9a6a12" };
+  const FONT = `Inter, "Segoe UI", Roboto, Tahoma, "Noto Sans Arabic", Arial, sans-serif`;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const X = (x) => (rtl ? W - x : x);
+  const box = (x, y, w, h, color, radius = 0) => { ctx.fillStyle = color; ctx.beginPath(); const lx = rtl ? W - x - w : x; if (radius && typeof ctx.roundRect === "function") ctx.roundRect(lx, y, w, h, radius); else ctx.rect(lx, y, w, h); ctx.fill(); };
+  const ltrMoney = (v) => (rtl ? String(v ?? "").replace(/\$[\d,]+(?:\.\d+)?|[\d,]+ LBP/g, (m) => `⁦${m}⁩`) : String(v ?? ""));
+  const text = (value, x, y, { size = 30, weight = 400, color = C.ink, align = "start" } = {}) => { ctx.font = `${weight} ${size}px ${FONT}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(ltrMoney(value), X(x), y); };
+  box(0, 0, W, H, C.white);
+  return { canvas, ctx, C, box, text, rtl, X };
+}
+
+function drawHandOverReceiptCanvas(r) {
+  const W = 1080;
+  const PAD = 64;
+  const link = receiptCheckLink({ ref: r.ref, code: r.code, amount: r.total, kind: "handover" });
+  const H = 640 + r.lines.length * 78 + (link ? 380 : 120);
+  const { canvas, ctx, C, box, text, rtl } = ownerCanvas(W, H);
+  box(0, 0, W, 250, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Hand-over receipt"), PAD, 160, { size: 60, weight: 800, color: C.white });
+  text(`${tr("Receipt: {no}", { no: r.ref })} · ${formatDateLabel(r.date)}`, PAD, 212, { size: 28, color: C.soft });
+  box(PAD, 290, W - PAD * 2, 230, C.tint, 26);
+  text(tr("Handed over to {name}", { name: r.owner }), PAD + 36, 350, { size: 30, color: C.muted });
+  text(formatMoney(r.total, r.currency), PAD + 36, 432, { size: 72, weight: 800, color: C.accent });
+  text([methodLabel(r.method), tr("rent collected for you, after the fee and expenses")].filter(Boolean).join(" · "), PAD + 36, 486, { size: 24, color: C.muted });
+  let y = 590;
+  r.lines.forEach((line) => {
+    text(tr("Flat {unit}", { unit: line.unit }), PAD, y, { size: 30, weight: 700 });
+    text(formatMoney(line.amount, r.currency), W - PAD, y, { size: 30, weight: 800, align: "end" });
+    if (line.tenant) text(tr("Tenant: {name}", { name: line.tenant }), PAD, y + 32, { size: 22, color: C.muted });
+    y += 78;
+  });
+  box(PAD, y - 20, W - PAD * 2, 2, C.line);
+  if (link) {
+    const qr = qrCanvas(link, 260);
+    ctx.drawImage(qr, rtl ? PAD : W - PAD - 260, y + 20, 260, 260);
+    text(tr("Scan to check this receipt"), PAD, y + 110, { size: 28, weight: 700 });
+    text(tr("The check shows the building, the flats and the amount."), PAD, y + 150, { size: 22, color: C.muted });
+  }
+  text(tr("Generated by Building Account Tracker"), PAD, H - 52, { size: 24, color: C.muted });
+  return canvas;
+}
+
+function buildHandOverReceiptPdf(r) {
+  const c = r.currency;
+  const check = receiptCheckLink({ ref: r.ref, code: r.code, amount: r.total, kind: "handover" });
+  const commands = ["0.2 w"];
+  const left = 50;
+  const right = 545;
+  let y = 800;
+  const infoX = check ? 300 : 380;
+  commands.push(pdfTextCommand(state.building?.name || "", left, y, 11));
+  commands.push(pdfTextCommand(tr("Hand-over receipt"), left, y - 28, 20, true));
+  commands.push(pdfTextCommand(tr("Handed over to {name}", { name: r.owner }), left, y - 48, 11));
+  commands.push(pdfTextCommand(tr("Receipt: {no}", { no: r.ref }), infoX, y, 10));
+  commands.push(pdfTextCommand(tr("Date: {date}", { date: r.date || localDateInput() }), infoX, y - 16, 10));
+  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, infoX, y - 32, 9));
+  if (check) {
+    commands.push(pdfQrCommand(check, 467, 740, 78));
+    commands.push(pdfTextCommand(tr("Scan the QR code to check this receipt."), infoX, y - 48, 8));
+  }
+  commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+  y -= 120;
+  [[tr("Handed over to"), r.owner], [tr("Amount"), formatMoney(r.total, c)], [tr("How"), methodLabel(r.method) || "-"], [tr("Flats"), r.lines.map((l) => l.unit).join(", ")]].forEach(([label, value], index) => {
+    const x = left + (index % 2) * 256;
+    const boxY = y - Math.floor(index / 2) * 52;
+    commands.push(pdfRectCommand(x, boxY, 238, 44));
+    commands.push(pdfTextCommand(label, x + 8, boxY + 26, 8));
+    commands.push(pdfTextCommand(pdfClip(value, 42), x + 8, boxY + 10, 12, true));
+  });
+  y -= 52 + 24;
+  const cols = [[tr("Flat"), 120], [tr("Tenant"), 245], [tr("Amount"), 130]];
+  let x = left;
+  cols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; });
+  y -= 22;
+  [...r.lines.map((l) => [l.unit, l.tenant, formatMoney(l.amount, c)]), [tr("Total"), "", formatMoney(r.total, c)]].slice(0, 24).forEach((cells, row, all) => {
+    x = left;
+    cells.forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, Math.floor(cols[i][1] / 5)), x + 5, y - 4, 8, row === all.length - 1)); x += cols[i][1]; });
+    y -= 22;
+  });
+  y -= 40;
+  commands.push(pdfTextCommand(tr("Rent collected for you by the building manager, after the fee and expenses."), left, y, 9));
+  commands.push(pdfLineCommand(left, y - 50, left + 220, y - 50));
+  commands.push(pdfTextCommand(tr("Received by (signature)"), left, y - 64, 9));
+  return buildPdfDocument(`${commands.join("\n")}\n`);
+}
+
+// ── Statements for a period ──
+function ownerStatementData(g, from, to, today = localDateInput()) {
+  const c = (Object.entries(g.account).sort((a, b) => b[1].collected - a[1].collected)[0] || ["USD"])[0];
+  const leases = g.leases.filter((l) => (l.currency || "USD") === c);
+  const end = to < today ? to : today;
+  const months = [];
+  for (let m = from.slice(0, 7); m <= end.slice(0, 7) && months.length < 240; m = addMonthsToDate(`${m}-01`, 1).slice(0, 7)) months.push(m);
+  const within = (list, a, b) => (list || []).filter((x) => String(x.date) >= a && String(x.date) <= b).reduce((t, x) => t + Number(x.amount || 0), 0);
+  const rows = months.map((key) => {
+    const a = `${key}-01` < from ? from : `${key}-01`;
+    const b = `${key}-31` > end ? end : `${key}-31`;
+    const add = (fn) => roundMoney(leases.reduce((t, l) => t + fn(l), 0), c);
+    return { month: key, collected: add((l) => within(l.payments, a, b)), fee: add((l) => leaseFeesBetween(l, a, b, today)), expenses: add((l) => within(l.deductions, a, b)), handedOver: add((l) => within(livePayouts(l), a, b)) };
+  }).filter((r) => r.collected || r.fee || r.expenses || r.handedOver);
+  const totals = { collected: 0, fee: 0, expenses: 0, handedOver: 0 };
+  rows.forEach((r) => Object.keys(totals).forEach((k) => { totals[k] = roundMoney(totals[k] + r[k], c); }));
+  const entries = ownerHistoryEntries(leases).filter((e) => String(e.date) >= from && String(e.date) <= end)
+    .map((e) => ({ date: e.date, kind: e.kind, text: e.kind === "handover" ? tr("Handed over") : e.item.description, where: e.kind === "handover" ? e.parts.map((p) => leaseFlat(p.lease)?.unit || "").join(", ") : leaseFlat(e.lease)?.unit || "", amount: e.amount, ref: e.ref || "" }));
+  const now = g.account[c] || { toHandOver: 0, deposit: 0 };
+  return { owner: g.name, phone: g.phone, currency: c, from, to: end, rows, totals, entries, dueNow: now.toHandOver, deposit: now.deposit, flats: leases.map((l) => ({ unit: leaseFlat(l)?.unit || "", tenant: l.tenant?.name || "", ended: l.status === "ended" })) };
+}
+
+function openOwnerStatementDialog(key) {
+  const g = rentalOwnerGroups().find((x) => x.key === key);
+  if (!g) return;
+  const today = localDateInput();
+  const year = Number(today.slice(0, 4));
+  const first = g.leases.map((l) => l.start).filter(Boolean).sort()[0] || `${year}-01-01`;
+  const period = selectInput([["year", tr("This year")], ["last", tr("Last year")], ["all", tr("Since the first lease")], ["custom", tr("Choose dates")]], "year");
+  const from = mk("input", { type: "date", value: `${year}-01-01` });
+  const to = mk("input", { type: "date", value: today });
+  const custom = mk("div", { className: "two-col hidden" }, field(tr("From"), from), field(tr("To"), to));
+  period.addEventListener("change", () => custom.classList.toggle("hidden", period.value !== "custom"));
+  const range = () => (period.value === "last" ? [`${year - 1}-01-01`, `${year - 1}-12-31`] : period.value === "all" ? [first, today] : period.value === "custom" ? [from.value || first, to.value || today] : [`${year}-01-01`, today]);
+  const data = () => { const [a, b] = range(); return ownerStatementData(g, a <= b ? a : b, a <= b ? b : a); };
+  const file = (d, ext) => `Owner-statement_${safeFilePart(d.owner, "owner")}_${d.from}_${d.to}.${ext}`;
+  openToolDialog(tr("Statement — {name}", { name: g.name }),
+    note(tr("Rent collected, your fee, expenses and hand-overs for the period, and what is due to the owner now.")),
+    field(tr("Period"), period),
+    custom,
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Picture (for WhatsApp)"), () => { const d = data(); closeToolDialog(); void shareCanvasPicture(drawOwnerStatementCanvas(d), file(d, "png"), tr("Owner statement")); }),
+      secondaryButton("PDF", () => { const d = data(); closeToolDialog(); void sharePdfFile(buildOwnerPeriodStatementPdf(d), file(d, "pdf"), tr("Owner statement")); }),
+      g.phone ? secondaryButton(tr("WhatsApp text"), () => { const d = data(); closeToolDialog(); window.open(whatsappLink(g.phone, ownerPeriodStatementText(d, tenantLanguage(g.flats[0] || {}))), "_blank", "noopener"); }) : null));
+}
+
+function ownerPeriodStatementText(d, lang = currentLang) {
+  const c = d.currency;
+  const lines = [
+    trIn(lang, "Hello {name}, rent statement from {from} to {to}:", { name: d.owner, from: formatDateLabel(d.from), to: formatDateLabel(d.to) }),
+    ...d.flats.map((f) => `• ${trIn(lang, "Flat {unit}", { unit: f.unit })}${f.tenant ? ` (${f.tenant})` : ""}`),
+    trIn(lang, "Rent collected: {amount}", { amount: formatMoney(d.totals.collected, c) }),
+    trIn(lang, "Management fee: {amount}", { amount: formatMoney(d.totals.fee, c) }),
+  ];
+  d.entries.filter((e) => e.kind === "expense").forEach((e) => lines.push(`• ${formatDateLabel(e.date)} — ${e.text}: ${formatMoney(e.amount, c)}`));
+  lines.push(trIn(lang, "Handed over to you: {amount}", { amount: formatMoney(d.totals.handedOver, c) }));
+  lines.push(d.dueNow < -0.005 ? trIn(lang, "You owe the building manager: {amount}", { amount: formatMoney(-d.dueNow, c) }) : trIn(lang, "Due to you now: {amount}", { amount: formatMoney(d.dueNow, c) }));
+  if (d.deposit) lines.push(trIn(lang, "Tenant's deposit held: {amount} (to give back to the tenant)", { amount: formatMoney(d.deposit, c) }));
+  return lines.join("\n");
+}
+
+function drawOwnerStatementCanvas(d) {
+  const c = d.currency;
+  const rows = d.rows.slice(-12).reverse();
+  const entries = d.entries.slice(0, 8);
+  const W = 1080;
+  const PAD = 64;
+  const H = 830 + 90 + rows.length * 88 + 110 + Math.max(1, entries.length) * 76 + (d.deposit ? 60 : 0) + 120;
+  const { canvas, C, box, text, ctx, rtl } = ownerCanvas(W, H);
+  box(0, 0, W, 250, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Owner statement"), PAD, 160, { size: 64, weight: 800, color: C.white });
+  text(`${d.owner} · ${formatDateLabel(d.from)} – ${formatDateLabel(d.to)}`, PAD, 212, { size: 28, color: C.soft });
+  const owes = d.dueNow < -0.005;
+  box(PAD, 290, W - PAD * 2, 220, C.tint, 26);
+  text(owes ? tr("You owe the building manager") : tr("Due to you now"), PAD + 36, 350, { size: 30, color: C.muted });
+  text(formatMoney(Math.abs(d.dueNow), c), PAD + 36, 432, { size: 72, weight: 800, color: owes ? C.red : C.accent });
+  text(d.flats.map((f) => tr("Flat {unit}", { unit: f.unit }) + (f.tenant ? ` (${f.tenant})` : "")).join(" · "), PAD + 36, 480, { size: 24, color: C.muted });
+  const cell = (i, label, value, color = C.ink) => {
+    const w = (W - PAD * 2 - 40) / 3;
+    const x = PAD + i * (w + 20);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.strokeRect(rtl ? W - x - w : x, 550, w, 130);
+    text(label, x + 22, 600, { size: 24, color: C.muted });
+    text(value, x + 22, 655, { size: 34, weight: 800, color });
+  };
+  cell(0, tr("Rent collected"), formatMoney(d.totals.collected, c));
+  cell(1, tr("Fee and expenses"), formatMoney(roundMoney(d.totals.fee + d.totals.expenses, c), c));
+  cell(2, tr("Handed over"), formatMoney(d.totals.handedOver, c), C.accent);
+  text(tr("For the period above; \"due to you now\" counts everything since the start."), PAD, 730, { size: 22, color: C.muted });
+  let y = 830;
+  text(tr("Month by month"), PAD, y, { size: 32, weight: 800 });
+  y += 30;
+  box(PAD, y, W - PAD * 2, 2, C.line);
+  y += 58;
+  if (!rows.length) { text(tr("Nothing in this period."), PAD, y, { size: 28, color: C.muted }); y += 88; }
+  rows.forEach((r) => {
+    text(formatMonth(`${r.month}-01`), PAD, y, { size: 30, weight: 700 });
+    text(formatMoney(r.collected, c), W - PAD, y, { size: 30, weight: 800, align: "end" });
+    text([tr("fee {amount}", { amount: formatMoney(r.fee, c) }), r.expenses ? tr("expenses {amount}", { amount: formatMoney(r.expenses, c) }) : "", r.handedOver ? tr("handed over {amount}", { amount: formatMoney(r.handedOver, c) }) : ""].filter(Boolean).join(" · "), PAD, y + 34, { size: 22, color: C.muted });
+    y += 88;
+  });
+  y += 20;
+  text(tr("Hand-overs and expenses"), PAD, y, { size: 32, weight: 800 });
+  y += 30;
+  box(PAD, y, W - PAD * 2, 2, C.line);
+  y += 56;
+  if (!entries.length) { text(tr("None in this period."), PAD, y, { size: 28, color: C.muted }); y += 76; }
+  entries.forEach((e) => {
+    text(e.text, PAD, y, { size: 28, weight: 700 });
+    text(e.kind === "expense" ? `−${formatMoney(e.amount, c)}` : formatMoney(e.amount, c), W - PAD, y, { size: 28, weight: 800, color: e.kind === "expense" ? C.red : C.accent, align: "end" });
+    text([formatDateLabel(e.date), e.where ? tr("Flat {unit}", { unit: e.where }) : "", e.ref ? tr("Receipt: {no}", { no: e.ref }) : ""].filter(Boolean).join(" · "), PAD, y + 32, { size: 22, color: C.muted });
+    y += 76;
+  });
+  if (d.deposit) text(tr("Tenant's deposit held: {amount} (to give back to the tenant)", { amount: formatMoney(d.deposit, c) }), PAD, y + 10, { size: 24, color: C.muted });
+  text(tr("Generated by Building Account Tracker"), PAD, H - 52, { size: 24, color: C.muted });
+  return canvas;
+}
+
+function buildOwnerPeriodStatementPdf(d) {
+  const c = d.currency;
+  const left = 50;
+  const right = 545;
+  const pages = [];
+  let commands;
+  let y;
+  const start = (first) => {
+    if (commands) pages.push(`${commands.join("\n")}\n`);
+    commands = ["0.2 w"];
+    y = 800;
+    if (first) {
+      commands.push(pdfTextCommand(state.building?.name || "", left, y, 11));
+      commands.push(pdfTextCommand(tr("Owner statement"), left, y - 28, 20, true));
+      commands.push(pdfTextCommand(d.owner, left, y - 48, 11));
+      commands.push(pdfTextCommand(tr("Date: {date}", { date: localDateInput() }), 360, y, 10));
+      commands.push(pdfTextCommand(tr("Period: {from} - {to}", { from: d.from, to: d.to }), 360, y - 16, 10));
+      commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 360, y - 32, 9));
+      commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+      y -= 92;
+    } else {
+      commands.push(pdfTextCommand(tr("{name} - statement (continued)", { name: d.owner }), left, y, 10, true));
+      commands.push(pdfLineCommand(left, y - 10, right, y - 10));
+      y -= 34;
+    }
+  };
+  start(true);
+  const boxes = [
+    [tr("Rent collected"), formatMoney(d.totals.collected, c)],
+    [tr("Management fee"), formatMoney(d.totals.fee, c)],
+    [tr("Expenses paid for you"), formatMoney(d.totals.expenses, c)],
+    [tr("Handed over to you"), formatMoney(d.totals.handedOver, c)],
+    [d.dueNow < -0.005 ? tr("You owe the building manager") : tr("Due to you now"), formatMoney(Math.abs(d.dueNow), c)],
+    ...(d.deposit ? [[tr("Tenant's deposit held"), formatMoney(d.deposit, c)]] : []),
+  ];
+  boxes.forEach(([label, value], index) => {
+    const x = left + (index % 2) * 256;
+    const by = y - Math.floor(index / 2) * 52 - 44;
+    commands.push(pdfRectCommand(x, by, 238, 44));
+    commands.push(pdfTextCommand(label, x + 8, by + 26, 8));
+    commands.push(pdfTextCommand(pdfClip(value, 40), x + 8, by + 10, 12, true));
+  });
+  y -= Math.ceil(boxes.length / 2) * 52 + 16;
+  commands.push(pdfTextCommand(pdfClip(d.flats.map((f) => `${tr("Flat {unit}", { unit: f.unit })}${f.tenant ? ` (${f.tenant})` : ""}`).join(", "), 100), left, y, 9));
+  y -= 26;
+  const cols = [[tr("Month"), 105], [tr("Collected"), 100], [tr("Fee"), 90], [tr("Expenses"), 100], [tr("Handed over"), 100]];
+  const header = () => { let x = left; cols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; }); y -= 22; };
+  commands.push(pdfTextCommand(tr("Month by month"), left, y, 13, true));
+  y -= 20;
+  header();
+  [...d.rows, null].forEach((r) => {
+    if (y < 80) { start(false); header(); }
+    const cells = r ? [formatMonth(`${r.month}-01`), ...["collected", "fee", "expenses", "handedOver"].map((k) => formatMoney(r[k], c))] : [tr("Total"), ...["collected", "fee", "expenses", "handedOver"].map((k) => formatMoney(d.totals[k], c))];
+    let x = left;
+    cells.forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(v, x + 5, y - 4, 8, !r)); x += cols[i][1]; });
+    y -= 22;
+  });
+  if (y < 140) start(false); else y -= 18;
+  commands.push(pdfTextCommand(tr("Hand-overs and expenses"), left, y, 13, true));
+  y -= 20;
+  const ecols = [[tr("Date"), 95], [tr("What"), 200], [tr("Flat"), 70], [tr("Amount"), 130]];
+  const eheader = () => { let x = left; ecols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; }); y -= 22; };
+  eheader();
+  if (!d.entries.length) { commands.push(pdfTextCommand(tr("None in this period."), left + 5, y - 4, 8)); y -= 22; }
+  d.entries.slice().reverse().forEach((e) => {
+    if (y < 80) { start(false); eheader(); }
+    let x = left;
+    [formatDateLabel(e.date), e.ref ? `${e.text} (${e.ref})` : e.text, e.where, e.kind === "expense" ? `-${formatMoney(e.amount, c)}` : formatMoney(e.amount, c)]
+      .forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, ecols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, Math.floor(ecols[i][1] / 4.6)), x + 5, y - 4, 8)); x += ecols[i][1]; });
+    y -= 22;
+  });
+  commands.push(pdfTextCommand(tr("The rent is collected by the building manager and handed over to you after the fee and expenses."), left, Math.max(48, y - 18), 9));
+  pages.push(`${commands.join("\n")}\n`);
+  return buildMultiPagePdf(pages);
+}
+
+// ── Your fees, month by month ──
+function feesReportData(year, leases = rentalLeases || [], today = localDateInput()) {
+  const rows = [];
+  for (let m = 1; m <= 12; m += 1) {
+    const key = `${year}-${String(m).padStart(2, "0")}`;
+    if (key > today.slice(0, 7)) break;
+    const parts = leases.filter((l) => !l.ownFlat).map((l) => ({ lease: l, fee: leaseFeesBetween(l, `${key}-01`, `${key}-31`, today), c: l.currency || "USD" })).filter((x) => x.fee > 0.005);
+    const total = {};
+    parts.forEach((x) => addMoneyTo(total, x.c, x.fee));
+    rows.push({ month: key, total, parts });
+  }
+  const total = {};
+  rows.forEach((r) => Object.entries(r.total).forEach(([c, v]) => addMoneyTo(total, c, v)));
+  return { year: String(year), rows, total };
+}
+
+function openFeesReport(year = Number(localDateInput().slice(0, 4))) {
+  const d = feesReportData(year);
+  const partsText = (r) => r.parts.map((x) => `${leaseFlat(x.lease)?.unit || ""} ${formatMoney(x.fee, x.c)}`).join(" · ");
+  openToolDialog(tr("Your fees — {year}", { year }),
+    mk("div", { className: "fees-year" },
+      miniButton("‹", () => openFeesReport(year - 1)),
+      mk("strong", { text: String(year) }),
+      year < Number(localDateInput().slice(0, 4)) ? miniButton("›", () => openFeesReport(year + 1)) : mk("span")),
+    mk("div", { className: "tech-summary-cell fees-total" }, mk("span", { text: tr("Fees earned in {year}", { year }) }), mk("strong", { text: moneyListText(d.total) })),
+    d.rows.some((r) => r.parts.length)
+      ? mk("div", {}, d.rows.slice().reverse().filter((r) => r.parts.length).map((r) => breakdownRow(formatMonth(`${r.month}-01`), moneyListText(r.total), partsText(r))))
+      : note(tr("No fees this year yet.")),
+    mk("div", { className: "button-row" },
+      primaryButton(tr("Picture"), () => { void shareCanvasPicture(drawFeesReportCanvas(d), `Fees_${d.year}.png`, tr("Your fees — {year}", { year })); }),
+      secondaryButton("PDF", () => { void sharePdfFile(buildFeesReportPdf(d), `Fees_${d.year}.pdf`, tr("Your fees — {year}", { year: d.year })); }),
+      secondaryButton(tr("Close"), closeToolDialog)));
+}
+
+function drawFeesReportCanvas(d) {
+  const rows = d.rows.filter((r) => r.parts.length).reverse();
+  const W = 1080;
+  const PAD = 64;
+  const H = 560 + Math.max(1, rows.length) * 88 + 120;
+  const { canvas, C, box, text } = ownerCanvas(W, H);
+  box(0, 0, W, 250, C.green);
+  text(state.building?.name || "", PAD, 82, { size: 34, weight: 700, color: C.soft });
+  text(tr("Your fees — {year}", { year: d.year }), PAD, 160, { size: 60, weight: 800, color: C.white });
+  text(formatDateLabel(localDateInput()), PAD, 212, { size: 28, color: C.soft });
+  box(PAD, 290, W - PAD * 2, 170, C.tint, 26);
+  text(tr("Fees earned in {year}", { year: d.year }), PAD + 36, 350, { size: 30, color: C.muted });
+  text(moneyListText(d.total), PAD + 36, 425, { size: 64, weight: 800, color: C.accent });
+  let y = 540;
+  if (!rows.length) text(tr("No fees this year yet."), PAD, y, { size: 28, color: C.muted });
+  rows.forEach((r) => {
+    text(formatMonth(`${r.month}-01`), PAD, y, { size: 30, weight: 700 });
+    text(moneyListText(r.total), W - PAD, y, { size: 30, weight: 800, align: "end" });
+    text(r.parts.map((x) => `${tr("Flat {unit}", { unit: leaseFlat(x.lease)?.unit || "" })} ${formatMoney(x.fee, x.c)}`).join(" · "), PAD, y + 34, { size: 22, color: C.muted });
+    y += 88;
+  });
+  text(tr("Generated by Building Account Tracker"), PAD, H - 52, { size: 24, color: C.muted });
+  return canvas;
+}
+
+function buildFeesReportPdf(d) {
+  const left = 50;
+  const right = 545;
+  const commands = ["0.2 w"];
+  let y = 800;
+  commands.push(pdfTextCommand(state.building?.name || "", left, y, 11));
+  commands.push(pdfTextCommand(tr("Your fees — {year}", { year: d.year }), left, y - 28, 20, true));
+  commands.push(pdfTextCommand(tr("Date: {date}", { date: localDateInput() }), 380, y, 10));
+  commands.push(pdfTextCommand(`App: ${APP_VERSION}`, 380, y - 16, 9));
+  commands.push(pdfLineCommand(left, y - 64, right, y - 64));
+  y -= 100;
+  const cols = [[tr("Month"), 120], [tr("Fees"), 110], [tr("From"), 265]];
+  let x = left;
+  cols.forEach(([h, w]) => { commands.push(pdfRectCommand(x, y - 16, w, 22)); commands.push(pdfTextCommand(h, x + 5, y - 4, 8, true)); x += w; });
+  y -= 22;
+  [...d.rows.filter((r) => r.parts.length).map((r) => [formatMonth(`${r.month}-01`), moneyListText(r.total), r.parts.map((p) => `${leaseFlat(p.lease)?.unit || ""} ${formatMoney(p.fee, p.c)}`).join(", ")]), [tr("Total"), moneyListText(d.total), ""]]
+    .forEach((cells, row, all) => {
+      x = left;
+      cells.forEach((v, i) => { commands.push(pdfRectCommand(x, y - 16, cols[i][1], 22)); commands.push(pdfTextCommand(pdfClip(v, Math.floor(cols[i][1] / 4.6)), x + 5, y - 4, 8, row === all.length - 1)); x += cols[i][1]; });
+      y -= 22;
+    });
+  return buildPdfDocument(`${commands.join("\n")}\n`);
+}
+
+// The owner's phone: each hand-over with its receipt.
+function ownerPhoneHandOvers(lease) {
+  const handed = ownerHistoryEntries([lease]).filter((e) => e.kind === "handover");
+  if (!handed.length) return null;
+  return reportsSection(tr("Handed over to you"), mk("div", {}, handed.map((e) => mk("div", { className: "breakdown-row" },
+    mk("span", {}, mk("strong", { text: formatMoney(e.amount, e.c) }), mk("small", { text: [formatDateLabel(e.date), methodLabel(e.method)].filter(Boolean).join(" · ") })),
+    miniButton(tr("Receipt"), () => openHandOverReceipt(e.ref, state.myRentals || []))))));
+}
+
 // Guard against one bad cloud write cascading into data loss on every device.
 // The auto-sync path adopts the cloud copy whenever this device has nothing
 // unsynced — which is correct, EXCEPT when the cloud copy has lost everything.
@@ -24355,6 +25251,17 @@ export const __test = {
   depositsHeldUsd,
   pendingApprovals,
   v167bAttentionItems,
+  livePayouts,
+  leaseFeesBetween,
+  ownerGroupAccount,
+  rentalOwnerGroups,
+  ownersSummary,
+  splitHandOver,
+  ownerStatementData,
+  feesReportData,
+  handOverReceiptData,
+  ownerHistoryEntries,
+  ownerPeriodStatementText,
   leaseAdvanceMonths,
   signingDueText,
   rentStatementRows,

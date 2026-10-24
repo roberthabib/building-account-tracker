@@ -114,8 +114,8 @@
           cancelled: "This receipt was cancelled", cancelledSub: "The payment was removed from the records on {date}.",
           not_found: "Not found", not_foundSub: "This receipt isn't in the building's records. Ask the building manager.",
           error: "Couldn't check right now", errorSub: "Check your internet connection and try again.",
-          building: "Building", flat: "Flat", amount: "Amount", date: "Date", forWhat: "For", receipt: "Receipt",
-          rent: "Rent", project: "Project: {name}", note: "Checked {time}. Names and phone numbers are never shown here.",
+          building: "Building", flat: "Flat", flats: "Flats", amount: "Amount", date: "Date", forWhat: "For", receipt: "Receipt",
+          rent: "Rent", handover: "Rent handed over to the owner", project: "Project: {name}", note: "Checked {time}. Names and phone numbers are never shown here.",
         },
         ar: {
           title: "التحقق من الإيصال", checking: "جارٍ التحقق…",
@@ -124,8 +124,8 @@
           cancelled: "تم إلغاء هذا الإيصال", cancelledSub: "حُذفت الدفعة من السجلات في {date}.",
           not_found: "غير موجود", not_foundSub: "هذا الإيصال غير موجود في سجلات المبنى. اسأل مدير المبنى.",
           error: "تعذّر التحقق الآن", errorSub: "تحقّق من اتصال الإنترنت وحاول مجدداً.",
-          building: "المبنى", flat: "الشقة", amount: "المبلغ", date: "التاريخ", forWhat: "عن", receipt: "الإيصال",
-          rent: "الإيجار", project: "مشروع: {name}", note: "تم التحقق {time}. لا تظهر هنا الأسماء ولا أرقام الهواتف.",
+          building: "المبنى", flat: "الشقة", flats: "الشقق", amount: "المبلغ", date: "التاريخ", forWhat: "عن", receipt: "الإيصال",
+          rent: "الإيجار", handover: "إيجار سُلِّم للمالك", project: "مشروع: {name}", note: "تم التحقق {time}. لا تظهر هنا الأسماء ولا أرقام الهواتف.",
         },
       }[lang];
       const fill = (s, p = {}) => s.replace(/\{(\w+)\}/g, (_, k) => p[k] ?? "");
@@ -150,10 +150,10 @@
         $("sub").textContent = fill(T[`${status}Sub`], { amount: money(r.amount, r.currency), printed: money(q.get("a"), r.currency), date: day(r.at) });
         const rows = [];
         if (r.building) rows.push([T.building, r.building]);
-        if (r.unit) rows.push([T.flat, r.unit]);
+        if (r.unit) rows.push([r.kind === "handover" && r.unit.includes(",") ? T.flats : T.flat, r.unit]);
         if (r.amount != null && status !== "not_found") rows.push([T.amount, money(r.amount, r.currency), "amount"]);
         if (r.date) rows.push([T.date, day(r.date)]);
-        const what = r.kind === "rent" ? T.rent : r.project ? fill(T.project, { name: r.project }) : (r.months || []).map(month).join(" · ");
+        const what = r.kind === "rent" ? T.rent : r.kind === "handover" ? T.handover : r.project ? fill(T.project, { name: r.project }) : (r.months || []).map(month).join(" · ");
         if (what) rows.push([T.forWhat, what]);
         if (r.ref && r.kind !== "rent") rows.push([T.receipt, r.ref]);
         const dl = $("details");
@@ -176,7 +176,7 @@
         const res = await fetch(`${CLOUD_CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/verify_receipt`, {
           method: "POST",
           headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
-          body: JSON.stringify({ p_building: q.get("b") || "building", p_ref: q.get("r"), p_code: q.get("c"), p_amount: q.get("a") ? Number(q.get("a")) : null, p_kind: q.get("k") === "rent" ? "rent" : "building" }),
+          body: JSON.stringify({ p_building: q.get("b") || "building", p_ref: q.get("r"), p_code: q.get("c"), p_amount: q.get("a") ? Number(q.get("a")) : null, p_kind: ["rent", "handover"].includes(q.get("k")) ? q.get("k") : "building" }),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const r = await res.json();
