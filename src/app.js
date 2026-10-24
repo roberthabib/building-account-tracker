@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v202";
+const APP_VERSION = "v203";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -22091,6 +22091,7 @@ async function saveLease(lease) {
     rentalLeases = [...(rentalLeases || []).filter((l) => l.id !== lease.id), saved];
     renderRentalsView();
     renderAttention();
+    renderRentalsDashCard();
     return saved;
   } catch (error) {
     if (/changed-elsewhere/.test(error.message || "")) {
@@ -22468,6 +22469,7 @@ async function deleteLease(id) {
     rentalLeases = (rentalLeases || []).filter((l) => l.id !== id);
     closeToolDialog();
     renderRentalsView();
+    renderRentalsDashCard();
     showToast("Lease deleted");
   } catch (error) {
     showToast(rentalsMissingDb(error) || describeSyncProblem(error), 6000);
