@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v213";
+const APP_VERSION = "v214";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -17851,7 +17851,7 @@ async function conciergeSaveReadings(month, readings) {
 
 function conciergeHomePanel() {
   const mine = state.transactions.filter((t) => t.enteredBy === "concierge")
-    .sort((a, b) => String(transactionDateValue(b)).localeCompare(String(transactionDateValue(a)))).slice(0, 8);
+    .sort((a, b) => String(transactionDateValue(b)).localeCompare(String(transactionDateValue(a)))).slice(0, 30);
   const openIssues = (state.issues || []).filter((i) => i.status !== "fixed").length;
   const tile = (label, sub, onClick) => {
     const b = mk("button", { type: "button", className: "concierge-tile" }, mk("strong", { text: label }), mk("span", { text: sub }));

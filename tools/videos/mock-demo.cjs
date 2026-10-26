@@ -283,7 +283,7 @@ http.createServer((req, res) => {
         const c = JSON.parse(JSON.stringify(STATE));
         return send(200, { meta: c.meta, building: c.building, settings: c.settings, security: {}, setupComplete: true,
           tenants: c.tenants.map((t) => ({ id: t.id, name: t.name, unit: t.unit, active: t.active !== false, breakerAmps: t.breakerAmps, coefficient: 0, phone: "", pinHash: "" })),
-          transactions: c.transactions.filter((x) => x.category === "Expenses" || x.category === "Services Expenses").map(({ shares, ...x }) => x),
+          transactions: c.transactions.filter((x) => (x.category === "Expenses" || x.category === "Services Expenses") && x.enteredBy === "concierge").map(({ shares, ...x }) => x),
           serviceReadings: c.serviceReadings, issues: c.issues || [], maintenanceTasks: c.maintenanceTasks || [], equipment: c.equipment || [], generatorServices: c.generatorServices || [],
           suppliers: (c.suppliers || []).map((x) => ({ id: x.id, name: x.name, trade: x.trade, phone: x.phone })), expenseCategories: c.expenseCategories || [],
           announcements: (c.announcements || []).map(({ seenBy, ...n }) => n), monthLocks: c.monthLocks || [], deleted: c.deleted || {}, redaction: { role: "concierge" },
