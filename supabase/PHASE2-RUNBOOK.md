@@ -158,6 +158,8 @@ app's auth), then reload.
 | v194 re-let on the day a lease ended (`phase2u-v194.sql`): `lease_last` of an ended lease = the day before it ended | ✅ applied 2026-10-24 (run by Claude in the dashboard); 11/11 live checks (`phase2u-checks.sql`, rolled back) |
 | v199 hand-over receipts can be checked (`phase2v-v199.sql`): `verify_receipt` kind `handover` (payouts sharing a receipt number + code across an owner's flats; deleted = `voidedAt` → cancelled) | ✅ applied 2026-10-24 (run by Claude in the dashboard); 8/8 live checks (`phase2v-checks.sql`, rolled back) |
 | v201 the owner hears about a hand-over (`phase2w-v201.sql`): `notify_flat_owner` (manager only) → push target `owner` (the flat's owner, never its tenant) | ✅ applied 2026-10-24 (run by Claude in the dashboard); 5/5 live checks (`phase2w-checks.sql`, rolled back) |
+| 2026-10-26 restore after the 24 Oct incident (a concierge's cut-down copy was uploaded as the building): `building_state` rebuilt from the 24 Oct backup + the later month locks, concierge job ticks, Cleaning category, hidden reminder and audit entries; epoch 1, redaction stripped (run by Claude via SQL; the 26 Oct backup holds the damaged copy) | ✅ done |
+| v212 the database refuses a cut-down copy (`phase2x-v212.sql`): trigger `refuse_partial_building_copy` rejects any `building_state` write whose state carries `redaction` | ⏳ to apply |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.
