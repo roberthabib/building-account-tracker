@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v212";
+const APP_VERSION = "v213";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -1638,6 +1638,7 @@ const DYN_AR = {
   "This phone can't use a fingerprint or face lock here": "لا يمكن لهذا الهاتف استخدام قفل البصمة أو الوجه هنا",
   "Under warranty": "ضمن الكفالة",
   "Unlink this phone": "فك ربط هذا الهاتف",
+  "Linking it again needs a new invite code": "لإعادة ربطه يلزم رمز دعوة جديد",
   "Unlock": "فتح",
   "Vote closes: {title}": "ينتهي التصويت: {title}",
   "Vote open": "تصويت مفتوح",
@@ -3658,6 +3659,7 @@ const LUCIDE_ICONS = {
   wrench: [["path", { d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" }]],
   barChart: [["path", { d: "M3 3v18h18" }], ["path", { d: "M18 17V9" }], ["path", { d: "M13 17V5" }], ["path", { d: "M8 17v-3" }]],
   bell: [["path", { d: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" }], ["path", { d: "M10.3 21a1.94 1.94 0 0 0 3.4 0" }]],
+  logOut: [["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" }], ["path", { d: "m16 17 5-5-5-5" }], ["path", { d: "M21 12H9" }]],
 };
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -14218,7 +14220,7 @@ function installLockMenuItem() {
   if (!settings) return;
   if (!item) {
     item = mk("button", { type: "button", id: "lockMenuItem", className: "more-menu-item" },
-      mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("key", { size: 22 })),
+      mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("key", { size: 22, color: "var(--avatar-text)" })),
       mk("span", { className: "mm-text" }, mk("strong"), mk("span")));
     item.addEventListener("click", () => { setView("dashboardView"); logout(); });
     settings.after(item);
@@ -14228,8 +14230,27 @@ function installLockMenuItem() {
   item.classList.toggle("hidden", !show);
 }
 
+// v213: the concierge unlinks the phone from More, at the very end of the
+// menu, not from the bottom of the home page.
+function installUnlinkMenuItem() {
+  const settings = document.querySelector("#moreMenu .more-menu-item[data-view=\"settingsView\"]");
+  let item = document.querySelector("#unlinkMenuItem");
+  if (!settings) return;
+  if (!item) {
+    item = mk("button", { type: "button", id: "unlinkMenuItem", className: "more-menu-item" },
+      mk("span", { className: "mm-icon", "aria-hidden": "true" }, lucide("logOut", { size: 22, color: "var(--avatar-text)" })),
+      mk("span", { className: "mm-text" }, mk("strong"), mk("span")));
+    item.addEventListener("click", unlinkTenantPhone);
+    settings.after(item);
+  }
+  item.querySelector("strong").textContent = tr("Unlink this phone");
+  item.querySelector(".mm-text > span").textContent = tr("Linking it again needs a new invite code");
+  item.classList.toggle("hidden", sessionMode !== "concierge");
+}
+
 function renderV148() {
   installLockMenuItem();
+  installUnlinkMenuItem();
   renderRentalsDashCard();
   renderNotices();
   renderIssues();
@@ -17846,8 +17867,7 @@ function conciergeHomePanel() {
       tile(tr("Problems"), tr("{n} open", { n: openIssues }), () => setView("issuesView")),
       ...conciergeExtraTiles(tile)),
     mine.length ? mk("h4", { className: "tenant-page-heading", text: tr("Added by you") }) : null,
-    mine.length ? mk("div", {}, mine.map((t) => breakdownRow(t.description || tr(t.category), formatUsd(txUsd(t, t.debitUsd, t.debitLbp)), formatDateLabel(transactionDateValue(t))))) : null,
-    mk("div", { className: "button-row" }, mk("button", { type: "button", className: "text-link-btn", text: tr("Unlink this phone"), onclick: unlinkTenantPhone })));
+    mine.length ? mk("div", {}, mine.map((t) => breakdownRow(t.description || tr(t.category), formatUsd(txUsd(t, t.debitUsd, t.debitLbp)), formatDateLabel(transactionDateValue(t))))) : null);
 }
 
 function renderConciergeHome() {
