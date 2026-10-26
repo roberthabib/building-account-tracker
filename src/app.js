@@ -1,5 +1,5 @@
 const STORAGE_KEY = "building-account-tracker:v1";
-const APP_VERSION = "v211";
+const APP_VERSION = "v212";
 
 // Built-in cloud configuration (src/cloud-config.js). Deployed but not
 // committed, so the live app is preconfigured while the public repo stays free
@@ -345,6 +345,15 @@ const usdFormat = new Intl.NumberFormat("en-US", {
 
 const DEFAULT_LBP_PER_USD = 89500;
 const SYNC_META_KEY = "building-account-tracker:sync";
+// v212: set while this phone holds a resident's / concierge's cut-down copy
+// (get_my_state). Such a copy must never be uploaded as the building: entering
+// as manager first replaces it with the full copy.
+const PARTIAL_COPY_KEY = "building-account-tracker:partial-copy";
+let fullCopyLoaded = false;
+
+function holdsPartialCopy() {
+  try { return localStorage.getItem(PARTIAL_COPY_KEY) === "1"; } catch { return false; }
+}
 const DEFAULT_CATEGORIES = ["Opening Balance", "Payments", "Expenses"];
 const SERVER_INVOICE_UPLOAD_PATH = "/api/upload-invoice";
 const EXPENSE_INVOICE_PREFIX = "INV";
@@ -2299,6 +2308,7 @@ const DYN_AR = {
   "Get a notification when the building manager posts a notice, records your payment or updates a problem you reported.": "تلقَّ إشعاراً عندما ينشر المدير إعلاناً أو يسجّل دفعتك أو يحدّث مشكلة أبلغت عنها.",
   "Get a notification when a resident says they paid or reports a problem.": "تلقَّ إشعاراً عندما يبلّغ ساكن أنه دفع أو يبلّغ عن مشكلة.",
   "Turn off": "إيقاف",
+  "The full building was loaded first. Please make that change again.": "حُمّل المبنى كاملاً أولاً. يرجى إعادة هذا التعديل.",
   "Lock the app": "قفل التطبيق",
   "Back to the sign-in page; Enter brings you back": "العودة إلى صفحة الدخول؛ «دخول» يعيدك",
   "Residents and the concierge join with the invite code the building manager sends them. After that, this phone stays signed in.": "ينضم السكان والناطور برمز الدعوة الذي يرسله مدير المبنى. بعد ذلك يبقى هذا الهاتف مسجّلاً.",
@@ -5521,6 +5531,10 @@ function enterAsOwner() {
   els.loginPasswordInput.value = "";
   renderAll();
   checkSetupWizard();
+  if (holdsPartialCopy()) {
+    setFirstSyncLoading(true);
+    void syncFromSheet({ silent: true }).finally(() => setFirstSyncLoading(false));
+  }
   refreshKeepaliveStatus();
   refreshTenantLinks();
   checkInvoiceReading();
@@ -5980,6 +5994,9 @@ function checkNewMonthBanner() {
 }
 
 function checkSetupWizard() {
+  // v212: with the cloud, wait for the building to download first; a new
+  // phone must not ask for the building's details again.
+  if (hasCloudConfig() && !fullCopyLoaded) return;
   if (sessionMode === "owner" && !state.setupComplete) openSetupWizard();
 }
 
@@ -9701,6 +9718,14 @@ async function saveCloudState({ silent = false } = {}) {
     if (!silent) showToast(lastSyncProblem, 6000);
     return;
   }
+  if (holdsPartialCopy()) {
+    // A resident's / concierge's copy is never uploaded: load the full building.
+    await syncFromSheet({ silent: true });
+    showToast("The full building was loaded first. Please make that change again.", 7000);
+    return;
+  }
+  delete state.redaction;
+  delete state.directory;
   window.clearTimeout(cloudSaveTimer);
   cloudSaveInFlight = true;
   setSyncChip("saving");
@@ -16104,14 +16129,17 @@ function monthToAutoAdd(today = localDateInput()) {
   if (!isFixedMode()) return null;
   const current = `${String(today).slice(0, 7)}-01`;
   const list = (state.monthlyExpected || []).slice().sort((a, b) => String(a.month).localeCompare(String(b.month)));
-  if (!list.length || list.some((e) => e.month === current)) return null;
+  if (list.some((e) => e.month === current)) return null;
   const previous = list.filter((e) => e.month < current).at(-1);
-  if (!previous) return null;
-  return { month: current, expectedUsd: Number(previous.expectedUsd || state.settings.defaultDueUsd || 0) };
+  // v212: no month set up yet: the building's monthly amount.
+  const amount = Number(previous?.expectedUsd || state.settings.defaultDueUsd || 0);
+  if (!(amount > 0)) return null;
+  return { month: current, expectedUsd: amount };
 }
 
 function autoAddCurrentMonth() {
   if (autoMonthDone || sessionMode !== "owner" || isViewerSession()) return false;
+  if (hasCloudConfig() && (!fullCopyLoaded || holdsPartialCopy())) return false;
   autoMonthDone = true;
   const add = monthToAutoAdd();
   if (!add) return false;
@@ -25723,6 +25751,8 @@ async function syncFromSheet({ silent = false } = {}) {
       if (!remote) return;
       state = hydrateState(remote);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(PARTIAL_COPY_KEY, "1");
+      saveSyncMeta({ lastSyncedToken: "", lastPushedRev: Number(state.meta?.rev || 0) });
       if (sessionMode === "tenant" || sessionMode === "concierge") renderAll();
       setSyncChip("saved");
     } catch (error) {
@@ -25736,7 +25766,22 @@ async function syncFromSheet({ silent = false } = {}) {
     if (!remote) return;
     const sync = loadSyncMeta();
     const remoteToken = remote.meta?.token || "";
+    if (holdsPartialCopy()) {
+      // This phone held a resident's or concierge's copy: take the full
+      // building as it is; nothing from the cut-down copy is kept.
+      state = hydrateState(remote);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.removeItem(PARTIAL_COPY_KEY);
+      saveSyncMeta({ lastSyncedToken: remoteToken, lastPushedRev: Number(state.meta?.rev || 0) });
+      fullCopyLoaded = true;
+      populateTenantSelect();
+      renderAll();
+      setSyncChip("saved");
+      checkSetupWizard();
+      return;
+    }
     const dirty = localHasUnsyncedChanges();
+    fullCopyLoaded = true;
 
     if (remoteToken && remoteToken === sync.lastSyncedToken) {
       // Cloud unchanged since this device last synced. When clean, this is the
@@ -25773,6 +25818,8 @@ async function syncFromSheet({ silent = false } = {}) {
     setSyncChip("saved");
     refreshBalanceSnapshot();
     backfillReceiptChecks();
+    checkSetupWizard();
+    checkNewMonthBanner();
   } catch (error) {
     reportSyncProblem(error);
     if (!silent) renderCloudStatus(lastSyncProblem);
