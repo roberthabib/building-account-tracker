@@ -160,7 +160,7 @@ app's auth), then reload.
 | v201 the owner hears about a hand-over (`phase2w-v201.sql`): `notify_flat_owner` (manager only) → push target `owner` (the flat's owner, never its tenant) | ✅ applied 2026-10-24 (run by Claude in the dashboard); 5/5 live checks (`phase2w-checks.sql`, rolled back) |
 | 2026-10-26 restore after the 24 Oct incident (a concierge's cut-down copy was uploaded as the building): `building_state` rebuilt from the 24 Oct backup + the later month locks, concierge job ticks, Cleaning category, hidden reminder and audit entries; epoch 1, redaction stripped (run by Claude via SQL; the 26 Oct backup holds the damaged copy) | ✅ done |
 | v212 the database refuses a cut-down copy (`phase2x-v212.sql`): trigger `refuse_partial_building_copy` rejects any `building_state` write whose state carries `redaction` | ⏳ to apply |
-| v214 the concierge only receives his own expenses (`phase2y-v214.sql`): `get_my_state` keeps only `enteredBy = concierge` transactions for the concierge; checks `phase2y-checks.sql` | ⏳ to apply |
+| v214 the concierge only receives his own expenses (`phase2y-v214.sql`): `get_my_state` keeps only `enteredBy = concierge` transactions for the concierge; checks `phase2y-checks.sql` | ✅ applied 2026-10-26 by Claude (plugin execute_sql), live checks 5/5 (rolled back) |
 | Housekeeping | ✅ test identities + unused hotmail owner **banned (not deleted)** — undo: `update auth.users set banned_until = null where id = '…'` |
 
 Undo for step 7 is at the bottom of `phase2d-lockdown.sql`.
